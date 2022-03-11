@@ -15,6 +15,7 @@ const App = () => {
             count is: {count}
           </button>
         </p>
+        <p>API url: {import.meta.env.VITE_API_URL}</p>
         <p>
           Edit <code>App.tsx</code> and save to test HMR updates.
         </p>
