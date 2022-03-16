@@ -8,5 +8,6 @@ async function bootstrap() {
     credentials: true
   });
   await app.listen(8080);
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
