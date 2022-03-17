@@ -28,6 +28,7 @@ services:
     - DB_NAME=${DB_NAME}
     - DB_USER=${DB_USER}
     - DB_PASS=${DB_PASS}
+    - CLIENT_ORIGIN=${CLIENT_ORIGIN}
 
   client:
     build:

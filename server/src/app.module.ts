@@ -15,13 +15,13 @@ const ENV = process.env.NODE_ENV;
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (cs: ConfigService) => ({
+      useFactory: (config: ConfigService) => ({
         type: 'postgres',
-        host: cs.get<string>('DB_HOST'),
+        host: config.get<string>('DB_HOST'),
         port: 5432,
-        username: cs.get<string>('DB_USER'),
-        password: cs.get<string>('DB_PASS'),
-        database: cs.get<string>('DB_NAME'),
+        username: config.get<string>('DB_USER'),
+        password: config.get<string>('DB_PASS'),
+        database: config.get<string>('DB_NAME'),
         autoLoadEntities: true,
         synchronize: true,
       }),
