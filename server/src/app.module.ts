@@ -5,10 +5,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ChatGateway } from './chat.gateway';
 import { SubjectsModule } from './subjects/subjects.module';
-import { TeachersModule } from './teachers/teachers.module';
 import { LessonsModule } from './lessons/lessons.module';
-import { CustomersModule } from './customers/customers.module';
 import { ContractsModule } from './contracts/contracts.module';
+import { UsersModule } from './users/users.module';
 
 const ENV = process.env.NODE_ENV;
 
@@ -32,10 +31,9 @@ const ENV = process.env.NODE_ENV;
       inject: [ConfigService],
     }),
     SubjectsModule,
-    TeachersModule,
     LessonsModule,
-    CustomersModule,
     ContractsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService, ChatGateway],

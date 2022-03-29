@@ -1,6 +1,6 @@
 import { Subject } from 'src/subjects/subject.entity';
-import { User } from 'src/user';
-import { Entity, Column, ManyToMany, JoinTable } from 'typeorm';
+import { Role, User } from './user.entity';
+import { ChildEntity, Column, ManyToMany, JoinTable } from 'typeorm';
 
 export enum TeacherState {
   APPLIED = 'applied',
@@ -9,8 +9,10 @@ export enum TeacherState {
   QUIT = 'quit',
 }
 
-@Entity()
+@ChildEntity()
 export class Teacher extends User {
+  role = Role.TEACHER;
+
   //TODO: decimal value
   @Column()
   fee: number;

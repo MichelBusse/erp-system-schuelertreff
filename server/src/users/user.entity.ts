@@ -1,11 +1,25 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  TableInheritance,
+} from 'typeorm';
 
 export enum Salutation {
   FRAU = 'Frau',
   HERR = 'Herr',
 }
 
+export enum Role {
+  CUSTOMER = 'customer',
+  TEACHER = 'teacher',
+}
+
+@Entity()
+@TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export abstract class User {
+  role: Role;
+
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -28,10 +42,10 @@ export abstract class User {
   city: string;
 
   @Column()
-  postalCode: number;
+  postalCode: string;
 
   //TODO: E-Mail validation
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Column()

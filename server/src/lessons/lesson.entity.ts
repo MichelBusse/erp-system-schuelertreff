@@ -1,5 +1,5 @@
 import { Contract } from 'src/contracts/contract.entity';
-import { Teacher } from 'src/teachers/teacher.entity';
+import { Teacher } from 'src/users/teacher.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 export enum LessonState {

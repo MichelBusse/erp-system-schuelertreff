@@ -1,6 +1,6 @@
-import { Salutation } from 'src/user';
+import { Salutation } from '../user.entity';
 
-export class CreateCustomerDto {
+export abstract class CreateUserDto {
   lastName: string;
 
   firstName: string;
@@ -11,9 +11,8 @@ export class CreateCustomerDto {
 
   city: string;
 
-  postalCode: number;
+  postalCode: string;
 
-  //TODO: E-Mail type?
   email: string;
 
   phone: string;
