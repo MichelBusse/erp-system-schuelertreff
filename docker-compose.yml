@@ -25,10 +25,11 @@ services:
     - 8080
     environment:
     - DB_HOST=db
-    - DB_NAME=${DB_NAME}
-    - DB_USER=${DB_USER}
-    - DB_PASS=${DB_PASS}
-    - CLIENT_ORIGIN=${CLIENT_ORIGIN}
+    - DB_NAME
+    - DB_USER
+    - DB_PASS
+    - CLIENT_ORIGIN
+    - JWT_SECRET
 
   client:
     build:

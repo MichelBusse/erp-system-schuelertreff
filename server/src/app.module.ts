@@ -8,6 +8,9 @@ import { SubjectsModule } from './subjects/subjects.module';
 import { LessonsModule } from './lessons/lessons.module';
 import { ContractsModule } from './contracts/contracts.module';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 const ENV = process.env.NODE_ENV;
 
@@ -34,8 +37,16 @@ const ENV = process.env.NODE_ENV;
     LessonsModule,
     ContractsModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService, ChatGateway],
+  providers: [
+    AppService,
+    ChatGateway,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
