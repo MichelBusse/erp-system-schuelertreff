@@ -1,29 +1,23 @@
+import dayjs from 'dayjs'
+import 'dayjs/locale/de'
+import weekOfYear from 'dayjs/plugin/weekOfYear'
+import { useState } from 'react'
+import Calendar from '../components/Calendar'
+import CalendarControl from '../components/CalendarControl'
 
-import CalendarControll from "../components/CalendarControllComponent";
+dayjs.locale('de')
+dayjs.extend(weekOfYear)
 
 const Timetable: React.FC = () => {
+  const [date, setDate] = useState(dayjs())
 
-  var date = new Date();
-  var currentThursday = new Date(date.getTime() +(3-((date.getDay()+6) % 7)) * 86400000);
-  var yearOfThursday = currentThursday.getFullYear();
-  var firstThursday = new Date(new Date(yearOfThursday,0,4).getTime() +(3-((new Date(yearOfThursday,0,4).getDay()+6) % 7)) * 86400000);
-  var weekNumber = Math.floor(1 + 0.5 + (currentThursday.getTime() - firstThursday.getTime()) / 86400000/7);
-
-  var weekShown = weekNumber
-
-  function changeWeek(direction=""){
-    if(direction == "up") weekShown++
-    if(direction == "down") weekShown--
-
-    console.log(weekShown)
-  }
-  
   return (
     <>
-      <h1>Stundenplan {weekShown}</h1>
-      <CalendarControll changeWeek = {changeWeek} number = {weekShown}/>
+      <h1>Stundenplan</h1>
+      <CalendarControl date={date} setDate={setDate} />
+      <Calendar date={date} />
     </>
-  );
+  )
 }
 
 export default Timetable
