@@ -13,6 +13,7 @@ export enum Salutation {
 export enum Role {
   CUSTOMER = 'customer',
   TEACHER = 'teacher',
+  ADMIN = 'admin',
 }
 
 @Entity()

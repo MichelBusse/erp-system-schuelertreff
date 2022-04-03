@@ -30,6 +30,7 @@ services:
     - DB_PASS
     - CLIENT_ORIGIN
     - JWT_SECRET
+    - ADMIN_USER
 
   client:
     build:

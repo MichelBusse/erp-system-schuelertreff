@@ -5,11 +5,14 @@ import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { Teacher } from './teacher.entity';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  //TODO: this is public for development only!
+  @Public()
   @Get()
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
