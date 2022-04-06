@@ -1,5 +1,6 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { nanoid } from 'nanoid';
 import { Salutation } from './users/user.entity';
 import { UsersService } from './users/users.service';
 
@@ -13,18 +14,22 @@ export class AppService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     const adminUser = this.config.get<string>('ADMIN_USER');
 
-    if (!(await this.usersService.findOneByEmail(adminUser))) {
-      console.log('Creating admin user...');
+    // create intial admin user if it does not exist
+    if (!(await this.usersService.findByEmailAuth(adminUser))) {
+      const password = nanoid();
+
+      console.log(`Creating admin user with password '${password}'`);
 
       this.usersService.createAdmin({
         lastName: 'Administrator',
         firstName: '',
         salutation: Salutation.HERR,
         street: '',
-        city: 'Dresden',
+        city: '',
         postalCode: '',
         email: adminUser,
         phone: '',
+        password: password,
       });
     }
   }

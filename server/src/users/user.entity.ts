@@ -51,4 +51,10 @@ export abstract class User {
 
   @Column()
   phone: string;
+
+  @Column({ select: false, nullable: true })
+  passwordHash?: string;
+
+  @Column({ select: false })
+  mayAuthenticate: boolean;
 }

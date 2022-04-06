@@ -4,6 +4,8 @@ import { Subject } from 'src/subjects/subject.entity';
 import { CreateUserDto } from './create-user.dto';
 
 export class CreateTeacherDto extends CreateUserDto {
+  password: string;
+
   fee: number;
 
   @Type(() => Subject)

@@ -26,6 +26,4 @@ export class Teacher extends User {
   @ManyToMany(() => Subject, { cascade: true })
   @JoinTable()
   subjects: Subject[];
-
-  //TODO: Password Column
 }

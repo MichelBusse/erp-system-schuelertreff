@@ -6,6 +6,8 @@ import { User } from './user.entity';
 import { Teacher } from './teacher.entity';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { Public } from 'src/auth/public.decorator';
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { Admin } from './admin.entity';
 
 @Controller('users')
 export class UsersController {
@@ -49,5 +51,10 @@ export class UsersController {
   @Post('teacher')
   createTeacher(@Body() dto: CreateTeacherDto): Promise<Teacher> {
     return this.usersService.createTeacher(dto);
+  }
+
+  @Post('admin')
+  createAdmin(@Body() dto: CreateAdminDto): Promise<Admin> {
+    return this.usersService.createAdmin(dto);
   }
 }

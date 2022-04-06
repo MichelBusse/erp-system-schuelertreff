@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as argon2 from 'argon2';
 import { Repository } from 'typeorm';
 import { Admin } from './admin.entity';
 import { Customer } from './customer.entity';
@@ -25,6 +26,34 @@ export class UsersService {
     private readonly adminsRepository: Repository<Admin>,
   ) {}
 
+  /**
+   * Generate a salted password hash using argon2id
+   */
+  private async hash(password: string) {
+    return argon2.hash(password, {
+      type: argon2.argon2id,
+      timeCost: 2,
+      memoryCost: 15 * 1024,
+      parallelism: 1,
+    });
+  }
+
+  /**
+   * For authentication only!
+   * The returned {@link User} includes the hashed password.
+   */
+  findByEmailAuth(email: string): Promise<User> {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .where({ email: email })
+      .addSelect(['user.passwordHash', 'user.mayAuthenticate'])
+      .getOne();
+  }
+
+  /**
+   * Find methods
+   */
+
   async findAll(): Promise<User[]> {
     return this.usersRepository.find({
       relations: ['subjects'],
@@ -45,12 +74,6 @@ export class UsersService {
     return this.usersRepository.findOne(id);
   }
 
-  findOneByEmail(email: string): Promise<User> {
-    return this.usersRepository.findOne({
-      where: { email: email },
-    });
-  }
-
   findOneCustomer(id: string): Promise<Customer> {
     return this.customersRepository.findOne(id);
   }
@@ -59,11 +82,19 @@ export class UsersService {
     return this.teachersRepository.findOne(id);
   }
 
+  /**
+   * Removes the {@link User} with the given id
+   * @param id
+   */
   async remove(id: string): Promise<void> {
     await this.usersRepository.delete(id);
   }
 
-  createCustomer(dto: CreateCustomerDto): Promise<Customer> {
+  /**
+   * Create {@link User} methods
+   */
+
+  async createCustomer(dto: CreateCustomerDto): Promise<Customer> {
     const customer = this.customersRepository.create({
       lastName: dto.lastName,
       firstName: dto.firstName,
@@ -73,12 +104,13 @@ export class UsersService {
       postalCode: dto.postalCode,
       email: dto.email,
       phone: dto.phone,
+      mayAuthenticate: false,
     });
 
     return this.customersRepository.save(customer);
   }
 
-  createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
+  async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
     const teacher = this.teachersRepository.create({
       lastName: dto.lastName,
       firstName: dto.firstName,
@@ -91,12 +123,14 @@ export class UsersService {
       fee: dto.fee,
       state: TeacherState.APPLIED,
       subjects: dto.subjects,
+      passwordHash: await this.hash(dto.password),
+      mayAuthenticate: true,
     });
 
     return this.teachersRepository.save(teacher);
   }
 
-  createAdmin(dto: CreateAdminDto): Promise<Admin> {
+  async createAdmin(dto: CreateAdminDto): Promise<Admin> {
     const admin = this.adminsRepository.create({
       lastName: dto.lastName,
       firstName: dto.firstName,
@@ -106,6 +140,8 @@ export class UsersService {
       postalCode: dto.postalCode,
       email: dto.email,
       phone: dto.phone,
+      passwordHash: await this.hash(dto.password),
+      mayAuthenticate: true,
     });
 
     return this.adminsRepository.save(admin);

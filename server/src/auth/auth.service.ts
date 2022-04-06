@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import * as argon2 from 'argon2';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
 
@@ -11,12 +12,15 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.findOneByEmail(email);
+    const user = await this.usersService.findByEmailAuth(email);
 
-    if (user && user.city === password) {
-      const { city, ...result } = user;
-      return result;
-    }
+    try {
+      if (user.mayAuthenticate && await argon2.verify(user.passwordHash, password)) {
+        const { passwordHash, ...result } = user;
+
+        return result;
+      }
+    } catch (err) {}
 
     return null;
   }
