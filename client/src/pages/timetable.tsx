@@ -10,12 +10,19 @@ dayjs.extend(weekOfYear)
 
 const Timetable: React.FC = () => {
   const [date, setDate] = useState(dayjs())
-
+  var teachers = [ {id: 1, name: 'Prof. der Magie Fugi'},
+                   {id: 2, name: 'Oberhaupt Michel'},
+                   {id: 3, name: 'Dr. Shishos Cönos'},
+                   {id: 4, name: 'Klimmzug Teubner'},
+                   {id: 5, name: 'Eggi Extrem'},
+                   {id: 6, name: 'Außendienstler Bley'},
+                   {id: 7, name: 'Angela Merkel'},
+                   {id: 8, name: 'Luis Günthersohn'},
+                   {id: 9, name: 'Paul Albert Hendinger'}] 
   return (
     <>
-      <h1>Stundenplan</h1>
       <CalendarControl date={date} setDate={setDate} />
-      <Calendar date={date} />
+      <Calendar date = {date} teachers = {teachers}/>
     </>
   )
 }
