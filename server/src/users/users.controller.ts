@@ -1,13 +1,12 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { CreateCustomerDto } from './dto/create-customer.dto';
-import { Customer } from './customer.entity';
+import { Public } from 'src/auth/decorators/public.decorator';
 import { UsersService } from './users.service';
-import { User } from './user.entity';
-import { Teacher } from './teacher.entity';
-import { CreateTeacherDto } from './dto/create-teacher.dto';
-import { Public } from 'src/auth/public.decorator';
 import { CreateAdminDto } from './dto/create-admin.dto';
-import { Admin } from './admin.entity';
+import { CreateCustomerDto } from './dto/create-customer.dto';
+import { CreateTeacherDto } from './dto/create-teacher.dto';
+import { User, Admin, Customer, Teacher } from './entities';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/role.enum';
 
 @Controller('users')
 export class UsersController {
@@ -38,22 +37,26 @@ export class UsersController {
 
 
   @Delete(':id')
+  @Roles(Role.ADMIN)
   remove(@Param('id') id: string): Promise<void> {
     return this.usersService.remove(id);
   }
 
 
   @Post('customer')
+  @Roles(Role.ADMIN)
   createCustomer(@Body() dto: CreateCustomerDto): Promise<Customer> {
     return this.usersService.createCustomer(dto);
   }
 
   @Post('teacher')
+  @Roles(Role.ADMIN)
   createTeacher(@Body() dto: CreateTeacherDto): Promise<Teacher> {
     return this.usersService.createTeacher(dto);
   }
 
   @Post('admin')
+  @Roles(Role.ADMIN)
   createAdmin(@Body() dto: CreateAdminDto): Promise<Admin> {
     return this.usersService.createAdmin(dto);
   }

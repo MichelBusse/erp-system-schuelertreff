@@ -2,13 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as argon2 from 'argon2';
 import { Repository } from 'typeorm';
-import { Admin } from './admin.entity';
-import { Customer } from './customer.entity';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
-import { Teacher, TeacherState } from './teacher.entity';
-import { User } from './user.entity';
+import { User, Admin, Customer, Teacher } from './entities';
+import { TeacherState } from './entities/teacher.entity';
 
 @Injectable()
 export class UsersService {

@@ -1,3 +1,4 @@
+import { Role } from 'src/auth/role.enum';
 import {
   Column,
   Entity,
@@ -8,12 +9,6 @@ import {
 export enum Salutation {
   FRAU = 'Frau',
   HERR = 'Herr',
-}
-
-export enum Role {
-  CUSTOMER = 'customer',
-  TEACHER = 'teacher',
-  ADMIN = 'admin',
 }
 
 @Entity()

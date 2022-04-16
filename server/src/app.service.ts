@@ -1,7 +1,7 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { nanoid } from 'nanoid';
-import { Salutation } from './users/user.entity';
+import { Salutation } from './users/entities/user.entity';
 import { UsersService } from './users/users.service';
 
 @Injectable()

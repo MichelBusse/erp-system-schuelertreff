@@ -1,4 +1,4 @@
-import { Salutation } from '../user.entity';
+import { Salutation } from '../entities/user.entity';
 
 export abstract class CreateUserDto {
   lastName: string;
