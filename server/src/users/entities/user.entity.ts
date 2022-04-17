@@ -52,4 +52,7 @@ export abstract class User {
 
   @Column({ select: false })
   mayAuthenticate: boolean;
+
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  jwtValidAfter: Date;
 }
