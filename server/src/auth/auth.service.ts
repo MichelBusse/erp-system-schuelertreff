@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { User } from 'src/users/entities/user.entity';
@@ -31,5 +31,28 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async adminReset(id: number) {
+    const user = await this.usersService.findOne(id);
+
+    const payload = { sub: user.id, reset: true };
+
+    //TODO: send email to user
+    console.log(`reset token for ${user.email} - ${this.jwtService.sign(payload)}`)
+  }
+
+  async validateReset(token: string) {
+    try {
+      const payload = this.jwtService.verify(token)
+
+      if (payload.reset) {
+        const user = await this.usersService.findOne(payload.sub)
+
+        if (payload.iat * 1000 > user.jwtValidAfter.getTime()) return payload
+      }
+    } catch (e) {}
+
+    throw new UnauthorizedException()
   }
 }

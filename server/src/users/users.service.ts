@@ -68,15 +68,15 @@ export class UsersService {
     });
   }
 
-  findOne(id: string): Promise<User> {
+  findOne(id: number): Promise<User> {
     return this.usersRepository.findOne(id);
   }
 
-  findOneCustomer(id: string): Promise<Customer> {
+  findOneCustomer(id: number): Promise<Customer> {
     return this.customersRepository.findOne(id);
   }
 
-  findOneTeacher(id: string): Promise<Teacher> {
+  findOneTeacher(id: number): Promise<Teacher> {
     return this.teachersRepository.findOne(id);
   }
 
@@ -84,7 +84,7 @@ export class UsersService {
    * Removes the {@link User} with the given id
    * @param id
    */
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     await this.usersRepository.delete(id);
   }
 
@@ -143,5 +143,17 @@ export class UsersService {
     });
 
     return this.adminsRepository.save(admin);
+  }
+
+  /**
+   * Password reset
+   */
+  async resetPassword(id: number, password: string): Promise<User> {
+    const user = await this.usersRepository.findOne(id);
+
+    user.passwordHash = await this.hash(password);
+    user.jwtValidAfter = new Date()
+
+    return this.usersRepository.save(user);
   }
 }

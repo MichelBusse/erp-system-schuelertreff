@@ -31,14 +31,14 @@ export class UsersController {
 
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<User> {
+  findOne(@Param('id') id: number): Promise<User> {
     return this.usersService.findOne(id);
   }
 
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  remove(@Param('id') id: string): Promise<void> {
+  remove(@Param('id') id: number): Promise<void> {
     return this.usersService.remove(id);
   }
 
