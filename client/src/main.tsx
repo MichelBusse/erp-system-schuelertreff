@@ -5,13 +5,13 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 import Layout from './components/Layout'
 import Pages from './pages/_pages'
 import './globals.scss'
+import LoginComponent from './components/LoginComponent'
 
 const theme = createTheme()
 
 const Login = () => (
   <>
-    <h2>Login</h2>
-    <Link to="/">Home</Link>
+    <LoginComponent></LoginComponent>
   </>
 )
 
