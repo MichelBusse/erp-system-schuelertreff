@@ -20,7 +20,7 @@ export class AppService implements OnApplicationBootstrap {
 
       console.log(`Creating admin user with password '${password}'`);
 
-      this.usersService.createAdmin({
+      const user = await this.usersService.createAdmin({
         lastName: 'Administrator',
         firstName: '',
         salutation: Salutation.HERR,
@@ -29,8 +29,9 @@ export class AppService implements OnApplicationBootstrap {
         postalCode: '',
         email: adminUser,
         phone: '',
-        password: password,
       });
+
+      this.usersService.setPassword(user.id, password);
     }
   }
 

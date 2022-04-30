@@ -121,7 +121,6 @@ export class UsersService {
       fee: dto.fee,
       state: TeacherState.APPLIED,
       subjects: dto.subjects,
-      passwordHash: await this.hash(dto.password),
       mayAuthenticate: true,
     });
 
@@ -138,7 +137,6 @@ export class UsersService {
       postalCode: dto.postalCode,
       email: dto.email,
       phone: dto.phone,
-      passwordHash: await this.hash(dto.password),
       mayAuthenticate: true,
     });
 
@@ -148,11 +146,11 @@ export class UsersService {
   /**
    * Password reset
    */
-  async resetPassword(id: number, password: string): Promise<User> {
+  async setPassword(id: number, password: string): Promise<User> {
     const user = await this.usersRepository.findOne(id);
 
     user.passwordHash = await this.hash(password);
-    user.jwtValidAfter = new Date()
+    user.jwtValidAfter = new Date();
 
     return this.usersRepository.save(user);
   }

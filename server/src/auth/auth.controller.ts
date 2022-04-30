@@ -1,4 +1,12 @@
-import { Controller, Request, Post, UseGuards, Get, Param, Body } from '@nestjs/common';
+import {
+  Controller,
+  Request,
+  Post,
+  UseGuards,
+  Get,
+  Param,
+  Body,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { Public } from './decorators/public.decorator';
@@ -23,20 +31,22 @@ export class AuthController {
 
   @Get('refresh')
   async refresh(@Request() req) {
-    return this.authService.login(req.user)
+    return this.authService.login(req.user);
   }
 
   @Roles(Role.ADMIN)
   @Post('reset/:id')
   async adminReset(@Param('id') id: number) {
-    return this.authService.adminReset(id)
+    const user = await this.usersService.findOne(id);
+
+    return this.authService.initReset(user);
   }
 
   @Public()
   @Post('reset')
   async reset(@Body() dto: ResetPasswordDto) {
-    const payload = await this.authService.validateReset(dto.token)
+    const payload = await this.authService.validateReset(dto.token);
 
-    return this.usersService.resetPassword(payload.sub, dto.password)
+    return this.usersService.setPassword(payload.sub, dto.password);
   }
 }

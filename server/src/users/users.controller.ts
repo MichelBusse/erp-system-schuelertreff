@@ -7,10 +7,14 @@ import { CreateTeacherDto } from './dto/create-teacher.dto';
 import { User, Admin, Customer, Teacher } from './entities';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/role.enum';
+import { AuthService } from 'src/auth/auth.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService,
+  ) {}
 
   //TODO: this is public for development only!
   @Public()
@@ -45,19 +49,27 @@ export class UsersController {
 
   @Post('customer')
   @Roles(Role.ADMIN)
-  createCustomer(@Body() dto: CreateCustomerDto): Promise<Customer> {
+  async createCustomer(@Body() dto: CreateCustomerDto): Promise<Customer> {
     return this.usersService.createCustomer(dto);
   }
 
   @Post('teacher')
   @Roles(Role.ADMIN)
-  createTeacher(@Body() dto: CreateTeacherDto): Promise<Teacher> {
-    return this.usersService.createTeacher(dto);
+  async createTeacher(@Body() dto: CreateTeacherDto): Promise<Teacher> {
+    const user = await this.usersService.createTeacher(dto);
+
+    this.authService.initReset(user);
+
+    return user;
   }
 
   @Post('admin')
   @Roles(Role.ADMIN)
-  createAdmin(@Body() dto: CreateAdminDto): Promise<Admin> {
-    return this.usersService.createAdmin(dto);
+  async createAdmin(@Body() dto: CreateAdminDto): Promise<Admin> {
+    const user = await this.usersService.createAdmin(dto);
+
+    this.authService.initReset(user);
+
+    return user;
   }
 }

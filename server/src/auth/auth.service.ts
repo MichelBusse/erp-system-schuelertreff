@@ -33,9 +33,7 @@ export class AuthService {
     };
   }
 
-  async adminReset(id: number) {
-    const user = await this.usersService.findOne(id);
-
+  async initReset(user: User) {
     const payload = { sub: user.id, reset: true };
 
     //TODO: send email to user
@@ -44,15 +42,15 @@ export class AuthService {
 
   async validateReset(token: string) {
     try {
-      const payload = this.jwtService.verify(token)
+      const payload = this.jwtService.verify(token);
 
       if (payload.reset) {
-        const user = await this.usersService.findOne(payload.sub)
+        const user = await this.usersService.findOne(payload.sub);
 
-        if (payload.iat * 1000 > user.jwtValidAfter.getTime()) return payload
+        if (payload.iat * 1000 > user.jwtValidAfter.getTime()) return payload;
       }
     } catch (e) {}
 
-    throw new UnauthorizedException()
+    throw new UnauthorizedException();
   }
 }
