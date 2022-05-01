@@ -18,7 +18,8 @@ const Timetable: React.FC = () => {
                    {id: 6, name: 'Außendienstler Bley'},
                    {id: 7, name: 'Angela Merkel'},
                    {id: 8, name: 'Luis Günthersohn'},
-                   {id: 9, name: 'Paul Albert Hendinger'}] 
+                   {id: 9, name: 'Litsch'},
+                   {id: 10, name: 'Paul Albert Hendinger'}] 
   return (
     <>
       <CalendarControl date={date} setDate={setDate} />
