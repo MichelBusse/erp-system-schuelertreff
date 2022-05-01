@@ -1,6 +1,7 @@
-import { Subject } from 'src/subjects/subject.entity';
-import { Role, User } from './user.entity';
 import { ChildEntity, Column, ManyToMany, JoinTable } from 'typeorm';
+import { Subject } from 'src/subjects/subject.entity';
+import { Role } from 'src/auth/role.enum';
+import { User } from './user.entity';
 
 export enum TeacherState {
   APPLIED = 'applied',
@@ -26,6 +27,4 @@ export class Teacher extends User {
   @ManyToMany(() => Subject, { cascade: true })
   @JoinTable()
   subjects: Subject[];
-
-  //TODO: Password Column
 }

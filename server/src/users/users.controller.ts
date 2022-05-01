@@ -1,15 +1,23 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
-import { CreateCustomerDto } from './dto/create-customer.dto';
-import { Customer } from './customer.entity';
+import { Public } from 'src/auth/decorators/public.decorator';
 import { UsersService } from './users.service';
-import { User } from './user.entity';
-import { Teacher } from './teacher.entity';
+import { CreateAdminDto } from './dto/create-admin.dto';
+import { CreateCustomerDto } from './dto/create-customer.dto';
 import { CreateTeacherDto } from './dto/create-teacher.dto';
+import { User, Admin, Customer, Teacher } from './entities';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/role.enum';
+import { AuthService } from 'src/auth/auth.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService,
+  ) {}
 
+  //TODO: this is public for development only!
+  @Public()
   @Get()
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
@@ -27,24 +35,41 @@ export class UsersController {
 
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<User> {
+  findOne(@Param('id') id: number): Promise<User> {
     return this.usersService.findOne(id);
   }
 
 
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
+  @Roles(Role.ADMIN)
+  remove(@Param('id') id: number): Promise<void> {
     return this.usersService.remove(id);
   }
 
 
   @Post('customer')
-  createCustomer(@Body() dto: CreateCustomerDto): Promise<Customer> {
+  @Roles(Role.ADMIN)
+  async createCustomer(@Body() dto: CreateCustomerDto): Promise<Customer> {
     return this.usersService.createCustomer(dto);
   }
 
   @Post('teacher')
-  createTeacher(@Body() dto: CreateTeacherDto): Promise<Teacher> {
-    return this.usersService.createTeacher(dto);
+  @Roles(Role.ADMIN)
+  async createTeacher(@Body() dto: CreateTeacherDto): Promise<Teacher> {
+    const user = await this.usersService.createTeacher(dto);
+
+    this.authService.initReset(user);
+
+    return user;
+  }
+
+  @Post('admin')
+  @Roles(Role.ADMIN)
+  async createAdmin(@Body() dto: CreateAdminDto): Promise<Admin> {
+    const user = await this.usersService.createAdmin(dto);
+
+    this.authService.initReset(user);
+
+    return user;
   }
 }

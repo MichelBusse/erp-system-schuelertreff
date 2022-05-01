@@ -6,8 +6,8 @@ import {
   JoinTable,
   ManyToMany,
 } from 'typeorm';
-import { Customer } from 'src/users/customer.entity';
-import { Teacher } from 'src/users/teacher.entity';
+import { Customer } from 'src/users/entities/customer.entity';
+import { Teacher } from 'src/users/entities/teacher.entity';
 import { Subject } from 'src/subjects/subject.entity';
 
 export enum Weekdays {

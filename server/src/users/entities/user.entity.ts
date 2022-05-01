@@ -1,3 +1,4 @@
+import { Role } from 'src/auth/role.enum';
 import {
   Column,
   Entity,
@@ -8,11 +9,6 @@ import {
 export enum Salutation {
   FRAU = 'Frau',
   HERR = 'Herr',
-}
-
-export enum Role {
-  CUSTOMER = 'customer',
-  TEACHER = 'teacher',
 }
 
 @Entity()
@@ -50,4 +46,13 @@ export abstract class User {
 
   @Column()
   phone: string;
+
+  @Column({ select: false, nullable: true })
+  passwordHash?: string;
+
+  @Column({ select: false })
+  mayAuthenticate: boolean;
+
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  jwtValidAfter: Date;
 }
