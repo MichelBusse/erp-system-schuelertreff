@@ -9,7 +9,7 @@ const Item = styled(Paper)(({ theme }) => ({
     color: theme.palette.text.secondary,
   }));
 
-const LoginComponent: React.FC = () => {
+const Login: React.FC = () => {
     return (
     <>
         <Grid container direction="column" justifyContent="center" alignItems="center" style={{height: "90vh"}}>
@@ -20,4 +20,4 @@ const LoginComponent: React.FC = () => {
     </>)
   }
   
-  export default LoginComponent
+  export default Login

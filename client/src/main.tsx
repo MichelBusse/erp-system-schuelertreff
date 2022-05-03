@@ -5,15 +5,8 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 import Layout from './components/Layout'
 import Pages from './pages/_pages'
 import './globals.scss'
-import LoginComponent from './components/LoginComponent'
 
 const theme = createTheme()
-
-const Login = () => (
-  <>
-    <LoginComponent></LoginComponent>
-  </>
-)
 
 ReactDOM.render(
   <React.StrictMode>
@@ -28,7 +21,7 @@ ReactDOM.render(
             <Route path="subjects" element={<Pages.Subjects />} />
           </Route>
 
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Pages.Login />} />
 
           <Route path="*" element={<Pages.NotFound />} />
         </Routes>
