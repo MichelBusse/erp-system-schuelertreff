@@ -9,16 +9,19 @@ import TableRow from '@mui/material/TableRow';
 import dayjs, { Dayjs } from 'dayjs';
 import './calendar.scss';
 import { borderRadius } from '@mui/system';
+import HiddenMenu from './HiddenMenu'
+import { useState } from 'react'
 
 //Type of the Array Teachers
 type teachers = {
-  id: number,
+  id: number
   name: string
 }
 //Properties of the Component
 type Props = {
-  date: Dayjs,
+  date: Dayjs
   teachers: Array<teachers>
+  setOpen: Function
 }
 
 //Properties of the Columns
@@ -37,9 +40,9 @@ type Props = {
 // }
 
 //Calendar Component:
-const Calendar: React.FC<Props> = ({ date, teachers }) => {
+const Calendar: React.FC<Props> = ({ date, teachers, setOpen }) => {
 
-  return (
+  return (<>
     <Paper sx={{ width: '100%', overflow: 'hidden' , borderRadius: 5}}>
       <TableContainer sx={{ maxHeight: 440}}>
         <Table stickyHeader aria-label="sticky table">
@@ -65,7 +68,7 @@ const Calendar: React.FC<Props> = ({ date, teachers }) => {
               .map((teacher) => {
                 return (
                   <TableRow hover role="checkbox" key={teacher.id}>
-                    <TableCell >
+                    <TableCell onClick={() => setOpen({state: true, info: teacher.name})}>
                       {teacher.name}
                     </TableCell>
                     <TableCell className='TableCell'>1</TableCell>
@@ -80,7 +83,7 @@ const Calendar: React.FC<Props> = ({ date, teachers }) => {
         </Table>
       </TableContainer>
     </Paper>
+   </>
   );
 }
-
 export default Calendar

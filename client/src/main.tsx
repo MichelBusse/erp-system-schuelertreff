@@ -26,7 +26,6 @@ ReactDOM.render(
             <Route path="customers" element={<Pages.Customers />} />
             <Route path="teachers" element={<Pages.Teachers />} />
             <Route path="subjects" element={<Pages.Subjects />} />
-            <Route path="temporaryDrawer" element={<Pages.TemporaryDrawer />} />
           </Route>
 
           <Route path="/login" element={<Login />} />
