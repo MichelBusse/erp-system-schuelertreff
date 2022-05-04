@@ -77,11 +77,11 @@ export default function TemporaryDrawer() {
           <Button onClick={toggleDrawer(anchor, true)}>{anchor}</Button>
            {/* ist die versteckte anzeige, die erst bei buttonklick sichtbar wird*/}
           <Drawer
-             {/*anchor=Richtung*/}
+             /*anchor=Richtung*/
             anchor={anchor}
-            {/*open nimmt einen Booleanwert, ob offen oder geschlossen*/}
+            /*open nimmt einen Booleanwert, ob offen oder geschlossen*/
             open={state[anchor]}
-             {/* bei klick auf den Button wird anchor(die Richtung) und false an toggleDrawer geschickt (side menü schließt sich)*/}
+             /* bei klick auf den Button wird anchor(die Richtung) und false an toggleDrawer geschickt (side menü schließt sich)*/
             onClose={toggleDrawer(anchor, false)}
           >
               {/* ist das eigentliche side menü im Drawer*/}

@@ -29,6 +29,11 @@ const menuItems = [
     text: 'Fächer',
     href: '/subjects',
   },
+  {
+    icon: LayersIcon,
+    text: 'TemporaryDrawer',
+    href: '/temporaryDrawer',
+  },
 ]
 
 const Layout: React.FC = () => {
