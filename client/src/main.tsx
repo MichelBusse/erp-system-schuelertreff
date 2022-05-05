@@ -8,13 +8,6 @@ import './globals.scss'
 
 const theme = createTheme()
 
-const Login = () => (
-  <>
-    <h2>Login</h2>
-    <Link to="/">Home</Link>
-  </>
-)
-
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
@@ -28,7 +21,7 @@ ReactDOM.render(
             <Route path="subjects" element={<Pages.Subjects />} />
           </Route>
 
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Pages.Login />} />
 
           <Route path="*" element={<Pages.NotFound />} />
         </Routes>
