@@ -1,24 +1,33 @@
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
-import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import { Stack, IconButton } from '@mui/material'
+import { styled } from '@mui/system'
 import { Dayjs } from 'dayjs'
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 
 type Props = {
   date: Dayjs
   setDate: Function
 }
-
+//Styling:
+const StyledStack = styled(Stack, {})({
+  height: 40,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+  
+});
+//Component:
 const CalendarControl: React.FC<Props> = ({ date, setDate }) => {
   return (
-    <Stack direction="row" spacing={2}>
+    <StyledStack direction="row" spacing={1}>
       <IconButton onClick={() => setDate(date.subtract(1, 'week'))}>
-        <ChevronLeftIcon />
+        <KeyboardDoubleArrowLeftIcon fontSize='large' htmlColor='#CDFF4E'/>
       </IconButton>
-      <h3>Kalenderwoche {date.week()} {date.year()}</h3>
+      <h4>Kalenderwoche {date.week()}</h4>
       <IconButton onClick={() => setDate(date.add(1, 'week'))}>
-        <ChevronRightIcon />
+        <KeyboardDoubleArrowRightIcon fontSize='large' htmlColor='#CDFF4E'/>
       </IconButton>
-    </Stack>
+    </StyledStack>
   )
 }
 

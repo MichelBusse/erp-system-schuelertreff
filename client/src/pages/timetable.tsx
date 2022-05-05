@@ -24,13 +24,18 @@ const Timetable: React.FC = () => {
                    {id: 7, name: 'Angela Merkel'},
                    {id: 8, name: 'Luis Günthersohn'},
                    {id: 9, name: 'Litsch'},
-                   {id: 10, name: 'Paul Albert Hendinger'}] 
+                   {id: 10, name: 'Paul Albert Hendinger'},
+                   {id: 11, name: 'Eggi Extrem'},
+                   {id: 12, name: 'Außendienstler Bley'},
+                   {id: 13, name: 'Angela Merkel'},
+                   {id: 14, name: 'Luis Günthersohn'},
+                   {id: 15, name: 'Litsch'},
+                   {id: 16, name: 'Paul Albert Hendinger'}]  
 
 
   return (
     <>
-    <CalendarControl date={date} setDate={setDate} />
-    <Calendar date={date} teachers={teachers} setOpen={setOpen}/>
+    <Calendar date={date} teachers={teachers} setOpen={setOpen} setDate={setDate}/>
     <HiddenMenu open={open} setOpen={setOpen}/>
     </>
   )

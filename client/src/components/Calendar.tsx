@@ -8,9 +8,9 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import dayjs, { Dayjs } from 'dayjs';
 import './calendar.scss';
-import { borderRadius } from '@mui/system';
-import HiddenMenu from './HiddenMenu'
-import { useState } from 'react'
+import { styled } from '@mui/system';
+import CalendarControl from './CalendarControl';
+import { grey } from '@mui/material/colors';
 
 //Type of the Array Teachers
 type teachers = {
@@ -22,42 +22,56 @@ type Props = {
   date: Dayjs
   teachers: Array<teachers>
   setOpen: Function
+  setDate: Function
 }
+//Styling:
+const StyledPaper = styled(Paper, {})({
+  width: '100%',
+  overflow: 'hidden',
+  borderRadius: 25,
+});
 
-//Properties of the Columns
-// interface Column {
+const StyledCellContent = styled(TableCell, {})({
+  borderRightStyle: 'solid',
+  borderWidth: 0.5,
+  borderColor: '#CDCDCD',
+  backgroundColor: 'white'
+});
 
-// }
+const StyledCellWeekday = styled(TableCell, {})({
+  width: "17%",
+  minWidth: 150
+});
 
-//Array of all Columns with there Propertys
-// const columns: readonly Column[] = [
-//   { },
-// ];
-
-//Type of the Datas:
-// interface Data {
-
-// }
+const StyledCellTeacherName = styled(TableCell, {})({
+  width: '15em',
+  height: '5em',
+  borderStyle: 'none',
+  borderRightStyle: 'solid',
+  borderWidth: 0.5,
+  borderColor: '#CDCDCD',
+  paddingTop: 5,
+  paddingBottom: 5,
+});
 
 //Calendar Component:
-const Calendar: React.FC<Props> = ({ date, teachers, setOpen }) => {
-
+const Calendar: React.FC<Props> = ({ date, teachers, setOpen, setDate }) => {
   return (<>
-    <Paper sx={{ width: '100%', overflow: 'hidden' , borderRadius: 5}}>
-      <TableContainer sx={{ maxHeight: 440}}>
+    <StyledPaper>
+      <CalendarControl date={date} setDate={setDate} />
+      <TableContainer sx={{ maxHeight: 'calc(100vh - 104px)'}}>
         <Table stickyHeader aria-label="sticky table">
           {/* Tablehead (.map iterates through all columns and print them into single cells): */}
           <TableHead>
             <TableRow>
-              <TableCell className='TableHeadCell'></TableCell>
+              <StyledCellTeacherName sx={{borderStyle: "none"}} className="coloredCell"></StyledCellTeacherName>
               {[1,2,3,4,5].map((d) => {
                 // if its a column of day (all except the first on):
                   return(
-                    <TableCell align="center" key={d} className='TableHeadCell'>
-                      {/* Content of each cell (Day + Date): */}
-                      <p className='DayLable'>{date.day(d).format("dddd")}</p>
-                      <p className='DateLable'>{date.day(d).format('DD.MM.YYYY')}</p>
-                    </TableCell>
+                    <StyledCellWeekday align="center" key={d} className="coloredCell">
+                      <div style={{fontSize: '1.2rem'}}>{date.day(d).format("dddd")}</div>
+                      <div style={{fontSize: '0.8rem', margin: '-5px'}}>{date.day(d).format('DD.MM.YYYY')}</div>
+                    </StyledCellWeekday>
                   )
               })}
             </TableRow>
@@ -67,23 +81,24 @@ const Calendar: React.FC<Props> = ({ date, teachers, setOpen }) => {
             {teachers
               .map((teacher) => {
                 return (
-                  <TableRow hover role="checkbox" key={teacher.id}>
-                    <TableCell onClick={() => setOpen({state: true, info: teacher.name})}>
+                  <TableRow hover role="checkbox" key={teacher.id} className="coloredCell2">
+                    <StyledCellTeacherName onClick={() => setOpen({state: true, info: teacher.name})} >
                       {teacher.name}
-                    </TableCell>
-                    <TableCell className='TableCell'>1</TableCell>
-                    <TableCell className='TableCell'>2</TableCell>
-                    <TableCell className='TableCell'>3</TableCell>
-                    <TableCell className='TableCell'>4</TableCell>
-                    <TableCell className='TableCell'>5</TableCell>
+                    </StyledCellTeacherName>
+                    <StyledCellContent>1</StyledCellContent>
+                    <StyledCellContent>2</StyledCellContent>
+                    <StyledCellContent>3</StyledCellContent>
+                    <StyledCellContent>4</StyledCellContent>
+                    <StyledCellContent>5</StyledCellContent>
                   </TableRow>
                 );
               })}
           </TableBody>
         </Table>
       </TableContainer>
-    </Paper>
+    </StyledPaper>
    </>
   );
 }
+
 export default Calendar

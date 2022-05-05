@@ -1,18 +1,15 @@
-.TableCell{
-    border-style: solid;
-    border-color: grey;
-    border-width: 1px;
+.coloredCell:nth-child(2n){
+    background-color: #8CE6F9;
 }
 
-.DayLable{
-    margin: 0px;
-    height: 13px;
+.coloredCell:nth-child(2n+1){
+    background-color: #A8F0FF;
 }
-.DateLable{
-    margin: 0px;
-    font-size: 10px;
+
+.coloredCell2:nth-child(2n){
+    background-color: #A8F0FF;
 }
-.TableHeadCell{
-    min-width: 130px;
-    background-color: red;
+
+.coloredCell2:nth-child(2n+1){
+    background-color: #8CE6F9;
 }
