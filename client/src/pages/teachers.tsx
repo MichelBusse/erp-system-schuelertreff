@@ -1,41 +1,53 @@
-import { Box, Grid } from "@mui/material";
-import { styled } from '@mui/material/styles';
-import Paper from '@mui/material/Paper';
-import GridLine from '../components/GridLine';
+import { DataGrid, GridColumns, GridToolbarContainer, GridToolbarFilterButton, GridToolbarDensitySelector } from '@mui/x-data-grid'
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}));
+import React from 'react';
+import './teacher.scss'
+
+const cols: GridColumns = [{field: 'TeacherName', headerClassName:'DataGridHead', headerName: 'Teacher', width: 200},
+                            {field: 'SubjectName', headerClassName:'DataGridHead', headerName: 'Subject', width: 500}]
+
+const rows = [{id: 1, TeacherName: 'Dr. Fugi der Magie', SubjectName: ['Mathe', 'Englisch']},
+              {id: 2, TeacherName: 'Michel Boss', SubjectName: ['Deutsch', 'Spanisch', 'Info']},
+              {id: 3, TeacherName: 'Shishos Cönos', SubjectName: 'Ethik'},
+              {id: 4, TeacherName: 'Dr. Fugi der Magie', SubjectName: ['Mathe', 'Englisch']},
+              {id: 5, TeacherName: 'Michel Boss', SubjectName: ['Deutsch', 'Spanisch', 'Info']},
+              {id: 6, TeacherName: 'Shishos Cönos', SubjectName: 'Ethik'},
+              {id: 7, TeacherName: 'Dr. Fugi der Magie', SubjectName: ['Mathe', 'Englisch']},
+              {id: 8, TeacherName: 'Michel Boss', SubjectName: ['Deutsch', 'Spanisch', 'Info']},
+              {id: 9, TeacherName: 'Shishos Cönos', SubjectName: 'Ethik'},
+              {id: 10, TeacherName: 'Dr. Fugi der Magie', SubjectName: ['Mathe', 'Englisch']},
+              {id: 11, TeacherName: 'Michel Boss', SubjectName: ['Deutsch', 'Spanisch', 'Info']},
+              {id: 12, TeacherName: 'Shishos Cönos', SubjectName: 'Ethik'}
+]
+
+function CustomToolbar() {
+  return (
+    <GridToolbarContainer>
+      <GridToolbarFilterButton />
+      <GridToolbarDensitySelector />
+    </GridToolbarContainer>
+  );
+}
+
+const getRowSpacing = React.useCallback((params) => {
+  return {
+    top: params.isFirstVisible ? 0 : 5,
+    bottom: params.isLastVisible ? 0 : 5,
+  };
+}, []);
 
 const Teachers: React.FC = () => {
-  return (<Box sx={{ flexGrow: 1 }}>
-    <Grid container rowSpacing={2}>
-    {[1, 2, 3, 4].map( (number) => (
-        <Grid item xs={12} key={number}>
-          <Item>
-            <Grid container spacing={2}>
-              <Grid item xs={3}>
-            <Grid item xs={6}>
-                Lehrer Name
-            </Grid>
-              </Grid>
-            {[1, 2, 3, 4].map( (number) => (
-              <Grid item xs="auto" key={number}>
-                <Item sx={{backgroundColor: 'rgba(204, 204, 204, 0.5)'}}>
-                  Inneren {number}
-                </Item>
-              </Grid>
-            ))}
-            </Grid>            
-          </Item>
-      </Grid>
-    ))}
-    </Grid>
-  </Box>)
+  return (
+    <div style={{ height: 400, width: '100%' }}>
+      <DataGrid 
+      disableSelectionOnClick={true}
+      components={{ Toolbar: CustomToolbar }}
+      hideFooter = {true}
+      rows={rows} columns={cols}
+      // getRowSpacing={getRowSpacing}
+      />
+    </div>
+  );
 }
 
 export default Teachers
