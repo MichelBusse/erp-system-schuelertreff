@@ -1,3 +1,4 @@
+import { Grid, Paper, styled } from '@mui/material';
 import {
   DataGrid,
   GridColumns,
@@ -8,6 +9,14 @@ import {
 } from '@mui/x-data-grid'
 import React from 'react';
 import './teacher.scss'
+
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+}));
 
 const cols: GridColumns = [
   {
@@ -21,22 +30,33 @@ const cols: GridColumns = [
     headerClassName: 'DataGridHead',
     headerName: 'Subject',
     width: 500,
+    renderCell: (params) => (
+      <strong>
+      <Grid container spacing={2}>
+        {params.value.map((subject)=> 
+          <Grid item>
+            <Item>{subject}</Item>
+          </Grid>)}
+        {console.log(params.value)}
+        </Grid>
+      </strong>
+    ),
   },
 ]
 
 const rows = [
   {id: 1, TeacherName: 'Dr. Fugi der Magie', SubjectName: ['Mathe', 'Englisch']},
   {id: 2, TeacherName: 'Michel Boss', SubjectName: ['Deutsch', 'Spanisch', 'Info']},
-  {id: 3, TeacherName: 'Shishos Cönos', SubjectName: 'Ethik'},
+  {id: 3, TeacherName: 'Shishos Cönos', SubjectName: ['Ethik']},
   {id: 4, TeacherName: 'Dr. Fugi der Magie', SubjectName: ['Mathe', 'Englisch']},
   {id: 5, TeacherName: 'Michel Boss', SubjectName: ['Deutsch', 'Spanisch', 'Info']},
-  {id: 6, TeacherName: 'Shishos Cönos', SubjectName: 'Ethik'},
+  {id: 6, TeacherName: 'Shishos Cönos', SubjectName: ['Ethik']},
   {id: 7, TeacherName: 'Dr. Fugi der Magie', SubjectName: ['Mathe', 'Englisch']},
   {id: 8, TeacherName: 'Michel Boss', SubjectName: ['Deutsch', 'Spanisch', 'Info']},
-  {id: 9, TeacherName: 'Shishos Cönos', SubjectName: 'Ethik'},
+  {id: 9, TeacherName: 'Shishos Cönos', SubjectName: ['Ethik']},
   {id: 10, TeacherName: 'Dr. Fugi der Magie', SubjectName: ['Mathe', 'Englisch']},
   {id: 11, TeacherName: 'Michel Boss', SubjectName: ['Deutsch', 'Spanisch', 'Info']},
-  {id: 12, TeacherName: 'Shishos Cönos', SubjectName: 'Ethik'}
+  {id: 12, TeacherName: 'Shishos Cönos', SubjectName: ['Ethik']}
 ]
 
 function CustomToolbar() {
@@ -58,6 +78,7 @@ const Teachers: React.FC = () => {
     <div style={{ display: 'flex', height: '100%', width: '100%' }}>
       <div style={{ flexGrow: 1 }}>
         <DataGrid
+          headerHeight={0}
           disableSelectionOnClick={true}
           components={{ Toolbar: CustomToolbar }}
           hideFooter={true}
