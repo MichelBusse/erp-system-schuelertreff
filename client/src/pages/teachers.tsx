@@ -10,13 +10,18 @@ import {
 import React from 'react';
 import './teacher.scss'
 
+
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
-  padding: theme.spacing(1),
+  padding: theme.spacing(1.3),
   textAlign: 'center',
+  borderRadius: '25px',
+  paddingLeft: '25px',
+  paddingRight: '25px',
   color: theme.palette.text.secondary,
 }));
+
 
 const cols: GridColumns = [
   {
@@ -32,8 +37,8 @@ const cols: GridColumns = [
     width: 500,
     renderCell: (params) => (
       <strong>
-      <Grid container spacing={2}>
-        {params.value.map((subject)=> 
+      <Grid container spacing={3}>
+        {params.value.map((subject: string)=> 
           <Grid item>
             <Item>{subject}</Item>
           </Grid>)}
@@ -70,8 +75,8 @@ function CustomToolbar() {
 
 const Teachers: React.FC = () => {
   const getRowSpacing = React.useCallback((params: GridRowSpacingParams) => ({
-    top: params.isFirstVisible ? 0 : 5,
-    bottom: params.isLastVisible ? 0 : 5,
+    top: params.isFirstVisible ? 16 : 8,
+    bottom: params.isLastVisible ? 8 : 8,
   }), [])
 
   return (
