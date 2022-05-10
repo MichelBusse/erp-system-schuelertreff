@@ -4,8 +4,8 @@ import {
   GridColumns,
   GridToolbarContainer,
   GridToolbarFilterButton,
-  GridToolbarDensitySelector,
   GridRowSpacingParams,
+  getGridStringOperators
 } from '@mui/x-data-grid'
 import React from 'react';
 import './teacher.scss'
@@ -23,12 +23,17 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 
+const filterOperators = getGridStringOperators().filter(
+  (operator) => operator.value === 'contains',
+);
+
 const cols: GridColumns = [
   {
     field: 'TeacherName',
     headerClassName: 'DataGridHead',
     headerName: 'Teacher',
     width: 200,
+    filterOperators: filterOperators,
   },
   {
     field: 'SubjectName',
@@ -64,12 +69,26 @@ const rows = [
   {id: 12, TeacherName: 'Shishos Cönos', SubjectName: ['Ethik']}
 ]
 
+const CustomGridToolbarContainer = styled(GridToolbarContainer)(() => ({
+  backgroundColor: 'green',
+  borderRadius: '50px',
+  width: '95%',
+  height: '52px',
+  backgroundColor: 'white',
+  padding: '0px',
+  paddingLeft: '30px',
+  '& .MuiDataGrid-filterFormOperatorInput': {
+    display: 'none',
+  },
+}));
+
 function CustomToolbar() {
   return (
-    <GridToolbarContainer>
+    <div style={{width: '100%' }}>
+    <CustomGridToolbarContainer>
       <GridToolbarFilterButton />
-      <GridToolbarDensitySelector />
-    </GridToolbarContainer>
+    </CustomGridToolbarContainer>
+    </div>
   );
 }
 
