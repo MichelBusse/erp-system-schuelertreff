@@ -70,7 +70,6 @@ const rows = [
 ]
 
 const CustomGridToolbarContainer = styled(GridToolbarContainer)(() => ({
-  backgroundColor: 'green',
   borderRadius: '50px',
   width: '96.4%',
   height: '52px',
