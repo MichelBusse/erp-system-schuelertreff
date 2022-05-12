@@ -1,6 +1,6 @@
 .MuiDataGrid-row{
     border-radius: 50px;
-    width: 95% !important;
+    width: 100% !important;
     background-color: white;
     padding-left: 30px !important;
 }
@@ -13,4 +13,7 @@
 }
 .MuiDataGrid-cell{
     border-bottom: none !important;
+}
+.MuiDataGrid-virtualScrollerRenderZone {
+    width: 100%;
 }

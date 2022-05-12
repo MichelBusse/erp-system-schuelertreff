@@ -64,14 +64,10 @@ const rows = [
   {id: 7, TeacherName: 'Dr. Fugi der Magie', SubjectName: ['Mathe', 'Englisch']},
   {id: 8, TeacherName: 'Michel Boss', SubjectName: ['Deutsch', 'Spanisch', 'Info']},
   {id: 9, TeacherName: 'Shishos Cönos', SubjectName: ['Ethik']},
-  {id: 10, TeacherName: 'Dr. Fugi der Magie', SubjectName: ['Mathe', 'Englisch']},
-  {id: 11, TeacherName: 'Michel Boss', SubjectName: ['Deutsch', 'Spanisch', 'Info']},
-  {id: 12, TeacherName: 'Shishos Cönos', SubjectName: ['Ethik']}
 ]
 
 const CustomGridToolbarContainer = styled(GridToolbarContainer)(() => ({
   borderRadius: '50px',
-  width: '96.4%',
   height: '52px',
   backgroundColor: 'white',
   padding: '0px',
