@@ -27,9 +27,9 @@ const SubjectsList = [{subjectName: 'Deutsch', color: 'red'},
 const Subjects: React.FC = () => {
   return (
     <Grid container spacing={4}>
-      <Grid item xs={2}>
+      <Grid item xs={6} sm={4} md={3} lg={2} xl={1}>
             <Item className='plusField'>
-              <IconButton sx={{ height: '134px' }}>
+              <IconButton sx={{ height: '124px' }}>
                 <BsPlusLg/>
               </IconButton>
             </Item>

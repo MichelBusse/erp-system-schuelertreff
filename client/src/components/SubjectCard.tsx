@@ -17,10 +17,10 @@ const Item = styled(Paper)(() => ({
 
 const SubjectCard: React.FC<Props> = ({color, subjectName}) => {
     return (
-        <Grid item xs={2}>
+        <Grid item xs={6} sm={4} md={3} lg={2} xl={1}>
             <Item>{subjectName}
                 <div style={{   width: '100%', 
-                                height: '100px', 
+                                height: '90px', 
                                 backgroundColor: color, 
                                 marginTop: '10px'  }}>
                 </div>
