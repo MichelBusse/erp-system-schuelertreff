@@ -23,6 +23,12 @@ type Props = {
   setDate: Function
 }
 
+var lessons = [ {Day: 'Mon', Subject: ['Deu']},
+                {Day: 'Tue', Subject: ['Deu', 'Ma']},
+                {Day: 'Wed', Subject: ['Ph', 'Fr', 'Lat']},
+                {Day: 'Thu', Subject: ['Deu', 'Eng', 'Bio', 'Geo']},
+                {Day: 'Fri', Subject: ['Eth']} ]
+
 const Calendar: React.FC<Props> = ({ date, teachers, setOpen, setDate }) => (
   <Paper className={styles.wrapper}>
     <CalendarControl date={date} setDate={setDate} />
@@ -55,8 +61,8 @@ const Calendar: React.FC<Props> = ({ date, teachers, setOpen, setDate }) => (
                 {teacher.name}
               </TableCell>
 
-              {[1, 2, 3, 4, 5].map((d) => (
-                <TableCell key={d}>{d}</TableCell>
+              {lessons.map((day) => (
+                <TableCell key={day.Day}>{day.Subject}</TableCell>
               ))}
             </TableRow>
           ))}
