@@ -62,7 +62,7 @@ export type MainMenuProps = {
 const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
   const [open, setOpen] = useState(true)
   const toggleDrawer = () => setOpen(!open)
-  const { token, isAuthed, handleLogout } = useAuth()
+  const { isAuthed, handleLogout, decodeToken } = useAuth()
 
   return (
     <StyledDrawer variant="permanent" open={open}>
@@ -90,10 +90,19 @@ const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
         ))}
       </List>
       <Divider />
-      {isAuthed() && <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
-        <p>{token}</p>
-        <Button onClick={() => handleLogout()}>Logout</Button>
-      </Box>}
+      {isAuthed() && (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            mt: 1,
+          }}
+        >
+          <span>{decodeToken().username}</span>
+          <Button onClick={() => handleLogout()}>Logout</Button>
+        </Box>
+      )}
     </StyledDrawer>
   )
 }
