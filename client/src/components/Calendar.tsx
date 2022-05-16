@@ -62,7 +62,15 @@ const Calendar: React.FC<Props> = ({ date, teachers, setOpen, setDate }) => (
               </TableCell>
 
               {lessons.map((day) => (
-                <TableCell key={day.Day}>{day.Subject}</TableCell>
+                <TableCell key={day.Day} className={styles.lessonCell}>
+                  <div className={styles.lessonContainer}>
+                  {day.Subject.map((subject) => (
+                    <div className={styles.lesson}>
+                      {subject}
+                    </div>
+                  ))}
+                  </div>
+                </TableCell>
               ))}
             </TableRow>
           ))}

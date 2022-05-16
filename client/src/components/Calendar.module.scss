@@ -34,3 +34,23 @@
     background-color: #8CE6F9;
   }
 }
+
+.lessonCell{
+  padding: 0px !important;
+}
+
+.lessonContainer{
+  height: 72.02px;
+  display: flex;
+  justify-content: left;
+}
+
+.lesson{
+  width: 33.33%;
+  background-color: green;
+  border-style: solid;
+  border-color: brown;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
