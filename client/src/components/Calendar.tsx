@@ -7,7 +7,7 @@ import {
   TableRow,
   TableCell,
 } from '@mui/material'
-import dayjs, { Dayjs } from 'dayjs'
+import { Dayjs } from 'dayjs'
 import CalendarControl from './CalendarControl'
 import styles from './Calendar.module.scss'
 
@@ -23,11 +23,13 @@ type Props = {
   setDate: Function
 }
 
-var lessons = [ {Day: 'Mon', Subject: ['Deu']},
-                {Day: 'Tue', Subject: ['Deu', 'Ma']},
-                {Day: 'Wed', Subject: ['Ph', 'Fr', 'Lat']},
-                {Day: 'Thu', Subject: ['Deu', 'Eng', 'Bio', 'Geo']},
-                {Day: 'Fri', Subject: ['Eth']} ]
+var lessons = [
+  { Day: 'Mon', Subject: ['Deu'] },
+  { Day: 'Tue', Subject: ['Deu', 'Ma'] },
+  { Day: 'Wed', Subject: ['Ph', 'Fr', 'Lat'] },
+  { Day: 'Thu', Subject: ['Deu', 'Eng', 'Bio', 'Geo'] },
+  { Day: 'Fri', Subject: ['Eth'] },
+]
 
 const Calendar: React.FC<Props> = ({ date, teachers, setOpen, setDate }) => (
   <Paper className={styles.wrapper}>
@@ -35,7 +37,6 @@ const Calendar: React.FC<Props> = ({ date, teachers, setOpen, setDate }) => (
 
     <TableContainer sx={{ maxHeight: 'calc(100vh - 104px)' }}>
       <Table stickyHeader>
-
         <TableHead>
           <TableRow>
             <TableCell />
@@ -57,18 +58,18 @@ const Calendar: React.FC<Props> = ({ date, teachers, setOpen, setDate }) => (
         <TableBody>
           {teachers.map((teacher) => (
             <TableRow key={teacher.id} hover role="checkbox">
-              <TableCell onClick={() => setOpen({ state: true, info: teacher.name })}>
+              <TableCell
+                onClick={() => setOpen({ state: true, info: teacher.name })}
+              >
                 {teacher.name}
               </TableCell>
 
               {lessons.map((day) => (
                 <TableCell key={day.Day} className={styles.lessonCell}>
                   <div className={styles.lessonContainer}>
-                  {day.Subject.map((subject) => (
-                    <div className={styles.lesson}>
-                      {subject}
-                    </div>
-                  ))}
+                    {day.Subject.map((subject) => (
+                      <div className={styles.lesson}>{subject}</div>
+                    ))}
                   </div>
                 </TableCell>
               ))}
