@@ -53,6 +53,8 @@ export class UsersController {
     return this.usersService.createCustomer(dto);
   }
 
+  // TODO: Remove Public
+  @Public()
   @Post('teacher')
   @Roles(Role.ADMIN)
   async createTeacher(@Body() dto: CreateTeacherDto): Promise<Teacher> {

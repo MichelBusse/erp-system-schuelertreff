@@ -14,6 +14,8 @@ export class SubjectsService {
   create(createUserDto: CreateSubjectDto): Promise<Subject> {
     const subject = new Subject();
     subject.name = createUserDto.name;
+    subject.color = createUserDto.color;
+    subject.shortForm = createUserDto.shortForm;
 
     return this.subjectsRepository.save(subject);
   }

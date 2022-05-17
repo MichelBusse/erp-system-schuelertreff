@@ -2,8 +2,8 @@ import { Grid, Paper } from "@mui/material"
 import { styled } from "@mui/material/styles"
 
 type Props = {
-    color: String,
-    subjectName: String,
+    color: string,
+    subjectName: string,
 }
 
 const Item = styled(Paper)(() => ({
@@ -21,7 +21,8 @@ const SubjectCard: React.FC<Props> = ({color, subjectName}) => {
             <Item>{subjectName}
                 <div style={{   width: '100%', 
                                 height: '90px', 
-                                backgroundColor: color, 
+                                backgroundColor: color,
+                                opacity: 0.5, 
                                 marginTop: '10px'  }}>
                 </div>
             </Item>

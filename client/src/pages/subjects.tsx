@@ -2,7 +2,16 @@ import { Grid, Paper, IconButton } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import SubjectCard from "../components/SubjectCard"
 import { BsPlusLg } from "react-icons/bs"
-import './subjects.scss'
+import "./subjects.scss"
+import axios from "axios"
+import React, { useEffect, useState } from "react"
+
+type subject={
+  id: number,
+  name: string,
+  color: string,
+  shortForm: string
+}
 
 const Item = styled(Paper)(() => ({
   backgroundColor: 'white',
@@ -13,18 +22,18 @@ const Item = styled(Paper)(() => ({
   alignItems: 'center'
 }));
 
-const SubjectsList = [{subjectName: 'Deutsch', color: 'red'},
-                      {subjectName: 'Mathe', color: 'green'},
-                      {subjectName: 'Info', color: 'blue'},
-                      {subjectName: 'Englisch', color: 'yellow'},
-                      {subjectName: 'Religion', color: 'orange'},
-                      {subjectName: 'Physik', color: 'aqua'},
-                      {subjectName: 'Biologie', color: 'grey'},
-                      {subjectName: 'Geschichte', color: 'silver'},
-                      {subjectName: 'Französisch', color: 'purple'}
-]
-
 const Subjects: React.FC = () => {
+
+  const [subjects, setSubjects] = useState<subject[]>([])
+
+  useEffect(()=>{
+    axios.get(`http://localhost:8080/subjects`)
+      .then(res => {
+        const DBsubjects = res.data
+        setSubjects(DBsubjects)
+      })
+  }, [])
+
   return (
     <Grid container spacing={4}>
       <Grid item xs={6} sm={4} md={3} lg={2} xl={1}>
@@ -34,10 +43,11 @@ const Subjects: React.FC = () => {
               </IconButton>
             </Item>
       </Grid>
-      {SubjectsList.map((subject) =>
-        <SubjectCard key={subject.subjectName} subjectName={subject.subjectName} color={subject.color}/>
+      {subjects.map((subject) =>
+        <SubjectCard key={subject.id} subjectName={subject.name} color={subject.color}/>
       )}
     </Grid>)
 }
 
 export default Subjects
+
