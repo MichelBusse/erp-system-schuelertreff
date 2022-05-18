@@ -6,6 +6,7 @@ import "./subjects.scss"
 import axios from "axios"
 import React, { useEffect, useState } from "react"
 
+//Typedefiniton of subjects
 type subject={
   id: number,
   name: string,
@@ -13,6 +14,7 @@ type subject={
   shortForm: string
 }
 
+//style of the Griditem for single subjects
 const Item = styled(Paper)(() => ({
   backgroundColor: 'white',
   borderRadius: '15px',
@@ -22,10 +24,11 @@ const Item = styled(Paper)(() => ({
   alignItems: 'center'
 }));
 
+
+//subject site it self
 const Subjects: React.FC = () => {
-
+  //Get subjects from DB
   const [subjects, setSubjects] = useState<subject[]>([])
-
   useEffect(()=>{
     axios.get(`http://localhost:8080/subjects`)
       .then(res => {
@@ -33,10 +36,10 @@ const Subjects: React.FC = () => {
         setSubjects(DBsubjects)
       })
   }, [])
-
+  //Content of the site
   return (
-    <Grid container spacing={4}>
-      <Grid item xs={6} sm={4} md={3} lg={2} xl={1}>
+    <Grid container spacing={4} columns={24}>
+      <Grid item sm={12} md={6} lg={4} xl={3}>
             <Item className='plusField'>
               <IconButton sx={{ height: '124px' }}>
                 <BsPlusLg/>

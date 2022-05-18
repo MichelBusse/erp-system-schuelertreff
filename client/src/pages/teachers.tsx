@@ -1,3 +1,4 @@
+//Imports:
 import { Grid, Paper, styled } from '@mui/material';
 import {
   DataGrid,
@@ -7,26 +8,50 @@ import {
   GridRowSpacingParams,
   getGridStringOperators
 } from '@mui/x-data-grid'
-import React from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import './teacher.scss'
 
+//Typedefinition for subjects and teachers
+type subject={
+  id: number,
+  name: string,
+  color: string,
+  shortForm: string
+}
+type teacher = {
+  "role": string,
+  "id": number,
+  "lastName": string,
+  "firstName": string,
+  "salutation": string,
+  "street": string,
+  "city": string,
+  "postalCode": string,
+  "email": string,
+  "phone": string,
+  "jwtValidAfter": string,
+  "fee": number,
+  "state": string,
+  "subjects": subject[]
+}
 
+//Styles of the Girditem for the subjects behind the teachers
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1.3),
+  padding: '6px',
   textAlign: 'center',
   borderRadius: '25px',
   paddingLeft: '25px',
   paddingRight: '25px',
-  color: theme.palette.text.secondary,
+  color: 'black',
 }));
 
-
+//customize filter
 const filterOperators = getGridStringOperators().filter(
   (operator) => operator.value === 'contains',
 );
 
+//definition of the columns
 const cols: GridColumns = [
   {
     field: 'TeacherName',
@@ -39,33 +64,21 @@ const cols: GridColumns = [
     field: 'SubjectName',
     headerClassName: 'DataGridHead',
     headerName: 'Subject',
-    width: 500,
+    width: 650,
     renderCell: (params) => (
       <strong>
       <Grid container spacing={3}>
-        {params.value.map((subject: string)=> 
+        {params.value.map((subject: subject)=> 
           <Grid item>
-            <Item>{subject}</Item>
+            <Item sx={{backgroundColor: subject.color + 50}}>{subject.name}</Item>
           </Grid>)}
-        {console.log(params.value)}
         </Grid>
       </strong>
     ),
   },
 ]
 
-const rows = [
-  {id: 1, TeacherName: 'Dr. Fugi der Magie', SubjectName: ['Mathe', 'Englisch']},
-  {id: 2, TeacherName: 'Michel Boss', SubjectName: ['Deutsch', 'Spanisch', 'Info']},
-  {id: 3, TeacherName: 'Shishos Cönos', SubjectName: ['Ethik']},
-  {id: 4, TeacherName: 'Dr. Fugi der Magie', SubjectName: ['Mathe', 'Englisch']},
-  {id: 5, TeacherName: 'Michel Boss', SubjectName: ['Deutsch', 'Spanisch', 'Info']},
-  {id: 6, TeacherName: 'Shishos Cönos', SubjectName: ['Ethik']},
-  {id: 7, TeacherName: 'Dr. Fugi der Magie', SubjectName: ['Mathe', 'Englisch']},
-  {id: 8, TeacherName: 'Michel Boss', SubjectName: ['Deutsch', 'Spanisch', 'Info']},
-  {id: 9, TeacherName: 'Shishos Cönos', SubjectName: ['Ethik']},
-]
-
+//styles of the Toolbar (containse the e.g. filter)
 const CustomGridToolbarContainer = styled(GridToolbarContainer)(() => ({
   borderRadius: '50px',
   height: '52px',
@@ -77,6 +90,7 @@ const CustomGridToolbarContainer = styled(GridToolbarContainer)(() => ({
   },
 }));
 
+//customized Toolbar
 function CustomToolbar() {
   return (
     <div style={{width: '100%' }}>
@@ -87,12 +101,32 @@ function CustomToolbar() {
   );
 }
 
+
+//Teacher site it self
 const Teachers: React.FC = () => {
+  //Get Teachers from DB
+  const [teachers, setTeachers] = useState<teacher[]>([])
+  useEffect(()=>{
+    axios.get(`http://localhost:8080/users/teacher`)
+      .then(res => {
+        setTeachers(res.data)
+      })
+  }, [])
+  //creating rows out of the teachers
+  const rows = teachers.map((teacher: teacher) => {
+     return({
+      id: teacher.id,
+      TeacherName: teacher.firstName + ' ' + teacher.lastName,
+      SubjectName: teacher.subjects.map((subject: subject) => subject)
+    })
+  })
+  console.log(teachers)
+  //space between rows
   const getRowSpacing = React.useCallback((params: GridRowSpacingParams) => ({
     top: params.isFirstVisible ? 16 : 8,
     bottom: params.isLastVisible ? 8 : 8,
   }), [])
-
+  //content of the site
   return (
     <div style={{ display: 'flex', height: '100%', width: '100%' }}>
       <div style={{ flexGrow: 1 }}>

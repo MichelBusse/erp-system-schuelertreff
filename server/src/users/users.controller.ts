@@ -28,6 +28,8 @@ export class UsersController {
     return this.usersService.findAllCustomers();
   }
 
+  // TODO: Remove public
+  @Public()
   @Get('teacher')
   findAllTeachers(): Promise<Teacher[]> {
     return this.usersService.findAllTeachers();
@@ -56,7 +58,7 @@ export class UsersController {
   // TODO: Remove Public
   @Public()
   @Post('teacher')
-  @Roles(Role.ADMIN)
+  // @Roles(Role.ADMIN)
   async createTeacher(@Body() dto: CreateTeacherDto): Promise<Teacher> {
     const user = await this.usersService.createTeacher(dto);
 
