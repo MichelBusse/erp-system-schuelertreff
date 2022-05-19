@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import jwtDecode from 'jwt-decode'
 import axios from 'axios'
+import useInterval from 'react-useinterval'
 
-const localStorageKey = 'token'
+const KEY = 'token'
+const MINUTE = 60000
 
 export type JwtType = {
   exp: number
@@ -41,12 +43,10 @@ const AuthProvider: React.FC = ({ children }) => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const [token, setToken] = useState(
-    localStorage.getItem(localStorageKey) ?? '',
-  )
+  const [token, setToken] = useState(localStorage.getItem(KEY) ?? '')
 
   useEffect(() => {
-    localStorage.setItem(localStorageKey, token)
+    localStorage.setItem(KEY, token)
   }, [token])
 
   // methods
@@ -69,10 +69,26 @@ const AuthProvider: React.FC = ({ children }) => {
   const handleLogout = () => setToken('')
 
   const isAuthed = () => {
-    return token !== '' && new Date().getTime() >= decodeToken().exp * 1000
+    return token !== '' && new Date().getTime() < decodeToken().exp * 1000
   }
 
   const decodeToken = () => jwtDecode<JwtType>(token)
+
+  // if logged in, refresh token every minute to keep it active
+  const refreshToken = () => {
+    if (isAuthed()) {
+      API.get('/auth/refresh', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => {
+          setToken(res.data.access_token)
+        })
+        .catch((err) => {
+          console.error('error while refreshing token:', err)
+        })
+    }
+  }
+  useInterval(refreshToken, MINUTE)
 
   // context provider
 
