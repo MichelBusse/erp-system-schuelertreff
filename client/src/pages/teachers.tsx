@@ -69,7 +69,7 @@ const cols: GridColumns = [
       <strong>
       <Grid container spacing={3}>
         {params.value.map((subject: subject)=> 
-          <Grid item>
+          <Grid item key={subject.id}>
             <Item sx={{backgroundColor: subject.color + 50}}>{subject.name}</Item>
           </Grid>)}
         </Grid>
@@ -117,7 +117,7 @@ const Teachers: React.FC = () => {
      return({
       id: teacher.id,
       TeacherName: teacher.firstName + ' ' + teacher.lastName,
-      SubjectName: teacher.subjects.map((subject: subject) => subject)
+      SubjectName: teacher.subjects
     })
   })
   console.log(teachers)
