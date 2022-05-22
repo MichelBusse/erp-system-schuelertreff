@@ -89,7 +89,6 @@ const AuthProvider: React.FC = ({ children }) => {
 
   const decodeToken = () => jwtDecode<JwtType>(token)
 
-  // if logged in, refresh token every minute to keep it active
   const refreshToken = () => {
     if (isAuthed()) {
       API.get('/auth/refresh')
@@ -101,7 +100,16 @@ const AuthProvider: React.FC = ({ children }) => {
         })
     }
   }
+
+  // if logged in, refresh token every minute to keep it active
   useInterval(refreshToken, MINUTE)
+
+  // if token is already older than 1 minute, refresh immediately (will trigger logout if token is invalid)
+  useEffect(() => {
+    if (new Date().getTime() - decodeToken().iat * 1000 > MINUTE) {
+      refreshToken()
+    }
+  }, [])
 
   // context provider
 
