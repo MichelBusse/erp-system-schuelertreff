@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import jwtDecode from 'jwt-decode'
-import axios from 'axios'
+import axios, { AxiosInstance } from 'axios'
 import useInterval from 'react-useinterval'
 
 const KEY = 'token'
@@ -21,11 +21,8 @@ export type AuthContextValue = {
   handleLogout: () => void
   isAuthed: () => boolean
   decodeToken: () => JwtType
+  API: AxiosInstance
 }
-
-const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-})
 
 const AuthContext = React.createContext({} as AuthContextValue)
 
@@ -45,9 +42,18 @@ const AuthProvider: React.FC = ({ children }) => {
 
   const [token, setToken] = useState(localStorage.getItem(KEY) ?? '')
 
+  // localstorage value will be updated whenever token changes
   useEffect(() => {
     localStorage.setItem(KEY, token)
   }, [token])
+
+  // axios instance
+  const API = axios.create({
+    baseURL: import.meta.env.VITE_API_URL,
+    headers: {
+      Authorization: (token !== '') ? `Bearer ${token}` : '',
+    },
+  })
 
   // methods
 
@@ -77,9 +83,7 @@ const AuthProvider: React.FC = ({ children }) => {
   // if logged in, refresh token every minute to keep it active
   const refreshToken = () => {
     if (isAuthed()) {
-      API.get('/auth/refresh', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      API.get('/auth/refresh')
         .then((res) => {
           setToken(res.data.access_token)
         })
@@ -98,6 +102,7 @@ const AuthProvider: React.FC = ({ children }) => {
     handleLogout,
     isAuthed,
     decodeToken,
+    API,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
