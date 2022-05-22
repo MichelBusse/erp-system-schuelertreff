@@ -51,8 +51,17 @@ const AuthProvider: React.FC = ({ children }) => {
   const API = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     headers: {
-      Authorization: (token !== '') ? `Bearer ${token}` : '',
+      Authorization: token !== '' ? `Bearer ${token}` : '',
     },
+  })
+
+  API.interceptors.response.use(undefined, (error) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      // 401 unauthorized - token seems to be invalid!
+      handleLogout()
+    }
+
+    return Promise.reject(error)
   })
 
   // methods
