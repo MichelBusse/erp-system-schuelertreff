@@ -1,4 +1,7 @@
+import React, { useState } from 'react'
+import { NavLink as NavLinkBase, NavLinkProps } from 'react-router-dom'
 import {
+  Button,
   Divider,
   Drawer,
   IconButton,
@@ -14,8 +17,8 @@ import {
   ChevronLeft as ChevronLeftIcon,
   Menu as MenuIcon,
 } from '@mui/icons-material'
-import React, { useState } from 'react'
-import { NavLink as NavLinkBase, NavLinkProps } from 'react-router-dom'
+import { Box } from '@mui/system'
+import { useAuth } from './AuthProvider'
 
 const drawerWidth = 240
 
@@ -59,6 +62,7 @@ export type MainMenuProps = {
 const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
   const [open, setOpen] = useState(true)
   const toggleDrawer = () => setOpen(!open)
+  const { isAuthed, handleLogout, decodeToken } = useAuth()
 
   return (
     <StyledDrawer variant="permanent" open={open}>
@@ -85,6 +89,20 @@ const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
           </ListItemButton>
         ))}
       </List>
+      <Divider />
+      {isAuthed() && (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            mt: 1,
+          }}
+        >
+          <span>{decodeToken().username}</span>
+          <Button onClick={() => handleLogout()}>Logout</Button>
+        </Box>
+      )}
     </StyledDrawer>
   )
 }
