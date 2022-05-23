@@ -50,6 +50,7 @@ const NavLink = React.forwardRef<HTMLAnchorElement, NavLinkProps>(
     />
   ),
 )
+NavLink.displayName = 'NavLink' // for debugging
 
 export type MainMenuProps = {
   items: Array<{

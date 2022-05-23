@@ -10,6 +10,7 @@ import {
 import { Dayjs } from 'dayjs'
 import CalendarControl from './CalendarControl'
 import styles from './Calendar.module.scss'
+import { Open } from '../pages/timetable'
 
 type teacher = {
   id: number
@@ -19,11 +20,11 @@ type teacher = {
 type Props = {
   date: Dayjs
   teachers: Array<teacher>
-  setOpen: Function
-  setDate: Function
+  setOpen: (open: Open) => void
+  setDate: (date: Dayjs) => void
 }
 
-var lessons = [
+const lessons = [
   { Day: 'Mon', Subject: ['Deu'] },
   { Day: 'Tue', Subject: ['Deu', 'Ma'] },
   { Day: 'Wed', Subject: ['Ph', 'Fr', 'Lat'] },

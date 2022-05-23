@@ -8,8 +8,13 @@ import HiddenMenu from '../components/HiddenMenu'
 dayjs.locale('de')
 dayjs.extend(weekOfYear)
 
+export type Open = {
+  state: boolean
+  info: string
+}
+
 const Timetable: React.FC = () => {
-  const [open, setOpen] = useState({ state: false, info: 'Standard' })
+  const [open, setOpen] = useState<Open>({ state: false, info: 'Standard' })
   const [date, setDate] = useState(dayjs())
 
   const teachers = [

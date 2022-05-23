@@ -6,7 +6,7 @@ import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArro
 
 type Props = {
   date: Dayjs
-  setDate: Function
+  setDate: (open: Dayjs) => void
 }
 
 //Styling:

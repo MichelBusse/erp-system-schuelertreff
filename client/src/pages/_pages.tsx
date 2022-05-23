@@ -6,4 +6,12 @@ import Teachers from './teachers'
 import Timetable from './timetable'
 import NotFound from './404'
 
-export default { Home, Login, Customers, Subjects, Teachers, Timetable, NotFound }
+export default {
+  Home,
+  Login,
+  Customers,
+  Subjects,
+  Teachers,
+  Timetable,
+  NotFound,
+}

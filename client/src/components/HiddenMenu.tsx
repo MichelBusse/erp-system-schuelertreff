@@ -1,8 +1,9 @@
 import { Button, Drawer, styled } from '@mui/material'
+import { Open } from '../pages/timetable'
 
 type Props = {
-  open: { state: boolean; info: string }
-  setOpen: Function
+  open: Open
+  setOpen: (open: Open) => void
 }
 
 const StyledDrawer = styled(Drawer)(() => ({
