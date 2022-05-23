@@ -1,0 +1,41 @@
+.wrapper {
+  display: flex;
+  height: 100%;
+  width: 100%;
+
+  :global(.MuiDataGrid-row) {
+    border-radius: 50px;
+    width: 100% !important;
+    background-color: white;
+    padding-left: 30px !important;
+  }
+
+  :global(.MuiDataGrid-root) {
+    border: none !important;
+  }
+
+  :global(.MuiDataGrid-columnHeaders) {
+    border-bottom: none !important;
+  }
+
+  :global(.MuiDataGrid-cell) {
+    border-bottom: none !important;
+  }
+
+  :global(.MuiDataGrid-virtualScrollerRenderZone) {
+    width: 100%;
+  }
+
+  .customGridToolbarContainer {
+    border-radius: 50px;
+    height: 52px;
+    background-color: white;
+    padding: 0px 30px;
+    display: flex;
+    justify-content: space-between;
+
+    :global(.MuiDataGrid-filterFormOperatorInput) {
+      display: none;
+    }
+  }
+}

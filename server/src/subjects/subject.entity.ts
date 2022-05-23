@@ -7,4 +7,10 @@ export class Subject {
 
   @Column()
   name: string
+
+  @Column()
+  shortForm: string
+
+  @Column()
+  color: string
 }
