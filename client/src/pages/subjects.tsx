@@ -1,21 +1,22 @@
 import {
-  Grid,
-  Paper,
-  IconButton,
+  Button,
   Dialog,
   DialogActions,
-  Button,
   DialogContent,
-  TextField,
   DialogContentText,
   DialogTitle,
+  Grid,
+  IconButton,
+  Paper,
+  TextField,
 } from '@mui/material'
-import { BsPlusLg } from 'react-icons/bs'
-import styles from './subjects.module.scss'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { SketchPicker } from 'react-color'
+import { BsPlusLg } from 'react-icons/bs'
+
 import subject from '../types/subject'
+import styles from './subjects.module.scss'
 
 const defaultFormData = {
   color: '#FF0000',

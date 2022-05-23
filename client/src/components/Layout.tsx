@@ -1,12 +1,13 @@
-import { Box, CssBaseline, useTheme } from '@mui/material'
-import MainMenu from './MainMenu'
 import {
   Layers as LayersIcon,
   People as PeopleIcon,
   School as SchoolIcon,
   TableChart as TableChartIcon,
 } from '@mui/icons-material'
+import { Box, CssBaseline, useTheme } from '@mui/material'
 import { Outlet } from 'react-router-dom'
+
+import MainMenu from './MainMenu'
 
 const menuItems = [
   {

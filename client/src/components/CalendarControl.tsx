@@ -1,8 +1,8 @@
-import { Stack, IconButton } from '@mui/material'
-import { styled } from '@mui/system'
-import { Dayjs } from 'dayjs'
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft'
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight'
+import { IconButton, Stack } from '@mui/material'
+import { styled } from '@mui/system'
+import { Dayjs } from 'dayjs'
 
 type Props = {
   date: Dayjs
@@ -10,7 +10,10 @@ type Props = {
 }
 
 //Styling:
-const StyledStack = styled(Stack, {})({
+const StyledStack = styled(
+  Stack,
+  {},
+)({
   height: 40,
   display: 'flex',
   alignItems: 'center',

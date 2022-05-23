@@ -1,4 +1,4 @@
-import subject from "./subject"
+import subject from './subject'
 
 type teacher = {
   role: string

@@ -1,4 +1,5 @@
 import { Button, Drawer, styled } from '@mui/material'
+
 import { Open } from '../pages/timetable'
 
 type Props = {

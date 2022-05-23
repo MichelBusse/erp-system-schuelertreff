@@ -1,8 +1,10 @@
+import axios, { AxiosInstance } from 'axios'
+import jwtDecode from 'jwt-decode'
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import jwtDecode from 'jwt-decode'
-import axios, { AxiosInstance } from 'axios'
 import useInterval from 'react-useinterval'
+
+import { NavigateState } from '../App'
 
 const KEY = 'token'
 const MINUTE = 60000
@@ -76,7 +78,7 @@ const AuthProvider: React.FC = ({ children }) => {
     if (response.data.access_token) {
       setToken(response.data.access_token)
 
-      const origin = (location.state as any)?.from?.pathname || '/'
+      const origin = (location.state as NavigateState)?.from?.pathname || '/'
       navigate(origin)
     }
   }

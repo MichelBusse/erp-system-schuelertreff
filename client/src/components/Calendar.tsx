@@ -2,15 +2,16 @@ import {
   Paper,
   Table,
   TableBody,
+  TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  TableCell,
 } from '@mui/material'
 import { Dayjs } from 'dayjs'
-import CalendarControl from './CalendarControl'
-import styles from './Calendar.module.scss'
+
 import { Open } from '../pages/timetable'
+import styles from './Calendar.module.scss'
+import CalendarControl from './CalendarControl'
 
 type teacher = {
   id: number
@@ -68,8 +69,10 @@ const Calendar: React.FC<Props> = ({ date, teachers, setOpen, setDate }) => (
               {lessons.map((day) => (
                 <TableCell key={day.Day} className={styles.lessonCell}>
                   <div className={styles.lessonContainer}>
-                    {day.Subject.map((subject) => (
-                      <div className={styles.lesson}>{subject}</div>
+                    {day.Subject.map((subject, i) => (
+                      <div key={i} className={styles.lesson}>
+                        {subject}
+                      </div>
                     ))}
                   </div>
                 </TableCell>

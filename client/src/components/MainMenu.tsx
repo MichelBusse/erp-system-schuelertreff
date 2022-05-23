@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
-import { NavLink as NavLinkBase, NavLinkProps } from 'react-router-dom'
+import {
+  ChevronLeft as ChevronLeftIcon,
+  Menu as MenuIcon,
+} from '@mui/icons-material'
 import {
   Button,
   Divider,
@@ -13,11 +15,10 @@ import {
   SvgIcon,
   Toolbar,
 } from '@mui/material'
-import {
-  ChevronLeft as ChevronLeftIcon,
-  Menu as MenuIcon,
-} from '@mui/icons-material'
 import { Box } from '@mui/system'
+import React, { useState } from 'react'
+import { NavLink as NavLinkBase, NavLinkProps } from 'react-router-dom'
+
 import { useAuth } from './AuthProvider'
 
 const drawerWidth = 240

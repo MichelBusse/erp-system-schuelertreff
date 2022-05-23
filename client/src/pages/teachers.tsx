@@ -1,3 +1,4 @@
+import AddCircleIcon from '@mui/icons-material/AddCircle'
 import {
   Autocomplete,
   Button,
@@ -17,18 +18,18 @@ import {
 } from '@mui/material'
 import {
   DataGrid,
+  getGridStringOperators,
   GridColumns,
+  GridRowSpacingParams,
   GridToolbarContainer,
   GridToolbarFilterButton,
-  GridRowSpacingParams,
-  getGridStringOperators,
 } from '@mui/x-data-grid'
 import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
-import styles from './teachers.module.scss'
-import AddCircleIcon from '@mui/icons-material/AddCircle'
+
 import subject from '../types/subject'
 import teacher from '../types/teacher'
+import styles from './teachers.module.scss'
 
 //customize filter
 const filterOperators = getGridStringOperators().filter(
