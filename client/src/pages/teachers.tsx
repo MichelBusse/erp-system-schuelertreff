@@ -1,4 +1,3 @@
-//Imports:
 import {
   Autocomplete,
   Button,
@@ -14,7 +13,6 @@ import {
   MenuItem,
   Paper,
   Select,
-  styled,
   TextField,
 } from '@mui/material'
 import {
@@ -26,55 +24,11 @@ import {
   getGridStringOperators,
 } from '@mui/x-data-grid'
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import './teacher.scss'
+import { useCallback, useEffect, useState } from 'react'
+import styles from './teachers.module.scss'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-
-//Typedefinition for subjects and teachers
-type subject = {
-  id: number
-  name: string
-  color: string
-  shortForm: string
-}
-type FieldData = {
-  firstName: string,
-  lastName: string,
-  salutation: string,
-  city: string,
-  postalCode: string,
-  street: string,
-  email: string,
-  phone: string,
-  subjects: subject[],
-  fee: number,
-}
-type teacher = {
-  role: string
-  id: number
-  lastName: string
-  firstName: string
-  salutation: string
-  street: string
-  city: string
-  postalCode: string
-  email: string
-  phone: string
-  jwtValidAfter: string
-  fee: number
-  state: string
-  subjects: subject[]
-}
-
-//Styles of the Girditem for the subjects behind the teachers
-const Item = styled(Paper)(({ theme }) => ({
-  padding: '6px',
-  textAlign: 'center',
-  borderRadius: '25px',
-  paddingLeft: '25px',
-  paddingRight: '25px',
-  color: 'black',
-}))
+import subject from '../types/subject'
+import teacher from '../types/teacher'
 
 //customize filter
 const filterOperators = getGridStringOperators().filter(
@@ -100,9 +54,17 @@ const cols: GridColumns = [
         <Grid container spacing={3}>
           {params.value.map((subject: subject) => (
             <Grid item key={subject.id}>
-              <Item sx={{ backgroundColor: subject.color + 50 }}>
+              <Paper
+                sx={{
+                  backgroundColor: subject.color + 50,
+                  padding: '6px 25px',
+                  textAlign: 'center',
+                  borderRadius: '25px',
+                  color: 'black',
+                }}
+              >
                 {subject.name}
-              </Item>
+              </Paper>
             </Grid>
           ))}
         </Grid>
@@ -111,78 +73,44 @@ const cols: GridColumns = [
   },
 ]
 
-//styles of the Toolbar (containse the e.g. filter)
-const CustomGridToolbarContainer = styled(GridToolbarContainer)(() => ({
-  borderRadius: '50px',
-  height: '52px',
-  backgroundColor: 'white',
-  padding: '0px 30px',
-  display: 'flex',
-  justifyContent: 'space-between',
-  '& .MuiDataGrid-filterFormOperatorInput': {
-    display: 'none',
-  },
-}))
-
-//customized Toolbar
-function CustomToolbar(setOpen: Function) {
-  return (
-    <div style={{ width: '100%' }}>
-      <CustomGridToolbarContainer>
-        <GridToolbarFilterButton />
-      </CustomGridToolbarContainer>
-    </div>
-  )
+const defaultFormData = {
+  firstName: '',
+  lastName: '',
+  salutation: '',
+  city: '',
+  postalCode: '',
+  street: '',
+  email: '',
+  phone: '',
+  subjects: [] as subject[],
+  fee: 0,
 }
 
-//Teacher site it self
 const Teachers: React.FC = () => {
-  //Get subjects from DB
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [subjects, setSubjects] = useState<subject[]>([])
-  useEffect(()=>{
-    axios.get(`http://localhost:8080/subjects`)
-      .then(res => {
-        const DBsubjects = res.data
-        setSubjects(DBsubjects)
-      })
-  }, [])
-
-  //field Data:
-  const [Data, setData] = useState<FieldData>({
-    firstName: '',
-    lastName: '',
-    salutation: '',
-    city: '',
-    postalCode: '',
-    street: '',
-    email: '',
-    phone: '',
-    subjects: [],
-    fee: 0,
-  })
-
-  //Get Teachers from DB
   const [teachers, setTeachers] = useState<teacher[]>([])
+  const [data, setData] = useState(defaultFormData)
+
+  //Get subjects, teachers from DB
   useEffect(() => {
-    axios.get(`http://localhost:8080/users/teacher`).then((res) => {
-      setTeachers(res.data)
-    })
+    axios
+      .get(`http://localhost:8080/subjects`)
+      .then((res) => setSubjects(res.data))
+    axios
+      .get(`http://localhost:8080/users/teacher`)
+      .then((res) => setTeachers(res.data))
   }, [])
+
   //creating rows out of the teachers
-  const rows = teachers.map((teacher: teacher) => {
-    return {
-      id: teacher.id,
-      TeacherName: teacher.firstName + ' ' + teacher.lastName,
-      SubjectName: teacher.subjects,
-    }
-  })
-  console.log(teachers)
-  //open and close dialog
-  const [open, setOpen] = React.useState(false)
-  const handleClickOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
+  const rows = teachers.map((teacher) => ({
+    id: teacher.id,
+    TeacherName: teacher.firstName + ' ' + teacher.lastName,
+    SubjectName: teacher.subjects,
+  }))
+
   //space between rows
-  const getRowSpacing = React.useCallback(
+  const getRowSpacing = useCallback(
     (params: GridRowSpacingParams) => ({
       top: params.isFirstVisible ? 16 : 8,
       bottom: params.isLastVisible ? 8 : 8,
@@ -190,26 +118,36 @@ const Teachers: React.FC = () => {
     [],
   )
 
-  //TODO: validate filled s
-  //submit function:
-  const submit = () => {
-    console.log()
-    axios.post(`http://localhost:8080/users/teacher`, Data)
-      .then(res => {
-        setTeachers(s => [...s, res.data])
-        console.log(res)
-      })
-    setOpen(false);
+  const openDialog = () => {
+    setData(defaultFormData)
+    setDialogOpen(true)
   }
 
-  //content of the site
+  //TODO: validate filled fields
+  const submitForm = () => {
+    axios.post(`http://localhost:8080/users/teacher`, data).then((res) => {
+      setTeachers((s) => [...s, res.data])
+      setDialogOpen(false)
+    })
+  }
+
   return (
-    <div style={{ display: 'flex', height: '100%', width: '100%' }}>
+    <div className={styles.wrapper}>
       <div style={{ flexGrow: 1 }}>
         <DataGrid
           headerHeight={0}
           disableSelectionOnClick={true}
-          components={{ Toolbar: CustomToolbar }}
+          components={{
+            Toolbar: () => (
+              <div style={{ width: '100%' }}>
+                <GridToolbarContainer
+                  className={styles.customGridToolbarContainer}
+                >
+                  <GridToolbarFilterButton />
+                </GridToolbarContainer>
+              </div>
+            ),
+          }}
           hideFooter={true}
           rows={rows}
           columns={cols}
@@ -217,11 +155,11 @@ const Teachers: React.FC = () => {
         />
       </div>
       <div>
-        <IconButton onClick={handleClickOpen}>
+        <IconButton onClick={openDialog}>
           <AddCircleIcon fontSize="large" color="primary" />
         </IconButton>
       </div>
-      <Dialog open={open}>
+      <Dialog open={dialogOpen}>
         <DialogTitle>Fach hinzufügen</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -233,15 +171,16 @@ const Teachers: React.FC = () => {
             sx={{ width: '25%', marginRight: '75%', marginTop: '15px' }}
           >
             <InputLabel id="SalutationLable">Anrede *</InputLabel>
-            <Select 
-              id="Salutation" 
+            <Select
+              id="Salutation"
               label="Anrede"
+              value={data.salutation}
               onChange={(event) =>
-                setData((data) => ({ ...data, salutation: event.target.value as string }))
+                setData((data) => ({ ...data, salutation: event.target.value }))
               }
-              value={Data.salutation}>
-                <MenuItem value="Herr">Herr</MenuItem>
-                <MenuItem value="Frau">Frau</MenuItem>
+            >
+              <MenuItem value="Herr">Herr</MenuItem>
+              <MenuItem value="Frau">Frau</MenuItem>
             </Select>
           </FormControl>
           <TextField
@@ -250,10 +189,10 @@ const Teachers: React.FC = () => {
             variant="outlined"
             required={true}
             sx={{ margin: '10px', marginLeft: '0px', width: '45%' }}
+            value={data.firstName}
             onChange={(event) =>
               setData((data) => ({ ...data, firstName: event.target.value }))
             }
-            value={Data.firstName}
           />
           <TextField
             id="lastName"
@@ -261,10 +200,10 @@ const Teachers: React.FC = () => {
             variant="outlined"
             required={true}
             sx={{ margin: '10px', width: '45%' }}
+            value={data.lastName}
             onChange={(event) =>
               setData((data) => ({ ...data, lastName: event.target.value }))
             }
-            value={Data.lastName}
           />
           <TextField
             id="city"
@@ -272,10 +211,10 @@ const Teachers: React.FC = () => {
             variant="outlined"
             required={true}
             sx={{ margin: '10px', marginLeft: '0px', width: '60%' }}
+            value={data.city}
             onChange={(event) =>
               setData((data) => ({ ...data, city: event.target.value }))
             }
-            value={Data.city}
           />
           <TextField
             id="postalCode"
@@ -283,21 +222,21 @@ const Teachers: React.FC = () => {
             variant="outlined"
             required={true}
             sx={{ margin: '10px', width: '30%' }}
+            value={data.postalCode}
             onChange={(event) =>
               setData((data) => ({ ...data, postalCode: event.target.value }))
             }
-            value={Data.postalCode}
           />
-           <TextField
+          <TextField
             id="street"
             label="Straße"
             variant="outlined"
             required={true}
             sx={{ margin: '10px', marginLeft: '0px', width: '94%' }}
+            value={data.street}
             onChange={(event) =>
               setData((data) => ({ ...data, street: event.target.value }))
             }
-            value={Data.street}
           />
           <TextField
             id="email"
@@ -305,10 +244,10 @@ const Teachers: React.FC = () => {
             variant="outlined"
             required={true}
             sx={{ margin: '10px', marginLeft: '0px', width: '60%' }}
+            value={data.email}
             onChange={(event) =>
               setData((data) => ({ ...data, email: event.target.value }))
             }
-            value={Data.email}
           />
           <TextField
             id="phone"
@@ -316,10 +255,10 @@ const Teachers: React.FC = () => {
             variant="outlined"
             required={true}
             sx={{ margin: '10px', width: '30%' }}
+            value={data.phone}
             onChange={(event) =>
               setData((data) => ({ ...data, phone: event.target.value }))
             }
-            value={Data.phone}
           />
           <Autocomplete
             multiple
@@ -329,10 +268,10 @@ const Teachers: React.FC = () => {
             renderInput={(params) => (
               <TextField {...params} variant="standard" label="Fächer *" />
             )}
-            onChange={(event, value) =>
+            value={data.subjects}
+            onChange={(_, value) =>
               setData((data) => ({ ...data, subjects: value }))
             }
-            value={Data.subjects}
           />
           <TextField
             type="number"
@@ -340,15 +279,15 @@ const Teachers: React.FC = () => {
             label="Lohn"
             variant="outlined"
             sx={{ marginTop: '20px', width: '15%' }}
+            value={data.fee}
             onChange={(event) =>
-              setData((data) => ({ ...data, fee: event.target.value as unknown as number }))
+              setData((data) => ({ ...data, fee: Number(event.target.value) }))
             }
-            value={Data.fee}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Abbrechen</Button>
-          <Button onClick={submit}>Hinzufügen</Button>
+          <Button onClick={() => setDialogOpen(false)}>Abbrechen</Button>
+          <Button onClick={submitForm}>Hinzufügen</Button>
         </DialogActions>
       </Dialog>
     </div>

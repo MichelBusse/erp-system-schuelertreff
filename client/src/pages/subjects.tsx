@@ -1,121 +1,123 @@
-import { Grid, Paper, IconButton, Dialog, DialogActions, Button, DialogContent, TextField, DialogContentText, DialogTitle } from "@mui/material"
-import { styled } from "@mui/material/styles"
-import SubjectCard from "../components/SubjectCard"
-import { BsPlusLg } from "react-icons/bs"
-import "./subjects.scss"
-import axios from "axios"
-import React, { useEffect, useState } from "react"
+import {
+  Grid,
+  Paper,
+  IconButton,
+  Dialog,
+  DialogActions,
+  Button,
+  DialogContent,
+  TextField,
+  DialogContentText,
+  DialogTitle,
+} from '@mui/material'
+import { BsPlusLg } from 'react-icons/bs'
+import styles from './subjects.module.scss'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
 import { SketchPicker } from 'react-color'
+import subject from '../types/subject'
 
-//Typedefiniton of subjects
-type subject={
-  id: number,
-  name: string,
-  color: string,
-  shortForm: string
+const defaultFormData = {
+  color: '#FF0000',
+  name: '',
+  shortForm: '',
 }
 
-//style of the Griditem for single subjects
-const Item = styled(Paper)(() => ({
-  backgroundColor: 'white',
-  borderRadius: '15px',
-  padding: '15px',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center'
-}));
-
-
-//subject site it self
 const Subjects: React.FC = () => {
-  
-  //state of the AddSubject Dialog
-  const [open, setOpen] = React.useState(false)
-  const handleClickOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
-  //Handels the Colorchange
-  const [color, setColor] = React.useState('#FF0000')
-  const handleColorChange = (color:any) => setColor(color.hex)
-  //subjectName:
-  const [subjectName, setSubjectName] = useState('')
-  const changeSubjectName = (event:any) => setSubjectName(event.target.value)
-  //shortForm:
-  const [shortForm, setShortForm] = useState('')
-  const changeShortForm = (event:any) => setShortForm(event.target.value)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [data, setData] = useState(defaultFormData)
+  const [subjects, setSubjects] = useState<subject[]>([])
 
   //Get subjects from DB
-  const [subjects, setSubjects] = useState<subject[]>([])
-  useEffect(()=>{
-    axios.get(`http://localhost:8080/subjects`)
-      .then(res => {
-        const DBsubjects = res.data
-        setSubjects(DBsubjects)
-      })
+  useEffect(() => {
+    axios.get(`http://localhost:8080/subjects`).then((res) => {
+      const DBsubjects = res.data
+      setSubjects(DBsubjects)
+    })
   }, [])
 
-  //TODO: validate filled fields
-  //submit function:
-  const submit = () => {
-    axios.post(`http://localhost:8080/subjects`, {
-      name: subjectName,
-	    color: color,
-	    shortForm: shortForm
-    })
-      .then(res => {
-        setSubjects(s => [...s, res.data])
-        console.log(res)
-      })
-    setOpen(false);
+  const openDialog = () => {
+    setData(defaultFormData)
+    setDialogOpen(true)
   }
 
-  //Content of the site
+  //TODO: validate filled fields
+  const submitForm = () => {
+    axios.post(`http://localhost:8080/subjects`, data).then((res) => {
+      setSubjects((s) => [...s, res.data])
+      setData(defaultFormData)
+      setDialogOpen(false)
+    })
+  }
+
   return (
     <>
-      <Dialog open={open}>
+      <Dialog open={dialogOpen}>
         <DialogTitle>Fach hinzufügen</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Geben Sie die Bezeichnung das Faches, dessen Abkürzung für den Stundenplan ein und wählen Sie eine Farbe aus.
+            Geben Sie die Bezeichnung das Faches, dessen Abkürzung für den
+            Stundenplan ein und wählen Sie eine Farbe aus.
           </DialogContentText>
           <TextField
             id="subjectName"
             label="Fachbezeichnung"
             variant="outlined"
             required={true}
-            sx={{margin: '10px', marginLeft: '0px'}}
-            onChange={ changeSubjectName }
+            sx={{ margin: '10px', marginLeft: '0px' }}
+            value={data.name}
+            onChange={(event) =>
+              setData((data) => ({ ...data, name: event.target.value }))
+            }
           />
           <TextField
             id="shortForm"
             label="Abkürzung"
             variant="outlined"
             required={true}
-            sx={{margin: '10px'}}
-            onChange={ changeShortForm }
+            sx={{ margin: '10px' }}
+            value={data.shortForm}
+            onChange={(event) =>
+              setData((data) => ({ ...data, shortForm: event.target.value }))
+            }
           />
           <SketchPicker
-            color={ color }
-            onChange={ handleColorChange }
-          /> 
+            color={data.color}
+            onChange={(color) =>
+              setData((data) => ({ ...data, color: color.hex }))
+            }
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={ handleClose }>Abbrechen</Button>
-          <Button onClick={ submit }>Hinzufügen</Button>
+          <Button onClick={() => setDialogOpen(false)}>Abbrechen</Button>
+          <Button onClick={submitForm}>Hinzufügen</Button>
         </DialogActions>
       </Dialog>
       <Grid container spacing={4} columns={24}>
         <Grid item sm={12} md={6} lg={4} xl={3}>
-              <Item className='plusField' onClick={handleClickOpen}>
-                <IconButton sx={{ height: '124px' }}>
-                  <BsPlusLg/>
-                </IconButton>
-              </Item>
+          <IconButton className={styles.card} onClick={openDialog}>
+            <BsPlusLg />
+          </IconButton>
         </Grid>
-        {subjects.map((subject) =>
-          <SubjectCard key={subject.id} subjectName={subject.name} color={subject.color}/>
-        )}
+        {subjects.map((subject) => (
+          <Grid key={subject.id} item sm={12} md={6} lg={4} xl={3}>
+            <Paper className={styles.card}>
+              {subject.name}
+              <div
+                style={{
+                  width: '100%',
+                  height: 90,
+                  backgroundColor: subject.color,
+                  opacity: 0.5,
+                  marginTop: 10,
+                }}
+              />
+            </Paper>
+          </Grid>
+        ))}
       </Grid>
-    </>)
+    </>
+  )
 }
 
 export default Subjects
