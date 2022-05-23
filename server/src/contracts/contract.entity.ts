@@ -1,14 +1,15 @@
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
+  Entity,
   JoinTable,
   ManyToMany,
-} from 'typeorm';
-import { Customer } from 'src/users/entities/customer.entity';
-import { Teacher } from 'src/users/entities/teacher.entity';
-import { Subject } from 'src/subjects/subject.entity';
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm'
+
+import { Subject } from 'src/subjects/subject.entity'
+import { Customer } from 'src/users/entities/customer.entity'
+import { Teacher } from 'src/users/entities/teacher.entity'
 
 export enum Weekdays {
   MONDAY = 'monday',
@@ -23,36 +24,36 @@ export enum Weekdays {
 @Entity()
 export class Contract {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @ManyToMany(() => Customer, { cascade: true })
   @JoinTable()
-  customers: Customer[];
+  customers: Customer[]
 
   @ManyToOne(() => Teacher)
-  teacher: Teacher;
+  teacher: Teacher
 
   @ManyToOne(() => Subject)
-  subject: Subject;
+  subject: Subject
 
   @Column({
     type: 'enum',
     enum: Weekdays,
   })
-  weekday: Weekdays;
+  weekday: Weekdays
 
   @Column({ type: 'time' })
-  from: string;
+  from: string
 
   @Column({ type: 'time' })
-  to: string;
+  to: string
 
   @Column({ type: 'timestamptz' })
-  startDate: Date;
+  startDate: Date
 
   @Column({ type: 'timestamptz' })
-  endDate: Date;
+  endDate: Date
 
   @Column()
-  frequency: number;
+  frequency: number
 }

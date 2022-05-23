@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CreateLessonDto } from './dto/create-lesson.dto';
-import { Lesson } from './lesson.entity';
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+
+import { CreateLessonDto } from './dto/create-lesson.dto'
+import { Lesson } from './lesson.entity'
 
 @Injectable()
 export class LessonsService {
@@ -12,26 +13,26 @@ export class LessonsService {
   ) {}
 
   create(createLessonDto: CreateLessonDto): Promise<Lesson> {
-    const lesson = new Lesson();
-    lesson.date = createLessonDto.date;
-    lesson.state = createLessonDto.state;
-    lesson.teacher = createLessonDto.teacher; //TODO: teacher optional
-    lesson.contract = createLessonDto.contract;
+    const lesson = new Lesson()
+    lesson.date = createLessonDto.date
+    lesson.state = createLessonDto.state
+    lesson.teacher = createLessonDto.teacher //TODO: teacher optional
+    lesson.contract = createLessonDto.contract
 
-    return this.lessonsRepository.save(lesson);
+    return this.lessonsRepository.save(lesson)
   }
 
   async findAll(): Promise<Lesson[]> {
     return this.lessonsRepository.find({
       loadRelationIds: true,
-    });
+    })
   }
 
   findOne(id: string): Promise<Lesson> {
-    return this.lessonsRepository.findOne(id);
+    return this.lessonsRepository.findOne(id)
   }
 
   async remove(id: string): Promise<void> {
-    await this.lessonsRepository.delete(id);
+    await this.lessonsRepository.delete(id)
   }
 }

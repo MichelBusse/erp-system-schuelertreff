@@ -1,12 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import * as argon2 from 'argon2';
-import { Repository } from 'typeorm';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { CreateCustomerDto } from './dto/create-customer.dto';
-import { CreateTeacherDto } from './dto/create-teacher.dto';
-import { User, Admin, Customer, Teacher } from './entities';
-import { TeacherState } from './entities/teacher.entity';
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import * as argon2 from 'argon2'
+import { Repository } from 'typeorm'
+
+import { CreateAdminDto } from './dto/create-admin.dto'
+import { CreateCustomerDto } from './dto/create-customer.dto'
+import { CreateTeacherDto } from './dto/create-teacher.dto'
+import { Admin, Customer, Teacher, User } from './entities'
+import { TeacherState } from './entities/teacher.entity'
 
 @Injectable()
 export class UsersService {
@@ -33,7 +34,7 @@ export class UsersService {
       timeCost: 2,
       memoryCost: 15 * 1024,
       parallelism: 1,
-    });
+    })
   }
 
   /**
@@ -45,7 +46,7 @@ export class UsersService {
       .createQueryBuilder('user')
       .where({ email: email })
       .addSelect(['user.passwordHash', 'user.mayAuthenticate'])
-      .getOne();
+      .getOne()
   }
 
   /**
@@ -55,29 +56,29 @@ export class UsersService {
   async findAll(): Promise<User[]> {
     return this.usersRepository.find({
       relations: ['subjects'],
-    });
+    })
   }
 
   async findAllCustomers(): Promise<Customer[]> {
-    return this.customersRepository.find();
+    return this.customersRepository.find()
   }
 
   async findAllTeachers(): Promise<Teacher[]> {
     return this.teachersRepository.find({
       relations: ['subjects'],
-    });
+    })
   }
 
   findOne(id: number): Promise<User> {
-    return this.usersRepository.findOne(id);
+    return this.usersRepository.findOne(id)
   }
 
   findOneCustomer(id: number): Promise<Customer> {
-    return this.customersRepository.findOne(id);
+    return this.customersRepository.findOne(id)
   }
 
   findOneTeacher(id: number): Promise<Teacher> {
-    return this.teachersRepository.findOne(id);
+    return this.teachersRepository.findOne(id)
   }
 
   /**
@@ -85,7 +86,7 @@ export class UsersService {
    * @param id
    */
   async remove(id: number): Promise<void> {
-    await this.usersRepository.delete(id);
+    await this.usersRepository.delete(id)
   }
 
   /**
@@ -103,9 +104,9 @@ export class UsersService {
       email: dto.email,
       phone: dto.phone,
       mayAuthenticate: false,
-    });
+    })
 
-    return this.customersRepository.save(customer);
+    return this.customersRepository.save(customer)
   }
 
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
@@ -122,9 +123,9 @@ export class UsersService {
       state: TeacherState.APPLIED,
       subjects: dto.subjects,
       mayAuthenticate: true,
-    });
+    })
 
-    return this.teachersRepository.save(teacher);
+    return this.teachersRepository.save(teacher)
   }
 
   async createAdmin(dto: CreateAdminDto): Promise<Admin> {
@@ -138,20 +139,20 @@ export class UsersService {
       email: dto.email,
       phone: dto.phone,
       mayAuthenticate: true,
-    });
+    })
 
-    return this.adminsRepository.save(admin);
+    return this.adminsRepository.save(admin)
   }
 
   /**
    * Password reset
    */
   async setPassword(id: number, password: string): Promise<User> {
-    const user = await this.usersRepository.findOne(id);
+    const user = await this.usersRepository.findOne(id)
 
-    user.passwordHash = await this.hash(password);
-    user.jwtValidAfter = new Date();
+    user.passwordHash = await this.hash(password)
+    user.jwtValidAfter = new Date()
 
-    return this.usersRepository.save(user);
+    return this.usersRepository.save(user)
   }
 }

@@ -1,19 +1,19 @@
-import { Salutation } from '../entities/user.entity';
+import { Salutation } from '../entities/user.entity'
 
 export abstract class CreateUserDto {
-  lastName: string;
+  lastName: string
 
-  firstName: string;
+  firstName: string
 
-  salutation: Salutation;
+  salutation: Salutation
 
-  street: string;
+  street: string
 
-  city: string;
+  city: string
 
-  postalCode: string;
+  postalCode: string
 
-  email: string;
+  email: string
 
-  phone: string;
+  phone: string
 }

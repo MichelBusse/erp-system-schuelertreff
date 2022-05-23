@@ -1,7 +1,9 @@
-import { ChildEntity, Column, ManyToMany, JoinTable } from 'typeorm';
-import { Subject } from 'src/subjects/subject.entity';
-import { Role } from 'src/auth/role.enum';
-import { User } from './user.entity';
+import { ChildEntity, Column, JoinTable, ManyToMany } from 'typeorm'
+
+import { Role } from 'src/auth/role.enum'
+import { Subject } from 'src/subjects/subject.entity'
+
+import { User } from './user.entity'
 
 export enum TeacherState {
   APPLIED = 'applied',
@@ -12,19 +14,19 @@ export enum TeacherState {
 
 @ChildEntity()
 export class Teacher extends User {
-  role = Role.TEACHER;
+  role = Role.TEACHER
 
   //TODO: decimal value
   @Column()
-  fee: number;
+  fee: number
 
   @Column({
     type: 'enum',
     enum: TeacherState,
   })
-  state: TeacherState;
+  state: TeacherState
 
   @ManyToMany(() => Subject, { cascade: true })
   @JoinTable()
-  subjects: Subject[];
+  subjects: Subject[]
 }

@@ -1,8 +1,9 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { nanoid } from 'nanoid';
-import { Salutation } from './users/entities/user.entity';
-import { UsersService } from './users/users.service';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { nanoid } from 'nanoid'
+
+import { Salutation } from './users/entities/user.entity'
+import { UsersService } from './users/users.service'
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
@@ -12,13 +13,13 @@ export class AppService implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap() {
-    const adminUser = this.config.get<string>('ADMIN_USER');
+    const adminUser = this.config.get<string>('ADMIN_USER')
 
     // create intial admin user if it does not exist
     if (!(await this.usersService.findByEmailAuth(adminUser))) {
-      const password = nanoid();
+      const password = nanoid()
 
-      console.log(`Creating admin user with password '${password}'`);
+      console.log(`Creating admin user with password '${password}'`)
 
       const user = await this.usersService.createAdmin({
         lastName: 'Administrator',
@@ -29,13 +30,13 @@ export class AppService implements OnApplicationBootstrap {
         postalCode: '',
         email: adminUser,
         phone: '',
-      });
+      })
 
-      this.usersService.setPassword(user.id, password);
+      this.usersService.setPassword(user.id, password)
     }
   }
 
   getHello(): string {
-    return 'Hello World!';
+    return 'Hello World!'
   }
 }

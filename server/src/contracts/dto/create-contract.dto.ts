@@ -1,30 +1,32 @@
-import { ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
-import { Weekdays } from '../contract.entity';
-import { Teacher } from 'src/users/entities/teacher.entity';
-import { Customer } from 'src/users/entities/customer.entity';
-import { Subject } from 'src/subjects/subject.entity';
+import { Type } from 'class-transformer'
+import { ValidateNested } from 'class-validator'
+
+import { Subject } from 'src/subjects/subject.entity'
+import { Customer } from 'src/users/entities/customer.entity'
+import { Teacher } from 'src/users/entities/teacher.entity'
+
+import { Weekdays } from '../contract.entity'
 
 export class CreateContractDto {
   //TODO:
 
   @Type(() => Customer)
   @ValidateNested({ each: true })
-  customers: Customer[];
+  customers: Customer[]
 
-  teacher: Teacher;
+  teacher: Teacher
 
-  subject: Subject;
+  subject: Subject
 
-  weekday: Weekdays;
+  weekday: Weekdays
 
-  from: string;
+  from: string
 
-  to: string;
+  to: string
 
-  startDate: Date;
+  startDate: Date
 
-  endDate: Date;
+  endDate: Date
 
-  frequency: number;
+  frequency: number
 }

@@ -1,10 +1,11 @@
-import { Role } from 'src/auth/role.enum';
 import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
   TableInheritance,
-} from 'typeorm';
+} from 'typeorm'
+
+import { Role } from 'src/auth/role.enum'
 
 export enum Salutation {
   FRAU = 'Frau',
@@ -14,45 +15,45 @@ export enum Salutation {
 @Entity()
 @TableInheritance({ column: { type: 'varchar', name: 'type' } })
 export abstract class User {
-  role: Role;
+  role: Role
 
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @Column()
-  lastName: string;
+  lastName: string
 
   @Column()
-  firstName: string;
+  firstName: string
 
   @Column({
     type: 'enum',
     enum: Salutation,
   })
-  salutation: Salutation;
+  salutation: Salutation
 
   @Column()
-  street: string;
+  street: string
 
   @Column()
-  city: string;
+  city: string
 
   @Column()
-  postalCode: string;
+  postalCode: string
 
   //TODO: E-Mail validation
   @Column({ unique: true })
-  email: string;
+  email: string
 
   @Column()
-  phone: string;
+  phone: string
 
   @Column({ select: false, nullable: true })
-  passwordHash?: string;
+  passwordHash?: string
 
   @Column({ select: false })
-  mayAuthenticate: boolean;
+  mayAuthenticate: boolean
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  jwtValidAfter: Date;
+  jwtValidAfter: Date
 }

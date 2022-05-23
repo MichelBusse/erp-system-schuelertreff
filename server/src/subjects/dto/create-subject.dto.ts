@@ -1,3 +1,3 @@
 export class CreateSubjectDto {
-  name: string;
+  name: string
 }

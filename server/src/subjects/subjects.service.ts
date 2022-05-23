@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CreateSubjectDto } from './dto/create-subject.dto';
-import { Subject } from './subject.entity';
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+
+import { CreateSubjectDto } from './dto/create-subject.dto'
+import { Subject } from './subject.entity'
 
 @Injectable()
 export class SubjectsService {
@@ -12,21 +13,21 @@ export class SubjectsService {
   ) {}
 
   create(createUserDto: CreateSubjectDto): Promise<Subject> {
-    const subject = new Subject();
-    subject.name = createUserDto.name;
+    const subject = new Subject()
+    subject.name = createUserDto.name
 
-    return this.subjectsRepository.save(subject);
+    return this.subjectsRepository.save(subject)
   }
 
   async findAll(): Promise<Subject[]> {
-    return this.subjectsRepository.find();
+    return this.subjectsRepository.find()
   }
 
   findOne(id: string): Promise<Subject> {
-    return this.subjectsRepository.findOne(id);
+    return this.subjectsRepository.findOne(id)
   }
 
   async remove(id: string): Promise<void> {
-    await this.subjectsRepository.delete(id);
+    await this.subjectsRepository.delete(id)
   }
 }

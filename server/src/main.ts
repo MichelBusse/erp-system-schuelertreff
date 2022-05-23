@@ -1,19 +1,20 @@
-import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { ConfigService } from '@nestjs/config'
+import { NestFactory } from '@nestjs/core'
+
+import { AppModule } from './app.module'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule)
 
-  const config = app.get<ConfigService>(ConfigService);
+  const config = app.get<ConfigService>(ConfigService)
 
   app.enableCors({
     origin: config.get<string>('CLIENT_ORIGIN'),
     credentials: true,
-  });
+  })
 
-  await app.listen(8080);
+  await app.listen(8080)
 
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  console.log(`Application is running on: ${await app.getUrl()}`)
 }
-bootstrap();
+bootstrap()
