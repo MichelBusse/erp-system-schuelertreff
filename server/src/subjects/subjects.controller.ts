@@ -3,10 +3,7 @@ import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'
 import { Public } from 'src/auth/decorators/public.decorator'
 
 import { CreateSubjectDto } from './dto/create-subject.dto'
-import { CreateSubjectDto } from './dto/create-subject.dto'
 import { Subject } from './subject.entity'
-import { Subject } from './subject.entity'
-import { SubjectsService } from './subjects.service'
 import { SubjectsService } from './subjects.service'
 
 @Controller('subjects')
