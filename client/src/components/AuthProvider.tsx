@@ -85,30 +85,28 @@ const AuthProvider: React.FC = ({ children }) => {
 
   const handleLogout = () => setToken('')
 
-  const isAuthed = () => {
-    return token !== '' && new Date().getTime() < decodeToken().exp * 1000
-  }
+  const isAuthed = () => token !== ''
 
   const decodeToken = () => jwtDecode<JwtType>(token)
 
   const refreshToken = () => {
-    if (isAuthed()) {
-      API.get('/auth/refresh')
-        .then((res) => {
-          setToken(res.data.access_token)
-        })
-        .catch((err) => {
-          console.error('error while refreshing token:', err)
-        })
-    }
+    API.get('/auth/refresh')
+      .then((res) => {
+        setToken(res.data.access_token)
+      })
+      .catch((err) => {
+        console.error('error while refreshing token:', err)
+      })
   }
 
   // if logged in, refresh token every minute to keep it active
-  useInterval(refreshToken, MINUTE)
+  useInterval(() => {
+    if (isAuthed()) refreshToken()
+  }, MINUTE)
 
   // if token is already older than 1 minute, refresh immediately (will trigger logout if token is invalid)
   useEffect(() => {
-    if (new Date().getTime() - decodeToken().iat * 1000 > MINUTE) {
+    if (isAuthed() && new Date().getTime() - decodeToken().iat * 1e3 > MINUTE) {
       refreshToken()
     }
   }, [])
