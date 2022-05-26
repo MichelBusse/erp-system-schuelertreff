@@ -70,7 +70,12 @@ const App: React.FC = () => {
           />
         </Route>
 
-        <Route path="/login" element={<Pages.Login />} />
+        <Route path="login" element={<Pages.Login />} />
+
+        <Route path="reset">
+          <Route path="" element={<Navigate to="/" replace={true} />} />
+          <Route path=":token" element={<Pages.Reset />} />
+        </Route>
 
         <Route path="*" element={<Pages.NotFound />} />
       </Routes>

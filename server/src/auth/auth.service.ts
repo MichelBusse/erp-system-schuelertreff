@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import * as argon2 from 'argon2'
 
@@ -10,6 +11,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private config: ConfigService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -41,10 +43,13 @@ export class AuthService {
   async initReset(user: User) {
     const payload = { sub: user.id, reset: true }
 
+    const link =
+      this.config.get<string>('CLIENT_ORIGIN') +
+      '/reset/' +
+      this.jwtService.sign(payload)
+
     //TODO: send email to user
-    console.log(
-      `reset token for ${user.email} - ${this.jwtService.sign(payload)}`,
-    )
+    console.log(`reset link for ${user.email} - ${link}`)
   }
 
   async validateReset(token: string) {

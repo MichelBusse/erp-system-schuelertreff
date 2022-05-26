@@ -10,13 +10,6 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('')
   const { handleLogin } = useAuth()
 
-  const changeEmail: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    setEmail(e.target.value)
-  }
-  const changePassword: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    setPassword(e.target.value)
-  }
-
   const handleSubmit = async () => {
     try {
       await handleLogin(email, password)
@@ -42,24 +35,23 @@ const Login: React.FC = () => {
         component={'form'}
       >
         <TextField
-          id="outlined-basic"
           label="E-Mail"
           variant="outlined"
+          autoComplete="username"
           size="small"
           style={{ width: 200 }}
           value={email}
-          onChange={changeEmail}
+          onChange={(e) => setEmail(e.target.value)}
           error={error !== ''}
         />
         <TextField
-          id="outlined-password-input"
           label="Password"
           type="password"
           autoComplete="current-password"
           size="small"
           style={{ width: 200 }}
           value={password}
-          onChange={changePassword}
+          onChange={(e) => setPassword(e.target.value)}
           error={error !== ''}
           helperText={error}
           onKeyDown={(e) => {
