@@ -19,6 +19,7 @@ import { Box } from '@mui/system'
 import React, { useState } from 'react'
 import { NavLink as NavLinkBase, NavLinkProps } from 'react-router-dom'
 
+import logo from '../assets/logo.png'
 import { useAuth } from './AuthProvider'
 
 const drawerWidth = 240
@@ -80,6 +81,14 @@ const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
           {open ? <ChevronLeftIcon /> : <MenuIcon />}
         </IconButton>
       </Toolbar>
+      <img
+        src={logo}
+        alt="Schülertreff"
+        style={{
+          margin: '10%',
+          userSelect: 'none',
+        }}
+      />
       <Divider />
       <List component="nav">
         {items.map((item, i) => (
