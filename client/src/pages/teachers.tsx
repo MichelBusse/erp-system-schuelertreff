@@ -179,6 +179,7 @@ const Teachers: React.FC = () => {
             >
               <MenuItem value="Herr">Herr</MenuItem>
               <MenuItem value="Frau">Frau</MenuItem>
+              <MenuItem value="divers">divers</MenuItem>
             </Select>
           </FormControl>
           <TextField

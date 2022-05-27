@@ -10,6 +10,7 @@ import { Role } from 'src/auth/role.enum'
 export enum Salutation {
   FRAU = 'Frau',
   HERR = 'Herr',
+  DIVERS = 'divers',
 }
 
 @Entity()
