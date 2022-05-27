@@ -2,12 +2,11 @@
   display: flex;
   height: 100%;
   width: 100%;
+  padding: 20px 20px 0 20px;
 
   :global(.MuiDataGrid-row) {
     border-radius: 50px;
-    width: 100% !important;
-    background-color: white;
-    padding-left: 30px !important;
+    background-color: white !important;
   }
 
   :global(.MuiDataGrid-root) {
@@ -16,21 +15,23 @@
 
   :global(.MuiDataGrid-columnHeaders) {
     border-bottom: none !important;
+    display: none;
   }
 
   :global(.MuiDataGrid-cell) {
     border-bottom: none !important;
+    outline: none !important;
   }
 
   :global(.MuiDataGrid-virtualScrollerRenderZone) {
-    width: 100%;
+    padding-bottom: 20px;
   }
 
   .customGridToolbarContainer {
     border-radius: 50px;
     height: 52px;
     background-color: white;
-    padding: 0px 30px;
+    padding: 0px 20px;
     display: flex;
     justify-content: space-between;
 

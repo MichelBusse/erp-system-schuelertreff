@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -52,7 +53,7 @@ const Subjects: React.FC = () => {
   }
 
   return (
-    <>
+    <Box sx={{ p: 4 }} className={styles.wrapper}>
       <Dialog open={dialogOpen}>
         <DialogTitle>Fach hinzufügen</DialogTitle>
         <DialogContent>
@@ -117,7 +118,7 @@ const Subjects: React.FC = () => {
           </Grid>
         ))}
       </Grid>
-    </>
+    </Box>
   )
 }
 

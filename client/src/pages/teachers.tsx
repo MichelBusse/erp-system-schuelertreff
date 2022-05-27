@@ -2,18 +2,18 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 import {
   Autocomplete,
   Button,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
   FormControl,
-  Grid,
   IconButton,
   InputLabel,
   MenuItem,
-  Paper,
   Select,
+  Stack,
   TextField,
 } from '@mui/material'
 import {
@@ -31,49 +31,6 @@ import subject from '../types/subject'
 import teacher from '../types/teacher'
 import styles from './teachers.module.scss'
 
-//customize filter
-const filterOperators = getGridStringOperators().filter(
-  (operator) => operator.value === 'contains',
-)
-
-//definition of the columns
-const cols: GridColumns = [
-  {
-    field: 'TeacherName',
-    headerClassName: 'DataGridHead',
-    headerName: 'Teacher',
-    width: 200,
-    filterOperators: filterOperators,
-  },
-  {
-    field: 'SubjectName',
-    headerClassName: 'DataGridHead',
-    headerName: 'Subject',
-    width: 650,
-    renderCell: (params) => (
-      <strong>
-        <Grid container spacing={3}>
-          {params.value.map((subject: subject) => (
-            <Grid item key={subject.id}>
-              <Paper
-                sx={{
-                  backgroundColor: subject.color + 50,
-                  padding: '6px 25px',
-                  textAlign: 'center',
-                  borderRadius: '25px',
-                  color: 'black',
-                }}
-              >
-                {subject.name}
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
-      </strong>
-    ),
-  },
-]
-
 const defaultFormData = {
   firstName: '',
   lastName: '',
@@ -86,6 +43,49 @@ const defaultFormData = {
   subjects: [] as subject[],
   fee: 0,
 }
+
+//definition of the columns
+const cols: GridColumns = [
+  {
+    field: 'teacherName',
+    headerClassName: 'DataGridHead',
+    headerName: 'Teacher',
+    width: 200,
+    filterOperators: getGridStringOperators().filter(
+      (operator) => operator.value === 'contains',
+    ),
+    renderCell: (params) => (
+      <div
+        style={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          paddingLeft: 15,
+        }}
+      >
+        {params.value}
+      </div>
+    ),
+  },
+  {
+    field: 'subjectName',
+    headerClassName: 'DataGridHead',
+    headerName: 'Subject',
+    // width: 650,
+    minWidth: 300,
+    flex: 1,
+    renderCell: (params) => (
+      <Stack direction="row" spacing={2}>
+        {params.value.map((subject: subject) => (
+          <Chip
+            key={subject.id}
+            label={subject.name}
+            sx={{ bgcolor: subject.color + 50 }}
+          />
+        ))}
+      </Stack>
+    ),
+  },
+]
 
 const Teachers: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -106,8 +106,8 @@ const Teachers: React.FC = () => {
   //creating rows out of the teachers
   const rows = teachers.map((teacher) => ({
     id: teacher.id,
-    TeacherName: teacher.firstName + ' ' + teacher.lastName,
-    SubjectName: teacher.subjects,
+    teacherName: teacher.firstName + ' ' + teacher.lastName,
+    subjectName: teacher.subjects,
   }))
 
   //space between rows
@@ -140,13 +140,14 @@ const Teachers: React.FC = () => {
           disableSelectionOnClick={true}
           components={{
             Toolbar: () => (
-              <div style={{ width: '100%' }}>
-                <GridToolbarContainer
-                  className={styles.customGridToolbarContainer}
-                >
-                  <GridToolbarFilterButton />
-                </GridToolbarContainer>
-              </div>
+              <GridToolbarContainer
+                className={styles.customGridToolbarContainer}
+              >
+                <GridToolbarFilterButton />
+                <IconButton onClick={openDialog}>
+                  <AddCircleIcon fontSize="large" color="primary" />
+                </IconButton>
+              </GridToolbarContainer>
             ),
           }}
           hideFooter={true}
@@ -155,13 +156,9 @@ const Teachers: React.FC = () => {
           getRowSpacing={getRowSpacing}
         />
       </div>
-      <div>
-        <IconButton onClick={openDialog}>
-          <AddCircleIcon fontSize="large" color="primary" />
-        </IconButton>
-      </div>
+
       <Dialog open={dialogOpen}>
-        <DialogTitle>Fach hinzufügen</DialogTitle>
+        <DialogTitle>Lehrkraft hinzufügen</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Geben Sie die Daten der Lehrkraft ein. Pflichtfelder sind mit *

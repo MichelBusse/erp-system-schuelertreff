@@ -46,7 +46,6 @@ const Layout: React.FC = () => {
           flexGrow: 1,
           height: '100vh',
           overflow: 'auto',
-          p: 4,
         }}
       >
         <Outlet />

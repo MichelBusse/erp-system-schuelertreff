@@ -1,5 +1,6 @@
 import 'dayjs/locale/de'
 
+import { Box } from '@mui/material'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useState } from 'react'
@@ -39,7 +40,7 @@ const Timetable: React.FC = () => {
   ]
 
   return (
-    <>
+    <Box sx={{ p: 4 }}>
       <Calendar
         date={date}
         teachers={teachers}
@@ -47,7 +48,7 @@ const Timetable: React.FC = () => {
         setDate={setDate}
       />
       <HiddenMenu open={open} setOpen={setOpen} />
-    </>
+    </Box>
   )
 }
 

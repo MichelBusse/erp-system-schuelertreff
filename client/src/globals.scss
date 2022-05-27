@@ -11,3 +11,46 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+body {
+  overflow: overlay;
+}
+
+.overlay-scrollbar,
+.MuiDataGrid-virtualScroller {
+
+  overflow: overlay !important;
+
+  &::-webkit-scrollbar {
+    display: block;
+    width: 16px;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-track-piece {
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #00000000;
+    border: 5px solid transparent;
+    border-radius: 24px;
+    --scrollbar-color: #00000040;
+    box-shadow: 4px 0px 0px 4px var(--scrollbar-color) inset;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    --scrollbar-color: #00000060;
+  }
+}
