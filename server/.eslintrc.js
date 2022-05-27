@@ -21,9 +21,9 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     'prettier/prettier': 'warn',
-    'simple-import-sort/exports': 'warn',
+    'simple-import-sort/exports': 'off',
     'simple-import-sort/imports': [
-      'warn',
+      'off',
       {
         groups: [
           // Side effect imports

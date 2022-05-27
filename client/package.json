@@ -6,8 +6,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint ./src --rule 'prettier/prettier: off' --rule 'simple-import-sort/imports: off' --rule 'simple-import-sort/exports: off'",
-    "lint:fix": "eslint ./src --fix"
+    "lint": "eslint ./src --rule 'prettier/prettier: off'",
+    "lint:fix": "eslint ./src --fix --rule 'simple-import-sort/imports: warn' --rule 'simple-import-sort/exports: warn'"
   },
   "dependencies": {
     "@emotion/react": "^11.8.2",
