@@ -1,6 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'
 
 import { Public } from 'src/auth/decorators/public.decorator'
+import { Roles } from 'src/auth/decorators/roles.decorator'
+import { Role } from 'src/auth/role.enum'
+import { Admin } from 'src/users/entities'
 
 import { CreateSubjectDto } from './dto/create-subject.dto'
 import { Subject } from './subject.entity'
@@ -10,13 +13,13 @@ import { SubjectsService } from './subjects.service'
 export class SubjectsController {
   constructor(private readonly subjectsService: SubjectsService) {}
 
-  @Public() //TODO: remove public after tests
+  @Roles(Role.ADMIN)
   @Post()
   create(@Body() createSubjectDto: CreateSubjectDto): Promise<Subject> {
     return this.subjectsService.create(createSubjectDto)
   }
 
-  @Public() //TODO: remove public after tests
+  @Roles(Role.ADMIN)
   @Get()
   findAll(): Promise<Subject[]> {
     return this.subjectsService.findAll()

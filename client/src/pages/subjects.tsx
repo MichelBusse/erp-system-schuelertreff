@@ -26,15 +26,19 @@ const defaultFormData = {
 }
 
 const Subjects: React.FC = () => {
+  const [error, setError] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [data, setData] = useState(defaultFormData)
   const [subjects, setSubjects] = useState<subject[]>([])
-
-  const { API } = useAuth()
+  const { API, decodeToken } = useAuth()
 
   //Get subjects from DB
   useEffect(() => {
-    API.get('subjects').then((res) => setSubjects(res.data))
+    API.get('subjects')
+      .then((res) => setSubjects(res.data))
+      .catch((error) => {
+        setError('Seite konnte nicht geladen werden.')
+      })
   }, [])
 
   const openDialog = () => {
@@ -49,6 +53,10 @@ const Subjects: React.FC = () => {
       setData(defaultFormData)
       setDialogOpen(false)
     })
+  }
+
+  if (error !== '') {
+    return <h1>{error}</h1>
   }
 
   return (
@@ -94,12 +102,16 @@ const Subjects: React.FC = () => {
           <Button onClick={submitForm}>Hinzufügen</Button>
         </DialogActions>
       </Dialog>
+
       <Grid container spacing={4} columns={24}>
-        <Grid item sm={12} md={6} lg={4} xl={3}>
-          <IconButton className={styles.card} onClick={openDialog}>
-            <BsPlusLg />
-          </IconButton>
-        </Grid>
+        {decodeToken().role === 'admin' && (
+          <Grid item sm={12} md={6} lg={4} xl={3}>
+            <IconButton className={styles.card} onClick={openDialog}>
+              <BsPlusLg />
+            </IconButton>
+          </Grid>
+        )}
+
         {subjects.map((subject) => (
           <Grid key={subject.id} item sm={12} md={6} lg={4} xl={3}>
             <Paper className={styles.card}>
