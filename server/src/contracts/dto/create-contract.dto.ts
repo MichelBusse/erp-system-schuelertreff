@@ -1,32 +1,40 @@
 import { Type } from 'class-transformer'
-import { ValidateNested } from 'class-validator'
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsInt,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator'
 
 import { Subject } from 'src/subjects/subject.entity'
 import { Customer } from 'src/users/entities/customer.entity'
 import { Teacher } from 'src/users/entities/teacher.entity'
 
-import { Weekdays } from '../contract.entity'
-
 export class CreateContractDto {
-  //TODO:
-
-  @Type(() => Customer)
+  @IsArray()
+  @ArrayNotEmpty()
   @ValidateNested({ each: true })
+  @Type(() => Customer)
   customers: Customer[]
 
+  @Type(() => Teacher)
   teacher: Teacher
 
+  @Type(() => Subject)
   subject: Subject
 
-  weekday: Weekdays
+  startTime: string
 
-  from: string
-
-  to: string
+  endTime: string
 
   startDate: Date
 
   endDate: Date
 
+  @Min(1)
+  @Max(4)
+  @IsInt()
   interval: number
 }

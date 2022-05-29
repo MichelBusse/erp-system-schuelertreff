@@ -103,14 +103,7 @@ export class UsersService {
 
   async createCustomer(dto: CreateCustomerDto): Promise<Customer> {
     const customer = this.customersRepository.create({
-      lastName: dto.lastName,
-      firstName: dto.firstName,
-      salutation: dto.salutation,
-      street: dto.street,
-      city: dto.city,
-      postalCode: dto.postalCode,
-      email: dto.email,
-      phone: dto.phone,
+      ...dto,
       mayAuthenticate: false,
     })
 
@@ -119,17 +112,8 @@ export class UsersService {
 
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
     const teacher = this.teachersRepository.create({
-      lastName: dto.lastName,
-      firstName: dto.firstName,
-      salutation: dto.salutation,
-      street: dto.street,
-      city: dto.city,
-      postalCode: dto.postalCode,
-      email: dto.email,
-      phone: dto.phone,
-      fee: dto.fee,
+      ...dto,
       state: TeacherState.APPLIED,
-      subjects: dto.subjects,
       mayAuthenticate: true,
     })
 
@@ -138,14 +122,7 @@ export class UsersService {
 
   async createAdmin(dto: CreateAdminDto): Promise<Admin> {
     const admin = this.adminsRepository.create({
-      lastName: dto.lastName,
-      firstName: dto.firstName,
-      salutation: dto.salutation,
-      street: dto.street,
-      city: dto.city,
-      postalCode: dto.postalCode,
-      email: dto.email,
-      phone: dto.phone,
+      ...dto,
       mayAuthenticate: true,
     })
 

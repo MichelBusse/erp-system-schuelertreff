@@ -38,5 +38,6 @@ module.exports = {
     'react/prop-types': 'off',
     'simple-import-sort/imports': 'off',
     'simple-import-sort/exports': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
   },
 }

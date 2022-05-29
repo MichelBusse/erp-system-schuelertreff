@@ -38,19 +38,17 @@ type form = {
   teacher: teacher | null
 }
 
-const defaultFormData = {
-  customers: [],
-  subject: null,
-  interval: 1,
-  startDate: null,
-  endDate: null,
-  startTime: null,
-  endTime: null,
-  teacher: null,
-}
-
 const ContractDialog: React.FC<Props> = ({ open, setOpen }) => {
-  const [form, setForm] = useState<form>(defaultFormData)
+  const [form, setForm] = useState<form>({
+    customers: [],
+    subject: null,
+    interval: 1,
+    startDate: null,
+    endDate: null,
+    startTime: null,
+    endTime: null,
+    teacher: null,
+  })
 
   const [customers, setCustomers] = useState<customer[]>([])
   const [subjects, setSubjects] = useState<subject[]>([])
@@ -60,20 +58,20 @@ const ContractDialog: React.FC<Props> = ({ open, setOpen }) => {
 
   // get customers, subjects from DB
   useEffect(() => {
-    API.get(`users/customer`).then((res) => setCustomers(res.data))
-    API.get(`subjects`).then((res) => setSubjects(res.data))
+    API.get('users/customer').then((res) => setCustomers(res.data))
+    API.get('subjects').then((res) => setSubjects(res.data))
   }, [])
 
   // get available teachers from DB
   useEffect(() => {
-    API.get(`users/teacher/available`, {
+    API.get('users/teacher/available', {
       params: {
         subject: form.subject?.id,
         interval: form.interval,
-        startDate: form.startDate?.format('YYYY-DD-MM'),
-        endDate: form.endDate?.format('YYYY-DD-MM'),
-        startTime: form.startTime?.format('hh:mm'),
-        endTime: form.endTime?.format('hh:mm'),
+        startDate: form.startDate?.format('YYYY-MM-DD'),
+        endDate: form.endDate?.format('YYYY-MM-DD'),
+        startTime: form.startTime?.format('HH:mm'),
+        endTime: form.endTime?.format('HH:mm'),
       },
     }).then((res) => {
       setForm((data) => ({ ...data, teacher: null }))
@@ -88,7 +86,29 @@ const ContractDialog: React.FC<Props> = ({ open, setOpen }) => {
     form.endTime,
   ])
 
-  const submitForm = () => {}
+  const formValid = !!(
+    form.customers.length &&
+    form.subject &&
+    form.startDate &&
+    form.startTime &&
+    form.endTime &&
+    form.teacher
+  )
+
+  const submitForm = () => {
+    if (formValid) {
+      API.post('contracts', {
+        ...form,
+        customers: form.customers.map((c) => ({ id: c.id })),
+        startDate: form.startDate?.format('YYYY-MM-DD'),
+        endDate: form.endDate?.format('YYYY-MM-DD'),
+        startTime: form.startTime?.format('HH:mm'),
+        endTime: form.endTime?.format('HH:mm'),
+      })
+        .then(() => setOpen(false))
+        .catch((err) => console.error(err))
+    }
+  }
 
   return (
     <Dialog open={open}>
@@ -165,6 +185,7 @@ const ContractDialog: React.FC<Props> = ({ open, setOpen }) => {
                   endDate: null,
                 }))
               }}
+              shouldDisableDate={(date) => [0, 6].includes(date.day())}
               renderInput={(params) => (
                 <TextField {...params} required variant="standard" />
               )}
