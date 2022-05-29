@@ -1,10 +1,10 @@
 import { Button, Drawer, styled } from '@mui/material'
 
-import { Open } from '../pages/timetable'
+import { SideMenu } from '../pages/timetable'
 
 type Props = {
-  open: Open
-  setOpen: (open: Open) => void
+  open: SideMenu
+  setOpen: (open: SideMenu) => void
 }
 
 const StyledDrawer = styled(Drawer)(() => ({

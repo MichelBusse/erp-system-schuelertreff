@@ -9,7 +9,7 @@ import {
 } from '@mui/material'
 import { Dayjs } from 'dayjs'
 
-import { Open } from '../pages/timetable'
+import { SideMenu } from '../pages/timetable'
 import styles from './Calendar.module.scss'
 import CalendarControl from './CalendarControl'
 
@@ -21,7 +21,7 @@ type teacher = {
 type Props = {
   date: Dayjs
   teachers: Array<teacher>
-  setOpen: (open: Open) => void
+  setOpen: (open: SideMenu) => void
   setDate: (date: Dayjs) => void
 }
 

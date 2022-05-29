@@ -12,18 +12,8 @@ export class ContractsService {
     private readonly contractsRepository: Repository<Contract>,
   ) {}
 
-  create(createContractDto: CreateContractDto): Promise<Contract> {
-    const contract = new Contract()
-
-    contract.customers = createContractDto.customers
-    contract.teacher = createContractDto.teacher
-    contract.subject = createContractDto.subject
-    contract.weekday = createContractDto.weekday
-    contract.from = createContractDto.from
-    contract.to = createContractDto.to
-    contract.startDate = createContractDto.startDate
-    contract.endDate = createContractDto.endDate
-    contract.frequency = createContractDto.frequency
+  create(dto: CreateContractDto): Promise<Contract> {
+    const contract = this.contractsRepository.create(dto)
 
     return this.contractsRepository.save(contract)
   }

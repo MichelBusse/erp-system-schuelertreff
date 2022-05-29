@@ -81,6 +81,14 @@ export class UsersService {
     return this.teachersRepository.findOne(id)
   }
 
+  async findAvailableTeachers(subjectId: number): Promise<Teacher[]> {
+    return this.teachersRepository
+      .createQueryBuilder('t')
+      .innerJoin('t.subjects', 'sub', 'sub.id = :subjectId', { subjectId })
+      .select(['t.id', 't.lastName', 't.firstName', 't.fee'])
+      .getMany()
+  }
+
   /**
    * Removes the {@link User} with the given id
    * @param id

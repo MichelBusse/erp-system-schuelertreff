@@ -55,5 +55,5 @@ export class Contract {
   endDate: Date
 
   @Column()
-  frequency: number
+  interval: number
 }

@@ -25,11 +25,11 @@ export class SubjectsService {
     return this.subjectsRepository.find()
   }
 
-  findOne(id: string): Promise<Subject> {
+  findOne(id: number): Promise<Subject> {
     return this.subjectsRepository.findOne(id)
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     await this.subjectsRepository.delete(id)
   }
 }

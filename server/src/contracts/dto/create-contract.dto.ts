@@ -28,5 +28,5 @@ export class CreateContractDto {
 
   endDate: Date
 
-  frequency: number
+  interval: number
 }
