@@ -25,6 +25,8 @@ const ProtectedRoute: React.FC = ({ children }) => {
 const theme = createTheme()
 
 const App: React.FC = () => {
+  const { isAuthed } = useAuth()
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'de'}>
       <ThemeProvider theme={theme}>
@@ -35,7 +37,7 @@ const App: React.FC = () => {
               path=""
               element={
                 <ProtectedRoute>
-                  <Pages.Home />
+                  <Navigate to="/timetable" replace={true} />
                 </ProtectedRoute>
               }
             />
@@ -73,7 +75,12 @@ const App: React.FC = () => {
             />
           </Route>
 
-          <Route path="login" element={<Pages.Login />} />
+          <Route
+            path="login"
+            element={
+              !isAuthed() ? <Pages.Login /> : <Navigate to="/" replace={true} />
+            }
+          />
 
           <Route path="reset">
             <Route path="" element={<Navigate to="/" replace={true} />} />
