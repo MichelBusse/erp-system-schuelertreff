@@ -1,19 +1,12 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import {
-  Autocomplete,
   Button,
-  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
   TextField,
 } from '@mui/material'
 import {
@@ -27,30 +20,26 @@ import {
 import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 
-import subject from '../types/subject'
-import teacher from '../types/teacher'
+import schoolCustomer from '../types/schoolCustomer'
 import styles from './gridList.module.scss'
 
 const defaultFormData = {
-  firstName: '',
-  lastName: '',
-  salutation: '',
+  schoolName: '',
   city: '',
   postalCode: '',
   street: '',
   email: '',
   phone: '',
-  subjects: [] as subject[],
-  fee: 0,
 }
 
 //definition of the columns
 const cols: GridColumns = [
   {
-    field: 'teacherName',
+    field: 'customerName',
     headerClassName: 'DataGridHead',
-    headerName: 'Teacher',
-    width: 200,
+    headerName: 'Name',
+    minWidth: 300,
+    flex: 1,
     filterOperators: getGridStringOperators().filter(
       (operator) => operator.value === 'contains',
     ),
@@ -67,47 +56,41 @@ const cols: GridColumns = [
     ),
   },
   {
-    field: 'subjectName',
+    field: 'customerEmail',
     headerClassName: 'DataGridHead',
-    headerName: 'Subject',
-    // width: 650,
+    headerName: 'Email',
     minWidth: 300,
     flex: 1,
-    renderCell: (params) => (
-      <Stack direction="row" spacing={2}>
-        {params.value.map((subject: subject) => (
-          <Chip
-            key={subject.id}
-            label={subject.name}
-            sx={{ bgcolor: subject.color + 50 }}
-          />
-        ))}
-      </Stack>
-    ),
+  },
+  {
+    field: 'customerPhone',
+    headerClassName: 'DataGridHead',
+    headerName: 'Phone',
+    minWidth: 300,
+    flex: 1,
   },
 ]
 
-const Teachers: React.FC = () => {
+const SchoolCustomers: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [subjects, setSubjects] = useState<subject[]>([])
-  const [teachers, setTeachers] = useState<teacher[]>([])
+  const [customers, setCustomers] = useState<schoolCustomer[]>([])
   const [data, setData] = useState(defaultFormData)
 
   //Get subjects, teachers from DB
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/subjects`)
-      .then((res) => setSubjects(res.data))
-    axios
-      .get(`http://localhost:8080/users/teacher`)
-      .then((res) => setTeachers(res.data))
+      .get(`http://localhost:8080/users/schoolCustomer`)
+      .then((res) => setCustomers(res.data))
   }, [])
 
+  console.log(customers)
+
   //creating rows out of the teachers
-  const rows = teachers.map((teacher) => ({
-    id: teacher.id,
-    teacherName: teacher.firstName + ' ' + teacher.lastName,
-    subjectName: teacher.subjects,
+  const rows = customers.map((customer) => ({
+    id: customer.id,
+    customerName: customer.schoolName,
+    customerEmail: customer.email,
+    customerPhone: customer.phone,
   }))
 
   //space between rows
@@ -126,10 +109,12 @@ const Teachers: React.FC = () => {
 
   //TODO: validate filled fields
   const submitForm = () => {
-    axios.post(`http://localhost:8080/users/teacher`, data).then((res) => {
-      setTeachers((s) => [...s, res.data])
-      setDialogOpen(false)
-    })
+    axios
+      .post(`http://localhost:8080/users/schoolCustomer`, data)
+      .then((res) => {
+        setCustomers((s) => [...s, res.data])
+        setDialogOpen(false)
+      })
   }
 
   return (
@@ -164,44 +149,15 @@ const Teachers: React.FC = () => {
             Geben Sie die Daten der Lehrkraft ein. Pflichtfelder sind mit *
             markiert.
           </DialogContentText>
-          <FormControl
-            fullWidth
-            sx={{ width: '25%', marginRight: '75%', marginTop: '15px' }}
-          >
-            <InputLabel id="SalutationLable">Anrede *</InputLabel>
-            <Select
-              id="Salutation"
-              label="Anrede"
-              value={data.salutation}
-              onChange={(event) =>
-                setData((data) => ({ ...data, salutation: event.target.value }))
-              }
-            >
-              <MenuItem value="Herr">Herr</MenuItem>
-              <MenuItem value="Frau">Frau</MenuItem>
-              <MenuItem value="divers">divers</MenuItem>
-            </Select>
-          </FormControl>
           <TextField
-            id="firstName"
-            label="Vorname"
+            id="schoolName"
+            label="Schulname"
             variant="outlined"
             required={true}
-            sx={{ margin: '10px', marginLeft: '0px', width: '45%' }}
-            value={data.firstName}
+            sx={{ margin: '10px', marginLeft: '0px', width: '94%' }}
+            value={data.schoolName}
             onChange={(event) =>
-              setData((data) => ({ ...data, firstName: event.target.value }))
-            }
-          />
-          <TextField
-            id="lastName"
-            label="Nachname"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', width: '45%' }}
-            value={data.lastName}
-            onChange={(event) =>
-              setData((data) => ({ ...data, lastName: event.target.value }))
+              setData((data) => ({ ...data, schoolName: event.target.value }))
             }
           />
           <TextField
@@ -259,30 +215,6 @@ const Teachers: React.FC = () => {
               setData((data) => ({ ...data, phone: event.target.value }))
             }
           />
-          <Autocomplete
-            multiple
-            id="subjects"
-            options={subjects}
-            getOptionLabel={(option) => option.name}
-            renderInput={(params) => (
-              <TextField {...params} variant="standard" label="Fächer *" />
-            )}
-            value={data.subjects}
-            onChange={(_, value) =>
-              setData((data) => ({ ...data, subjects: value }))
-            }
-          />
-          <TextField
-            type="number"
-            id="fee"
-            label="Lohn"
-            variant="outlined"
-            sx={{ marginTop: '20px', width: '15%' }}
-            value={data.fee}
-            onChange={(event) =>
-              setData((data) => ({ ...data, fee: Number(event.target.value) }))
-            }
-          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>Abbrechen</Button>
@@ -293,4 +225,4 @@ const Teachers: React.FC = () => {
   )
 }
 
-export default Teachers
+export default SchoolCustomers

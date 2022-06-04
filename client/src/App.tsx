@@ -45,10 +45,18 @@ const App: React.FC = () => {
             }
           />
           <Route
-            path="customers"
+            path="privateCustomers"
             element={
               <ProtectedRoute>
-                <Pages.Customers />
+                <Pages.PrivateCustomers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="schoolCustomers"
+            element={
+              <ProtectedRoute>
+                <Pages.SchoolCustomers />
               </ProtectedRoute>
             }
           />

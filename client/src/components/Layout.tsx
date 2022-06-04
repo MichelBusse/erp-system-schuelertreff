@@ -1,4 +1,5 @@
 import {
+  AccountBalance as AccountBalanceIcon,
   Layers as LayersIcon,
   People as PeopleIcon,
   School as SchoolIcon,
@@ -22,8 +23,13 @@ const menuItems = [
   },
   {
     icon: PeopleIcon,
-    text: 'Kunden',
-    href: '/customers',
+    text: 'Privatkunden',
+    href: '/privateCustomers',
+  },
+  {
+    icon: AccountBalanceIcon,
+    text: 'Schulen',
+    href: '/schoolCustomers',
   },
   {
     icon: LayersIcon,
