@@ -4,9 +4,10 @@ import * as argon2 from 'argon2'
 import { Repository } from 'typeorm'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
-import { CreateCustomerDto } from './dto/create-customer.dto'
+import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
+import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
-import { Admin, Customer, Teacher, User } from './entities'
+import { Admin, PrivateCustomer, SchoolCustomer, Teacher, User } from './entities'
 import { TeacherState } from './entities/teacher.entity'
 
 @Injectable()
@@ -18,8 +19,11 @@ export class UsersService {
     @InjectRepository(Teacher)
     private readonly teachersRepository: Repository<Teacher>,
 
-    @InjectRepository(Customer)
-    private readonly customersRepository: Repository<Customer>,
+    @InjectRepository(PrivateCustomer)
+    private readonly privateCustomersRepository: Repository<PrivateCustomer>,
+
+    @InjectRepository(SchoolCustomer)
+    private readonly schoolCustomersRepository: Repository<SchoolCustomer>,
 
     @InjectRepository(Admin)
     private readonly adminsRepository: Repository<Admin>,
@@ -59,8 +63,12 @@ export class UsersService {
     })
   }
 
-  async findAllCustomers(): Promise<Customer[]> {
-    return this.customersRepository.find()
+  async findAllPrivateCustomers(): Promise<PrivateCustomer[]> {
+    return this.privateCustomersRepository.find()
+  }
+
+  async findAllSchoolCustomers(): Promise<SchoolCustomer[]> {
+    return this.schoolCustomersRepository.find()
   }
 
   async findAllTeachers(): Promise<Teacher[]> {
@@ -73,8 +81,12 @@ export class UsersService {
     return this.usersRepository.findOne(id)
   }
 
-  findOneCustomer(id: number): Promise<Customer> {
-    return this.customersRepository.findOne(id)
+  findOnePrivateCustomer(id: number): Promise<PrivateCustomer> {
+    return this.privateCustomersRepository.findOne(id)
+  }
+
+  findOneSchoolCustomer(id: number): Promise<SchoolCustomer> {
+    return this.schoolCustomersRepository.findOne(id)
   }
 
   findOneTeacher(id: number): Promise<Teacher> {
@@ -93,8 +105,8 @@ export class UsersService {
    * Create {@link User} methods
    */
 
-  async createCustomer(dto: CreateCustomerDto): Promise<Customer> {
-    const customer = this.customersRepository.create({
+  async createPrivateCustomer(dto: CreatePrivateCustomerDto): Promise<PrivateCustomer> {
+    const privateCustomer = this.privateCustomersRepository.create({
       lastName: dto.lastName,
       firstName: dto.firstName,
       salutation: dto.salutation,
@@ -106,7 +118,21 @@ export class UsersService {
       mayAuthenticate: false,
     })
 
-    return this.customersRepository.save(customer)
+    return this.privateCustomersRepository.save(privateCustomer)
+  }
+
+  async createSchoolCustomer(dto: CreateSchoolCustomerDto): Promise<SchoolCustomer> {
+    const schoolCustomer = this.schoolCustomersRepository.create({
+      schoolName: dto.schoolName,
+      street: dto.street,
+      city: dto.city,
+      postalCode: dto.postalCode,
+      email: dto.email,
+      phone: dto.phone,
+      mayAuthenticate: false,
+    })
+
+    return this.privateCustomersRepository.save(schoolCustomer)
   }
 
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {

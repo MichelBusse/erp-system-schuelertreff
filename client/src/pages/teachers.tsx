@@ -29,7 +29,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import subject from '../types/subject'
 import teacher from '../types/teacher'
-import styles from './teachers.module.scss'
+import styles from './gridList.module.scss'
 
 const defaultFormData = {
   firstName: '',
