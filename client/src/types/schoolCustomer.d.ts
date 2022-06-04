@@ -1,9 +1,7 @@
-type privateCustomer = {
+type schoolCustomer = {
   role: string
   id: number
-  lastName: string
-  firstName: string
-  salutation: string
+  schoolName: string
   street: string
   city: string
   postalCode: string
@@ -11,4 +9,4 @@ type privateCustomer = {
   phone: string
 }
 
-export default privateCustomer
+export default schoolCustomer

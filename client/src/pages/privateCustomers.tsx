@@ -24,7 +24,6 @@ import {
 import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 
-import subject from '../types/subject'
 import privateCustomer from '../types/privateCustomer'
 import styles from './gridList.module.scss'
 
@@ -45,7 +44,8 @@ const cols: GridColumns = [
     field: 'customerName',
     headerClassName: 'DataGridHead',
     headerName: 'Name',
-    width: 200,
+    minWidth: 300,
+    flex: 1,
     filterOperators: getGridStringOperators().filter(
       (operator) => operator.value === 'contains',
     ),

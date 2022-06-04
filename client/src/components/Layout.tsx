@@ -3,6 +3,7 @@ import {
   People as PeopleIcon,
   School as SchoolIcon,
   TableChart as TableChartIcon,
+  AccountBalance as AccountBalanceIcon
 } from '@mui/icons-material'
 import { Box, CssBaseline, useTheme } from '@mui/material'
 import { Outlet } from 'react-router-dom'
@@ -26,7 +27,7 @@ const menuItems = [
     href: '/privateCustomers',
   },
   {
-    icon: PeopleIcon,
+    icon: AccountBalanceIcon,
     text: 'Schulen',
     href: '/schoolCustomers',
   },
