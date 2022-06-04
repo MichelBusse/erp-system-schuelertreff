@@ -8,8 +8,8 @@ import {
 } from 'typeorm'
 
 import { Subject } from 'src/subjects/subject.entity'
-import { PrivateCustomer } from 'src/users/entities/privateCustomer.entity'
 import { Teacher } from 'src/users/entities/teacher.entity'
+import { Customer } from 'src/users/entities/customer.entity'
 
 export enum Weekdays {
   MONDAY = 'monday',
@@ -26,9 +26,9 @@ export class Contract {
   @PrimaryGeneratedColumn()
   id: number
 
-  @ManyToMany(() => PrivateCustomer, { cascade: true })
+  @ManyToMany(() => Customer, { cascade: true })
   @JoinTable()
-  customers: PrivateCustomer[]
+  customers: Customer[]
 
   @ManyToOne(() => Teacher)
   teacher: Teacher

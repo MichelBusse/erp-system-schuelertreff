@@ -2,7 +2,7 @@ import { Type } from 'class-transformer'
 import { ValidateNested } from 'class-validator'
 
 import { Subject } from 'src/subjects/subject.entity'
-import { PrivateCustomer } from 'src/users/entities/privateCustomer.entity'
+import { Customer } from 'src/users/entities/customer.entity'
 import { Teacher } from 'src/users/entities/teacher.entity'
 
 import { Weekdays } from '../contract.entity'
@@ -10,9 +10,9 @@ import { Weekdays } from '../contract.entity'
 export class CreateContractDto {
   //TODO:
 
-  @Type(() => PrivateCustomer)
+  @Type(() => Customer)
   @ValidateNested({ each: true })
-  customers: PrivateCustomer[]
+  customers: Customer[]
 
   teacher: Teacher
 

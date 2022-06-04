@@ -2,10 +2,10 @@ import { ChildEntity, Column } from 'typeorm'
 
 import { Role } from 'src/auth/role.enum'
 
-import { User } from './user.entity'
+import { Customer } from './customer.entity'
 
 @ChildEntity()
-export class SchoolCustomer extends User {
+export class SchoolCustomer extends Customer {
   role = Role.SCHOOLCUSTOMER
 
   @Column()
