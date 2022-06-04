@@ -26,11 +26,15 @@ export class UsersController {
     return this.usersService.findAll()
   }
 
+  // TODO: Remove public
+  @Public()
   @Get('privateCustomer')
   findAllPrivateCustomers(): Promise<PrivateCustomer[]> {
     return this.usersService.findAllPrivateCustomers()
   }
 
+  // TODO: Remove public
+  @Public()
   @Get('schoolCustomer')
   findAllSchoolCustomers(): Promise<SchoolCustomer[]> {
     return this.usersService.findAllSchoolCustomers()

@@ -132,7 +132,7 @@ export class UsersService {
       mayAuthenticate: false,
     })
 
-    return this.privateCustomersRepository.save(schoolCustomer)
+    return this.schoolCustomersRepository.save(schoolCustomer)
   }
 
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
