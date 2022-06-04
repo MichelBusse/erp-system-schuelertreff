@@ -1,5 +1,6 @@
 import NotFound from './404'
-import Customers from './customers'
+import privateCustomers from './privateCustomers'
+import schoolCustomers from './schoolCustomers'
 import Home from './home'
 import Login from './login'
 import Reset from './reset'
@@ -9,7 +10,8 @@ import Timetable from './timetable'
 
 export default {
   NotFound,
-  Customers,
+  privateCustomers,
+  schoolCustomers,
   Home,
   Login,
   Reset,

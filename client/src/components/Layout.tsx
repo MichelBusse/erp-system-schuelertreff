@@ -22,8 +22,13 @@ const menuItems = [
   },
   {
     icon: PeopleIcon,
-    text: 'Kunden',
-    href: '/customers',
+    text: 'Privatkunden',
+    href: '/privateCustomers',
+  },
+  {
+    icon: PeopleIcon,
+    text: 'Schulen',
+    href: '/schoolCustomers',
   },
   {
     icon: LayersIcon,
