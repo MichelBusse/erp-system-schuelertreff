@@ -66,18 +66,18 @@ const cols: GridColumns = [
     headerClassName: 'DataGridHead',
     headerName: 'Email',
     minWidth: 300,
-    flex: 1
+    flex: 1,
   },
   {
     field: 'customerPhone',
     headerClassName: 'DataGridHead',
     headerName: 'Phone',
     minWidth: 300,
-    flex: 1
+    flex: 1,
   },
 ]
 
-const privateCustomers: React.FC = () => {
+const PrivateCustomers: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [customers, setCustomers] = useState<privateCustomer[]>([])
   const [data, setData] = useState(defaultFormData)
@@ -115,10 +115,12 @@ const privateCustomers: React.FC = () => {
 
   //TODO: validate filled fields
   const submitForm = () => {
-    axios.post(`http://localhost:8080/users/privateCustomer`, data).then((res) => {
-      setCustomers((s) => [...s, res.data])
-      setDialogOpen(false)
-    })
+    axios
+      .post(`http://localhost:8080/users/privateCustomer`, data)
+      .then((res) => {
+        setCustomers((s) => [...s, res.data])
+        setDialogOpen(false)
+      })
   }
 
   return (
@@ -258,5 +260,4 @@ const privateCustomers: React.FC = () => {
   )
 }
 
-export default privateCustomers
-
+export default PrivateCustomers

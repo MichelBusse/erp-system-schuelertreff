@@ -60,18 +60,18 @@ const cols: GridColumns = [
     headerClassName: 'DataGridHead',
     headerName: 'Email',
     minWidth: 300,
-    flex: 1
+    flex: 1,
   },
   {
     field: 'customerPhone',
     headerClassName: 'DataGridHead',
     headerName: 'Phone',
     minWidth: 300,
-    flex: 1
+    flex: 1,
   },
 ]
 
-const schoolCustomers: React.FC = () => {
+const SchoolCustomers: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [customers, setCustomers] = useState<schoolCustomer[]>([])
   const [data, setData] = useState(defaultFormData)
@@ -109,10 +109,12 @@ const schoolCustomers: React.FC = () => {
 
   //TODO: validate filled fields
   const submitForm = () => {
-    axios.post(`http://localhost:8080/users/schoolCustomer`, data).then((res) => {
-      setCustomers((s) => [...s, res.data])
-      setDialogOpen(false)
-    })
+    axios
+      .post(`http://localhost:8080/users/schoolCustomer`, data)
+      .then((res) => {
+        setCustomers((s) => [...s, res.data])
+        setDialogOpen(false)
+      })
   }
 
   return (
@@ -223,6 +225,4 @@ const schoolCustomers: React.FC = () => {
   )
 }
 
-export default schoolCustomers
-
-
+export default SchoolCustomers

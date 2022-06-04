@@ -4,10 +4,16 @@ import * as argon2 from 'argon2'
 import { Repository } from 'typeorm'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
-import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
+import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
-import { Admin, PrivateCustomer, SchoolCustomer, Teacher, User } from './entities'
+import {
+  Admin,
+  PrivateCustomer,
+  SchoolCustomer,
+  Teacher,
+  User,
+} from './entities'
 import { TeacherState } from './entities/teacher.entity'
 
 @Injectable()
@@ -105,7 +111,9 @@ export class UsersService {
    * Create {@link User} methods
    */
 
-  async createPrivateCustomer(dto: CreatePrivateCustomerDto): Promise<PrivateCustomer> {
+  async createPrivateCustomer(
+    dto: CreatePrivateCustomerDto,
+  ): Promise<PrivateCustomer> {
     const privateCustomer = this.privateCustomersRepository.create({
       lastName: dto.lastName,
       firstName: dto.firstName,
@@ -121,7 +129,9 @@ export class UsersService {
     return this.privateCustomersRepository.save(privateCustomer)
   }
 
-  async createSchoolCustomer(dto: CreateSchoolCustomerDto): Promise<SchoolCustomer> {
+  async createSchoolCustomer(
+    dto: CreateSchoolCustomerDto,
+  ): Promise<SchoolCustomer> {
     const schoolCustomer = this.schoolCustomersRepository.create({
       schoolName: dto.schoolName,
       street: dto.street,

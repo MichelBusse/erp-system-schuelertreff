@@ -8,8 +8,8 @@ import {
 } from 'typeorm'
 
 import { Subject } from 'src/subjects/subject.entity'
-import { Teacher } from 'src/users/entities/teacher.entity'
 import { Customer } from 'src/users/entities/customer.entity'
+import { Teacher } from 'src/users/entities/teacher.entity'
 
 export enum Weekdays {
   MONDAY = 'monday',

@@ -3,9 +3,8 @@ import { IsNotEmpty, ValidateNested } from 'class-validator'
 
 import { Subject } from 'src/subjects/subject.entity'
 
-import { CreateUserDto } from './create-user.dto'
-
 import { Salutation } from '../entities/user.entity'
+import { CreateUserDto } from './create-user.dto'
 
 export class CreateTeacherDto extends CreateUserDto {
   @IsNotEmpty()
