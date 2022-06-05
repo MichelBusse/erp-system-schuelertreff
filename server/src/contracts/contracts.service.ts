@@ -42,8 +42,10 @@ export class ContractsService {
         'c',
         'subject',
         'customer.id',
+        'customer.type',
         'customer.firstName',
         'customer.lastName',
+        'customer.schoolName',
       ])
       .loadAllRelationIds({
         relations: ['teacher'],
