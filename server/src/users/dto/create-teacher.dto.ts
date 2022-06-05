@@ -1,11 +1,21 @@
 import { Type } from 'class-transformer'
-import { ValidateNested } from 'class-validator'
+import { IsNotEmpty, ValidateNested } from 'class-validator'
 
 import { Subject } from 'src/subjects/subject.entity'
 
+import { Salutation } from '../entities/user.entity'
 import { CreateUserDto } from './create-user.dto'
 
 export class CreateTeacherDto extends CreateUserDto {
+  @IsNotEmpty()
+  lastName: string
+
+  @IsNotEmpty()
+  firstName: string
+
+  @IsNotEmpty()
+  salutation: Salutation
+
   fee: number
 
   @Type(() => Subject)

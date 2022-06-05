@@ -1,7 +1,7 @@
 import subject from './subject'
 
 interface user {
-  role: 'admin' | 'teacher' | 'customer'
+  role: 'admin' | 'teacher' | 'privateCustomer' | 'schoolCustomer'
   id: number
   lastName: string
   firstName: string
@@ -20,12 +20,18 @@ export interface teacher extends user {
   subjects: subject[]
 }
 
-export interface customer extends user {
-  role: 'customer'
-}
-
 export interface admin extends user {
   role: 'admin'
+}
+
+export interface privateCustomer extends user {
+  role: 'privateCustomer'
+}
+
+export interface schoolCustomer
+  extends Omit<user, 'lastName' | 'firstName' | 'salutation'> {
+  role: 'schoolCustomer'
+  schoolName: string
 }
 
 export default user

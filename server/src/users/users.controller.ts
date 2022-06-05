@@ -14,9 +14,16 @@ import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
-import { CreateCustomerDto } from './dto/create-customer.dto'
+import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
+import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
-import { Admin, Customer, Teacher, User } from './entities'
+import {
+  Admin,
+  PrivateCustomer,
+  SchoolCustomer,
+  Teacher,
+  User,
+} from './entities'
 import { UsersService } from './users.service'
 
 @Controller('users')
@@ -33,9 +40,18 @@ export class UsersController {
     return this.usersService.findAll()
   }
 
-  @Get('customer')
-  findAllCustomers(): Promise<Customer[]> {
-    return this.usersService.findAllCustomers()
+  // TODO: Remove public
+  @Public()
+  @Get('privateCustomer')
+  findAllPrivateCustomers(): Promise<PrivateCustomer[]> {
+    return this.usersService.findAllPrivateCustomers()
+  }
+
+  // TODO: Remove public
+  @Public()
+  @Get('schoolCustomer')
+  findAllSchoolCustomers(): Promise<SchoolCustomer[]> {
+    return this.usersService.findAllSchoolCustomers()
   }
 
   // TODO: Remove public
@@ -56,10 +72,26 @@ export class UsersController {
     return this.usersService.remove(id)
   }
 
-  @Post('customer')
-  @Roles(Role.ADMIN)
-  async createCustomer(@Body() dto: CreateCustomerDto): Promise<Customer> {
-    return this.usersService.createCustomer(dto)
+  // TODO: Remove public
+  @Public()
+  @Post('privateCustomer')
+  // TODO: remove commentate
+  //@Roles(Role.ADMIN)
+  async createPrivateCustomer(
+    @Body() dto: CreatePrivateCustomerDto,
+  ): Promise<PrivateCustomer> {
+    return this.usersService.createPrivateCustomer(dto)
+  }
+
+  // TODO: Remove public
+  @Public()
+  @Post('schoolCustomer')
+  // TODO: remove commentate
+  //@Roles(Role.ADMIN)
+  async createSchoolCustomer(
+    @Body() dto: CreateSchoolCustomerDto,
+  ): Promise<SchoolCustomer> {
+    return this.usersService.createSchoolCustomer(dto)
   }
 
   // TODO: Remove Public

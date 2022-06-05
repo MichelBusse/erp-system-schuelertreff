@@ -1,14 +1,16 @@
 import NotFound from './404'
-import Customers from './customers'
 import Login from './login'
+import PrivateCustomers from './privateCustomers'
 import Reset from './reset'
+import SchoolCustomers from './schoolCustomers'
 import Subjects from './subjects'
 import Teachers from './teachers'
 import Timetable from './timetable'
 
 export default {
   NotFound,
-  Customers,
+  PrivateCustomers,
+  SchoolCustomers,
   Login,
   Reset,
   Subjects,
