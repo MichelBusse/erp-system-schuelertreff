@@ -9,6 +9,7 @@ import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
 import {
   Admin,
+  Customer,
   PrivateCustomer,
   SchoolCustomer,
   Teacher,
@@ -24,6 +25,9 @@ export class UsersService {
 
     @InjectRepository(Teacher)
     private readonly teachersRepository: Repository<Teacher>,
+
+    @InjectRepository(Customer)
+    private readonly customersRepository: Repository<Customer>,
 
     @InjectRepository(PrivateCustomer)
     private readonly privateCustomersRepository: Repository<PrivateCustomer>,
@@ -67,6 +71,10 @@ export class UsersService {
     return this.usersRepository.find({
       relations: ['subjects'],
     })
+  }
+
+  async findAllCustomers(): Promise<Customer[]> {
+    return this.customersRepository.find()
   }
 
   async findAllPrivateCustomers(): Promise<PrivateCustomer[]> {

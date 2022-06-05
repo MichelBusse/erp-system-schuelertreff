@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common'
 
 import { AuthService } from 'src/auth/auth.service'
-import { Public } from 'src/auth/decorators/public.decorator'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 
@@ -19,6 +18,7 @@ import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
 import {
   Admin,
+  Customer,
   PrivateCustomer,
   SchoolCustomer,
   Teacher,
@@ -33,29 +33,26 @@ export class UsersController {
     private readonly authService: AuthService,
   ) {}
 
-  //TODO: this is public for development only!
-  @Public()
   @Get()
   findAll(): Promise<User[]> {
     return this.usersService.findAll()
   }
 
-  // TODO: Remove public
-  @Public()
+  @Get('customer')
+  findAllCustomers(): Promise<Customer[]> {
+    return this.usersService.findAllCustomers()
+  }
+
   @Get('privateCustomer')
   findAllPrivateCustomers(): Promise<PrivateCustomer[]> {
     return this.usersService.findAllPrivateCustomers()
   }
 
-  // TODO: Remove public
-  @Public()
   @Get('schoolCustomer')
   findAllSchoolCustomers(): Promise<SchoolCustomer[]> {
     return this.usersService.findAllSchoolCustomers()
   }
 
-  // TODO: Remove public
-  @Public()
   @Get('teacher')
   findAllTeachers(): Promise<Teacher[]> {
     return this.usersService.findAllTeachers()
@@ -72,32 +69,24 @@ export class UsersController {
     return this.usersService.remove(id)
   }
 
-  // TODO: Remove public
-  @Public()
   @Post('privateCustomer')
-  // TODO: remove commentate
-  //@Roles(Role.ADMIN)
+  @Roles(Role.ADMIN)
   async createPrivateCustomer(
     @Body() dto: CreatePrivateCustomerDto,
   ): Promise<PrivateCustomer> {
     return this.usersService.createPrivateCustomer(dto)
   }
 
-  // TODO: Remove public
-  @Public()
   @Post('schoolCustomer')
-  // TODO: remove commentate
-  //@Roles(Role.ADMIN)
+  @Roles(Role.ADMIN)
   async createSchoolCustomer(
     @Body() dto: CreateSchoolCustomerDto,
   ): Promise<SchoolCustomer> {
     return this.usersService.createSchoolCustomer(dto)
   }
 
-  // TODO: Remove Public
-  @Public()
   @Post('teacher')
-  // @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN)
   async createTeacher(@Body() dto: CreateTeacherDto): Promise<Teacher> {
     const user = await this.usersService.createTeacher(dto)
 

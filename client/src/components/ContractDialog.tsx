@@ -21,6 +21,7 @@ import { useAuth } from './AuthProvider'
 import BetterTimePicker from './BetterTimePicker'
 import EqualStack from './EqualStack'
 import IconButtonAdornment from './IconButtonAdornment'
+import schoolCustomer from '../types/schoolCustomer'
 
 type Props = {
   open: boolean
@@ -119,7 +120,11 @@ const ContractDialog: React.FC<Props> = ({ open, setOpen }) => {
             fullWidth
             multiple
             options={customers}
-            getOptionLabel={(o) => o.firstName + ' ' + o.lastName}
+            getOptionLabel={(o) =>
+              o.role === 'schoolCustomer'
+                ? o.schoolName
+                : o.firstName + ' ' + o.lastName
+            }
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={form.customers}
             onChange={(_, value) =>
