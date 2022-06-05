@@ -32,11 +32,11 @@ export class Contract {
   @Column({ type: 'time' })
   endTime: string
 
-  @Column({ type: 'timestamptz' })
-  startDate: Date
+  @Column({ type: 'date' })
+  startDate: string
 
-  @Column({ type: 'timestamptz', nullable: true })
-  endDate: Date
+  @Column({ type: 'date', nullable: true })
+  endDate: string
 
   @Column()
   interval: number

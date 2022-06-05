@@ -26,11 +26,16 @@ export class ContractsController {
   private validateDto(dto: CreateContractDto) {
     const startTime = dayjs(dto.startTime, 'HH:mm')
     const endTime = dayjs(dto.endTime, 'HH:mm')
+    const startDate = dayjs(dto.startDate)
+    const endDate = dayjs(dto.endDate)
 
-    if (dto.endDate < dto.startDate)
+    if (endDate.isBefore(startDate))
       throw new BadRequestException('endDate must not be before startDate')
 
-    if (dayjs(dto.endDate).diff(dto.startDate, 'd') % (7 * dto.interval))
+    if ([0, 6].includes(startDate.day()))
+      throw new BadRequestException('invalid day of week')
+
+    if (endDate.diff(startDate, 'd') % (7 * dto.interval))
       throw new BadRequestException('invalid endDate')
 
     if (endTime.diff(startTime, 'm') < 30)

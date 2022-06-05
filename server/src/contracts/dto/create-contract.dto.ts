@@ -29,9 +29,9 @@ export class CreateContractDto {
 
   endTime: string
 
-  startDate: Date
+  startDate: string
 
-  endDate: Date
+  endDate: string
 
   @Min(1)
   @Max(4)

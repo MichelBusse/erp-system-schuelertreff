@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
+import dayjs, { Dayjs } from 'dayjs'
 import { Repository } from 'typeorm'
+
+import { ContractsService } from 'src/contracts/contracts.service'
 
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Lesson } from './lesson.entity'
@@ -10,6 +13,8 @@ export class LessonsService {
   constructor(
     @InjectRepository(Lesson)
     private readonly lessonsRepository: Repository<Lesson>,
+
+    private readonly contractsService: ContractsService,
   ) {}
 
   create(createLessonDto: CreateLessonDto): Promise<Lesson> {
@@ -34,5 +39,9 @@ export class LessonsService {
 
   async remove(id: string): Promise<void> {
     await this.lessonsRepository.delete(id)
+  }
+
+  async findByWeek(week: Dayjs | Date) {
+    return this.contractsService.findByWeek(dayjs(week))
   }
 }

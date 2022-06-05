@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
+import { Dayjs } from 'dayjs'
 import { Repository } from 'typeorm'
 
 import { Contract } from './contract.entity'
@@ -30,5 +31,34 @@ export class ContractsService {
 
   async remove(id: string): Promise<void> {
     await this.contractsRepository.delete(id)
+  }
+
+  async findByWeek(week: Dayjs): Promise<Contract[]> {
+    const q = this.contractsRepository
+      .createQueryBuilder('c')
+      .leftJoin('c.subject', 'subject')
+      .leftJoin('c.customers', 'customer')
+      .select([
+        'c',
+        'subject',
+        'customer.id',
+        'customer.firstName',
+        'customer.lastName',
+      ])
+      .loadAllRelationIds({
+        relations: ['teacher'],
+      })
+      .where(
+        `c.startDate <= date_trunc('week', :week::date) + interval '4 day'`,
+        { week: week.format() },
+      )
+      .andWhere(`c.endDate >= date_trunc('week', :week::date)`)
+      .andWhere(
+        `extract( days from ( date_trunc('week', c.startDate) - date_trunc('week', :week::date) ) ) / 7 % c.interval = 0`,
+      )
+
+    console.log(q.getQueryAndParameters())
+
+    return q.getMany()
   }
 }
