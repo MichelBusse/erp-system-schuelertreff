@@ -69,4 +69,8 @@
   :global(.MuiDataGrid-columnSeparator) {
     display: none !important;
   }
+
+  :global(.MuiDataGrid-cell):not(:first-child) {
+    padding: 0;
+  }
 }

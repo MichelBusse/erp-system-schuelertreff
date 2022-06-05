@@ -9,7 +9,8 @@ import {
 } from '@nestjs/common'
 import dayjs from 'dayjs'
 
-import { Public } from 'src/auth/decorators/public.decorator'
+import { Roles } from 'src/auth/decorators/roles.decorator'
+import { Role } from 'src/auth/role.enum'
 
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Lesson } from './lesson.entity'
@@ -19,13 +20,13 @@ import { LessonsService } from './lessons.service'
 export class LessonsController {
   constructor(private readonly lessonsService: LessonsService) {}
 
-  @Public()
   @Get('week')
   getWeek(@Query('of') date: string) {
     return this.lessonsService.findByWeek(dayjs(date))
   }
 
   @Post()
+  @Roles(Role.ADMIN)
   create(@Body() createLessonDto: CreateLessonDto): Promise<Lesson> {
     return this.lessonsService.create(createLessonDto)
   }
@@ -41,6 +42,7 @@ export class LessonsController {
   }
 
   @Delete(':id')
+  @Roles(Role.ADMIN)
   remove(@Param('id') id: string): Promise<void> {
     return this.lessonsService.remove(id)
   }

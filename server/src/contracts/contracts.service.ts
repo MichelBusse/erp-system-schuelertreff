@@ -59,8 +59,6 @@ export class ContractsService {
         `extract( days from ( date_trunc('week', c.startDate) - date_trunc('week', :week::date) ) ) / 7 % c.interval = 0`,
       )
 
-    console.log(q.getQueryAndParameters())
-
     return q.getMany()
   }
 }

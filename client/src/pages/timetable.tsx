@@ -19,7 +19,7 @@ export type SideMenu = {
 
 const Timetable: React.FC = () => {
   const [open, setOpen] = useState<SideMenu>({ state: false, info: 'Standard' })
-  const [date, setDate] = useState(dayjs())
+  const [date, setDate] = useState(dayjs().day(1))
   const [dialogOpen, setDialogOpen] = useState(false)
   const [render, setRender] = useState(0)
 

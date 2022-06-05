@@ -34,4 +34,6 @@ export interface schoolCustomer
   schoolName: string
 }
 
+export type customer = privateCustomer | schoolCustomer
+
 export default user
