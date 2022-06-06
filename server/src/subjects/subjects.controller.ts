@@ -23,12 +23,12 @@ export class SubjectsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<Subject> {
+  findOne(@Param('id') id: number): Promise<Subject> {
     return this.subjectsService.findOne(id)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
+  remove(@Param('id') id: number): Promise<void> {
     return this.subjectsService.remove(id)
   }
 }

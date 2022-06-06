@@ -9,6 +9,7 @@ import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
 import {
   Admin,
+  Customer,
   PrivateCustomer,
   SchoolCustomer,
   Teacher,
@@ -24,6 +25,9 @@ export class UsersService {
 
     @InjectRepository(Teacher)
     private readonly teachersRepository: Repository<Teacher>,
+
+    @InjectRepository(Customer)
+    private readonly customersRepository: Repository<Customer>,
 
     @InjectRepository(PrivateCustomer)
     private readonly privateCustomersRepository: Repository<PrivateCustomer>,
@@ -69,6 +73,10 @@ export class UsersService {
     })
   }
 
+  async findAllCustomers(): Promise<Customer[]> {
+    return this.customersRepository.find()
+  }
+
   async findAllPrivateCustomers(): Promise<PrivateCustomer[]> {
     return this.privateCustomersRepository.find()
   }
@@ -99,6 +107,14 @@ export class UsersService {
     return this.teachersRepository.findOne(id)
   }
 
+  async findAvailableTeachers(subjectId: number): Promise<Teacher[]> {
+    return this.teachersRepository
+      .createQueryBuilder('t')
+      .innerJoin('t.subjects', 'sub', 'sub.id = :subjectId', { subjectId })
+      .select(['t.id', 't.lastName', 't.firstName', 't.fee'])
+      .getMany()
+  }
+
   /**
    * Removes the {@link User} with the given id
    * @param id
@@ -115,14 +131,7 @@ export class UsersService {
     dto: CreatePrivateCustomerDto,
   ): Promise<PrivateCustomer> {
     const privateCustomer = this.privateCustomersRepository.create({
-      lastName: dto.lastName,
-      firstName: dto.firstName,
-      salutation: dto.salutation,
-      street: dto.street,
-      city: dto.city,
-      postalCode: dto.postalCode,
-      email: dto.email,
-      phone: dto.phone,
+      ...dto,
       mayAuthenticate: false,
     })
 
@@ -133,12 +142,7 @@ export class UsersService {
     dto: CreateSchoolCustomerDto,
   ): Promise<SchoolCustomer> {
     const schoolCustomer = this.schoolCustomersRepository.create({
-      schoolName: dto.schoolName,
-      street: dto.street,
-      city: dto.city,
-      postalCode: dto.postalCode,
-      email: dto.email,
-      phone: dto.phone,
+      ...dto,
       mayAuthenticate: false,
     })
 
@@ -147,17 +151,8 @@ export class UsersService {
 
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
     const teacher = this.teachersRepository.create({
-      lastName: dto.lastName,
-      firstName: dto.firstName,
-      salutation: dto.salutation,
-      street: dto.street,
-      city: dto.city,
-      postalCode: dto.postalCode,
-      email: dto.email,
-      phone: dto.phone,
-      fee: dto.fee,
+      ...dto,
       state: TeacherState.APPLIED,
-      subjects: dto.subjects,
       mayAuthenticate: true,
     })
 
@@ -166,14 +161,7 @@ export class UsersService {
 
   async createAdmin(dto: CreateAdminDto): Promise<Admin> {
     const admin = this.adminsRepository.create({
-      lastName: dto.lastName,
-      firstName: dto.firstName,
-      salutation: dto.salutation,
-      street: dto.street,
-      city: dto.city,
-      postalCode: dto.postalCode,
-      email: dto.email,
-      phone: dto.phone,
+      ...dto,
       mayAuthenticate: true,
     })
 

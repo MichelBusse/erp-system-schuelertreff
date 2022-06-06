@@ -11,16 +11,6 @@ import { Subject } from 'src/subjects/subject.entity'
 import { Customer } from 'src/users/entities/customer.entity'
 import { Teacher } from 'src/users/entities/teacher.entity'
 
-export enum Weekdays {
-  MONDAY = 'monday',
-  TUESDAY = 'tuesday',
-  WEDNESDAY = 'wednesday',
-  THURSTDAY = 'thurstday',
-  FRIDAY = 'friday',
-  SATURDAY = 'sturday',
-  SUNDAY = 'sunday',
-}
-
 @Entity()
 export class Contract {
   @PrimaryGeneratedColumn()
@@ -36,24 +26,18 @@ export class Contract {
   @ManyToOne(() => Subject)
   subject: Subject
 
-  @Column({
-    type: 'enum',
-    enum: Weekdays,
-  })
-  weekday: Weekdays
+  @Column({ type: 'time' })
+  startTime: string
 
   @Column({ type: 'time' })
-  from: string
+  endTime: string
 
-  @Column({ type: 'time' })
-  to: string
+  @Column({ type: 'date' })
+  startDate: string
 
-  @Column({ type: 'timestamptz' })
-  startDate: Date
-
-  @Column({ type: 'timestamptz' })
-  endDate: Date
+  @Column({ type: 'date', nullable: true })
+  endDate: string
 
   @Column()
-  frequency: number
+  interval: number
 }

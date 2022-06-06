@@ -28,7 +28,7 @@ import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 
 import subject from '../types/subject'
-import teacher from '../types/teacher'
+import { teacher } from '../types/user'
 import styles from './gridList.module.scss'
 
 const defaultFormData = {
