@@ -24,9 +24,9 @@ import {
   GridToolbarContainer,
   GridToolbarFilterButton,
 } from '@mui/x-data-grid'
-import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 
+import { useAuth } from '../components/AuthProvider'
 import subject from '../types/subject'
 import { teacher } from '../types/user'
 import styles from './gridList.module.scss'
@@ -93,14 +93,12 @@ const Teachers: React.FC = () => {
   const [teachers, setTeachers] = useState<teacher[]>([])
   const [data, setData] = useState(defaultFormData)
 
+  const { API } = useAuth()
+
   //Get subjects, teachers from DB
   useEffect(() => {
-    axios
-      .get(`http://localhost:8080/subjects`)
-      .then((res) => setSubjects(res.data))
-    axios
-      .get(`http://localhost:8080/users/teacher`)
-      .then((res) => setTeachers(res.data))
+    API.get(`subjects`).then((res) => setSubjects(res.data))
+    API.get(`users/teacher`).then((res) => setTeachers(res.data))
   }, [])
 
   //creating rows out of the teachers
@@ -126,7 +124,7 @@ const Teachers: React.FC = () => {
 
   //TODO: validate filled fields
   const submitForm = () => {
-    axios.post(`http://localhost:8080/users/teacher`, data).then((res) => {
+    API.post(`users/teacher`, data).then((res) => {
       setTeachers((s) => [...s, res.data])
       setDialogOpen(false)
     })

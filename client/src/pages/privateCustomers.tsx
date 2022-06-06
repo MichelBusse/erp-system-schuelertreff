@@ -21,9 +21,9 @@ import {
   GridToolbarContainer,
   GridToolbarFilterButton,
 } from '@mui/x-data-grid'
-import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 
+import { useAuth } from '../components/AuthProvider'
 import privateCustomer from '../types/privateCustomer'
 import styles from './gridList.module.scss'
 
@@ -82,11 +82,11 @@ const PrivateCustomers: React.FC = () => {
   const [customers, setCustomers] = useState<privateCustomer[]>([])
   const [data, setData] = useState(defaultFormData)
 
+  const { API } = useAuth()
+
   //Get subjects, teachers from DB
   useEffect(() => {
-    axios
-      .get(`http://localhost:8080/users/privateCustomer`)
-      .then((res) => setCustomers(res.data))
+    API.get(`users/privateCustomer`).then((res) => setCustomers(res.data))
   }, [])
 
   console.log(customers)
@@ -115,12 +115,10 @@ const PrivateCustomers: React.FC = () => {
 
   //TODO: validate filled fields
   const submitForm = () => {
-    axios
-      .post(`http://localhost:8080/users/privateCustomer`, data)
-      .then((res) => {
-        setCustomers((s) => [...s, res.data])
-        setDialogOpen(false)
-      })
+    API.post(`users/privateCustomer`, data).then((res) => {
+      setCustomers((s) => [...s, res.data])
+      setDialogOpen(false)
+    })
   }
 
   return (

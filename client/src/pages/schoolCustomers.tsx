@@ -20,6 +20,7 @@ import {
 import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 
+import { useAuth } from '../components/AuthProvider'
 import schoolCustomer from '../types/schoolCustomer'
 import styles from './gridList.module.scss'
 
@@ -76,11 +77,11 @@ const SchoolCustomers: React.FC = () => {
   const [customers, setCustomers] = useState<schoolCustomer[]>([])
   const [data, setData] = useState(defaultFormData)
 
+  const { API } = useAuth()
+
   //Get subjects, teachers from DB
   useEffect(() => {
-    axios
-      .get(`http://localhost:8080/users/schoolCustomer`)
-      .then((res) => setCustomers(res.data))
+    API.get(`users/schoolCustomer`).then((res) => setCustomers(res.data))
   }, [])
 
   console.log(customers)
@@ -109,12 +110,10 @@ const SchoolCustomers: React.FC = () => {
 
   //TODO: validate filled fields
   const submitForm = () => {
-    axios
-      .post(`http://localhost:8080/users/schoolCustomer`, data)
-      .then((res) => {
-        setCustomers((s) => [...s, res.data])
-        setDialogOpen(false)
-      })
+    API.post(`users/schoolCustomer`, data).then((res) => {
+      setCustomers((s) => [...s, res.data])
+      setDialogOpen(false)
+    })
   }
 
   return (

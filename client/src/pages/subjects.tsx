@@ -11,11 +11,11 @@ import {
   Paper,
   TextField,
 } from '@mui/material'
-import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { SketchPicker } from 'react-color'
 import { BsPlusLg } from 'react-icons/bs'
 
+import { useAuth } from '../components/AuthProvider'
 import subject from '../types/subject'
 import styles from './subjects.module.scss'
 
@@ -30,12 +30,11 @@ const Subjects: React.FC = () => {
   const [data, setData] = useState(defaultFormData)
   const [subjects, setSubjects] = useState<subject[]>([])
 
+  const { API } = useAuth()
+
   //Get subjects from DB
   useEffect(() => {
-    axios.get(`http://localhost:8080/subjects`).then((res) => {
-      const DBsubjects = res.data
-      setSubjects(DBsubjects)
-    })
+    API.get('subjects').then((res) => setSubjects(res.data))
   }, [])
 
   const openDialog = () => {
@@ -45,7 +44,7 @@ const Subjects: React.FC = () => {
 
   //TODO: validate filled fields
   const submitForm = () => {
-    axios.post(`http://localhost:8080/subjects`, data).then((res) => {
+    API.post('subjects', data).then((res) => {
       setSubjects((s) => [...s, res.data])
       setData(defaultFormData)
       setDialogOpen(false)
