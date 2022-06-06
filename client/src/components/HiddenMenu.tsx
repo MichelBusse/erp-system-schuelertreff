@@ -1,55 +1,35 @@
-import { Button, Drawer, styled } from '@mui/material'
+import { Box, Button, Drawer } from '@mui/material'
 
 import { SideMenu } from '../pages/timetable'
 
 type Props = {
-  open: SideMenu
-  setOpen: (open: SideMenu) => void
+  state: SideMenu
+  close: () => void
 }
 
-const StyledDrawer = styled(Drawer)(() => ({
-  '& .MuiDrawer-paper': {
-    // styles like width: 100,
-    padding: 20,
-  },
-}))
-
-const HiddenMenu: React.FC<Props> = ({ open, setOpen }) => {
-  const HiddenMenuContent = () => {
-    return (
-      <>
-        <ul>
-          <li>ersten</li>
-          <li>zweitens</li>
-          <li>Lehrername: {open.info}</li>
-        </ul>
-        <Button
-          variant="outlined"
-          size="large"
-          onClick={() => setOpen({ state: false, info: 'standard' })}
-        >
-          Details Schließen
-        </Button>
-      </>
-    )
-  }
-
-  return (
-    <>
-      <StyledDrawer
-        variant="persistent"
-        sx={{ width: 500 }}
-        /*anchor=Richtung*/
-        anchor="right"
-        /*open nimmt einen Booleanwert, ob offen oder geschlossen*/
-        open={open.state}
-        /* bei klick auf den Button wird anchor(die Richtung) und false an toggleDrawer geschickt (side menü schließt sich)*/
-      >
-        {/* ist das eigentliche side menü im Drawer*/}
-        {HiddenMenuContent()}
-      </StyledDrawer>
-    </>
-  )
-}
+const HiddenMenu: React.FC<Props> = ({ state, close }) => (
+  <Drawer
+    variant="persistent"
+    anchor="right"
+    open={state.open}
+    PaperProps={{
+      style: {
+        width: 240,
+        padding: 20,
+        overflowX: 'hidden',
+      },
+    }}
+  >
+    <Box>{state.content}</Box>
+    <Button
+      variant="text"
+      size="medium"
+      onClick={close}
+      sx={{ marginTop: 'auto' }}
+    >
+      schließen
+    </Button>
+  </Drawer>
+)
 
 export default HiddenMenu

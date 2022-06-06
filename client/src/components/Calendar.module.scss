@@ -27,19 +27,19 @@
 
   :global(.MuiDataGrid-columnHeader),
   :global(.MuiDataGrid-row) > :first-child {
-    background-color: #A8F0FF;
+    background-color: #a8f0ff;
   }
 
   :global(.MuiDataGrid-columnHeader):nth-child(2n),
-  :global(.MuiDataGrid-row):nth-child(2n+1) > :first-child {
-    background-color: #8CE6F9;
+  :global(.MuiDataGrid-row):nth-child(2n + 1) > :first-child {
+    background-color: #8ce6f9;
   }
 
   :global(.MuiDataGrid-row) {
     background-color: #8ce6f903 !important;
   }
 
-  :global(.MuiDataGrid-row):nth-child(2n+1) {
+  :global(.MuiDataGrid-row):nth-child(2n + 1) {
     background-color: #8ce6f912 !important;
   }
 
@@ -73,4 +73,10 @@
   :global(.MuiDataGrid-cell):not(:first-child) {
     padding: 0;
   }
+}
+
+.list {
+  padding-left: 20px;
+  margin-top: 0px !important;
+  list-style-type: '-  ';
 }

@@ -1,7 +1,12 @@
 import AddIcon from '@mui/icons-material/Add'
-import { Fab, Paper } from '@mui/material'
+import { Fab, Paper, Stack, Typography } from '@mui/material'
 import { Box } from '@mui/system'
-import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRowsProp,
+} from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 
@@ -14,7 +19,7 @@ import CalendarControl from './CalendarControl'
 
 type Props = {
   date: Dayjs
-  setOpen: (open: SideMenu) => void
+  setDrawer: (open: SideMenu) => void
   setDate: (date: Dayjs) => void
   openDialog: () => void
 }
@@ -31,7 +36,12 @@ type contract = {
   teacher: number
 }
 
-const Calendar: React.FC<Props> = ({ date, setOpen, setDate, openDialog }) => {
+const Calendar: React.FC<Props> = ({
+  date,
+  setDrawer,
+  setDate,
+  openDialog,
+}) => {
   const { API } = useAuth()
   const [teachers, setTeachers] = useState<teacher[]>([])
   const [contracts, setContracts] = useState<Record<number, contract[]>>([])
@@ -46,7 +56,7 @@ const Calendar: React.FC<Props> = ({ date, setOpen, setDate, openDialog }) => {
         of: date.format('YYYY-MM-DD'),
       },
     }).then((res) => {
-      let contractsByTeacher: Record<number, contract[]> = {}
+      const contractsByTeacher: Record<number, contract[]> = {}
 
       res.data.map((c: contract) => {
         contractsByTeacher[c.teacher] = (
@@ -63,6 +73,33 @@ const Calendar: React.FC<Props> = ({ date, setOpen, setDate, openDialog }) => {
       (c) => dayjs(c.startDate).day().toString() === field,
     )
 
+  const renderCell: GridColDef['renderCell'] = (params) => (
+    <Box
+      sx={{
+        width: '100%',
+        height: '100%',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        cursor: (params.value ?? []).length > 0 ? 'pointer' : 'normal',
+      }}
+    >
+      {(params.value as contract[])?.map((c) => (
+        <Box
+          key={c.id}
+          sx={{
+            backgroundColor: c.subject.color + '95',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            boxShadow: `0 0 2px ${c.subject.color} inset`,
+          }}
+        >
+          {c.subject.shortForm}
+        </Box>
+      ))}
+    </Box>
+  )
+
   const columns: GridColDef[] = [
     { field: 'teacher', headerName: '', width: 200, sortable: false },
 
@@ -73,31 +110,7 @@ const Calendar: React.FC<Props> = ({ date, setOpen, setDate, openDialog }) => {
         width: 150,
         sortable: false,
         valueGetter: getCellValue,
-        renderCell: (params) => (
-          <Box
-            sx={{
-              width: '100%',
-              height: '100%',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-            }}
-          >
-            {(params.value as contract[])?.map((c) => (
-              <Box
-                key={c.id}
-                sx={{
-                  backgroundColor: c.subject.color + '95',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  boxShadow: `0 0 5px ${c.subject.color} inset`,
-                }}
-              >
-                {c.subject.shortForm}
-              </Box>
-            ))}
-          </Box>
-        ),
+        renderCell,
       }),
     ),
   ]
@@ -124,8 +137,12 @@ const Calendar: React.FC<Props> = ({ date, setOpen, setDate, openDialog }) => {
         disableColumnMenu={true}
         disableSelectionOnClick={true}
         onCellClick={(params) => {
-          if (params.colDef.field === 'teacher')
-            setOpen({ state: true, info: `${params.id}` })
+          if (
+            params.colDef.field !== 'teacher' &&
+            (params.value ?? []).length > 0
+          ) {
+            setDrawer({ open: true, content: drawerContent(params) })
+          }
         }}
       />
 
@@ -144,5 +161,42 @@ const Calendar: React.FC<Props> = ({ date, setOpen, setDate, openDialog }) => {
     </Paper>
   )
 }
+
+const drawerContent = (params: GridCellParams) => (
+  <>
+    <span>{params.colDef.headerName?.replace('\n', ' / ')}</span>
+    <Typography variant="h5" mb={3}>
+      {params.row.teacher}
+    </Typography>
+    <Stack spacing={2}>
+      {(params.value as contract[])?.map((c) => (
+        <Stack
+          key={c.id}
+          spacing={0.5}
+          sx={{
+            backgroundColor: c.subject.color + 50,
+            p: 1,
+            borderRadius: 2,
+          }}
+        >
+          <span>
+            {c.startTime.substring(0, 5) + ' - ' + c.endTime.substring(0, 5)}
+          </span>
+          <span>{c.subject.name}</span>
+          <span>Kunden:</span>
+          <ul className={styles.list}>
+            {c.customers.map((s) => (
+              <li key={s.id}>
+                {s.role === 'schoolCustomer'
+                  ? s.schoolName
+                  : s.firstName + ' ' + s.lastName}
+              </li>
+            ))}
+          </ul>
+        </Stack>
+      ))}
+    </Stack>
+  </>
+)
 
 export default Calendar

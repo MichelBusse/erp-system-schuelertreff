@@ -21,7 +21,6 @@ import { useAuth } from './AuthProvider'
 import BetterTimePicker from './BetterTimePicker'
 import EqualStack from './EqualStack'
 import IconButtonAdornment from './IconButtonAdornment'
-import schoolCustomer from '../types/schoolCustomer'
 
 type Props = {
   open: boolean

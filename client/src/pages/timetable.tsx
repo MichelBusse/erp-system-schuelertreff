@@ -3,7 +3,7 @@ import 'dayjs/locale/de'
 import { Box } from '@mui/material'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
-import { useState } from 'react'
+import { ReactElement, useState } from 'react'
 
 import Calendar from '../components/Calendar'
 import ContractDialog from '../components/ContractDialog'
@@ -13,18 +13,34 @@ dayjs.locale('de')
 dayjs.extend(weekOfYear)
 
 export type SideMenu = {
-  state: boolean
-  info: string
+  open: boolean
+  content: ReactElement
 }
 
 const Timetable: React.FC = () => {
-  const [open, setOpen] = useState<SideMenu>({ state: false, info: 'Standard' })
+  const [drawer, setDrawer] = useState<SideMenu>({
+    open: false,
+    content: <></>,
+  })
   const [date, setDate] = useState(dayjs().day(1))
   const [dialogOpen, setDialogOpen] = useState(false)
   const [render, setRender] = useState(0)
 
   return (
-    <Box sx={{ p: 4, height: '100%' }}>
+    <Box
+      sx={{
+        p: 4,
+        height: '100%',
+        // marginRight: drawer.open ? '240px' : 0,
+        // transition: theme.transitions.create('margin', {
+        //   easing: theme.transitions.easing.easeInOut,
+        //   duration:
+        //     theme.transitions.duration[
+        //       drawer.open ? 'leavingScreen' : 'enteringScreen'
+        //     ],
+        // }),
+      }}
+    >
       <Box
         sx={{
           height: '100%',
@@ -35,7 +51,7 @@ const Timetable: React.FC = () => {
       >
         <Calendar
           date={date}
-          setOpen={setOpen}
+          setDrawer={setDrawer}
           setDate={setDate}
           openDialog={() => {
             // dialog component is re-created each time
@@ -46,7 +62,10 @@ const Timetable: React.FC = () => {
         />
       </Box>
 
-      <HiddenMenu open={open} setOpen={setOpen} />
+      <HiddenMenu
+        state={drawer}
+        close={() => setDrawer((d) => ({ ...d, open: false }))}
+      />
 
       {!!render && (
         <ContractDialog
