@@ -8,6 +8,7 @@ import { ReactElement, useState } from 'react'
 import Calendar from '../components/Calendar'
 import ContractDialog from '../components/ContractDialog'
 import HiddenMenu from '../components/HiddenMenu'
+import TeacherCalendar from '../components/TeacherCalendar'
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)
@@ -49,7 +50,7 @@ const Timetable: React.FC = () => {
           alignItems: 'center',
         }}
       >
-        <Calendar
+        {/* <Calendar
           date={date}
           setDrawer={setDrawer}
           setDate={setDate}
@@ -59,6 +60,11 @@ const Timetable: React.FC = () => {
             setRender(render + 1)
             setDialogOpen(true)
           }}
+        /> */}
+        <TeacherCalendar
+          date={date}
+          setDrawer={setDrawer}
+          setDate={setDate}
         />
       </Box>
 
