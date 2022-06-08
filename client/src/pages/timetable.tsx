@@ -3,12 +3,13 @@ import 'dayjs/locale/de'
 import { Box } from '@mui/material'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
-import { ReactElement, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 
 import Calendar from '../components/Calendar'
 import ContractDialog from '../components/ContractDialog'
 import HiddenMenu from '../components/HiddenMenu'
 import TeacherCalendar from '../components/TeacherCalendar'
+import { useAuth } from '../components/AuthProvider'
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)
@@ -26,6 +27,14 @@ const Timetable: React.FC = () => {
   const [date, setDate] = useState(dayjs().day(1))
   const [dialogOpen, setDialogOpen] = useState(false)
   const [render, setRender] = useState(0)
+  const { API } = useAuth()
+  const [myRole, setMyRole] = useState('')
+
+  useEffect(() => {
+    API.get('users/me').then((res) => {
+      setMyRole(res.data.role)
+    })
+  }, [])
 
   return (
     <Box
@@ -50,22 +59,27 @@ const Timetable: React.FC = () => {
           alignItems: 'center',
         }}
       >
-        {/* <Calendar
-          date={date}
-          setDrawer={setDrawer}
-          setDate={setDate}
-          openDialog={() => {
-            // dialog component is re-created each time
-            // -> data will be fetched on button press
-            setRender(render + 1)
-            setDialogOpen(true)
-          }}
-        /> */}
-        <TeacherCalendar
-          date={date}
-          setDrawer={setDrawer}
-          setDate={setDate}
-        />
+        {myRole == 'admin' ? (
+          <Calendar
+            date={date}
+            setDrawer={setDrawer}
+            setDate={setDate}
+            openDialog={() => {
+              // dialog component is re-created each time
+              // -> data will be fetched on button press
+              setRender(render + 1)
+              setDialogOpen(true)
+            }}
+          />
+        ) : null}
+
+        {myRole == 'teacher' ? (
+          <TeacherCalendar
+            date={date}
+            setDrawer={setDrawer}
+            setDate={setDate}
+          />
+        ) : null}
       </Box>
 
       <HiddenMenu
