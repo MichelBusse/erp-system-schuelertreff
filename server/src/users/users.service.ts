@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import * as argon2 from 'argon2'
+import dayjs from 'dayjs'
 import { Repository } from 'typeorm'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
+import { timeAvailable } from './dto/timeAvailable'
 import {
   Admin,
   Customer,
@@ -16,6 +18,7 @@ import {
   User,
 } from './entities'
 import { TeacherState } from './entities/teacher.entity'
+import { maxTimeRange } from './entities/user.entity'
 
 @Injectable()
 export class UsersService {
@@ -49,6 +52,20 @@ export class UsersService {
       memoryCost: 15 * 1024,
       parallelism: 1,
     })
+  }
+
+  /**
+   * Format Array of {@link timeAvailable} as Postgres `tstzmultirange`
+   */
+  private formatTimesAvailable(times: timeAvailable[]) {
+    if (times.length === 0) return `{${maxTimeRange}}`
+
+    return `{${times
+      .map((t) => {
+        const date = dayjs('2001-01-01').day(t.dow).format('YYYY-MM-DD')
+        return `[${date} ${t.start}, ${date} ${t.end}]`
+      })
+      .join(', ')}}`
   }
 
   /**
@@ -130,12 +147,15 @@ export class UsersService {
   async createPrivateCustomer(
     dto: CreatePrivateCustomerDto,
   ): Promise<PrivateCustomer> {
-    const privateCustomer = this.privateCustomersRepository.create({
-      ...dto,
-      mayAuthenticate: false,
-    })
+    console.log(this.formatTimesAvailable(dto.timesAvailable))
+    return
+    // const privateCustomer = this.privateCustomersRepository.create({
+    //   ...dto,
+    //   timesAvailable: this.formatTimesAvailable(dto.timesAvailable),
+    //   mayAuthenticate: false,
+    // })
 
-    return this.privateCustomersRepository.save(privateCustomer)
+    // return this.privateCustomersRepository.save(privateCustomer)
   }
 
   async createSchoolCustomer(

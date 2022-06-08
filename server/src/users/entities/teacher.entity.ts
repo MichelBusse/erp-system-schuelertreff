@@ -1,9 +1,9 @@
-import { ChildEntity, Column, JoinTable, ManyToMany } from 'typeorm'
+import { Check, ChildEntity, Column, JoinTable, ManyToMany } from 'typeorm'
 
 import { Role } from 'src/auth/role.enum'
 import { Subject } from 'src/subjects/subject.entity'
 
-import { User } from './user.entity'
+import { maxTimeRange, User } from './user.entity'
 
 export enum TeacherState {
   APPLIED = 'applied',
@@ -13,6 +13,7 @@ export enum TeacherState {
 }
 
 @ChildEntity()
+@Check(`"timesAvailable" <@ '${maxTimeRange}'::tstzrange`)
 export class Teacher extends User {
   role = Role.TEACHER
 
@@ -29,4 +30,11 @@ export class Teacher extends User {
   @ManyToMany(() => Subject, { cascade: true })
   @JoinTable()
   subjects: Subject[]
+
+  @Column({
+    type: 'tstzmultirange',
+    default: `{${maxTimeRange}}`,
+    nullable: false,
+  })
+  timesAvailable: string
 }
