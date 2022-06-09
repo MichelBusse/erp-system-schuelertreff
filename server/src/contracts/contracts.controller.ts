@@ -6,6 +6,9 @@ import {
   Get,
   Param,
   Post,
+  Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -16,6 +19,7 @@ import { Role } from 'src/auth/role.enum'
 import { Contract } from './contract.entity'
 import { ContractsService } from './contracts.service'
 import { CreateContractDto } from './dto/create-contract.dto'
+import { SuggestContractsDto } from './dto/suggest-contracts.dto'
 
 dayjs.extend(customParseFormat)
 
@@ -51,6 +55,12 @@ export class ContractsController {
     this.validateDto(dto)
 
     return this.contractsService.create(dto)
+  }
+
+  @Get('suggest')
+  @Roles(Role.ADMIN)
+  suggestContracts(@Query() dto: SuggestContractsDto): Promise<Contract[]> {
+    return this.contractsService.suggestContracts(dto)
   }
 
   @Get()

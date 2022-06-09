@@ -5,6 +5,7 @@ import { Repository } from 'typeorm'
 
 import { Contract } from './contract.entity'
 import { CreateContractDto } from './dto/create-contract.dto'
+import { SuggestContractsDto } from './dto/suggest-contracts.dto'
 
 @Injectable()
 export class ContractsService {
@@ -27,6 +28,10 @@ export class ContractsService {
 
   findOne(id: string): Promise<Contract> {
     return this.contractsRepository.findOne(id)
+  }
+
+  async suggestContracts(dto: SuggestContractsDto): Promise<Contract[]> {
+    return
   }
 
   async remove(id: string): Promise<void> {
