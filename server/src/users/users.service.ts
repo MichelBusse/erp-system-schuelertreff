@@ -147,15 +147,13 @@ export class UsersService {
   async createPrivateCustomer(
     dto: CreatePrivateCustomerDto,
   ): Promise<PrivateCustomer> {
-    console.log(this.formatTimesAvailable(dto.timesAvailable))
-    return
-    // const privateCustomer = this.privateCustomersRepository.create({
-    //   ...dto,
-    //   timesAvailable: this.formatTimesAvailable(dto.timesAvailable),
-    //   mayAuthenticate: false,
-    // })
+    const privateCustomer = this.privateCustomersRepository.create({
+      ...dto,
+      timesAvailable: this.formatTimesAvailable(dto.timesAvailable),
+      mayAuthenticate: false,
+    })
 
-    // return this.privateCustomersRepository.save(privateCustomer)
+    return this.privateCustomersRepository.save(privateCustomer)
   }
 
   async createSchoolCustomer(
@@ -163,6 +161,7 @@ export class UsersService {
   ): Promise<SchoolCustomer> {
     const schoolCustomer = this.schoolCustomersRepository.create({
       ...dto,
+      timesAvailable: this.formatTimesAvailable(dto.timesAvailable),
       mayAuthenticate: false,
     })
 
@@ -172,6 +171,7 @@ export class UsersService {
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
     const teacher = this.teachersRepository.create({
       ...dto,
+      timesAvailable: this.formatTimesAvailable(dto.timesAvailable),
       state: TeacherState.APPLIED,
       mayAuthenticate: true,
     })

@@ -1,4 +1,5 @@
 import {
+  Check,
   Column,
   Entity,
   PrimaryGeneratedColumn,
@@ -18,6 +19,7 @@ export const maxTimeRange = '[2001-01-01 00:00, 2001-01-08 00:00]'
 
 @Entity()
 @TableInheritance({ column: { type: 'varchar', name: 'type' } })
+@Check(`"timesAvailable" <@ '${maxTimeRange}'::tstzrange`)
 export abstract class User {
   role: Role
 
@@ -61,4 +63,11 @@ export abstract class User {
 
   @Column({ type: 'timestamptz', default: new Date(0) })
   jwtValidAfter: Date
+
+  @Column({
+    type: 'tstzmultirange',
+    default: `{${maxTimeRange}}`,
+    nullable: false,
+  })
+  timesAvailable: string
 }

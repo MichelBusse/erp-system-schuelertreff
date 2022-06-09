@@ -1,14 +1,6 @@
-import { Check, ChildEntity, Column } from 'typeorm'
+import { ChildEntity } from 'typeorm'
 
-import { maxTimeRange, User } from './user.entity'
+import { User } from './user.entity'
 
 @ChildEntity()
-@Check(`"timesAvailable" <@ '${maxTimeRange}'::tstzrange`)
-export abstract class Customer extends User {
-  @Column({
-    type: 'tstzmultirange',
-    default: `{${maxTimeRange}}`,
-    nullable: false,
-  })
-  timesAvailable: string
-}
+export abstract class Customer extends User {}
