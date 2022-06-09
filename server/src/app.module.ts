@@ -30,7 +30,8 @@ const ENV = process.env.NODE_ENV
         password: config.get<string>('DB_PASS'),
         database: config.get<string>('DB_NAME'),
         autoLoadEntities: true,
-        synchronize: true,
+        // can cause data loss, disable in production
+        synchronize: ENV !== 'production',
       }),
       inject: [ConfigService],
     }),
