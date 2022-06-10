@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
 import { Dayjs } from 'dayjs'
-import { Repository } from 'typeorm'
+import { Customer, Teacher, User } from 'src/users/entities'
+import { Connection, Repository } from 'typeorm'
 
 import { Contract } from './contract.entity'
 import { CreateContractDto } from './dto/create-contract.dto'
@@ -12,7 +13,32 @@ export class ContractsService {
   constructor(
     @InjectRepository(Contract)
     private readonly contractsRepository: Repository<Contract>,
-  ) {}
+
+    @InjectConnection()
+    private connection: Connection,
+  ) {
+    this.initDb()
+  }
+
+  async initDb() {
+    const runner = this.connection.createQueryRunner()
+
+    await runner.connect()
+
+    await runner.query(`
+      CREATE or REPLACE FUNCTION int_tstzmultirange(a tstzmultirange, b tstzmultirange)
+        returns tstzmultirange language plpgsql as
+          'begin return a * b; end';
+
+      CREATE or REPLACE AGGREGATE intersection ( tstzmultirange ) (
+        SFUNC = int_tstzmultirange,
+        STYPE = tstzmultirange,
+        INITCOND = '{[,]}'
+      );
+    `)
+
+    await runner.release()
+  }
 
   create(dto: CreateContractDto): Promise<Contract> {
     const contract = this.contractsRepository.create(dto)
@@ -30,8 +56,34 @@ export class ContractsService {
     return this.contractsRepository.findOne(id)
   }
 
-  async suggestContracts(dto: SuggestContractsDto): Promise<Contract[]> {
-    return
+  async suggestContracts(dto: SuggestContractsDto): Promise<any[]> {
+    const qb = this.connection.createQueryBuilder()
+
+    // subquery: when are all customers available?
+    const cTimes = qb
+      .subQuery()
+      .select('intersection(c."timesAvailable")')
+      .from(Customer, 'c')
+      .where('c.id IN (:...cid)', { cid: dto.customers })
+
+    const mainQuery = qb
+      .select('*')
+      .from((subq) => {
+        return subq
+          .select('t.id', 'teacherId')
+          .addSelect(
+            't.timesAvailable * ' + cTimes.getQuery(),
+            'possibleTimes',
+          )
+          .from(User, 't')
+          .where('t.type = :tt', { tt: 'Teacher' })
+          .setParameters(cTimes.getParameters())
+      }, 's')
+      .where(`s."possibleTimes" <> '{}'::tstzmultirange`)
+
+    // console.log(mainQuery.getQueryAndParameters())
+
+    return mainQuery.getRawMany()
   }
 
   async remove(id: string): Promise<void> {

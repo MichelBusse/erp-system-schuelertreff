@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer'
+import { Transform, Type } from 'class-transformer'
 import {
   ArrayNotEmpty,
   IsArray,
@@ -13,8 +13,8 @@ export class SuggestContractsDto {
   @IsInt()
   subjectId: number
 
-  @Type(() => Number)
-  @IsArray()
+  @Type(() => String)
+  @Transform(({ value }) => value.split(',').map(parseFloat))
   @ArrayNotEmpty()
   @IsInt({ each: true })
   customers: number[]
