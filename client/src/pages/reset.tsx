@@ -11,22 +11,25 @@ import {
 } from '@mui/material'
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-
+import PasswordChecklist from 'react-password-checklist'
 import { useAuth } from '../components/AuthProvider'
 
 const Reset: React.FC = () => {
   const [dialog, setDialog] = useState<'' | 'error' | 'success'>('')
   const [password, setPassword] = useState({ pw1: '', pw2: '' })
 
+  //const [containsUL, setContainsUL] = useState(false) // uppercase letter
+  //const [containsSC, setContainsSC] = useState(false) // special character
+  const [containsN, setContainsN] = useState(false) // number
+  const [contains8C, setContains8C] = useState(false) // min 8 characters
+  const [passwordMatch, setPasswordMatch] = useState(false) // passwords matches
+
   const navigate = useNavigate()
   const { API, handleLogout } = useAuth()
   const { token } = useParams()
 
-  const pwEqual = password.pw1 === password.pw2
-  const errorNotEquals = !pwEqual && password.pw2 !== ''
-
   const handleSubmit = async () => {
-    if (pwEqual && password.pw2 !== '') {
+    if (passwordMatch && password.pw2 !== '') {
       API.post('/auth/reset', { token: token, password: password.pw1 })
         .then(() => {
           handleLogout()
@@ -37,6 +40,28 @@ const Reset: React.FC = () => {
           setDialog('error')
         })
     }
+  }
+
+  //check password requirements:
+  const validatePassword = () => {
+    // has uppercase letter
+    //if (password.pw1.toLowerCase() != password.pw1) setContainsUL(true)
+    //else setContainsUL(false)
+    // has special character
+    //if (/[~`!#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?]/g.test(password.pw1))
+    //  setContainsSC(true)
+    //else setContainsSC(false)
+
+    // has number
+    if (/\d/.test(password.pw1)) setContainsN(true)
+    else setContainsN(false)
+    // has 8 characters
+    if (password.pw1.length >= 8) setContains8C(true)
+    else setContains8C(false)
+    // passwords match
+    if (password.pw1 !== '' && password.pw1 === password.pw2)
+      setPasswordMatch(true)
+    else setPasswordMatch(false)
   }
 
   return (
@@ -62,6 +87,7 @@ const Reset: React.FC = () => {
           onChange={(e) =>
             setPassword((password) => ({ ...password, pw1: e.target.value }))
           }
+          onKeyUp={validatePassword}
         />
         <TextField
           label="Passwort wiederholen"
@@ -69,19 +95,30 @@ const Reset: React.FC = () => {
           autoComplete="new-password"
           size="small"
           style={{ width: 200 }}
-          error={errorNotEquals}
-          helperText={errorNotEquals ? 'Eingabe stimmt nicht überein' : ' '}
+          error={!passwordMatch}
           onChange={(e) =>
             setPassword((password) => ({ ...password, pw2: e.target.value }))
           }
+          onKeyUp={validatePassword}
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleSubmit()
+          }}
+        />
+        <PasswordChecklist
+          rules={['minLength', 'number', 'match']}
+          minLength={8}
+          value={password.pw1}
+          valueAgain={password.pw2}
+          messages={{
+            minLength: 'Mindestens 8 Zeichen.',
+            number: 'Enthält eine Ziffer',
+            match: 'Passwörter stimmen überein.',
           }}
         />
         <Button
           variant="outlined"
           size="medium"
-          disabled={!pwEqual || password.pw2 === ''}
+          disabled={!(containsN && contains8C && passwordMatch)}
           onClick={handleSubmit}
         >
           Zurücksetzen
