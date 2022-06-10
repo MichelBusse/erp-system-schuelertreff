@@ -1,12 +1,6 @@
 import { Transform, Type } from 'class-transformer'
-import {
-  ArrayNotEmpty,
-  IsArray,
-  IsInt,
-  IsOptional,
-  Max,
-  Min,
-} from 'class-validator'
+import { ArrayNotEmpty, IsInt, IsOptional, Max, Min } from 'class-validator'
+
 import { IsTime24h } from 'src/IsTime24h.decorator'
 
 export class SuggestContractsDto {

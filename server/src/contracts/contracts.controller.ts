@@ -7,8 +7,6 @@ import {
   Param,
   Post,
   Query,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'

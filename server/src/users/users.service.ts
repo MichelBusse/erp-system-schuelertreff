@@ -63,7 +63,7 @@ export class UsersService {
     return `{${times
       .map((t) => {
         const date = dayjs('2001-01-01').day(t.dow).format('YYYY-MM-DD')
-        return `[${date} ${t.start}, ${date} ${t.end}]`
+        return `[${date} ${t.start}, ${date} ${t.end})` // exclusive upper bound
       })
       .join(', ')}}`
   }

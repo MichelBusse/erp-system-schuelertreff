@@ -3,6 +3,7 @@ import { registerDecorator, ValidationOptions } from 'class-validator'
 const regexTime = /^([01][0-9]|2[0-3]):([0-5][0-9])$/
 
 export function IsTime24h(validationOptions?: ValidationOptions) {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   return function (object: Object, propertyName: string) {
     registerDecorator({
       name: 'isTime24h',

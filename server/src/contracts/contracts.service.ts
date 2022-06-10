@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
 import { Dayjs } from 'dayjs'
-import { Customer, Teacher, User } from 'src/users/entities'
 import { Connection, Repository } from 'typeorm'
+
+import { Customer, User } from 'src/users/entities'
 
 import { Contract } from './contract.entity'
 import { CreateContractDto } from './dto/create-contract.dto'
@@ -57,24 +58,39 @@ export class ContractsService {
   }
 
   async suggestContracts(dto: SuggestContractsDto): Promise<any[]> {
+    const dowFilter =
+      typeof dto.dow !== 'undefined' ? [dto.dow] : [1, 2, 3, 4, 5]
+
+    const dowTime = dowFilter.map((dow) => {
+      const start = `[2001-01-0${dow} ${dto.startTime ?? '00:00'}, `
+      const end =
+        typeof dto.endTime !== 'undefined'
+          ? `2001-01-0${dow} ${dto.endTime}]`
+          : `2001-01-0${dow + 1} 00:00)` // exclusive bound of next day 00:00
+
+      return start + end
+    })
+
+    const dowTimeFilter = `{${dowTime.join(', ')}}`
+
+    // begin actual query
+
     const qb = this.connection.createQueryBuilder()
 
     // subquery: when are all customers available?
     const cTimes = qb
       .subQuery()
-      .select('intersection(c."timesAvailable")')
+      .select('intersection(c."timesAvailable") * :filter::tstzmultirange')
       .from(Customer, 'c')
       .where('c.id IN (:...cid)', { cid: dto.customers })
+      .setParameter('filter', dowTimeFilter)
 
     const mainQuery = qb
       .select('*')
       .from((subq) => {
         return subq
           .select('t.id', 'teacherId')
-          .addSelect(
-            't.timesAvailable * ' + cTimes.getQuery(),
-            'possibleTimes',
-          )
+          .addSelect('t.timesAvailable * ' + cTimes.getQuery(), 'possibleTimes')
           .from(User, 't')
           .where('t.type = :tt', { tt: 'Teacher' })
           .setParameters(cTimes.getParameters())
