@@ -61,7 +61,7 @@ export class UsersController {
 
   @Get('me')
   getMe(@Request() req) {
-    return this.usersService.findOne(req.user.id);
+    return this.usersService.findOne(req.user.id)
   }
 
   @Get(':id')

@@ -5,11 +5,11 @@ import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { ReactElement, useEffect, useState } from 'react'
 
+import { useAuth } from '../components/AuthProvider'
 import Calendar from '../components/Calendar'
 import ContractDialog from '../components/ContractDialog'
 import HiddenMenu from '../components/HiddenMenu'
 import TeacherCalendar from '../components/TeacherCalendar'
-import { useAuth } from '../components/AuthProvider'
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)

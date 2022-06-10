@@ -33,7 +33,7 @@ export class ContractsService {
     await this.contractsRepository.delete(id)
   }
 
-  async findByWeek(week: Dayjs): Promise<Contract[]> {
+  async findByWeek(week: Dayjs, teacherId?: number): Promise<Contract[]> {
     const q = this.contractsRepository
       .createQueryBuilder('c')
       .leftJoin('c.subject', 'subject')
@@ -59,35 +59,8 @@ export class ContractsService {
         `extract( days from ( date_trunc('week', c.startDate) - date_trunc('week', :week::date) ) ) / 7 % c.interval = 0`,
       )
 
-    return q.getMany()
-  }
-
-  async findMyContracts(teacherId: number, week: Dayjs): Promise<Contract[]> {
-    const q = this.contractsRepository
-      .createQueryBuilder('c')
-      .leftJoin('c.subject', 'subject')
-      .leftJoin('c.customers', 'customer')
-      .select([
-        'c',
-        'subject',
-        'customer.id',
-        'customer.type',
-        'customer.firstName',
-        'customer.lastName',
-        'customer.schoolName',
-      ])
-      .loadAllRelationIds({
-        relations: ['teacher'],
-      })
-      .where(
-        `c.startDate <= date_trunc('week', :week::date) + interval '4 day'`,
-        { week: week.format() },
-      )
-      .andWhere(`c.endDate >= date_trunc('week', :week::date)`)
-      .andWhere(
-        `extract( days from ( date_trunc('week', c.startDate) - date_trunc('week', :week::date) ) ) / 7 % c.interval = 0`,
-      )
-      .andWhere('c.teacherId = :teacherId', { teacherId: teacherId })
+    if (typeof teacherId !== 'undefined')
+      q.andWhere('c.teacherId = :teacherId', { teacherId: teacherId })
 
     return q.getMany()
   }

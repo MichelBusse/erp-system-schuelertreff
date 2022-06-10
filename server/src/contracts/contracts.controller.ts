@@ -6,8 +6,8 @@ import {
   Get,
   Param,
   Post,
-  Request,
   Query,
+  Request,
 } from '@nestjs/common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -56,8 +56,11 @@ export class ContractsController {
   }
 
   @Get('myContracts')
-  findMyContracts(@Request() req, @Query('of') date: string): Promise<Contract[]>{
-    return this.contractsService.findMyContracts(req.user.id, dayjs(date))
+  findMyContracts(
+    @Request() req,
+    @Query('of') date: string,
+  ): Promise<Contract[]> {
+    return this.contractsService.findByWeek(dayjs(date), req.user.id)
   }
 
   @Get()
