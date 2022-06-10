@@ -33,7 +33,7 @@ export class ContractsService {
     await this.contractsRepository.delete(id)
   }
 
-  async findByWeek(week: Dayjs): Promise<Contract[]> {
+  async findByWeek(week: Dayjs, teacherId?: number): Promise<Contract[]> {
     const q = this.contractsRepository
       .createQueryBuilder('c')
       .leftJoin('c.subject', 'subject')
@@ -58,6 +58,9 @@ export class ContractsService {
       .andWhere(
         `extract( days from ( date_trunc('week', c.startDate) - date_trunc('week', :week::date) ) ) / 7 % c.interval = 0`,
       )
+
+    if (typeof teacherId !== 'undefined')
+      q.andWhere('c.teacherId = :teacherId', { teacherId: teacherId })
 
     return q.getMany()
   }

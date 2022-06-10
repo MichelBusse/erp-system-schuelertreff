@@ -17,7 +17,6 @@ import {
   GridToolbarContainer,
   GridToolbarFilterButton,
 } from '@mui/x-data-grid'
-import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
