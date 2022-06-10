@@ -7,6 +7,7 @@ import {
   DialogContentText,
   DialogTitle,
   FormControl,
+  FormHelperText,
   IconButton,
   InputLabel,
   MenuItem,
@@ -26,6 +27,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAuth } from '../components/AuthProvider'
 import privateCustomer from '../types/privateCustomer'
 import styles from './gridList.module.scss'
+
+const testEmail = (email: string) => /.+@.+\.[A-Za-z]+$/.test(email)
 
 const defaultFormData = {
   firstName: '',
@@ -81,6 +84,7 @@ const PrivateCustomers: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [customers, setCustomers] = useState<privateCustomer[]>([])
   const [data, setData] = useState(defaultFormData)
+  const [errors, setErrors] = useState(defaultFormData)
 
   const { API } = useAuth()
 
@@ -88,8 +92,6 @@ const PrivateCustomers: React.FC = () => {
   useEffect(() => {
     API.get(`users/privateCustomer`).then((res) => setCustomers(res.data))
   }, [])
-
-  console.log(customers)
 
   //creating rows out of the teachers
   const rows = customers.map((customer) => ({
@@ -109,16 +111,40 @@ const PrivateCustomers: React.FC = () => {
   )
 
   const openDialog = () => {
+    setErrors(defaultFormData)
     setData(defaultFormData)
     setDialogOpen(true)
   }
 
   //TODO: validate filled fields
-  const submitForm = () => {
-    API.post(`users/privateCustomer`, data).then((res) => {
-      setCustomers((s) => [...s, res.data])
-      setDialogOpen(false)
+  const formValidation = () =>
+    setErrors({
+      firstName: data.firstName ? '' : 'Vorname fehlt!',
+      lastName: data.lastName ? '' : 'Nachname fehlt!',
+      salutation: data.salutation ? '' : 'Anrede fehlt!',
+      city: data.city ? '' : 'Stadt fehlt!',
+      postalCode: data.postalCode.length == 5 ? '' : 'genau 5 Stellen!',
+      street: data.street ? '' : 'Straße fehlt!',
+      email: testEmail(data.email) ? '' : 'E-Mail ist nicht korrekt!',
+      phone: data.phone.length > 9 ? '' : 'mind. 10 Stellen!',
     })
+
+  const submitForm = () => {
+    if (
+      data.firstName &&
+      data.lastName &&
+      data.salutation &&
+      data.city &&
+      data.postalCode.length == 5 &&
+      data.street &&
+      testEmail(data.email) &&
+      data.phone.length > 9
+    ) {
+      API.post(`users/privateCustomer`, data).then((res) => {
+        setCustomers((s) => [...s, res.data])
+        setDialogOpen(false)
+      })
+    }
   }
 
   return (
@@ -170,8 +196,10 @@ const PrivateCustomers: React.FC = () => {
               <MenuItem value="Frau">Frau</MenuItem>
               <MenuItem value="divers">divers</MenuItem>
             </Select>
+            <FormHelperText>{errors.salutation}</FormHelperText>
           </FormControl>
           <TextField
+            helperText={errors.firstName}
             id="firstName"
             label="Vorname"
             variant="outlined"
@@ -183,6 +211,7 @@ const PrivateCustomers: React.FC = () => {
             }
           />
           <TextField
+            helperText={errors.lastName}
             id="lastName"
             label="Nachname"
             variant="outlined"
@@ -194,6 +223,7 @@ const PrivateCustomers: React.FC = () => {
             }
           />
           <TextField
+            helperText={errors.city}
             id="city"
             label="Stadt"
             variant="outlined"
@@ -205,6 +235,7 @@ const PrivateCustomers: React.FC = () => {
             }
           />
           <TextField
+            helperText={errors.postalCode}
             id="postalCode"
             label="Postleitzahl"
             variant="outlined"
@@ -216,6 +247,7 @@ const PrivateCustomers: React.FC = () => {
             }
           />
           <TextField
+            helperText={errors.street}
             id="street"
             label="Straße"
             variant="outlined"
@@ -227,6 +259,7 @@ const PrivateCustomers: React.FC = () => {
             }
           />
           <TextField
+            helperText={errors.email}
             id="email"
             label="E-Mail Adresse"
             variant="outlined"
@@ -238,6 +271,7 @@ const PrivateCustomers: React.FC = () => {
             }
           />
           <TextField
+            helperText={errors.phone}
             id="phone"
             label="Telefonnummer"
             variant="outlined"
@@ -251,7 +285,14 @@ const PrivateCustomers: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>Abbrechen</Button>
-          <Button onClick={submitForm}>Hinzufügen</Button>
+          <Button
+            onClick={() => {
+              formValidation()
+              submitForm()
+            }}
+          >
+            Hinzufügen
+          </Button>
         </DialogActions>
       </Dialog>
     </div>
