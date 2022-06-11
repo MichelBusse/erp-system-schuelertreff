@@ -21,7 +21,7 @@ export class ContractsService {
     this.initDb()
   }
 
-  async initDb() {
+  private async initDb() {
     const runner = this.connection.createQueryRunner()
 
     await runner.connect()
@@ -83,6 +83,7 @@ export class ContractsService {
       .select('intersection(c."timesAvailable") * :filter::tstzmultirange')
       .from(Customer, 'c')
       .where('c.id IN (:...cid)', { cid: dto.customers })
+      .having('count(c) = :cc', { cc: dto.customers.length })
       .setParameter('filter', dowTimeFilter)
 
     const mainQuery = qb
@@ -97,9 +98,19 @@ export class ContractsService {
       }, 's')
       .where(`s."possibleTimes" <> '{}'::tstzmultirange`)
 
-    // console.log(mainQuery.getQueryAndParameters())
+    ;[1, 2, 3, 4, 5].map((n) => {
+      qb.addSelect(
+        's."possibleTimes" * ' +
+          `'{[2001-01-0${n}, 2001-01-0${n + 1})}'::tstzmultirange`,
+        n.toString(),
+      )
+    })
 
-    return mainQuery.getRawMany()
+    console.log(mainQuery.getQueryAndParameters())
+
+    const availableTeachers = await mainQuery.getRawMany()
+
+    return availableTeachers
   }
 
   async remove(id: string): Promise<void> {
