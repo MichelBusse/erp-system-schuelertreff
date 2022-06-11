@@ -21,7 +21,7 @@ import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
-import schoolCustomer from '../types/schoolCustomer'
+import { schoolCustomer } from '../types/user'
 import styles from './gridList.module.scss'
 
 const defaultFormData = {

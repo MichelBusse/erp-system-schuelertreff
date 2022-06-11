@@ -24,7 +24,7 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
-import privateCustomer from '../types/privateCustomer'
+import { privateCustomer } from '../types/user'
 import styles from './gridList.module.scss'
 
 const defaultFormData = {
