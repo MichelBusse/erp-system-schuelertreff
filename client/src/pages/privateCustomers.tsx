@@ -22,14 +22,14 @@ import {
   GridToolbarFilterButton,
 } from '@mui/x-data-grid'
 import { useCallback, useEffect, useState } from 'react'
-import AddTimes from '../components/AddTimes'
 
+import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
-import { privateCustomer } from '../types/user'
-import styles from './gridList.module.scss'
-import timeAvailable from '../types/timeAvailable'
 import form from '../types/defaultFormData'
 import subject from '../types/subject'
+import timeAvailable from '../types/timeAvailable'
+import { privateCustomer } from '../types/user'
+import styles from './gridList.module.scss'
 
 const defaultFormData = {
   firstName: '',

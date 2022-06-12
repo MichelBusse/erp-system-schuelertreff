@@ -13,15 +13,14 @@ import {
   Select,
   TextField,
 } from '@mui/material'
-
 import { useEffect, useState } from 'react'
 
-import subject from '../types/subject'
-import { teacher } from '../types/user'
-import { useAuth } from './AuthProvider'
-import AddTimes from './AddTimes'
-import timeAvailable from '../types/timeAvailable'
 import form from '../types/defaultFormData'
+import subject from '../types/subject'
+import timeAvailable from '../types/timeAvailable'
+import { teacher } from '../types/user'
+import AddTimes from './AddTimes'
+import { useAuth } from './AuthProvider'
 
 type Props = {
   open: boolean
@@ -92,11 +91,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
   }
 
   const addTime = () => {
-    if (
-      times.dow &&
-      times.start &&
-      times.end
-    ) {
+    if (times.dow && times.start && times.end) {
       const timesList = data.timesAvailable.concat({
         id: times.id,
         dow: times.dow,
@@ -113,8 +108,8 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
     }
   }
 
-  async function deleteTime(id: number){
-    let newTimes = data.timesAvailable.filter(time => time.id != id)
+  async function deleteTime(id: number) {
+    const newTimes = data.timesAvailable.filter((time) => time.id != id)
     setData((data) => ({ ...data, timesAvailable: newTimes }))
   }
 
@@ -241,11 +236,11 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
             setData((data) => ({ ...data, fee: Number(event.target.value) }))
           }
         />
-        <AddTimes 
-          data = {data}
-          setData = {setData}
-          times = {times}
-          setTimes = {setTimes}
+        <AddTimes
+          data={data}
+          setData={setData}
+          times={times}
+          setTimes={setTimes}
         />
       </DialogContent>
       <DialogActions>

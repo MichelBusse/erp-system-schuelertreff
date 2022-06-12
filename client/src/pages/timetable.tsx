@@ -68,11 +68,7 @@ const Timetable: React.FC = () => {
       />
 
       {!!render && (
-        <ContractDialog
-          key={render}
-          open={open}
-          setOpen={setOpen}
-        />
+        <ContractDialog key={render} open={open} setOpen={setOpen} />
       )}
     </Box>
   )

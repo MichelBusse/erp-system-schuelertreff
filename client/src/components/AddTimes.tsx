@@ -1,15 +1,8 @@
 import 'dayjs/locale/de'
 
-import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
-import ListItemAvatar from '@mui/material/ListItemAvatar'
-import ListItemText from '@mui/material/ListItemText'
-import Avatar from '@mui/material/Avatar'
-
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
-import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
-
+import DeleteIcon from '@mui/icons-material/Delete'
 import {
   FormControl,
   Grid,
@@ -18,7 +11,11 @@ import {
   MenuItem,
   Select,
 } from '@mui/material'
-
+import Avatar from '@mui/material/Avatar'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemAvatar from '@mui/material/ListItemAvatar'
+import ListItemText from '@mui/material/ListItemText'
 import { Dayjs } from 'dayjs'
 
 import subject from '../types/subject'
@@ -69,7 +66,6 @@ const defaultFormData = {
 }
 
 const AddTimes: React.FC<Props> = ({ data, setData, times, setTimes }) => {
-
   const { API } = useAuth()
 
   const addTime = () => {
@@ -91,7 +87,7 @@ const AddTimes: React.FC<Props> = ({ data, setData, times, setTimes }) => {
   }
 
   async function deleteTime(id: number) {
-    let newTimes = data.timesAvailable.filter((time) => time.id != id)
+    const newTimes = data.timesAvailable.filter((time) => time.id != id)
     setData((data) => ({ ...data, timesAvailable: newTimes }))
   }
 

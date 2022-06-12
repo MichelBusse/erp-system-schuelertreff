@@ -1,21 +1,5 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import {
-  Autocomplete,
-  Button,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  FormControl,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-} from '@mui/material'
+import { Chip, IconButton, Stack } from '@mui/material'
 import {
   DataGrid,
   getGridStringOperators,
@@ -127,11 +111,7 @@ const Teachers: React.FC = () => {
         />
       </div>
 
-      <TeacherDialog 
-        open={open}
-        setOpen={setOpen}
-        setTeachers={setTeachers}
-      />
+      <TeacherDialog open={open} setOpen={setOpen} setTeachers={setTeachers} />
     </div>
   )
 }

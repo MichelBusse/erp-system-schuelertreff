@@ -1,4 +1,4 @@
-import { Dayjs } from "dayjs"
+import { Dayjs } from 'dayjs'
 
 type timeAvailable = {
   id: number

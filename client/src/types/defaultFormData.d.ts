@@ -1,5 +1,5 @@
-import subject from "./subject"
-import timeAvailable from "./timeAvailable"
+import subject from './subject'
+import timeAvailable from './timeAvailable'
 
 type form = {
   firstName: string
