@@ -15,7 +15,6 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 
-import form from '../types/defaultFormData'
 import subject from '../types/subject'
 import timeAvailable from '../types/timeAvailable'
 import { teacher } from '../types/user'
@@ -24,8 +23,22 @@ import { useAuth } from './AuthProvider'
 
 type Props = {
   open: boolean
-  setOpen: (open: boolean) => void
-  setTeachers: (teacher: teacher[]) => void
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setTeachers: React.Dispatch<React.SetStateAction<teacher[]>>
+}
+
+export type form = {
+  firstName: string
+  lastName: string
+  salutation: string
+  city: string
+  postalCode: string
+  street: string
+  email: string
+  phone: string
+  subjects: subject[]
+  fee: number
+  timesAvailable: (timeAvailable & { id: string })[]
 }
 
 const defaultFormData = {
@@ -46,7 +59,6 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
   const [data, setData] = useState<form>(defaultFormData)
   const [subjects, setSubjects] = useState<subject[]>([])
   const [times, setTimes] = useState<timeAvailable>({
-    id: 1,
     dow: '',
     start: null,
     end: null,
@@ -88,29 +100,6 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
   const closeForm = () => {
     setOpen(false)
     setData(defaultFormData)
-  }
-
-  const addTime = () => {
-    if (times.dow && times.start && times.end) {
-      const timesList = data.timesAvailable.concat({
-        id: times.id,
-        dow: times.dow,
-        start: times.start,
-        end: times.end,
-      })
-      setData((data) => ({ ...data, timesAvailable: timesList }))
-      setTimes({
-        id: times.id + 1,
-        dow: '',
-        start: null,
-        end: null,
-      })
-    }
-  }
-
-  async function deleteTime(id: number) {
-    const newTimes = data.timesAvailable.filter((time) => time.id != id)
-    setData((data) => ({ ...data, timesAvailable: newTimes }))
   }
 
   return (

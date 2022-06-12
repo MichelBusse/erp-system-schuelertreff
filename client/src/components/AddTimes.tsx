@@ -10,75 +10,44 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Stack,
 } from '@mui/material'
 import Avatar from '@mui/material/Avatar'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
-import { Dayjs } from 'dayjs'
+import { nanoid } from 'nanoid'
 
-import subject from '../types/subject'
-import { useAuth } from './AuthProvider'
+import timeAvailable from '../types/timeAvailable'
 import BetterTimePicker from './BetterTimePicker'
 import EqualStack from './EqualStack'
-
-type timeAvailable = {
-  id: number
-  dow: number | string
-  start: Dayjs | null
-  end: Dayjs | null
-}
-
-type form = {
-  firstName: string
-  lastName: string
-  salutation: string
-  city: string
-  postalCode: string
-  street: string
-  email: string
-  phone: string
-  subjects: subject[]
-  fee: number
-  timesAvailable: timeAvailable[]
-}
+import { form } from './TeacherDialog'
 
 type Props = {
   data: form
-  setData: (data: form) => void
+  setData: React.Dispatch<React.SetStateAction<form>>
   times: timeAvailable
-  setTimes: (times: timeAvailable) => void
-}
-
-const defaultFormData = {
-  firstName: '',
-  lastName: '',
-  salutation: '',
-  city: '',
-  postalCode: '',
-  street: '',
-  email: '',
-  phone: '',
-  subjects: [] as subject[],
-  fee: 0,
-  timesAvailable: [],
+  setTimes: React.Dispatch<React.SetStateAction<timeAvailable>>
 }
 
 const AddTimes: React.FC<Props> = ({ data, setData, times, setTimes }) => {
-  const { API } = useAuth()
-
   const addTime = () => {
     if (times.dow && times.start && times.end) {
-      const timesList = data.timesAvailable.concat({
-        id: times.id,
-        dow: times.dow,
-        start: times.start,
-        end: times.end,
-      })
-      setData((data) => ({ ...data, timesAvailable: timesList }))
+      setData((data) => ({
+        ...data,
+        timesAvailable: [
+          ...data.timesAvailable,
+          {
+            id: nanoid(),
+            dow: times.dow,
+            start: times.start,
+            end: times.end,
+          },
+        ],
+      }))
+
       setTimes({
-        id: times.id + 1,
         dow: '',
         start: null,
         end: null,
@@ -86,19 +55,15 @@ const AddTimes: React.FC<Props> = ({ data, setData, times, setTimes }) => {
     }
   }
 
-  async function deleteTime(id: number) {
-    const newTimes = data.timesAvailable.filter((time) => time.id != id)
+  async function deleteTime(id: string) {
+    const newTimes = data.timesAvailable.filter((time) => time.id !== id)
     setData((data) => ({ ...data, timesAvailable: newTimes }))
   }
 
   return (
     <>
-      <div style={{ display: 'flex' }}>
-        <EqualStack
-          direction="row"
-          spacing={2}
-          sx={{ marginTop: '16px', width: '90%' }}
-        >
+      <Stack direction="row" spacing={2} mt={2}>
+        <EqualStack direction="row" spacing={2}>
           <FormControl>
             <InputLabel id="SalutationLable">Wochentag</InputLabel>
             <Select
@@ -147,10 +112,10 @@ const AddTimes: React.FC<Props> = ({ data, setData, times, setTimes }) => {
             }}
           />
         </EqualStack>
-        <IconButton onClick={addTime} sx={{ width: '10%' }}>
+        <IconButton onClick={addTime} sx={{ alignSelf: 'center' }}>
           <AddIcon />
         </IconButton>
-      </div>
+      </Stack>
       <Grid item xs={12} md={6}>
         <List dense={true}>
           {data.timesAvailable.map((time) => {
