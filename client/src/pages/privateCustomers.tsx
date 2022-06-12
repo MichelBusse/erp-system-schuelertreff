@@ -22,10 +22,14 @@ import {
   GridToolbarFilterButton,
 } from '@mui/x-data-grid'
 import { useCallback, useEffect, useState } from 'react'
+import AddTimes from '../components/AddTimes'
 
 import { useAuth } from '../components/AuthProvider'
 import { privateCustomer } from '../types/user'
 import styles from './gridList.module.scss'
+import timeAvailable from '../types/timeAvailable'
+import form from '../types/defaultFormData'
+import subject from '../types/subject'
 
 const defaultFormData = {
   firstName: '',
@@ -36,6 +40,9 @@ const defaultFormData = {
   street: '',
   email: '',
   phone: '',
+  subjects: [] as subject[],
+  fee: 0,
+  timesAvailable: [],
 }
 
 //definition of the columns
@@ -80,7 +87,13 @@ const cols: GridColumns = [
 const PrivateCustomers: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [customers, setCustomers] = useState<privateCustomer[]>([])
-  const [data, setData] = useState(defaultFormData)
+  const [data, setData] = useState<form>(defaultFormData)
+  const [times, setTimes] = useState<timeAvailable>({
+    id: 1,
+    dow: '',
+    start: null,
+    end: null,
+  })
 
   const { API } = useAuth()
 
@@ -115,7 +128,22 @@ const PrivateCustomers: React.FC = () => {
 
   //TODO: validate filled fields
   const submitForm = () => {
-    API.post(`users/privateCustomer`, data).then((res) => {
+    API.post(`users/privateCustomer`, {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      salutation: data.salutation,
+      city: data.city,
+      postalCode: data.postalCode,
+      street: data.street,
+      email: data.email,
+      phone: data.phone,
+      timesAvailable: data.timesAvailable.map((time) => ({
+        dow: time.dow,
+        start: time.start?.format('HH:mm'),
+        end: time.end?.format('HH:mm'),
+      })),
+    }).then((res) => {
+      console.log(res)
       setCustomers((s) => [...s, res.data])
       setDialogOpen(false)
     })
@@ -247,6 +275,12 @@ const PrivateCustomers: React.FC = () => {
             onChange={(event) =>
               setData((data) => ({ ...data, phone: event.target.value }))
             }
+          />
+          <AddTimes
+            data={data}
+            setData={setData}
+            times={times}
+            setTimes={setTimes}
           />
         </DialogContent>
         <DialogActions>

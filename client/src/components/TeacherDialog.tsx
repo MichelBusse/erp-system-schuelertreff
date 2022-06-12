@@ -1,15 +1,5 @@
 import 'dayjs/locale/de'
 
-import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
-import ListItemAvatar from '@mui/material/ListItemAvatar'
-import ListItemText from '@mui/material/ListItemText'
-import Avatar from '@mui/material/Avatar'
-
-import AccessTimeIcon from '@mui/icons-material/AccessTime'
-import DeleteIcon from '@mui/icons-material/Delete'
-import AddIcon from '@mui/icons-material/Add'
-
 import {
   Autocomplete,
   Button,
@@ -18,48 +8,25 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
-  Grid,
-  IconButton,
   InputLabel,
   MenuItem,
   Select,
   TextField,
 } from '@mui/material'
 
-import { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 
 import subject from '../types/subject'
 import { teacher } from '../types/user'
 import { useAuth } from './AuthProvider'
-import BetterTimePicker from './BetterTimePicker'
-import EqualStack from './EqualStack'
+import AddTimes from './AddTimes'
+import timeAvailable from '../types/timeAvailable'
+import form from '../types/defaultFormData'
 
 type Props = {
   open: boolean
   setOpen: (open: boolean) => void
   setTeachers: (teacher: teacher[]) => void
-}
-
-type timeAvailable = {
-  id: number
-  dow: number | string
-  start: Dayjs | null
-  end: Dayjs | null
-}
-
-type form = {
-  firstName: string
-  lastName: string
-  salutation: string
-  city: string
-  postalCode: string
-  street: string
-  email: string
-  phone: string
-  subjects: subject[]
-  fee: number
-  timesAvailable: timeAvailable[]
 }
 
 const defaultFormData = {
@@ -274,99 +241,12 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
             setData((data) => ({ ...data, fee: Number(event.target.value) }))
           }
         />
-        <div style={{ display: 'flex' }}>
-          <EqualStack
-            direction="row"
-            spacing={2}
-            sx={{ marginTop: '16px', width: '90%' }}
-          >
-            <FormControl>
-              <InputLabel id="SalutationLable">Wochentag</InputLabel>
-              <Select
-                id="dow"
-                label="Wochentag"
-                value={times.dow}
-                onChange={(event) =>
-                  //TODO fix types
-                  setTimes((data) => ({
-                    ...data,
-                    dow: Number(event.target.value),
-                  }))
-                }
-              >
-                <MenuItem value={1}>Montag</MenuItem>
-                <MenuItem value={2}>Dienstag</MenuItem>
-                <MenuItem value={3}>Mittwoch</MenuItem>
-                <MenuItem value={4}>Donnerstag</MenuItem>
-                <MenuItem value={5}>Freitag</MenuItem>
-              </Select>
-            </FormControl>
-            <BetterTimePicker
-              label="Startzeit"
-              minutesStep={5}
-              required={true}
-              maxTime={times.end?.subtract(30, 'm')}
-              value={times.start}
-              onChange={(value) => {
-                setTimes((data) => ({ ...data, start: value }))
-              }}
-              clearValue={() => {
-                setTimes((data) => ({ ...data, start: null }))
-              }}
-            />
-            <BetterTimePicker
-              label="Endzeit"
-              minutesStep={5}
-              required={true}
-              minTime={times.start?.add(30, 'm')}
-              value={times.end}
-              onChange={(value) => {
-                setTimes((data) => ({ ...data, end: value }))
-              }}
-              clearValue={() => {
-                setTimes((data) => ({ ...data, end: null }))
-              }}
-            />
-          </EqualStack>
-          <IconButton onClick={addTime} sx={{ width: '10%' }}>
-            <AddIcon />
-          </IconButton>
-        </div>
-        <Grid item xs={12} md={6}>
-          <List dense={true}>
-            {data.timesAvailable.map((time) => {
-              const days = [
-                'Montag',
-                'Dienstag',
-                'Mittwoch',
-                'Donnerstag',
-                'Freitag',
-              ]
-              const timeText =
-                days[Number(time.dow) - 1] +
-                ': ' +
-                time.start?.format('HH:mm') +
-                ' - ' +
-                time.end?.format('HH:mm')
-              return (
-                <ListItem key={time.id}
-                  secondaryAction={
-                    <IconButton edge="end" aria-label="delete" onClick={() => deleteTime(time.id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  }
-                >
-                  <ListItemAvatar>
-                    <Avatar>
-                      <AccessTimeIcon />
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText primary={timeText} />
-                </ListItem>
-              )
-            })}
-          </List>
-        </Grid>
+        <AddTimes 
+          data = {data}
+          setData = {setData}
+          times = {times}
+          setTimes = {setTimes}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={closeForm}>Abbrechen</Button>
