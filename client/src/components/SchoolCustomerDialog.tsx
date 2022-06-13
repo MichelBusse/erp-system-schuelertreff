@@ -11,6 +11,7 @@ import { useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
 import { schoolCustomer } from '../types/user'
+import { formValidation } from './FormValidation'
 
 type Props = {
   open: boolean
@@ -30,11 +31,15 @@ const defaultFormData = {
 
 const SchoolCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
   const [data, setData] = useState(defaultFormData)
+  const [errors, setErrors] = useState(defaultFormData)
 
   const { API } = useAuth()
 
   //TODO: validate filled fields
   const submitForm = () => {
+    setErrors(formValidation('schoolCustomer', data))
+
+    if(formValidation('schoolCustomer', data).validation)
     API.post(`users/schoolCustomer`, data).then((res) => {
       setCustomers((s) => [...s, res.data])
       setOpen(false)
@@ -51,6 +56,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) 
         <DialogTitle>Lehrkraft hinzufügen</DialogTitle>
         <DialogContent>
           <TextField
+            helperText={errors.schoolName}
             id="schoolName"
             label="Schulname"
             variant="outlined"
@@ -62,6 +68,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) 
             }
           />
           <TextField
+            helperText={errors.city}
             id="city"
             label="Stadt"
             variant="outlined"
@@ -73,6 +80,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) 
             }
           />
           <TextField
+            helperText={errors.postalCode}
             id="postalCode"
             label="Postleitzahl"
             variant="outlined"
@@ -84,6 +92,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) 
             }
           />
           <TextField
+            helperText={errors.street}
             id="street"
             label="Straße"
             variant="outlined"
@@ -95,6 +104,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) 
             }
           />
           <TextField
+            helperText={errors.email}
             id="email"
             label="E-Mail Adresse"
             variant="outlined"
@@ -106,6 +116,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) 
             }
           />
           <TextField
+            helperText={errors.phone}
             id="phone"
             label="Telefonnummer"
             variant="outlined"

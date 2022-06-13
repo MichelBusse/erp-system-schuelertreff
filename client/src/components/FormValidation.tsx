@@ -47,7 +47,33 @@ export function formValidation(form: string, data: any):any{
   }
 
   if(form === 'schoolCustomer'){
-    const temp = {}
+    const temp = {
+      schoolName: '',
+      city: '',
+      postalCode: '',
+      street: '',
+      email: '',
+      phone: '',
+      validation: false
+    }
+
+    temp.schoolName = data.schoolName ? '' : 'Schulname fehlt!'
+    temp.city = data.city ? '' : 'Stadt fehlt!'
+    temp.postalCode = data.postalCode.length == 5 ? '' : 'genau 5 Stellen!'
+    temp.street = data.street ? '' : 'Straße fehlt!'
+    temp.email = testEmail(data.email) ? '' : 'E-Mail ist nicht korrekt!'
+    temp.phone = data.phone.length > 9 ? '' : 'mind. 10 Stellen!'
+
+    if (
+      data.schoolName &&
+      data.city &&
+      data.postalCode.length == 5 &&
+      data.street &&
+      testEmail(data.email) &&
+      data.phone.length > 9
+    ) temp.validation = true
+
+    return(temp)
   }
 
   if(form === 'subject'){
