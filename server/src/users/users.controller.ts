@@ -71,7 +71,7 @@ export class UsersController {
   }
 
   @Post('privateCustomer')
-  @Public()
+  @Roles(Role.ADMIN)
   async createPrivateCustomer(
     @Body() dto: CreatePrivateCustomerDto,
   ): Promise<PrivateCustomer> {

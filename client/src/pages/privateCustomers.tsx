@@ -13,25 +13,9 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
-import { form } from '../types/form'
-import subject from '../types/subject'
 import { privateCustomer } from '../types/user'
 import styles from './gridList.module.scss'
 import PrivateCustomerDialog from '../components/PrivateCustomerDialog'
-
-const defaultFormData = {
-  firstName: '',
-  lastName: '',
-  salutation: '',
-  city: '',
-  postalCode: '',
-  street: '',
-  email: '',
-  phone: '',
-  subjects: [] as subject[],
-  fee: 0,
-  timesAvailable: [],
-}
 
 //definition of the columns
 const cols: GridColumns = [
@@ -99,7 +83,7 @@ const PrivateCustomers: React.FC = () => {
     }),
     [],
   )
-  
+
   return (
     <div className={styles.wrapper}>
       <div style={{ flexGrow: 1 }}>
