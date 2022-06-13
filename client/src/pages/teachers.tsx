@@ -111,11 +111,7 @@ const Teachers: React.FC = () => {
         />
       </div>
 
-      <TeacherDialog 
-        open={open}
-        setOpen={setOpen}
-        setTeachers={setTeachers} 
-      />
+      <TeacherDialog open={open} setOpen={setOpen} setTeachers={setTeachers} />
     </div>
   )
 }

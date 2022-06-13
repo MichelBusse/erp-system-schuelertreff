@@ -1,9 +1,4 @@
-import {
-  Box,
-  Grid,
-  IconButton,
-  Paper,
-} from '@mui/material'
+import { Box, Grid, IconButton, Paper } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { BsPlusLg } from 'react-icons/bs'
 
@@ -48,11 +43,7 @@ const Subjects: React.FC = () => {
           </Grid>
         ))}
       </Grid>
-      <SubjectDialog 
-        open={open}
-        setOpen={setOpen}
-        setSubjects={setSubjects}
-      />
+      <SubjectDialog open={open} setOpen={setOpen} setSubjects={setSubjects} />
     </Box>
   )
 }

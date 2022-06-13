@@ -15,12 +15,12 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 
+import { form } from '../types/form'
 import subject from '../types/subject'
 import timeAvailable from '../types/timeAvailable'
 import { teacher } from '../types/user'
 import AddTimes from './AddTimes'
 import { useAuth } from './AuthProvider'
-import { form } from '../types/form'
 
 type Props = {
   open: boolean

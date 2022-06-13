@@ -44,43 +44,43 @@ const SubjectDialog: React.FC<Props> = ({ open, setOpen, setSubjects }) => {
   }
 
   return (
-      <Dialog open={open}>
-        <DialogTitle>Fach hinzufügen</DialogTitle>
-        <DialogContent>
-          <TextField
-            id="subjectName"
-            label="Fachbezeichnung"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', marginLeft: '0px' }}
-            value={data.name}
-            onChange={(event) =>
-              setData((data) => ({ ...data, name: event.target.value }))
-            }
-          />
-          <TextField
-            id="shortForm"
-            label="Abkürzung"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px' }}
-            value={data.shortForm}
-            onChange={(event) =>
-              setData((data) => ({ ...data, shortForm: event.target.value }))
-            }
-          />
-          <SketchPicker
-            color={data.color}
-            onChange={(color) =>
-              setData((data) => ({ ...data, color: color.hex }))
-            }
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeForm}>Abbrechen</Button>
-          <Button onClick={submitForm}>Hinzufügen</Button>
-        </DialogActions>
-      </Dialog>
+    <Dialog open={open}>
+      <DialogTitle>Fach hinzufügen</DialogTitle>
+      <DialogContent>
+        <TextField
+          id="subjectName"
+          label="Fachbezeichnung"
+          variant="outlined"
+          required={true}
+          sx={{ margin: '10px', marginLeft: '0px' }}
+          value={data.name}
+          onChange={(event) =>
+            setData((data) => ({ ...data, name: event.target.value }))
+          }
+        />
+        <TextField
+          id="shortForm"
+          label="Abkürzung"
+          variant="outlined"
+          required={true}
+          sx={{ margin: '10px' }}
+          value={data.shortForm}
+          onChange={(event) =>
+            setData((data) => ({ ...data, shortForm: event.target.value }))
+          }
+        />
+        <SketchPicker
+          color={data.color}
+          onChange={(color) =>
+            setData((data) => ({ ...data, color: color.hex }))
+          }
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={closeForm}>Abbrechen</Button>
+        <Button onClick={submitForm}>Hinzufügen</Button>
+      </DialogActions>
+    </Dialog>
   )
 }
 

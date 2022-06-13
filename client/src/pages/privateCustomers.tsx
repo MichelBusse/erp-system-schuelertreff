@@ -1,7 +1,5 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import {
-  IconButton,
-} from '@mui/material'
+import { IconButton } from '@mui/material'
 import {
   DataGrid,
   getGridStringOperators,
@@ -13,9 +11,9 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
+import PrivateCustomerDialog from '../components/PrivateCustomerDialog'
 import { privateCustomer } from '../types/user'
 import styles from './gridList.module.scss'
-import PrivateCustomerDialog from '../components/PrivateCustomerDialog'
 
 //definition of the columns
 const cols: GridColumns = [
@@ -108,7 +106,7 @@ const PrivateCustomers: React.FC = () => {
           getRowSpacing={getRowSpacing}
         />
       </div>
-      <PrivateCustomerDialog 
+      <PrivateCustomerDialog
         open={open}
         setOpen={setOpen}
         setCustomers={setCustomers}

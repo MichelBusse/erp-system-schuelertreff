@@ -19,10 +19,10 @@ import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
 import { nanoid } from 'nanoid'
 
+import { form } from '../types/form'
 import timeAvailable from '../types/timeAvailable'
 import BetterTimePicker from './BetterTimePicker'
 import EqualStack from './EqualStack'
-import { form } from '../types/form'
 
 type Props = {
   data: form
