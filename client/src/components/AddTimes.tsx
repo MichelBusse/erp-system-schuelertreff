@@ -22,7 +22,7 @@ import { nanoid } from 'nanoid'
 import timeAvailable from '../types/timeAvailable'
 import BetterTimePicker from './BetterTimePicker'
 import EqualStack from './EqualStack'
-import { form } from './TeacherDialog'
+import { form } from '../types/form'
 
 type Props = {
   data: form
@@ -65,7 +65,7 @@ const AddTimes: React.FC<Props> = ({ data, setData, times, setTimes }) => {
       <Stack direction="row" spacing={2} mt={2}>
         <EqualStack direction="row" spacing={2}>
           <FormControl>
-            <InputLabel id="SalutationLable">Wochentag</InputLabel>
+            <InputLabel id="DowLable">Wochentag</InputLabel>
             <Select
               id="dow"
               label="Wochentag"

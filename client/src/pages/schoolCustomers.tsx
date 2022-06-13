@@ -143,10 +143,6 @@ const SchoolCustomers: React.FC = () => {
       <Dialog open={dialogOpen}>
         <DialogTitle>Lehrkraft hinzufügen</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Geben Sie die Daten der Lehrkraft ein. Pflichtfelder sind mit *
-            markiert.
-          </DialogContentText>
           <TextField
             id="schoolName"
             label="Schulname"

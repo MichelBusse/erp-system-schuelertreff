@@ -20,25 +20,12 @@ import timeAvailable from '../types/timeAvailable'
 import { teacher } from '../types/user'
 import AddTimes from './AddTimes'
 import { useAuth } from './AuthProvider'
+import { form } from '../types/form'
 
 type Props = {
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   setTeachers: React.Dispatch<React.SetStateAction<teacher[]>>
-}
-
-export type form = {
-  firstName: string
-  lastName: string
-  salutation: string
-  city: string
-  postalCode: string
-  street: string
-  email: string
-  phone: string
-  subjects: subject[]
-  fee: number
-  timesAvailable: (timeAvailable & { id: string })[]
 }
 
 const defaultFormData = {
@@ -82,7 +69,6 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
 
   //TODO fix it
   const submitForm = () => {
-    console.log(data)
     API.post(`users/teacher`, {
       ...data,
       timesAvailable: data.timesAvailable.map((time) => ({

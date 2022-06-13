@@ -1,17 +1,6 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
 } from '@mui/material'
 import {
   DataGrid,
@@ -23,13 +12,12 @@ import {
 } from '@mui/x-data-grid'
 import { useCallback, useEffect, useState } from 'react'
 
-import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
-import form from '../types/defaultFormData'
+import { form } from '../types/form'
 import subject from '../types/subject'
-import timeAvailable from '../types/timeAvailable'
 import { privateCustomer } from '../types/user'
 import styles from './gridList.module.scss'
+import PrivateCustomerDialog from '../components/PrivateCustomerDialog'
 
 const defaultFormData = {
   firstName: '',
@@ -85,15 +73,8 @@ const cols: GridColumns = [
 ]
 
 const PrivateCustomers: React.FC = () => {
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [open, setOpen] = useState(false)
   const [customers, setCustomers] = useState<privateCustomer[]>([])
-  const [data, setData] = useState<form>(defaultFormData)
-  const [times, setTimes] = useState<timeAvailable>({
-    id: 1,
-    dow: '',
-    start: null,
-    end: null,
-  })
 
   const { API } = useAuth()
 
@@ -101,8 +82,6 @@ const PrivateCustomers: React.FC = () => {
   useEffect(() => {
     API.get(`users/privateCustomer`).then((res) => setCustomers(res.data))
   }, [])
-
-  console.log(customers)
 
   //creating rows out of the teachers
   const rows = customers.map((customer) => ({
@@ -120,35 +99,7 @@ const PrivateCustomers: React.FC = () => {
     }),
     [],
   )
-
-  const openDialog = () => {
-    setData(defaultFormData)
-    setDialogOpen(true)
-  }
-
-  //TODO: validate filled fields
-  const submitForm = () => {
-    API.post(`users/privateCustomer`, {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      salutation: data.salutation,
-      city: data.city,
-      postalCode: data.postalCode,
-      street: data.street,
-      email: data.email,
-      phone: data.phone,
-      timesAvailable: data.timesAvailable.map((time) => ({
-        dow: time.dow,
-        start: time.start?.format('HH:mm'),
-        end: time.end?.format('HH:mm'),
-      })),
-    }).then((res) => {
-      console.log(res)
-      setCustomers((s) => [...s, res.data])
-      setDialogOpen(false)
-    })
-  }
-
+  
   return (
     <div className={styles.wrapper}>
       <div style={{ flexGrow: 1 }}>
@@ -161,7 +112,7 @@ const PrivateCustomers: React.FC = () => {
                 className={styles.customGridToolbarContainer}
               >
                 <GridToolbarFilterButton />
-                <IconButton onClick={openDialog}>
+                <IconButton onClick={() => setOpen(true)}>
                   <AddCircleIcon fontSize="large" color="primary" />
                 </IconButton>
               </GridToolbarContainer>
@@ -173,121 +124,11 @@ const PrivateCustomers: React.FC = () => {
           getRowSpacing={getRowSpacing}
         />
       </div>
-
-      <Dialog open={dialogOpen}>
-        <DialogTitle>Lehrkraft hinzufügen</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Geben Sie die Daten der Lehrkraft ein. Pflichtfelder sind mit *
-            markiert.
-          </DialogContentText>
-          <FormControl
-            fullWidth
-            sx={{ width: '25%', marginRight: '75%', marginTop: '15px' }}
-          >
-            <InputLabel id="SalutationLable">Anrede *</InputLabel>
-            <Select
-              id="Salutation"
-              label="Anrede"
-              value={data.salutation}
-              onChange={(event) =>
-                setData((data) => ({ ...data, salutation: event.target.value }))
-              }
-            >
-              <MenuItem value="Herr">Herr</MenuItem>
-              <MenuItem value="Frau">Frau</MenuItem>
-              <MenuItem value="divers">divers</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            id="firstName"
-            label="Vorname"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', marginLeft: '0px', width: '45%' }}
-            value={data.firstName}
-            onChange={(event) =>
-              setData((data) => ({ ...data, firstName: event.target.value }))
-            }
-          />
-          <TextField
-            id="lastName"
-            label="Nachname"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', width: '45%' }}
-            value={data.lastName}
-            onChange={(event) =>
-              setData((data) => ({ ...data, lastName: event.target.value }))
-            }
-          />
-          <TextField
-            id="city"
-            label="Stadt"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', marginLeft: '0px', width: '60%' }}
-            value={data.city}
-            onChange={(event) =>
-              setData((data) => ({ ...data, city: event.target.value }))
-            }
-          />
-          <TextField
-            id="postalCode"
-            label="Postleitzahl"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', width: '30%' }}
-            value={data.postalCode}
-            onChange={(event) =>
-              setData((data) => ({ ...data, postalCode: event.target.value }))
-            }
-          />
-          <TextField
-            id="street"
-            label="Straße"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', marginLeft: '0px', width: '94%' }}
-            value={data.street}
-            onChange={(event) =>
-              setData((data) => ({ ...data, street: event.target.value }))
-            }
-          />
-          <TextField
-            id="email"
-            label="E-Mail Adresse"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', marginLeft: '0px', width: '60%' }}
-            value={data.email}
-            onChange={(event) =>
-              setData((data) => ({ ...data, email: event.target.value }))
-            }
-          />
-          <TextField
-            id="phone"
-            label="Telefonnummer"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', width: '30%' }}
-            value={data.phone}
-            onChange={(event) =>
-              setData((data) => ({ ...data, phone: event.target.value }))
-            }
-          />
-          <AddTimes
-            data={data}
-            setData={setData}
-            times={times}
-            setTimes={setTimes}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Abbrechen</Button>
-          <Button onClick={submitForm}>Hinzufügen</Button>
-        </DialogActions>
-      </Dialog>
+      <PrivateCustomerDialog 
+        open={open}
+        setOpen={setOpen}
+        setCustomers={setCustomers}
+      />
     </div>
   )
 }

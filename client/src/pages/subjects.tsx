@@ -56,10 +56,6 @@ const Subjects: React.FC = () => {
       <Dialog open={dialogOpen}>
         <DialogTitle>Fach hinzufügen</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Geben Sie die Bezeichnung das Faches, dessen Abkürzung für den
-            Stundenplan ein und wählen Sie eine Farbe aus.
-          </DialogContentText>
           <TextField
             id="subjectName"
             label="Fachbezeichnung"
