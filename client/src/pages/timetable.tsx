@@ -23,7 +23,7 @@ const Timetable: React.FC = () => {
     content: <></>,
   })
   const [date, setDate] = useState(dayjs().day(1))
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [open, setOpen] = useState(false)
   const [render, setRender] = useState(0)
 
   return (
@@ -57,7 +57,7 @@ const Timetable: React.FC = () => {
             // dialog component is re-created each time
             // -> data will be fetched on button press
             setRender(render + 1)
-            setDialogOpen(true)
+            setOpen(true)
           }}
         />
       </Box>
@@ -68,11 +68,7 @@ const Timetable: React.FC = () => {
       />
 
       {!!render && (
-        <ContractDialog
-          key={render}
-          open={dialogOpen}
-          setOpen={setDialogOpen}
-        />
+        <ContractDialog key={render} open={open} setOpen={setOpen} />
       )}
     </Box>
   )

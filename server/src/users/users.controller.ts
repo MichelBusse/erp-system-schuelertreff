@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common'
 
 import { AuthService } from 'src/auth/auth.service'
+import { Public } from 'src/auth/decorators/public.decorator'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 
