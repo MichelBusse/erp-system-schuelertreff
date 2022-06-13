@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  FormHelperText,
   InputLabel,
   MenuItem,
   Select,
@@ -21,6 +22,7 @@ import { teacher } from '../types/user'
 import AddTimes from './AddTimes'
 import { useAuth } from './AuthProvider'
 import { form } from '../types/form'
+import { formValidation } from './FormValidation'
 
 type Props = {
   open: boolean
@@ -50,6 +52,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
     start: null,
     end: null,
   })
+  const [errors, setErrors] = useState(defaultFormData)
 
   const { API } = useAuth()
 
@@ -57,18 +60,10 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
     API.get(`subjects`).then((res) => setSubjects(res.data))
   }, [])
 
-  //TODO CG
-  // const formValid = !!(
-  //   form.customers.length &&
-  //   form.subject &&
-  //   form.startDate &&
-  //   form.startTime &&
-  //   form.endTime &&
-  //   form.teacher
-  // )
-
-  //TODO fix it
   const submitForm = () => {
+    setErrors(formValidation('teacher', data))
+    
+    if(formValidation('teacher', data).validation)
     API.post(`users/teacher`, {
       ...data,
       timesAvailable: data.timesAvailable.map((time) => ({
@@ -86,6 +81,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
   const closeForm = () => {
     setOpen(false)
     setData(defaultFormData)
+    setErrors(defaultFormData)
   }
 
   return (
@@ -109,8 +105,10 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
             <MenuItem value="Frau">Frau</MenuItem>
             <MenuItem value="divers">divers</MenuItem>
           </Select>
+          <FormHelperText>{errors.salutation}</FormHelperText>
         </FormControl>
         <TextField
+          helperText={errors.firstName}
           id="firstName"
           label="Vorname"
           variant="outlined"
@@ -122,6 +120,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           }
         />
         <TextField
+          helperText={errors.lastName}
           id="lastName"
           label="Nachname"
           variant="outlined"
@@ -133,6 +132,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           }
         />
         <TextField
+          helperText={errors.city}
           id="city"
           label="Stadt"
           variant="outlined"
@@ -144,6 +144,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           }
         />
         <TextField
+          helperText={errors.postalCode}
           id="postalCode"
           label="Postleitzahl"
           variant="outlined"
@@ -155,6 +156,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           }
         />
         <TextField
+          helperText={errors.street}
           id="street"
           label="Straße"
           variant="outlined"
@@ -166,6 +168,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           }
         />
         <TextField
+          helperText={errors.email}
           id="email"
           label="E-Mail Adresse"
           variant="outlined"
@@ -177,6 +180,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           }
         />
         <TextField
+          helperText={errors.phone}
           id="phone"
           label="Telefonnummer"
           variant="outlined"

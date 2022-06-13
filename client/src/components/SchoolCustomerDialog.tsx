@@ -49,6 +49,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) 
   const closeForm = () => {
     setOpen(false)
     setData(defaultFormData)
+    setErrors(defaultFormData)
   }
 
   return (
