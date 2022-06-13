@@ -3,9 +3,9 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   FormControl,
+  FormHelperText,
   InputLabel,
   MenuItem,
   Select,
@@ -19,6 +19,7 @@ import { form } from '../types/form'
 import subject from '../types/subject'
 import timeAvailable from '../types/timeAvailable'
 import { privateCustomer } from '../types/user'
+import { formValidation } from './FormValidation'
 
 type Props = {
   open: boolean
@@ -47,11 +48,15 @@ const PrivateCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers })
     start: null,
     end: null,
   })
+  const [errors, setErrors] = useState(defaultFormData)
 
   const { API } = useAuth()
 
   //TODO: validate filled fields
   const submitForm = () => {
+    setErrors(formValidation('privateCustomer', data))
+    
+    if(formValidation('privateCustomer', data).validation)
     API.post(`users/privateCustomer`, {
       firstName: data.firstName,
       lastName: data.lastName,
@@ -76,6 +81,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers })
   const closeForm = () => {
     setOpen(false)
     setData(defaultFormData)
+    setErrors(defaultFormData)
   }
 
   return (
@@ -99,8 +105,10 @@ const PrivateCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers })
               <MenuItem value="Frau">Frau</MenuItem>
               <MenuItem value="divers">divers</MenuItem>
             </Select>
+            <FormHelperText>{errors.salutation}</FormHelperText>
           </FormControl>
           <TextField
+            helperText={errors.firstName}
             id="firstName"
             label="Vorname"
             variant="outlined"
@@ -112,6 +120,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers })
             }
           />
           <TextField
+            helperText={errors.lastName}
             id="lastName"
             label="Nachname"
             variant="outlined"
@@ -123,6 +132,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers })
             }
           />
           <TextField
+            helperText={errors.city}
             id="city"
             label="Stadt"
             variant="outlined"
@@ -134,6 +144,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers })
             }
           />
           <TextField
+            helperText={errors.postalCode}
             id="postalCode"
             label="Postleitzahl"
             variant="outlined"
@@ -145,6 +156,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers })
             }
           />
           <TextField
+            helperText={errors.street}
             id="street"
             label="Straße"
             variant="outlined"
@@ -156,6 +168,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers })
             }
           />
           <TextField
+            helperText={errors.email}
             id="email"
             label="E-Mail Adresse"
             variant="outlined"
@@ -167,6 +180,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({ open, setOpen, setCustomers })
             }
           />
           <TextField
+            helperText={errors.phone}
             id="phone"
             label="Telefonnummer"
             variant="outlined"
