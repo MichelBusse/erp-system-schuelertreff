@@ -15,7 +15,7 @@ export enum Salutation {
 }
 
 // the week of 2001-01-01 is used as dummy, DOW and time is important here
-export const maxTimeRange = '[2001-01-01 00:00, 2001-01-08 00:00]'
+export const maxTimeRange = '[2001-01-01 00:00, 2001-01-08 00:00)'
 
 @Entity()
 @TableInheritance({ column: { type: 'varchar', name: 'type' } })

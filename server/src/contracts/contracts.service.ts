@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
-import { Dayjs } from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { Connection, Repository } from 'typeorm'
 
 import { Customer, User } from 'src/users/entities'
@@ -8,6 +8,12 @@ import { Customer, User } from 'src/users/entities'
 import { Contract } from './contract.entity'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
+
+type suggestion = {
+  start: string
+  end: string
+  dow: number
+}
 
 @Injectable()
 export class ContractsService {
@@ -41,6 +47,21 @@ export class ContractsService {
     await runner.release()
   }
 
+  private parseMultirange(multirange: string): suggestion[] {
+    const regex = /[\[\(]"([^"]*)","([^"]*)"[\]\)]/g
+
+    return [...multirange.matchAll(regex)].map((range) => {
+      const start = dayjs(range[1].substring(0, 16))
+      const end = dayjs(range[2].substring(0, 16))
+
+      return {
+        start: start.format('HH:mm'),
+        end: end.day() > start.day() ? '24:00' : end.format('HH:mm'),
+        dow: start.day(),
+      }
+    })
+  }
+
   create(dto: CreateContractDto): Promise<Contract> {
     const contract = this.contractsRepository.create(dto)
 
@@ -62,13 +83,13 @@ export class ContractsService {
       typeof dto.dow !== 'undefined' ? [dto.dow] : [1, 2, 3, 4, 5]
 
     const dowTime = dowFilter.map((dow) => {
-      const start = `[2001-01-0${dow} ${dto.startTime ?? '00:00'}, `
+      const start = `2001-01-0${dow} ${dto.startTime ?? '00:00'}`
       const end =
         typeof dto.endTime !== 'undefined'
-          ? `2001-01-0${dow} ${dto.endTime}]`
-          : `2001-01-0${dow + 1} 00:00)` // exclusive bound of next day 00:00
+          ? `2001-01-0${dow} ${dto.endTime}`
+          : `2001-01-0${dow + 1} 00:00` // exclusive bound of next day 00:00
 
-      return start + end
+      return `[${start}, ${end})`
     })
 
     const dowTimeFilter = `{${dowTime.join(', ')}}`
@@ -106,11 +127,27 @@ export class ContractsService {
       )
     })
 
-    console.log(mainQuery.getQueryAndParameters())
+    // console.log(mainQuery.getQueryAndParameters())
 
-    const availableTeachers = await mainQuery.getRawMany()
+    // available times are split by dow
+    type at = {
+      1: string
+      2: string
+      3: string
+      4: string
+      5: string
+      teacherId: number
+      possibleTimes: string
+    }
 
-    return availableTeachers
+    const availableTeachers = await mainQuery.getRawMany<at>()
+
+    const suggestions = availableTeachers.map((a) => ({
+      teacherId: a.teacherId,
+      suggestions: [1, 2, 3, 4, 5].flatMap((n) => this.parseMultirange(a[n])),
+    }))
+
+    return suggestions
   }
 
   async remove(id: string): Promise<void> {
