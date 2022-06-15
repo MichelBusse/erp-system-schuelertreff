@@ -36,6 +36,11 @@ const menuItems = [
     text: 'Fächer',
     href: '/subjects',
   },
+  {
+    icon: LayersIcon,
+    text: 'Profil',
+    href: '/profil',
+  },
 ]
 
 const Layout: React.FC = () => {

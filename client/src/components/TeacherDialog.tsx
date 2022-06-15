@@ -45,11 +45,6 @@ const defaultFormData = {
 const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
   const [data, setData] = useState<form>(defaultFormData)
   const [subjects, setSubjects] = useState<subject[]>([])
-  const [times, setTimes] = useState<timeAvailable>({
-    dow: '',
-    start: null,
-    end: null,
-  })
 
   const { API } = useAuth()
 
@@ -214,8 +209,6 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
         <AddTimes
           data={data}
           setData={setData}
-          times={times}
-          setTimes={setTimes}
         />
       </DialogContent>
       <DialogActions>

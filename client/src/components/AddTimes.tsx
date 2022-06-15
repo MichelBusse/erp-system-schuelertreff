@@ -23,15 +23,20 @@ import { form } from '../types/form'
 import timeAvailable from '../types/timeAvailable'
 import BetterTimePicker from './BetterTimePicker'
 import EqualStack from './EqualStack'
+import { useState } from 'react'
 
 type Props = {
   data: form
   setData: React.Dispatch<React.SetStateAction<form>>
-  times: timeAvailable
-  setTimes: React.Dispatch<React.SetStateAction<timeAvailable>>
 }
 
-const AddTimes: React.FC<Props> = ({ data, setData, times, setTimes }) => {
+const AddTimes: React.FC<Props> = ({ data, setData }) => {
+  console.log(data)
+  const [times, setTimes] = useState<timeAvailable>({
+    dow: '',
+    start: null,
+    end: null,
+  })
   const addTime = () => {
     if (times.dow && times.start && times.end) {
       setData((data) => ({

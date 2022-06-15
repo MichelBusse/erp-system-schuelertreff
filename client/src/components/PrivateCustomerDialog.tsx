@@ -46,11 +46,6 @@ const PrivateCustomerDialog: React.FC<Props> = ({
   setCustomers,
 }) => {
   const [data, setData] = useState<form>(defaultFormData)
-  const [times, setTimes] = useState<timeAvailable>({
-    dow: '',
-    start: null,
-    end: null,
-  })
 
   const { API } = useAuth()
 
@@ -84,7 +79,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
 
   return (
     <Dialog open={open}>
-      <DialogTitle>Lehrkraft hinzufügen</DialogTitle>
+      <DialogTitle>Privatkunden hinzufügen</DialogTitle>
       <DialogContent>
         <FormControl
           fullWidth
@@ -184,8 +179,6 @@ const PrivateCustomerDialog: React.FC<Props> = ({
         <AddTimes
           data={data}
           setData={setData}
-          times={times}
-          setTimes={setTimes}
         />
       </DialogContent>
       <DialogActions>

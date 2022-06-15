@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Query,
+  Request,
 } from '@nestjs/common'
 
 import { AuthService } from 'src/auth/auth.service'
@@ -57,6 +58,11 @@ export class UsersController {
   @Get('teacher')
   findAllTeachers(): Promise<Teacher[]> {
     return this.usersService.findAllTeachers()
+  }
+
+  @Get('me')
+  getMe(@Request() req) {
+    return this.usersService.findOne(req.user.id);
   }
 
   @Get(':id')
