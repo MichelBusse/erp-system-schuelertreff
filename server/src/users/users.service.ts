@@ -20,6 +20,51 @@ import {
 import { TeacherState } from './entities/teacher.entity'
 import { maxTimeRange } from './entities/user.entity'
 
+/**
+ * Format Array of {@link timeAvailable} as Postgres `tstzmultirange`
+ */
+export function formatTimesAvailable(times: timeAvailable[]) {
+  if (times.length === 0) return `{${maxTimeRange}}`
+
+  return `{${times
+    .map((t) => {
+      const date = dayjs('2001-01-01').day(t.dow).format('YYYY-MM-DD')
+      return `[${date} ${t.start}, ${date} ${t.end})` // exclusive upper bound
+    })
+    .join(', ')}}`
+}
+
+/**
+ * Parse Postgres `tstzmultirange` literal to Array of {@link timeAvailable}
+ */
+export function parseMultirange(multirange: string): timeAvailable[] {
+  const regex = /[\[\(]"([^"]*)","([^"]*)"[\]\)]/g
+
+  return [...multirange.matchAll(regex)].map((range) => {
+    const start = dayjs(range[1].substring(0, 16))
+    const end = dayjs(range[2].substring(0, 16))
+
+    return {
+      start: start.format('HH:mm'),
+      end: end.day() > start.day() ? '24:00' : end.format('HH:mm'),
+      dow: start.day(),
+    }
+  })
+}
+
+function transformUser<U extends User>(
+  user: U,
+): U & { timesAvailableParsed: timeAvailable[] } {
+  return {
+    ...user,
+    timesAvailableParsed: parseMultirange(user.timesAvailable),
+  }
+}
+
+function transformUsers<U extends User>(users: U[]) {
+  return users.map(transformUser)
+}
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -55,20 +100,6 @@ export class UsersService {
   }
 
   /**
-   * Format Array of {@link timeAvailable} as Postgres `tstzmultirange`
-   */
-  private formatTimesAvailable(times: timeAvailable[]) {
-    if (times.length === 0) return `{${maxTimeRange}}`
-
-    return `{${times
-      .map((t) => {
-        const date = dayjs('2001-01-01').day(t.dow).format('YYYY-MM-DD')
-        return `[${date} ${t.start}, ${date} ${t.end})` // exclusive upper bound
-      })
-      .join(', ')}}`
-  }
-
-  /**
    * For authentication only!
    * The returned {@link User} includes the hashed password.
    */
@@ -85,43 +116,47 @@ export class UsersService {
    */
 
   async findAll(): Promise<User[]> {
-    return this.usersRepository.find({
-      relations: ['subjects'],
-    })
+    return transformUsers(
+      await this.usersRepository.find({
+        relations: ['subjects'],
+      }),
+    )
   }
 
   async findAllCustomers(): Promise<Customer[]> {
-    return this.customersRepository.find()
+    return transformUsers(await this.customersRepository.find())
   }
 
   async findAllPrivateCustomers(): Promise<PrivateCustomer[]> {
-    return this.privateCustomersRepository.find()
+    return transformUsers(await this.privateCustomersRepository.find())
   }
 
   async findAllSchoolCustomers(): Promise<SchoolCustomer[]> {
-    return this.schoolCustomersRepository.find()
+    return transformUsers(await this.schoolCustomersRepository.find())
   }
 
   async findAllTeachers(): Promise<Teacher[]> {
-    return this.teachersRepository.find({
-      relations: ['subjects'],
-    })
+    return transformUsers(
+      await this.teachersRepository.find({
+        relations: ['subjects'],
+      }),
+    )
   }
 
-  findOne(id: number): Promise<User> {
-    return this.usersRepository.findOne(id)
+  async findOne(id: number): Promise<User> {
+    return transformUser(await this.usersRepository.findOne(id))
   }
 
-  findOnePrivateCustomer(id: number): Promise<PrivateCustomer> {
-    return this.privateCustomersRepository.findOne(id)
+  async findOnePrivateCustomer(id: number): Promise<PrivateCustomer> {
+    return transformUser(await this.privateCustomersRepository.findOne(id))
   }
 
-  findOneSchoolCustomer(id: number): Promise<SchoolCustomer> {
-    return this.schoolCustomersRepository.findOne(id)
+  async findOneSchoolCustomer(id: number): Promise<SchoolCustomer> {
+    return transformUser(await this.schoolCustomersRepository.findOne(id))
   }
 
-  findOneTeacher(id: number): Promise<Teacher> {
-    return this.teachersRepository.findOne(id)
+  async findOneTeacher(id: number): Promise<Teacher> {
+    return transformUser(await this.teachersRepository.findOne(id))
   }
 
   async findAvailableTeachers(subjectId: number): Promise<Teacher[]> {
@@ -149,7 +184,7 @@ export class UsersService {
   ): Promise<PrivateCustomer> {
     const privateCustomer = this.privateCustomersRepository.create({
       ...dto,
-      timesAvailable: this.formatTimesAvailable(dto.timesAvailable),
+      timesAvailable: formatTimesAvailable(dto.timesAvailable),
       mayAuthenticate: false,
     })
 
@@ -161,7 +196,7 @@ export class UsersService {
   ): Promise<SchoolCustomer> {
     const schoolCustomer = this.schoolCustomersRepository.create({
       ...dto,
-      timesAvailable: this.formatTimesAvailable(dto.timesAvailable),
+      timesAvailable: formatTimesAvailable(dto.timesAvailable),
       mayAuthenticate: false,
     })
 
@@ -171,7 +206,7 @@ export class UsersService {
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
     const teacher = this.teachersRepository.create({
       ...dto,
-      timesAvailable: this.formatTimesAvailable(dto.timesAvailable),
+      timesAvailable: formatTimesAvailable(dto.timesAvailable),
       state: TeacherState.APPLIED,
       mayAuthenticate: true,
     })
