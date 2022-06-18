@@ -1,19 +1,14 @@
 import { Injectable } from '@nestjs/common'
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
-import dayjs, { Dayjs } from 'dayjs'
+import { Dayjs } from 'dayjs'
 import { Connection, Repository } from 'typeorm'
 
 import { Customer, User } from 'src/users/entities'
+import { parseMultirange } from 'src/users/users.service'
 
 import { Contract } from './contract.entity'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
-
-type suggestion = {
-  start: string
-  end: string
-  dow: number
-}
 
 @Injectable()
 export class ContractsService {
@@ -45,21 +40,6 @@ export class ContractsService {
     `)
 
     await runner.release()
-  }
-
-  private parseMultirange(multirange: string): suggestion[] {
-    const regex = /[\[\(]"([^"]*)","([^"]*)"[\]\)]/g
-
-    return [...multirange.matchAll(regex)].map((range) => {
-      const start = dayjs(range[1].substring(0, 16))
-      const end = dayjs(range[2].substring(0, 16))
-
-      return {
-        start: start.format('HH:mm'),
-        end: end.day() > start.day() ? '24:00' : end.format('HH:mm'),
-        dow: start.day(),
-      }
-    })
   }
 
   create(dto: CreateContractDto): Promise<Contract> {
@@ -144,7 +124,7 @@ export class ContractsService {
 
     const suggestions = availableTeachers.map((a) => ({
       teacherId: a.teacherId,
-      suggestions: [1, 2, 3, 4, 5].flatMap((n) => this.parseMultirange(a[n])),
+      suggestions: [1, 2, 3, 4, 5].flatMap((n) => parseMultirange(a[n])),
     }))
 
     return suggestions
