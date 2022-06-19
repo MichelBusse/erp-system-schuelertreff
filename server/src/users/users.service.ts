@@ -116,55 +116,51 @@ export class UsersService {
    */
 
   async findAll(): Promise<User[]> {
-    return transformUsers(
-      await this.usersRepository.find({
+    return this.usersRepository
+      .find({
         relations: ['subjects'],
-      }),
-    )
+      })
+      .then(transformUsers)
   }
 
   async findAllCustomers(): Promise<Customer[]> {
-    return transformUsers(await this.customersRepository.find())
+    return this.customersRepository.find().then(transformUsers)
   }
 
   async findAllPrivateCustomers(): Promise<PrivateCustomer[]> {
-    return transformUsers(await this.privateCustomersRepository.find())
+    return this.privateCustomersRepository.find().then(transformUsers)
   }
 
   async findAllSchoolCustomers(): Promise<SchoolCustomer[]> {
-    return transformUsers(await this.schoolCustomersRepository.find())
+    return this.schoolCustomersRepository.find().then(transformUsers)
   }
 
   async findAllTeachers(): Promise<Teacher[]> {
-    return transformUsers(
-      await this.teachersRepository.find({
+    return this.teachersRepository
+      .find({
         relations: ['subjects'],
-      }),
-    )
+      })
+      .then(transformUsers)
   }
 
   async findOne(id: number): Promise<User> {
-    return transformUser(await this.usersRepository.findOne(id))
+    return this.usersRepository.findOneOrFail(id).then(transformUser)
+  }
+
+  async findOneCustomer(id: number): Promise<Customer> {
+    return this.customersRepository.findOneOrFail(id).then(transformUser)
   }
 
   async findOnePrivateCustomer(id: number): Promise<PrivateCustomer> {
-    return transformUser(await this.privateCustomersRepository.findOne(id))
+    return this.privateCustomersRepository.findOneOrFail(id).then(transformUser)
   }
 
   async findOneSchoolCustomer(id: number): Promise<SchoolCustomer> {
-    return transformUser(await this.schoolCustomersRepository.findOne(id))
+    return this.schoolCustomersRepository.findOneOrFail(id).then(transformUser)
   }
 
   async findOneTeacher(id: number): Promise<Teacher> {
-    return transformUser(await this.teachersRepository.findOne(id))
-  }
-
-  async findAvailableTeachers(subjectId: number): Promise<Teacher[]> {
-    return this.teachersRepository
-      .createQueryBuilder('t')
-      .innerJoin('t.subjects', 'sub', 'sub.id = :subjectId', { subjectId })
-      .select(['t.id', 't.lastName', 't.firstName', 't.fee'])
-      .getMany()
+    return this.teachersRepository.findOneOrFail(id).then(transformUser)
   }
 
   /**

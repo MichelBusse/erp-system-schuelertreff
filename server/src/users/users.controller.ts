@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Query,
-} from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'
 
 import { AuthService } from 'src/auth/auth.service'
 import { Roles } from 'src/auth/decorators/roles.decorator'
@@ -103,13 +95,5 @@ export class UsersController {
     this.authService.initReset(user)
 
     return user
-  }
-
-  @Get('teacher/available')
-  @Roles(Role.ADMIN)
-  async findAvailableTeachers(
-    @Query('subject') subjectId: number,
-  ): Promise<Teacher[]> {
-    return this.usersService.findAvailableTeachers(subjectId)
   }
 }

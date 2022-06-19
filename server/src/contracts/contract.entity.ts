@@ -16,7 +16,7 @@ export class Contract {
   @PrimaryGeneratedColumn()
   id: number
 
-  @ManyToMany(() => Customer, { cascade: true })
+  @ManyToMany(() => Customer)
   @JoinTable()
   customers: Customer[]
 

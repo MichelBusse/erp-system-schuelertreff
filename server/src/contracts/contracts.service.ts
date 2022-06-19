@@ -4,7 +4,7 @@ import { Dayjs } from 'dayjs'
 import { Connection, Repository } from 'typeorm'
 
 import { Customer, User } from 'src/users/entities'
-import { parseMultirange } from 'src/users/users.service'
+import { parseMultirange, UsersService } from 'src/users/users.service'
 
 import { Contract } from './contract.entity'
 import { CreateContractDto } from './dto/create-contract.dto'
@@ -18,32 +18,23 @@ export class ContractsService {
 
     @InjectConnection()
     private connection: Connection,
-  ) {
-    this.initDb()
-  }
 
-  private async initDb() {
-    const runner = this.connection.createQueryRunner()
+    private readonly usersService: UsersService,
+  ) {}
 
-    await runner.connect()
-
-    await runner.query(`
-      CREATE or REPLACE FUNCTION int_tstzmultirange(a tstzmultirange, b tstzmultirange)
-        returns tstzmultirange language plpgsql as
-          'begin return a * b; end';
-
-      CREATE or REPLACE AGGREGATE intersection ( tstzmultirange ) (
-        SFUNC = int_tstzmultirange,
-        STYPE = tstzmultirange,
-        INITCOND = '{[,]}'
-      );
-    `)
-
-    await runner.release()
-  }
-
-  create(dto: CreateContractDto): Promise<Contract> {
-    const contract = this.contractsRepository.create(dto)
+  async create(dto: CreateContractDto): Promise<Contract> {
+    const contract = this.contractsRepository.create({
+      ...dto,
+      subject: { id: dto.subject },
+      teacher: await this.usersService
+        .findOneTeacher(dto.teacher)
+        .then((c) => ({ id: c.id })),
+      customers: await Promise.all(
+        dto.customers.map((id) =>
+          this.usersService.findOneCustomer(id).then((c) => ({ id: c.id })),
+        ),
+      ),
+    })
 
     return this.contractsRepository.save(contract)
   }
