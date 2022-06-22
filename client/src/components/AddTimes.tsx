@@ -18,6 +18,7 @@ import ListItem from '@mui/material/ListItem'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
 import { nanoid } from 'nanoid'
+import { useState } from 'react'
 
 import { form } from '../types/form'
 import timeAvailable from '../types/timeAvailable'
@@ -27,11 +28,14 @@ import EqualStack from './EqualStack'
 type Props = {
   data: form
   setData: React.Dispatch<React.SetStateAction<form>>
-  times: timeAvailable
-  setTimes: React.Dispatch<React.SetStateAction<timeAvailable>>
 }
 
-const AddTimes: React.FC<Props> = ({ data, setData, times, setTimes }) => {
+const AddTimes: React.FC<Props> = ({ data, setData }) => {
+  const [times, setTimes] = useState<timeAvailable>({
+    dow: '',
+    start: null,
+    end: null,
+  })
   const addTime = () => {
     if (times.dow && times.start && times.end) {
       setData((data) => ({
@@ -41,8 +45,8 @@ const AddTimes: React.FC<Props> = ({ data, setData, times, setTimes }) => {
           {
             id: nanoid(),
             dow: times.dow,
-            start: times.start,
-            end: times.end,
+            start: times.start?.format('HH:mm'),
+            end: times.end?.format('HH:mm'),
           },
         ],
       }))
@@ -116,9 +120,10 @@ const AddTimes: React.FC<Props> = ({ data, setData, times, setTimes }) => {
           <AddIcon />
         </IconButton>
       </Stack>
-      <Grid item xs={12} md={6}>
+      <Grid item>
         <List dense={true}>
           {data.timesAvailable.map((time) => {
+            let timeText = ''
             const days = [
               'Montag',
               'Dienstag',
@@ -126,12 +131,22 @@ const AddTimes: React.FC<Props> = ({ data, setData, times, setTimes }) => {
               'Donnerstag',
               'Freitag',
             ]
-            const timeText =
-              days[Number(time.dow) - 1] +
-              ': ' +
-              time.start?.format('HH:mm') +
-              ' - ' +
-              time.end?.format('HH:mm')
+            if (typeof time.start === 'string') {
+              timeText =
+                days[Number(time.dow) - 1] +
+                ': ' +
+                time.start +
+                ' - ' +
+                time.end
+            } else {
+              timeText =
+                days[Number(time.dow) - 1] +
+                ': ' +
+                time.start?.format('HH:mm') +
+                ' - ' +
+                time.end?.format('HH:mm')
+            }
+
             return (
               <ListItem
                 key={time.id}

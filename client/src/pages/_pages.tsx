@@ -1,6 +1,7 @@
 import NotFound from './404'
 import Login from './login'
 import PrivateCustomers from './privateCustomers'
+import Profil from './profil'
 import Reset from './reset'
 import SchoolCustomers from './schoolCustomers'
 import Subjects from './subjects'
@@ -16,4 +17,5 @@ export default {
   Subjects,
   Teachers,
   Timetable,
+  Profil,
 }

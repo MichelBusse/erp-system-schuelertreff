@@ -83,6 +83,14 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="profil"
+                element={
+                  <ProtectedRoute>
+                    <Pages.Profil />
+                  </ProtectedRoute>
+                }
+              />
             </Route>
 
             <Route

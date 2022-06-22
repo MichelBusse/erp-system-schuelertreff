@@ -17,7 +17,6 @@ import { useEffect, useState } from 'react'
 
 import { form } from '../types/form'
 import subject from '../types/subject'
-import timeAvailable from '../types/timeAvailable'
 import { teacher } from '../types/user'
 import AddTimes from './AddTimes'
 import { useAuth } from './AuthProvider'
@@ -45,11 +44,6 @@ const defaultFormData = {
 const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
   const [data, setData] = useState<form>(defaultFormData)
   const [subjects, setSubjects] = useState<subject[]>([])
-  const [times, setTimes] = useState<timeAvailable>({
-    dow: '',
-    start: null,
-    end: null,
-  })
 
   const { API } = useAuth()
 
@@ -57,24 +51,13 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
     API.get(`subjects`).then((res) => setSubjects(res.data))
   }, [])
 
-  //TODO CG
-  // const formValid = !!(
-  //   form.customers.length &&
-  //   form.subject &&
-  //   form.startDate &&
-  //   form.startTime &&
-  //   form.endTime &&
-  //   form.teacher
-  // )
-
-  //TODO fix it
   const submitForm = () => {
     API.post(`users/teacher`, {
       ...data,
       timesAvailable: data.timesAvailable.map((time) => ({
         dow: time.dow,
-        start: time.start?.format('HH:mm'),
-        end: time.end?.format('HH:mm'),
+        start: time.start,
+        end: time.end,
       })),
     }).then((res) => {
       setTeachers((s) => [...s, res.data])
@@ -211,12 +194,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
             setData((data) => ({ ...data, fee: Number(event.target.value) }))
           }
         />
-        <AddTimes
-          data={data}
-          setData={setData}
-          times={times}
-          setTimes={setTimes}
-        />
+        <AddTimes data={data} setData={setData} />
       </DialogContent>
       <DialogActions>
         <Button onClick={closeForm}>Abbrechen</Button>

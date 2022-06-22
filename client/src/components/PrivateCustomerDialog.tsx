@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   FormControl,
   InputLabel,
@@ -17,7 +16,6 @@ import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
 import { form } from '../types/form'
 import subject from '../types/subject'
-import timeAvailable from '../types/timeAvailable'
 import { privateCustomer } from '../types/user'
 
 type Props = {
@@ -46,11 +44,6 @@ const PrivateCustomerDialog: React.FC<Props> = ({
   setCustomers,
 }) => {
   const [data, setData] = useState<form>(defaultFormData)
-  const [times, setTimes] = useState<timeAvailable>({
-    dow: '',
-    start: null,
-    end: null,
-  })
 
   const { API } = useAuth()
 
@@ -84,7 +77,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
 
   return (
     <Dialog open={open}>
-      <DialogTitle>Lehrkraft hinzufügen</DialogTitle>
+      <DialogTitle>Privatkunden hinzufügen</DialogTitle>
       <DialogContent>
         <FormControl
           fullWidth
@@ -181,12 +174,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
             setData((data) => ({ ...data, phone: event.target.value }))
           }
         />
-        <AddTimes
-          data={data}
-          setData={setData}
-          times={times}
-          setTimes={setTimes}
-        />
+        <AddTimes data={data} setData={setData} />
       </DialogContent>
       <DialogActions>
         <Button onClick={closeForm}>Abbrechen</Button>
