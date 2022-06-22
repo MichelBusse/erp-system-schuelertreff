@@ -23,6 +23,7 @@ export type AuthContextValue = {
   handleLogout: () => void
   isAuthed: () => boolean
   decodeToken: () => JwtType
+  hasRole: (role: string) => boolean
   API: AxiosInstance
 }
 
@@ -99,6 +100,8 @@ const AuthProvider: React.FC = ({ children }) => {
       })
   }
 
+  const hasRole = (role: string) => isAuthed() && decodeToken().role === role
+
   // if logged in, refresh token every minute to keep it active
   useInterval(() => {
     if (isAuthed()) refreshToken()
@@ -119,6 +122,7 @@ const AuthProvider: React.FC = ({ children }) => {
     handleLogout,
     isAuthed,
     decodeToken,
+    hasRole,
     API,
   }
 

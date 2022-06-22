@@ -20,21 +20,25 @@ const menuItems = [
     icon: SchoolIcon,
     text: 'Lehrkräfte',
     href: '/teachers',
+    roles: ['admin'],
   },
   {
     icon: PeopleIcon,
     text: 'Privatkunden',
     href: '/privateCustomers',
+    roles: ['admin'],
   },
   {
     icon: AccountBalanceIcon,
     text: 'Schulen',
     href: '/schoolCustomers',
+    roles: ['admin'],
   },
   {
     icon: LayersIcon,
     text: 'Fächer',
     href: '/subjects',
+    roles: ['admin'],
   },
 ]
 

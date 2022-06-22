@@ -59,6 +59,7 @@ export type MainMenuProps = {
     icon: typeof SvgIcon
     text: string
     href: string
+    roles?: string[]
   }>
 }
 
@@ -91,14 +92,20 @@ const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
       />
       <Divider />
       <List component="nav">
-        {items.map((item, i) => (
-          <ListItemButton key={i} component={NavLink} to={item.href}>
-            <ListItemIcon>
-              <item.icon />
-            </ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItemButton>
-        ))}
+        {items
+          .filter(
+            (item) =>
+              typeof item.roles === 'undefined' ||
+              (isAuthed() && item.roles.includes(decodeToken().role)),
+          )
+          .map((item, i) => (
+            <ListItemButton key={i} component={NavLink} to={item.href}>
+              <ListItemIcon>
+                <item.icon />
+              </ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          ))}
       </List>
       <Divider />
       {isAuthed() && (
