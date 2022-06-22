@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   FormControl,
   InputLabel,
@@ -17,7 +16,6 @@ import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
 import { form } from '../types/form'
 import subject from '../types/subject'
-import timeAvailable from '../types/timeAvailable'
 import { privateCustomer } from '../types/user'
 
 type Props = {
@@ -176,10 +174,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
             setData((data) => ({ ...data, phone: event.target.value }))
           }
         />
-        <AddTimes
-          data={data}
-          setData={setData}
-        />
+        <AddTimes data={data} setData={setData} />
       </DialogContent>
       <DialogActions>
         <Button onClick={closeForm}>Abbrechen</Button>

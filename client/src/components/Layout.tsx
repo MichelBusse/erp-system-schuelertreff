@@ -1,10 +1,10 @@
 import {
   AccountBalance as AccountBalanceIcon,
   Layers as LayersIcon,
+  ManageAccounts as ManageAccountsIcon,
   People as PeopleIcon,
   School as SchoolIcon,
   TableChart as TableChartIcon,
-  ManageAccounts as ManageAccountsIcon
 } from '@mui/icons-material'
 import { Box, CssBaseline, useTheme } from '@mui/material'
 import { Outlet } from 'react-router-dom'

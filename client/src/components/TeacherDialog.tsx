@@ -17,7 +17,6 @@ import { useEffect, useState } from 'react'
 
 import { form } from '../types/form'
 import subject from '../types/subject'
-import timeAvailable from '../types/timeAvailable'
 import { teacher } from '../types/user'
 import AddTimes from './AddTimes'
 import { useAuth } from './AuthProvider'
@@ -71,7 +70,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
     setOpen(false)
     setData(defaultFormData)
   }
- 
+
   return (
     <Dialog open={open}>
       <DialogTitle>Lehrkraft hinzufügen</DialogTitle>
@@ -195,10 +194,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
             setData((data) => ({ ...data, fee: Number(event.target.value) }))
           }
         />
-        <AddTimes
-          data={data}
-          setData={setData}
-        />
+        <AddTimes data={data} setData={setData} />
       </DialogContent>
       <DialogActions>
         <Button onClick={closeForm}>Abbrechen</Button>

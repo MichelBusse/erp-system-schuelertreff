@@ -18,12 +18,12 @@ import ListItem from '@mui/material/ListItem'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
 import { nanoid } from 'nanoid'
+import { useState } from 'react'
 
 import { form } from '../types/form'
 import timeAvailable from '../types/timeAvailable'
 import BetterTimePicker from './BetterTimePicker'
 import EqualStack from './EqualStack'
-import { useState } from 'react'
 
 type Props = {
   data: form
@@ -131,20 +131,20 @@ const AddTimes: React.FC<Props> = ({ data, setData }) => {
               'Donnerstag',
               'Freitag',
             ]
-            if(typeof(time.start) === 'string'){
-              timeText = days[Number(time.dow) - 1] +
-              ': ' +
-              time.start +
-              ' - ' +
-              time.end
-            }
-            else{
+            if (typeof time.start === 'string') {
               timeText =
-              days[Number(time.dow) - 1] +
-              ': ' +
-              time.start?.format('HH:mm') +
-              ' - ' +
-              time.end?.format('HH:mm')
+                days[Number(time.dow) - 1] +
+                ': ' +
+                time.start +
+                ' - ' +
+                time.end
+            } else {
+              timeText =
+                days[Number(time.dow) - 1] +
+                ': ' +
+                time.start?.format('HH:mm') +
+                ' - ' +
+                time.end?.format('HH:mm')
             }
 
             return (

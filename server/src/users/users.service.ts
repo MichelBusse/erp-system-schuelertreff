@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import * as argon2 from 'argon2'
 import dayjs from 'dayjs'
-import { Entity, Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
 import { timeAvailable } from './dto/timeAvailable'
+import { UpdateUserDto } from './dto/update-user.dto'
 import {
   Admin,
   Customer,
@@ -214,10 +215,16 @@ export class UsersService {
     return this.teachersRepository.save(teacher)
   }
 
-  async updateUser<U extends User & {timesAvailable: timeAvailable[]}>(user: U): Promise<U> {
+  async updateUser(id: number, dto: UpdateUserDto): Promise<User> {
+    const user = await this.findOne(id)
+
     return this.usersRepository.save({
       ...user,
-      timesAvailable: formatTimesAvailable(user.timesAvailable)
+      street: dto.street,
+      postalCode: dto.postalCode,
+      city: dto.city,
+      phone: dto.phone,
+      timesAvailable: formatTimesAvailable(dto.timesAvailable),
     })
   }
 

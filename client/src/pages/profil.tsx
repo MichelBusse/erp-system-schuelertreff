@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react'
-import { useAuth } from '../components/AuthProvider'
-import styles from './gridList.module.scss'
-
+import { Button, styled, TextField } from '@mui/material'
+import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
-import Box from '@mui/material/Box'
-import { Button, styled, TextField } from '@mui/material'
-import subject from '../types/subject'
-import AddTimes from '../components/AddTimes'
-import { form } from '../types/form'
 import { nanoid } from 'nanoid'
+import { useEffect, useState } from 'react'
+
+import AddTimes from '../components/AddTimes'
+import { useAuth } from '../components/AuthProvider'
+import { form } from '../types/form'
+import subject from '../types/subject'
 import timeAvailable from '../types/timeAvailable'
+import styles from './gridList.module.scss'
 
 const Item = styled(Paper)(() => ({
   display: 'flex',
@@ -49,16 +49,16 @@ const Profil: React.FC = () => {
         email: res.data.email,
         phone: res.data.phone,
         timesAvailable: res.data.timesAvailableParsed.map(
-          (timeAvailableParsed: timeAvailable & { id: string }) =>
-            ({...timeAvailableParsed,
-              id: nanoid()}),
+          (timeAvailableParsed: timeAvailable) => ({
+            ...timeAvailableParsed,
+            id: nanoid(),
+          }),
         ),
       }))
     })
   }, [])
 
   const submitForm = () => {
-
     const url = 'users/' + teacherId
     API.post(url, {
       ...data,
@@ -66,7 +66,7 @@ const Profil: React.FC = () => {
         dow: time.dow,
         start: time.start,
         end: time.end,
-      }))
+      })),
     })
   }
 
