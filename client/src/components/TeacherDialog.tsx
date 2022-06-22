@@ -52,24 +52,13 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
     API.get(`subjects`).then((res) => setSubjects(res.data))
   }, [])
 
-  //TODO CG
-  // const formValid = !!(
-  //   form.customers.length &&
-  //   form.subject &&
-  //   form.startDate &&
-  //   form.startTime &&
-  //   form.endTime &&
-  //   form.teacher
-  // )
-
-  //TODO fix it
   const submitForm = () => {
     API.post(`users/teacher`, {
       ...data,
       timesAvailable: data.timesAvailable.map((time) => ({
         dow: time.dow,
-        start: time.start?.format('HH:mm'),
-        end: time.end?.format('HH:mm'),
+        start: time.start,
+        end: time.end,
       })),
     }).then((res) => {
       setTeachers((s) => [...s, res.data])
@@ -82,7 +71,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
     setOpen(false)
     setData(defaultFormData)
   }
-
+ 
   return (
     <Dialog open={open}>
       <DialogTitle>Lehrkraft hinzufügen</DialogTitle>

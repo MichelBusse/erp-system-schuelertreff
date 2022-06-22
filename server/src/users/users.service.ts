@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import * as argon2 from 'argon2'
 import dayjs from 'dayjs'
-import { Repository } from 'typeorm'
+import { Entity, Repository } from 'typeorm'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
@@ -212,6 +212,13 @@ export class UsersService {
     })
 
     return this.teachersRepository.save(teacher)
+  }
+
+  async updateUser<U extends User & {timesAvailable: timeAvailable[]}>(user: U): Promise<U> {
+    return this.usersRepository.save({
+      ...user,
+      timesAvailable: formatTimesAvailable(user.timesAvailable)
+    })
   }
 
   async createAdmin(dto: CreateAdminDto): Promise<Admin> {

@@ -31,7 +31,6 @@ type Props = {
 }
 
 const AddTimes: React.FC<Props> = ({ data, setData }) => {
-  console.log(data)
   const [times, setTimes] = useState<timeAvailable>({
     dow: '',
     start: null,
@@ -46,8 +45,8 @@ const AddTimes: React.FC<Props> = ({ data, setData }) => {
           {
             id: nanoid(),
             dow: times.dow,
-            start: times.start,
-            end: times.end,
+            start: times.start?.format('HH:mm'),
+            end: times.end?.format('HH:mm'),
           },
         ],
       }))
@@ -121,9 +120,10 @@ const AddTimes: React.FC<Props> = ({ data, setData }) => {
           <AddIcon />
         </IconButton>
       </Stack>
-      <Grid item xs={12} md={6}>
+      <Grid item>
         <List dense={true}>
           {data.timesAvailable.map((time) => {
+            let timeText = ''
             const days = [
               'Montag',
               'Dienstag',
@@ -131,12 +131,22 @@ const AddTimes: React.FC<Props> = ({ data, setData }) => {
               'Donnerstag',
               'Freitag',
             ]
-            const timeText =
+            if(typeof(time.start) === 'string'){
+              timeText = days[Number(time.dow) - 1] +
+              ': ' +
+              time.start +
+              ' - ' +
+              time.end
+            }
+            else{
+              timeText =
               days[Number(time.dow) - 1] +
               ': ' +
               time.start?.format('HH:mm') +
               ' - ' +
               time.end?.format('HH:mm')
+            }
+
             return (
               <ListItem
                 key={time.id}

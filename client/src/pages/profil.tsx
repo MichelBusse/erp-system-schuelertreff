@@ -5,10 +5,11 @@ import styles from './gridList.module.scss'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import Box from '@mui/material/Box'
-import { Checkbox, FormControl, InputLabel, MenuItem, Select, styled, TextField } from '@mui/material'
+import { Button, styled, TextField } from '@mui/material'
 import subject from '../types/subject'
 import AddTimes from '../components/AddTimes'
 import { form } from '../types/form'
+import { nanoid } from 'nanoid'
 import timeAvailable from '../types/timeAvailable'
 
 const Item = styled(Paper)(() => ({
@@ -19,16 +20,7 @@ const Item = styled(Paper)(() => ({
 
 const Profil: React.FC = () => {
   const { API } = useAuth()
-  const [disabled, setDisabled] = useState({
-    lastName: true,
-    firstName: true,
-    salutation: true,
-    street: true,
-    city: true,
-    postalCode: true,
-    email: true,
-    phone: true,
-  })
+  const [teacherId, setTeacherId] = useState<number>(0)
   const [data, setData] = useState<form>({
     firstName: '',
     lastName: '',
@@ -40,33 +32,57 @@ const Profil: React.FC = () => {
     phone: '',
     subjects: [] as subject[],
     fee: 0,
-    timesAvailable: []
+    timesAvailable: [],
   })
 
   useEffect(() => {
     API.get('users/me').then((res) => {
-      
-      setData(data => ({
-        ...data, timesAvailable: Object.values(res.data.timesAvailable)
+      setTeacherId(res.data.id)
+      setData((data) => ({
+        ...data,
+        firstName: res.data.firstName,
+        lastName: res.data.lastName,
+        salutation: res.data.salutation,
+        city: res.data.city,
+        postalCode: res.data.postalCode,
+        street: res.data.street,
+        email: res.data.email,
+        phone: res.data.phone,
+        timesAvailable: res.data.timesAvailableParsed.map(
+          (timeAvailableParsed: timeAvailable & { id: string }) =>
+            ({...timeAvailableParsed,
+              id: nanoid()}),
+        ),
       }))
     })
   }, [])
 
+  const submitForm = () => {
+
+    const url = 'users/' + teacherId
+    API.post(url, {
+      ...data,
+      timesAvailable: data.timesAvailable.map((time) => ({
+        dow: time.dow,
+        start: time.start,
+        end: time.end,
+      }))
+    })
+  }
+
   return (
     <div className={styles.wrapper}>
       <Box sx={{ flexGrow: 1 }}>
-        <Grid container spacing={2}
-        rowSpacing = '0px'>
-
+        <Grid container spacing={2} rowSpacing="0px">
           <Grid item xs={12}>
             <h3>Person:</h3>
           </Grid>
 
-          <Grid item xs = {2}>
+          <Grid item xs={2}>
             <Item>
               <TextField
-                fullWidth = {true}
-                label = "Anrede"
+                fullWidth={true}
+                label="Anrede"
                 sx={{ marginLeft: '10px' }}
                 size="small"
                 onChange={(event) =>
@@ -77,17 +93,17 @@ const Profil: React.FC = () => {
                 }
                 value={data.salutation}
                 InputProps={{
-                  readOnly: disabled.salutation,
+                  readOnly: true,
                 }}
               />
             </Item>
           </Grid>
-          
-          <Grid item xs = {3}>
+
+          <Grid item xs={3}>
             <Item>
               <TextField
-                fullWidth = {true}
-                label = "Vorname"
+                fullWidth={true}
+                label="Vorname"
                 sx={{ marginLeft: '10px' }}
                 size="small"
                 onChange={(event) =>
@@ -98,17 +114,17 @@ const Profil: React.FC = () => {
                 }
                 value={data.firstName}
                 InputProps={{
-                  readOnly: disabled.firstName,
+                  readOnly: true,
                 }}
               />
             </Item>
           </Grid>
-          
-          <Grid item xs = {3}>
+
+          <Grid item xs={3}>
             <Item>
               <TextField
-                fullWidth = {true}
-                label = "Nachname"
+                fullWidth={true}
+                label="Nachname"
                 sx={{ marginLeft: '10px' }}
                 size="small"
                 onChange={(event) =>
@@ -119,7 +135,7 @@ const Profil: React.FC = () => {
                 }
                 value={data.lastName}
                 InputProps={{
-                  readOnly: disabled.lastName,
+                  readOnly: true,
                 }}
               />
             </Item>
@@ -132,8 +148,8 @@ const Profil: React.FC = () => {
           <Grid item xs={4}>
             <Item>
               <TextField
-                label = "Straße"
-                fullWidth = {true}
+                label="Straße"
+                fullWidth={true}
                 sx={{ marginLeft: '10px' }}
                 size="small"
                 onChange={(event) =>
@@ -144,12 +160,7 @@ const Profil: React.FC = () => {
                 }
                 value={data.street}
                 InputProps={{
-                  readOnly: disabled.street,
-                }}
-              />
-              <Checkbox
-                onChange={(event) => {
-                  setDisabled((disabled) => ({ ...disabled, street: !event.target.checked }))
+                  readOnly: false,
                 }}
               />
             </Item>
@@ -158,8 +169,8 @@ const Profil: React.FC = () => {
           <Grid item xs={2.2}>
             <Item>
               <TextField
-                label = "Postleitzahl"
-                fullWidth = {true}
+                label="Postleitzahl"
+                fullWidth={true}
                 sx={{ marginLeft: '10px' }}
                 size="small"
                 onChange={(event) =>
@@ -170,12 +181,7 @@ const Profil: React.FC = () => {
                 }
                 value={data.postalCode}
                 InputProps={{
-                  readOnly: disabled.postalCode,
-                }}
-              />
-              <Checkbox
-                onChange={(event) => {
-                  setDisabled((disabled) => ({ ...disabled, postalCode: !event.target.checked }))
+                  readOnly: false,
                 }}
               />
             </Item>
@@ -184,8 +190,8 @@ const Profil: React.FC = () => {
           <Grid item xs={3}>
             <Item>
               <TextField
-                label = "Stadt"
-                fullWidth = {true}
+                label="Stadt"
+                fullWidth={true}
                 sx={{ marginLeft: '10px' }}
                 size="small"
                 onChange={(event) =>
@@ -196,12 +202,7 @@ const Profil: React.FC = () => {
                 }
                 value={data.city}
                 InputProps={{
-                  readOnly: disabled.city,
-                }}
-              />
-              <Checkbox
-                onChange={(event) => {
-                  setDisabled((disabled) => ({ ...disabled, city: !event.target.checked }))
+                  readOnly: false,
                 }}
               />
             </Item>
@@ -211,11 +212,11 @@ const Profil: React.FC = () => {
             <h3>Kontakt:</h3>
           </Grid>
 
-          <Grid item xs = {4}>
+          <Grid item xs={4}>
             <Item>
               <TextField
-                fullWidth = {true}
-                label = "Email"
+                fullWidth={true}
+                label="Email"
                 sx={{ marginLeft: '10px' }}
                 size="small"
                 onChange={(event) =>
@@ -226,22 +227,17 @@ const Profil: React.FC = () => {
                 }
                 value={data.email}
                 InputProps={{
-                  readOnly: disabled.email,
-                }}
-              />
-              <Checkbox
-                onChange={(event) => {
-                  setDisabled((disabled) => ({ ...disabled, email: !event.target.checked }))
+                  readOnly: true,
                 }}
               />
             </Item>
           </Grid>
-          
-          <Grid item xs = {3}>
+
+          <Grid item xs={3}>
             <Item>
               <TextField
-                fullWidth = {true}
-                label = "Telefonnummer"
+                fullWidth={true}
+                label="Telefonnummer"
                 sx={{ marginLeft: '10px' }}
                 size="small"
                 onChange={(event) =>
@@ -251,30 +247,24 @@ const Profil: React.FC = () => {
                   }))
                 }
                 value={data.phone}
-                InputProps={{
-                  readOnly: disabled.phone,
-                }}
-              />
-              <Checkbox
-                onChange={(event) => {
-                  setDisabled((disabled) => ({ ...disabled, phone: !event.target.checked }))
-                }}
               />
             </Item>
           </Grid>
-          
-          <Grid item xs={12}>
+
+          <Grid item xs={8}>
             <h3>Zeiten:</h3>
           </Grid>
 
-          <Grid item xs = {8}>
-            <Paper sx={{padding: '10px'}}>
-              <AddTimes
-                data={data}
-                setData={setData}
-              />
+          <Grid item xs={6}>
+            <Paper sx={{ padding: '10px' }}>
+              <AddTimes data={data} setData={setData} />
             </Paper>
           </Grid>
+        </Grid>
+        <Grid item xs={8}>
+          <Button onClick={submitForm} sx={{ margin: '15px' }}>
+            Speichern
+          </Button>
         </Grid>
       </Box>
     </div>

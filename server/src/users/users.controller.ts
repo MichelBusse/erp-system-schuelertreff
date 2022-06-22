@@ -8,15 +8,18 @@ import {
   Query,
   Request,
 } from '@nestjs/common'
+import { isPostalCode } from 'class-validator'
 
 import { AuthService } from 'src/auth/auth.service'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
+import { ChildEntity } from 'typeorm'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
+import { timeAvailable } from './dto/timeAvailable'
 import {
   Admin,
   Customer,
@@ -109,6 +112,27 @@ export class UsersController {
     this.authService.initReset(user)
 
     return user
+  }
+
+  @Post(':id')
+  async updateUser(
+    @Param('id') id: number, 
+    @Body('street') street: string, 
+    @Body('postalCode') postalCode: string,
+    @Body('city') city: string,
+    @Body('phone') phone: string,
+    @Body('timesAvailable') timesAvailable: string & timeAvailable[]
+  ): Promise<User> {
+    const user = await this.usersService.findOne(id)
+
+    return this.usersService.updateUser({
+      ...user,
+      street: street,
+      postalCode: postalCode,
+      city: city,
+      phone: phone,
+      timesAvailable: timesAvailable
+    })
   }
 
   @Get('teacher/available')
