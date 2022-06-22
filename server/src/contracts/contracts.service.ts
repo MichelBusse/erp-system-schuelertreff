@@ -83,6 +83,8 @@ export class ContractsService {
       .from((subq) => {
         return subq
           .select('t.id', 'teacherId')
+          .addSelect('t.firstName', 'firstName')
+          .addSelect('t.lastName', 'lastName')
           .addSelect('t.timesAvailable * ' + cTimes.getQuery(), 'possibleTimes')
           .from(User, 't')
           .where('t.type = :tt', { tt: 'Teacher' })
@@ -98,8 +100,6 @@ export class ContractsService {
       )
     })
 
-    // console.log(mainQuery.getQueryAndParameters())
-
     // available times are split by dow
     type at = {
       1: string
@@ -108,6 +108,8 @@ export class ContractsService {
       4: string
       5: string
       teacherId: number
+      firstName: string
+      lastName: string
       possibleTimes: string
     }
 
@@ -115,6 +117,7 @@ export class ContractsService {
 
     const suggestions = availableTeachers.map((a) => ({
       teacherId: a.teacherId,
+      teacherName: a.firstName + ' ' + a.lastName,
       suggestions: [1, 2, 3, 4, 5].flatMap((n) => parseMultirange(a[n])),
     }))
 

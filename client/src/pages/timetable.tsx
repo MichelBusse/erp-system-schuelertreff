@@ -25,20 +25,13 @@ const Timetable: React.FC = () => {
   const [date, setDate] = useState(dayjs().day(1))
   const [open, setOpen] = useState(false)
   const [render, setRender] = useState(0)
+  const [refreshCalendar, setRefreshCalendar] = useState(0)
 
   return (
     <Box
       sx={{
         p: 4,
         height: '100%',
-        // marginRight: drawer.open ? '240px' : 0,
-        // transition: theme.transitions.create('margin', {
-        //   easing: theme.transitions.easing.easeInOut,
-        //   duration:
-        //     theme.transitions.duration[
-        //       drawer.open ? 'leavingScreen' : 'enteringScreen'
-        //     ],
-        // }),
       }}
     >
       <Box
@@ -59,6 +52,7 @@ const Timetable: React.FC = () => {
             setRender(render + 1)
             setOpen(true)
           }}
+          refresh={refreshCalendar}
         />
       </Box>
 
@@ -68,7 +62,12 @@ const Timetable: React.FC = () => {
       />
 
       {!!render && (
-        <ContractDialog key={render} open={open} setOpen={setOpen} />
+        <ContractDialog
+          key={render}
+          open={open}
+          setOpen={setOpen}
+          onSuccess={() => setRefreshCalendar((r) => r + 1)}
+        />
       )}
     </Box>
   )

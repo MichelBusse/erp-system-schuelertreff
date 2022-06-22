@@ -22,6 +22,7 @@ type Props = {
   setDrawer: (open: SideMenu) => void
   setDate: (date: Dayjs) => void
   openDialog: () => void
+  refresh?: number
 }
 
 type contract = {
@@ -41,6 +42,7 @@ const Calendar: React.FC<Props> = ({
   setDrawer,
   setDate,
   openDialog,
+  refresh,
 }) => {
   const { API } = useAuth()
   const [teachers, setTeachers] = useState<teacher[]>([])
@@ -48,7 +50,7 @@ const Calendar: React.FC<Props> = ({
 
   useEffect(() => {
     API.get('users/teacher').then((res) => setTeachers(res.data))
-  }, [])
+  }, [refresh])
 
   useEffect(() => {
     API.get('lessons/week', {
@@ -66,7 +68,7 @@ const Calendar: React.FC<Props> = ({
 
       setContracts(contractsByTeacher)
     })
-  }, [date])
+  }, [date, refresh])
 
   const getCellValue: GridColDef['valueGetter'] = ({ id, colDef: { field } }) =>
     contracts[id as number]?.filter(
