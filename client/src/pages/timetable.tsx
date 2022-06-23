@@ -3,11 +3,13 @@ import 'dayjs/locale/de'
 import { Box } from '@mui/material'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
-import { ReactElement, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 
+import { useAuth } from '../components/AuthProvider'
 import Calendar from '../components/Calendar'
 import ContractDialog from '../components/ContractDialog'
 import HiddenMenu from '../components/HiddenMenu'
+import { teacher } from '../types/user'
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)
@@ -18,6 +20,8 @@ export type SideMenu = {
 }
 
 const Timetable: React.FC = () => {
+  const { API } = useAuth()
+
   const [drawer, setDrawer] = useState<SideMenu>({
     open: false,
     content: <></>,
@@ -26,6 +30,11 @@ const Timetable: React.FC = () => {
   const [open, setOpen] = useState(false)
   const [render, setRender] = useState(0)
   const [refreshCalendar, setRefreshCalendar] = useState(0)
+  const [teachers, setTeachers] = useState<teacher[]>([])
+
+  useEffect(() => {
+    API.get('users/teacher').then((res) => setTeachers(res.data))
+  }, [refreshCalendar])
 
   return (
     <Box
@@ -53,6 +62,7 @@ const Timetable: React.FC = () => {
             setOpen(true)
           }}
           refresh={refreshCalendar}
+          teachers={teachers}
         />
       </Box>
 
@@ -67,6 +77,7 @@ const Timetable: React.FC = () => {
           open={open}
           setOpen={setOpen}
           onSuccess={() => setRefreshCalendar((r) => r + 1)}
+          teachers={teachers}
         />
       )}
     </Box>

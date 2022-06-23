@@ -23,21 +23,19 @@ import {
 } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import dayjs, { Dayjs } from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { OptionsObject as SnackbarOptions, useSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 
 import subject from '../types/subject'
-import { customer } from '../types/user'
+import { customer, teacher } from '../types/user'
+import { getNextDow } from '../utils/date'
 import { useAuth } from './AuthProvider'
 import BetterTimePicker from './BetterTimePicker'
 import EqualStack from './EqualStack'
 import IconButtonAdornment from './IconButtonAdornment'
 
-type Props = {
-  open: boolean
-  setOpen: (open: boolean) => void
-  onSuccess?: () => void
-}
+dayjs.extend(customParseFormat)
 
 type suggestion = {
   teacherId: number
@@ -59,6 +57,17 @@ type form0 = {
   endTime: Dayjs | null
 }
 
+type form1 = {
+  startDate: Dayjs | null
+  endDate: Dayjs | null
+  startTime: Dayjs | null
+  endTime: Dayjs | null
+  minTime: Dayjs | null
+  maxTime: Dayjs | null
+  teacher: string
+  dow: number | null
+}
+
 const snackbarOptions: SnackbarOptions = {
   variant: 'error',
   anchorOrigin: {
@@ -67,10 +76,18 @@ const snackbarOptions: SnackbarOptions = {
   },
 }
 
+type Props = {
+  open: boolean
+  setOpen: (open: boolean) => void
+  onSuccess?: () => void
+  teachers: teacher[]
+}
+
 const ContractDialog: React.FC<Props> = ({
   open,
   setOpen,
   onSuccess = () => {},
+  teachers,
 }) => {
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
@@ -95,6 +112,16 @@ const ContractDialog: React.FC<Props> = ({
   const [suggestions, setSuggestions] = useState<suggestion[]>([])
   const [loading1, setLoading1] = useState(false)
   const [selSuggestion, setSelSuggestion] = useState<string>('')
+  const [form1, setForm1] = useState<form1>({
+    startDate: null,
+    endDate: null,
+    startTime: null,
+    endTime: null,
+    minTime: null,
+    maxTime: null,
+    teacher: '',
+    dow: null,
+  })
 
   // get customers, subjects from DB
   useEffect(() => {
@@ -102,71 +129,106 @@ const ContractDialog: React.FC<Props> = ({
     API.get('subjects').then((res) => setSubjects(res.data))
   }, [])
 
-  const handleSubmit0 = () => {
-    // required fields
-    if (form0.customers.length && form0.subject && form0.interval) {
-      setLoading0(true)
+  const validForm0 = !!(
+    form0.customers.length &&
+    form0.subject &&
+    form0.interval
+  )
 
-      API.get('contracts/suggest', {
-        params: {
-          customers: form0.customers.map((c) => c.id).join(','),
-          subjectId: form0.subject?.id,
-          interval: form0.interval,
-          startDate: form0.startDate?.format('YYYY-MM-DD'),
-          endDate: form0.endDate?.format('YYYY-MM-DD'),
-          startTime: form0.startTime?.format('HH:mm'),
-          endTime: form0.endTime?.format('HH:mm'),
-        },
+  const handleSubmit0 = () => {
+    setLoading0(true)
+
+    API.get('contracts/suggest', {
+      params: {
+        customers: form0.customers.map((c) => c.id).join(','),
+        subjectId: form0.subject?.id,
+        interval: form0.interval,
+        startDate: form0.startDate?.format('YYYY-MM-DD'),
+        endDate: form0.endDate?.format('YYYY-MM-DD'),
+        startTime: form0.startTime?.format('HH:mm'),
+        endTime: form0.endTime?.format('HH:mm'),
+      },
+    })
+      .then((res) => {
+        updateSelSuggestion('')
+        setSuggestions(res.data)
+        setActiveStep(1)
       })
-        .then((res) => {
-          setSelSuggestion('')
-          setSuggestions(res.data)
-          setActiveStep(1)
-        })
-        .catch((err) => {
-          console.error(err)
-          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
-        })
-        .finally(() => setLoading0(false))
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
+      })
+      .finally(() => setLoading0(false))
+  }
+
+  const updateSelSuggestion = (newSuggestion: string) => {
+    setSelSuggestion(newSuggestion)
+
+    if (newSuggestion !== '') {
+      const [t, s] = newSuggestion.split(',').map((n) => parseInt(n))
+
+      const teacher = suggestions[t]
+      const suggestion = teacher.suggestions[s]
+
+      const startTime = dayjs(suggestion.start, 'HH:mm')
+      const endTime = dayjs(suggestion.end, 'HH:mm')
+
+      setForm1({
+        startDate: getNextDow(
+          suggestion.dow,
+          form0.startDate ?? dayjs('00:00', 'HH:mm').add(1, 'day'),
+        ),
+        endDate: null,
+        startTime: startTime,
+        endTime: endTime,
+        minTime: startTime,
+        maxTime: endTime,
+        teacher: teacher.teacherId.toString(),
+        dow: suggestion.dow,
+      })
+    } else {
+      setForm1({
+        startDate: null,
+        endDate: null,
+        startTime: null,
+        endTime: null,
+        minTime: null,
+        maxTime: null,
+        teacher: '',
+        dow: null,
+      })
     }
   }
 
+  const validForm1 = !!(
+    form1.teacher !== '' &&
+    form1.startDate !== null &&
+    form1.startTime !== null &&
+    form1.endTime !== null
+  )
+
   const handleSubmit1 = () => {
-    if (selSuggestion !== '') {
-      setLoading1(true)
+    setLoading1(true)
 
-      API.post('contracts', {
-        // teacher: suggestions[selSuggestion.teacher].teacherId,
-        // customers: [5, 10],
-        // subject: 2,
-        // interval: 1,
-        // startDate: '2022-06-17',
-        // endDate: '2022-07-15',
-        // startTime: '12:00',
-        // endTime: '13:00',
+    API.post('contracts', {
+      customers: form0.customers.map((c) => c.id),
+      subject: form0.subject?.id,
+      interval: form0.interval,
+      teacher: form1.teacher,
+      startDate: form1.startDate?.format('YYYY-MM-DD'),
+      endDate: form1.endDate?.format('YYYY-MM-DD'),
+      startTime: form1.startTime?.format('HH:mm'),
+      endTime: form1.endTime?.format('HH:mm'),
+    })
+      .then(() => {
+        onSuccess()
+        setOpen(false)
       })
-        .then(() => {
-          onSuccess()
-        })
-        .catch((err) => {
-          console.error(err)
-          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
-        })
-        .finally(() => setLoading1(false))
-    }
-
-    //   if (formValid) {
-    //     API.post('contracts', {
-    //       ...form,
-    //       customers: form.customers.map((c) => ({ id: c.id })),
-    //       startDate: form.startDate?.format('YYYY-MM-DD'),
-    //       endDate: form.endDate?.format('YYYY-MM-DD'),
-    //       startTime: form.startTime?.format('HH:mm'),
-    //       endTime: form.endTime?.format('HH:mm'),
-    //     })
-    //       .then(() => setOpen(false))
-    //       .catch((err) => console.error(err))
-    //   }
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
+      })
+      .finally(() => setLoading1(false))
   }
 
   const steps: {
@@ -181,6 +243,7 @@ const ContractDialog: React.FC<Props> = ({
           <Autocomplete
             fullWidth
             multiple
+            size="small"
             options={customers}
             getOptionLabel={(o) =>
               o.role === 'schoolCustomer'
@@ -196,6 +259,7 @@ const ContractDialog: React.FC<Props> = ({
               <TextField
                 {...params}
                 required
+                size="medium"
                 variant="standard"
                 label="Kunde(n)"
               />
@@ -288,12 +352,7 @@ const ContractDialog: React.FC<Props> = ({
               onChange={(value) => {
                 setForm0((data) => ({ ...data, endDate: value }))
               }}
-              shouldDisableDate={(day) =>
-                !!(
-                  form0.startDate &&
-                  day.diff(form0.startDate, 'd') % (7 * form0.interval)
-                )
-              }
+              shouldDisableDate={(date) => [0, 6].includes(date.day())}
               renderInput={(params) => (
                 <TextField {...params} variant="standard" />
               )}
@@ -317,7 +376,7 @@ const ContractDialog: React.FC<Props> = ({
             <BetterTimePicker
               label="Startzeit"
               minutesStep={5}
-              maxTime={form0.endTime?.subtract(30, 'm')}
+              maxTime={form0.endTime?.subtract(45, 'm')}
               value={form0.startTime}
               onChange={(value) => {
                 setForm0((data) => ({ ...data, startTime: value }))
@@ -329,7 +388,7 @@ const ContractDialog: React.FC<Props> = ({
             <BetterTimePicker
               label="Endzeit"
               minutesStep={5}
-              minTime={form0.startTime?.add(30, 'm')}
+              minTime={form0.startTime?.add(45, 'm')}
               value={form0.endTime}
               onChange={(value) => {
                 setForm0((data) => ({ ...data, endTime: value }))
@@ -348,6 +407,7 @@ const ContractDialog: React.FC<Props> = ({
             variant="contained"
             onClick={handleSubmit0}
             loading={loading0}
+            disabled={!validForm0}
           >
             Weiter
           </LoadingButton>
@@ -366,7 +426,7 @@ const ContractDialog: React.FC<Props> = ({
               id="suggestion-select"
               disabled={suggestions.length === 0}
               value={selSuggestion}
-              onChange={(e) => setSelSuggestion(e.target.value)}
+              onChange={(e) => updateSelSuggestion(e.target.value)}
             >
               <MenuItem value="">freie Wahl</MenuItem>
               {suggestions.flatMap((t, i) => [
@@ -381,6 +441,131 @@ const ContractDialog: React.FC<Props> = ({
               ])}
             </Select>
           </FormControl>
+
+          <FormControl variant="standard" fullWidth required>
+            <InputLabel htmlFor="teacher-select">Lehrkraft</InputLabel>
+            <Select
+              id="teacher-select"
+              disabled={selSuggestion !== ''}
+              value={form1.teacher}
+              onChange={(e) =>
+                setForm1((data) => ({ ...data, teacher: e.target.value }))
+              }
+            >
+              {teachers.map((t) => (
+                <MenuItem key={t.id} value={t.id.toString()}>
+                  {`${t.firstName} ${t.lastName}`}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <EqualStack direction="row" spacing={2}>
+            <DatePicker
+              label="Startdatum"
+              mask="__.__.____"
+              minDate={form0.startDate ?? dayjs().add(1, 'd')}
+              maxDate={form0.endDate ?? undefined}
+              defaultCalendarMonth={form0.startDate ?? undefined}
+              value={form1.startDate}
+              onChange={(value) => {
+                setForm1((data) => ({
+                  ...data,
+                  startDate: value,
+                  endDate: null,
+                }))
+              }}
+              shouldDisableDate={(day) =>
+                [0, 6].includes(day.day()) ||
+                (selSuggestion !== '' && day.day() !== form1.dow)
+              }
+              renderInput={(params) => (
+                <TextField {...params} required variant="standard" />
+              )}
+              InputAdornmentProps={{
+                position: 'start',
+              }}
+              InputProps={{
+                endAdornment: (
+                  <IconButtonAdornment
+                    icon={ClearIcon}
+                    hidden={form1.startDate === null}
+                    onClick={() =>
+                      setForm1((data) => ({
+                        ...data,
+                        startDate: null,
+                      }))
+                    }
+                  />
+                ),
+              }}
+            />
+            <DatePicker
+              label="Enddatum"
+              mask="__.__.____"
+              minDate={form1.startDate ?? undefined}
+              maxDate={form0.endDate ?? undefined}
+              defaultCalendarMonth={form1.startDate ?? undefined}
+              disabled={form1.startDate === null}
+              value={form1.endDate}
+              onChange={(value) => {
+                setForm1((data) => ({ ...data, endDate: value }))
+              }}
+              shouldDisableDate={(day) =>
+                !!(
+                  form1.startDate &&
+                  day.diff(form1.startDate, 'd') % (7 * form0.interval)
+                )
+              }
+              renderInput={(params) => (
+                <TextField {...params} variant="standard" />
+              )}
+              InputAdornmentProps={{
+                position: 'start',
+              }}
+              InputProps={{
+                endAdornment: (
+                  <IconButtonAdornment
+                    icon={ClearIcon}
+                    hidden={form1.endDate === null}
+                    onClick={() =>
+                      setForm1((data) => ({ ...data, endDate: null }))
+                    }
+                  />
+                ),
+              }}
+            />
+          </EqualStack>
+          <EqualStack direction="row" spacing={2}>
+            <BetterTimePicker
+              label="Startzeit"
+              required
+              minutesStep={5}
+              minTime={form1.minTime ?? form0.startTime ?? undefined}
+              maxTime={(form1.endTime ?? form0.endTime)?.subtract(45, 'm')}
+              value={form1.startTime}
+              onChange={(value) => {
+                setForm1((data) => ({ ...data, startTime: value }))
+              }}
+              clearValue={() => {
+                setForm1((data) => ({ ...data, startTime: null }))
+              }}
+            />
+            <BetterTimePicker
+              label="Endzeit"
+              required
+              minutesStep={5}
+              minTime={(form1.startTime ?? form0.startTime)?.add(45, 'm')}
+              maxTime={form1.maxTime ?? form0.endTime ?? undefined}
+              value={form1.endTime}
+              onChange={(value) => {
+                setForm1((data) => ({ ...data, endTime: value }))
+              }}
+              clearValue={() => {
+                setForm1((data) => ({ ...data, endTime: null }))
+              }}
+            />
+          </EqualStack>
         </Stack>
       ),
       actions: (
@@ -390,6 +575,7 @@ const ContractDialog: React.FC<Props> = ({
             variant="contained"
             onClick={handleSubmit1}
             loading={loading1}
+            disabled={!validForm1}
           >
             Hinzufügen
           </LoadingButton>

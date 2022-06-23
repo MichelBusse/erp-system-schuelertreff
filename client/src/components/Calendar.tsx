@@ -23,6 +23,7 @@ type Props = {
   setDate: (date: Dayjs) => void
   openDialog: () => void
   refresh?: number
+  teachers: teacher[]
 }
 
 type contract = {
@@ -43,14 +44,11 @@ const Calendar: React.FC<Props> = ({
   setDate,
   openDialog,
   refresh,
+  teachers,
 }) => {
   const { API } = useAuth()
-  const [teachers, setTeachers] = useState<teacher[]>([])
-  const [contracts, setContracts] = useState<Record<number, contract[]>>([])
 
-  useEffect(() => {
-    API.get('users/teacher').then((res) => setTeachers(res.data))
-  }, [refresh])
+  const [contracts, setContracts] = useState<Record<number, contract[]>>([])
 
   useEffect(() => {
     API.get('lessons/week', {
