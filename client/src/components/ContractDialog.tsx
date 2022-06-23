@@ -44,6 +44,7 @@ type suggestion = {
     dow: number
     start: string
     end: string
+    overlap: number[]
   }[]
 }
 
@@ -435,11 +436,19 @@ const ContractDialog: React.FC<Props> = ({
                 <ListSubheader key={t.teacherId}>
                   {t.teacherName}
                 </ListSubheader>,
-                t.suggestions.map((s, j) => (
-                  <MenuItem key={i + ',' + j} value={i + ',' + j}>
-                    {`${dayjs().day(s.dow).format('dd')} ${s.start} - ${s.end}`}
-                  </MenuItem>
-                )),
+                t.suggestions.map((s, j) => {
+                  let text =
+                    `${dayjs().day(s.dow).format('dd')} ` +
+                    `${s.start} - ${s.end}`
+
+                  if (s.overlap.length > 0) text += ' *'
+
+                  return (
+                    <MenuItem key={i + ',' + j} value={i + ',' + j}>
+                      {text}
+                    </MenuItem>
+                  )
+                }),
               ])}
             </Select>
           </FormControl>

@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
-import { Dayjs } from 'dayjs'
-import { Connection, Repository } from 'typeorm'
+import dayjs, { Dayjs } from 'dayjs'
+import { Brackets, Connection, Repository } from 'typeorm'
 
+import { timeAvailable } from 'src/users/dto/timeAvailable'
 import { Customer, User } from 'src/users/entities'
 import { parseMultirange, UsersService } from 'src/users/users.service'
 
@@ -45,7 +46,7 @@ export class ContractsService {
     })
   }
 
-  findOne(id: string): Promise<Contract> {
+  async findOne(id: string): Promise<Contract> {
     return this.contractsRepository.findOne(id)
   }
 
@@ -117,17 +118,60 @@ export class ContractsService {
 
     const availableTeachers = await mainQuery.getRawMany<at>()
 
-    const suggestions = availableTeachers.map((a) => ({
-      teacherId: a.teacherId,
-      teacherName: a.firstName + ' ' + a.lastName,
-      suggestions: [1, 2, 3, 4, 5].flatMap((n) => parseMultirange(a[n])),
-    }))
+    const suggestions = await Promise.all(
+      availableTeachers.map(async (a) => ({
+        teacherId: a.teacherId,
+        teacherName: a.firstName + ' ' + a.lastName,
+        suggestions: await Promise.all(
+          [1, 2, 3, 4, 5].flatMap((n) =>
+            parseMultirange(a[n]).map(async (r) => ({
+              ...r,
+              overlap: (
+                await this.checkOverlap(a.teacherId, dto.customers, r)
+              ).map((c) => c.id),
+            })),
+          ),
+        ),
+      })),
+    )
 
     return suggestions
   }
 
+  async checkOverlap(
+    teacherId: number,
+    customers: number[],
+    range: timeAvailable,
+  ) {
+    const qb = this.contractsRepository.createQueryBuilder('c')
+
+    qb.select('c.id')
+      .leftJoin('c.customers', 'customer')
+      .leftJoin('c.teacher', 'teacher')
+      .where('extract(dow from c.startDate) = :dow')
+      .andWhere('c.startTime < :end::time')
+      .andWhere('c.endTime > :start::time')
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('teacher.id = :tid', { tid: teacherId }) //
+            .orWhere('customer.id IN (:...cid)', { cid: customers })
+        }),
+      )
+      .setParameters(range)
+
+    return qb.getMany()
+  }
+
   async remove(id: string): Promise<void> {
-    await this.contractsRepository.delete(id)
+    const contract = await this.contractsRepository.findOne(id)
+
+    console.log(contract.startDate)
+
+    if (dayjs().isBefore(contract.startDate)) {
+      this.contractsRepository.delete(id)
+    } else {
+      throw new BadRequestException('contract cannot be deleted')
+    }
   }
 
   async findByWeek(week: Dayjs, teacherId?: number): Promise<Contract[]> {
