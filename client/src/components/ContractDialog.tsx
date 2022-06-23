@@ -458,7 +458,7 @@ const ContractDialog: React.FC<Props> = ({
                 .filter(
                   (t) =>
                     form0.subject !== null &&
-                    t.subjects.some((s) => s.id === form0.subject.id),
+                    t.subjects.some((s) => s.id === form0.subject?.id),
                 )
                 .map((t) => (
                   <MenuItem key={t.id} value={t.id.toString()}>
