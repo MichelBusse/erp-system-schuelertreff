@@ -1,9 +1,21 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import { Chip, IconButton, Stack } from '@mui/material'
+import {
+  Autocomplete,
+  Box,
+  Chip,
+  IconButton,
+  Stack,
+  TextField,
+} from '@mui/material'
 import {
   DataGrid,
   getGridStringOperators,
+  GridCellParams,
+  GridColDef,
   GridColumns,
+  GridFilterInputValueProps,
+  GridFilterItem,
+  GridFilterOperator,
   GridRowSpacingParams,
   GridToolbarContainer,
   GridToolbarFilterButton,
@@ -16,12 +28,78 @@ import subject from '../types/subject'
 import { teacher } from '../types/user'
 import styles from './gridList.module.scss'
 
+//definition of subject filter input
+function SubjectsFilterInputValue(props: GridFilterInputValueProps) {
+  const { item, applyValue, focusElementRef } = props
+  const { API } = useAuth()
+  const [subjects, setSubjects] = useState<subject[]>([])
+
+  useEffect(() => {
+    API.get(`subjects`).then((res) => setSubjects(res.data))
+  }, [])
+
+  return (
+    <Box
+      sx={{
+        display: 'inline-flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 48,
+        pl: '20px',
+      }}
+    >
+      <Autocomplete
+        id="subjects"
+        options={subjects}
+        getOptionLabel={(option) => option.name}
+        value={item.value}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            variant="standard"
+            label="Fächer *"
+            sx={{ minWidth: '150px' }}
+          />
+        )}
+        onChange={(event, newValue) => {
+          applyValue({ ...item, value: newValue })
+        }}
+      />
+    </Box>
+  )
+}
+
+//definition of subject filter operator
+const subjectOperator: GridFilterOperator = {
+  label: 'enthalten',
+  value: 'includes',
+  getApplyFilterFn: (filterItem: GridFilterItem, column: GridColDef) => {
+    if (
+      !filterItem.columnField ||
+      !filterItem.value ||
+      !filterItem.operatorValue
+    ) {
+      return null
+    }
+
+    return (params: GridCellParams): boolean => {
+      console.log(params.value[0].name, filterItem.value.name)
+
+      return params.value
+        .map((sub: subject) => sub.name)
+        .includes(filterItem.value.name)
+    }
+  },
+  InputComponent: SubjectsFilterInputValue,
+  InputComponentProps: { type: 'string' },
+}
+
 //definition of the columns
 const cols: GridColumns = [
   {
     field: 'teacherName',
     headerClassName: 'DataGridHead',
-    headerName: 'Teacher',
+    headerName: 'Name',
     width: 200,
     filterOperators: getGridStringOperators().filter(
       (operator) => operator.value === 'contains',
@@ -41,10 +119,11 @@ const cols: GridColumns = [
   {
     field: 'subjectName',
     headerClassName: 'DataGridHead',
-    headerName: 'Subject',
+    headerName: 'Fächer',
     // width: 650,
     minWidth: 300,
     flex: 1,
+    filterOperators: [subjectOperator],
     renderCell: (params) => (
       <Stack direction="row" spacing={2}>
         {params.value.map((subject: subject) => (
@@ -90,6 +169,13 @@ const Teachers: React.FC = () => {
     <div className={styles.wrapper}>
       <div style={{ flexGrow: 1 }}>
         <DataGrid
+          localeText={{
+            filterPanelColumns: 'Spalte',
+            filterPanelOperators: 'Operator',
+            filterPanelInputLabel: 'Wert',
+            filterOperatorContains: 'enthält',
+            filterPanelInputPlaceholder: 'Eingabe',
+          }}
           headerHeight={0}
           disableSelectionOnClick={true}
           components={{
