@@ -17,7 +17,6 @@ export class SubjectsController {
     return this.subjectsService.create(createSubjectDto)
   }
 
-  @Roles(Role.ADMIN)
   @Get()
   findAll(): Promise<Subject[]> {
     return this.subjectsService.findAll()

@@ -9,6 +9,7 @@ import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
 import { timeAvailable } from './dto/timeAvailable'
+import { UpdateTeacherDto } from './dto/update-teacher.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import {
   Admin,
@@ -159,9 +160,13 @@ export class UsersService {
   async findOneSchoolCustomer(id: number): Promise<SchoolCustomer> {
     return this.schoolCustomersRepository.findOneOrFail(id).then(transformUser)
   }
-
+  
   async findOneTeacher(id: number): Promise<Teacher> {
-    return this.teachersRepository.findOneOrFail(id).then(transformUser)
+    return this.teachersRepository
+      .findOneOrFail(id, {
+        relations: ['subjects'],
+      })
+      .then(transformUser)
   }
 
   /**
@@ -211,6 +216,7 @@ export class UsersService {
     return this.teachersRepository.save(teacher)
   }
 
+
   async updateUser(id: number, dto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id)
 
@@ -220,6 +226,39 @@ export class UsersService {
       postalCode: dto.postalCode,
       city: dto.city,
       phone: dto.phone,
+      timesAvailable: formatTimesAvailable(dto.timesAvailable),
+    })
+  }
+  
+  async updateUserAdmin(id: number, dto: UpdateUserDto): Promise<User> {
+    const user = await this.findOne(id)
+
+    return this.usersRepository.save({
+      ...user,
+      ...dto,
+      timesAvailable: formatTimesAvailable(dto.timesAvailable),
+    })
+  }
+
+  async updateTeacher(id: number, dto: UpdateTeacherDto): Promise<User> {
+    const user = await this.findOne(id)
+    return this.usersRepository.save({
+      ...user,
+      street: dto.street,
+      postalCode: dto.postalCode,
+      subjects: dto.subjects,
+      email: dto.email,
+      phone: dto.phone,
+      city: dto.city,
+      timesAvailable: formatTimesAvailable(dto.timesAvailable),
+    })
+  }
+
+  async updateTeacherAdmin(id: number, dto: UpdateTeacherDto): Promise<User> {
+    const user = await this.findOne(id)
+    return this.usersRepository.save({
+      ...user,
+      ...dto,
       timesAvailable: formatTimesAvailable(dto.timesAvailable),
     })
   }

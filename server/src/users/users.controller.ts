@@ -16,6 +16,7 @@ import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
+import { UpdateTeacherDto } from './dto/update-teacher.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import {
   Admin,
@@ -65,8 +66,21 @@ export class UsersController {
   }
 
   @Get(':id')
+  @Roles(Role.ADMIN)
   findOne(@Param('id') id: number): Promise<User> {
     return this.usersService.findOne(id)
+  }
+
+
+  @Get('teacher/me')
+  getMeAsTeacher(@Request() req) {
+    return this.usersService.findOneTeacher(req.user.id)
+  }
+
+  @Get('teacher/:id')
+  @Roles(Role.ADMIN)
+  findOneTeacher(@Param('id') id: number): Promise<Teacher> {
+    return this.usersService.findOneTeacher(id)
   }
 
   @Delete(':id')
@@ -101,6 +115,42 @@ export class UsersController {
     return user
   }
 
+  @Post('me')
+  async updateUser(
+    @Request() req,
+    @Body() dto: UpdateUserDto,
+  ): Promise<User> {
+    return this.usersService.updateUser(req.user.id, dto)
+  }
+
+  @Post(':id')
+  @Roles(Role.ADMIN)
+  async updateUserAdmin(
+    @Param('id') id: number,
+    @Body() dto: UpdateUserDto,
+  ): Promise<User> {
+    return this.usersService.updateUserAdmin(id, dto)
+  }
+
+  @Post('teacher/me')
+  async updateTeacher(
+    @Request() req,
+    @Body() dto: UpdateTeacherDto,
+  ): Promise<User> {
+
+    return this.usersService.updateTeacher(req.user.id, dto)
+  }
+
+  @Post('teacher/:id')
+  @Roles(Role.ADMIN)
+  async updateTeacherAdmin(
+    @Param('id') id: number,
+    @Body() dto: UpdateTeacherDto,
+  ): Promise<User> {
+
+    return this.usersService.updateTeacherAdmin(id, dto)
+  }
+
   @Post('admin')
   @Roles(Role.ADMIN)
   async createAdmin(@Body() dto: CreateAdminDto): Promise<Admin> {
@@ -111,11 +161,4 @@ export class UsersController {
     return user
   }
 
-  @Post(':id')
-  async updateUser(
-    @Param('id') id: number,
-    @Body() dto: UpdateUserDto,
-  ): Promise<User> {
-    return this.usersService.updateUser(id, dto)
-  }
 }

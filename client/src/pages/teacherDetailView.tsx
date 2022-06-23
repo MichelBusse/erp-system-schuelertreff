@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../components/AuthProvider'
 import {
+  Autocomplete,
   Button,
   FormControl,
   FormHelperText,
@@ -9,11 +10,9 @@ import {
   MenuItem,
   Select,
   Stack,
-  styled,
   TextField,
 } from '@mui/material'
 import Box from '@mui/material/Box'
-import Paper from '@mui/material/Paper'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { nanoid } from 'nanoid'
@@ -24,15 +23,20 @@ import styles from '../pages/gridList.module.scss'
 import { useSnackbar } from 'notistack'
 import { defaultTeacherFormData } from '../consts'
 import { formValidation } from '../components/FormValidation'
+import subject from '../types/subject'
 
 dayjs.extend(customParseFormat)
 
 const TeacherDetailView: React.FC = () => {
   const { API } = useAuth()
-  const [userId, setUserId] = useState<number>(0)
   const { id } = useParams()
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
+  const [subjects, setSubjects] = useState<subject[]>([])
+
+  useEffect(() => {
+    API.get(`subjects`).then((res) => setSubjects(res.data))
+  }, [])
 
   let requestedId = id ? id : 'me'
 
@@ -40,18 +44,19 @@ const TeacherDetailView: React.FC = () => {
   const [errors, setErrors] = useState(defaultTeacherFormData)
 
   useEffect(() => {
-    API.get('users/' + requestedId).then((res) => {
-      setUserId(res.data.id)
+    API.get('users/teacher/' + requestedId).then((res) => {
 
       //Convert default value to "Immer verfügbar" in list
       const newTimesAvailable =
         res.data.timesAvailableParsed.length === 1 &&
-        res.data.timesAvailableParsed[0].dow === 1 && res.data.timesAvailableParsed[0].start === "00:00" && res.data.timesAvailableParsed[0].end === "00:00"
+        res.data.timesAvailableParsed[0].dow === 1 &&
+        res.data.timesAvailableParsed[0].start === '00:00' &&
+        res.data.timesAvailableParsed[0].end === '00:00'
           ? []
           : res.data.timesAvailableParsed.map((time: timesAvailableParsed) => ({
               dow: time.dow,
               start: dayjs(time.start, 'HH:mm'),
-              end: dayjs(time.start, 'HH:mm'),
+              end: dayjs(time.end, 'HH:mm'),
               id: nanoid(),
             }))
 
@@ -66,6 +71,7 @@ const TeacherDetailView: React.FC = () => {
         email: res.data.email,
         phone: res.data.phone,
         timesAvailable: newTimesAvailable,
+        subjects: res.data.subjects,
       }))
     })
   }, [])
@@ -74,16 +80,17 @@ const TeacherDetailView: React.FC = () => {
     setErrors(formValidation('teacher', data))
 
     if (formValidation('teacher', data).validation) {
-      API.post('users/' + userId, {
+      API.post('users/teacher/' + requestedId, {
         ...data,
         timesAvailable: data.timesAvailable.map((time) => ({
           dow: time.dow,
           start: time.start?.format('HH:mm'),
           end: time.end?.format('HH:mm'),
         })),
+      }).then(() => {
+        enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gespeichert')
+        if (id) navigate('/teachers')
       })
-      enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gespeichert')
-      if (id) navigate('/teachers')
     }
   }
 
@@ -233,6 +240,22 @@ const TeacherDetailView: React.FC = () => {
                 }))
               }
               value={data.phone}
+            />
+          </Stack>
+          <h3>Lehrerdaten:</h3>
+          <Stack>
+            <Autocomplete
+              multiple
+              id="subjects"
+              options={subjects}
+              getOptionLabel={(option) => option.name}
+              renderInput={(params) => (
+                <TextField {...params} variant="standard" label="Fächer *" />
+              )}
+              value={data.subjects}
+              onChange={(_, value) =>
+                setData((data) => ({ ...data, subjects: value }))
+              }
             />
           </Stack>
           <h3>Verfügbarkeit:</h3>

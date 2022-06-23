@@ -27,7 +27,6 @@ dayjs.extend(customParseFormat)
 
 const PrivateCustomerDetailView: React.FC = () => {
   const { API } = useAuth()
-  const [userId, setUserId] = useState<number>(0)
   const { id } = useParams()
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
@@ -39,8 +38,6 @@ const PrivateCustomerDetailView: React.FC = () => {
 
   useEffect(() => {
     API.get('users/' + requestedId).then((res) => {
-      setUserId(res.data.id)
-
       const newTimesAvailable =
         res.data.timesAvailableParsed.length === 1 &&
         res.data.timesAvailableParsed[0].dow === 1 &&
@@ -50,7 +47,7 @@ const PrivateCustomerDetailView: React.FC = () => {
           : res.data.timesAvailableParsed.map((time: timesAvailableParsed) => ({
               dow: time.dow,
               start: dayjs(time.start, 'HH:mm'),
-              end: dayjs(time.start, 'HH:mm'),
+              end: dayjs(time.end, 'HH:mm'),
               id: nanoid(),
             }))
 
@@ -73,16 +70,17 @@ const PrivateCustomerDetailView: React.FC = () => {
     setErrors(formValidation('privateCustomer', data))
 
     if (formValidation('privateCustomer', data).validation) {
-      API.post('users/' + userId, {
+      API.post('users/' + requestedId, {
         ...data,
         timesAvailable: data.timesAvailable.map((time) => ({
           dow: time.dow,
           start: time.start?.format('HH:mm'),
           end: time.end?.format('HH:mm'),
         })),
+      }).then(() => {
+        enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gespeichert')
+        if (id) navigate('/privateCustomers')
       })
-      enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gespeichert')
-      if (id) navigate('/privateCustomers')
     }
   }
 

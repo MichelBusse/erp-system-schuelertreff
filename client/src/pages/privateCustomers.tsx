@@ -10,7 +10,7 @@ import {
   GridToolbarFilterButton,
 } from '@mui/x-data-grid'
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../components/AuthProvider'
 import PrivateCustomerDialog from '../components/PrivateCustomerDialog'
@@ -66,14 +66,15 @@ const cols: GridColumns = [
 const PrivateCustomers: React.FC = () => {
   const [open, setOpen] = useState(false)
   const [customers, setCustomers] = useState<privateCustomer[]>([])
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const { API } = useAuth()
 
   //Get subjects, teachers from DB
   useEffect(() => {
     API.get(`users/privateCustomer`).then((res) => setCustomers(res.data))
-  }, [])
+  }, [location])
 
   //creating rows out of the teachers
   const rows = customers.map((customer) => ({

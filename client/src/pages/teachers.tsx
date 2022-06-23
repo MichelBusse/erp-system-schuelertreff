@@ -22,7 +22,7 @@ import {
   GridToolbarFilterButton,
 } from '@mui/x-data-grid'
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../components/AuthProvider'
 import TeacherDialog from '../components/TeacherDialog'
@@ -86,8 +86,6 @@ const subjectOperator: GridFilterOperator = {
     }
 
     return (params: GridCellParams): boolean => {
-      console.log(params.value[0].name, filterItem.value.name)
-
       return params.value
         .map((sub: subject) => sub.name)
         .includes(filterItem.value.name)
@@ -165,13 +163,16 @@ const Teachers: React.FC = () => {
   const [open, setOpen] = useState(false)
   const [teachers, setTeachers] = useState<teacher[]>([])
   const navigate = useNavigate()
+  const location = useLocation()
 
   const { API } = useAuth()
 
   //Get subjects, teachers from DB
   useEffect(() => {
-    API.get(`users/teacher`).then((res) => setTeachers(res.data))
-  }, [])
+    API.get(`users/teacher`).then((res) => {
+      setTeachers(res.data)
+    })
+  }, [location])
 
   //creating rows out of the teachers
   const rows = teachers.map((teacher) => ({
@@ -191,10 +192,8 @@ const Teachers: React.FC = () => {
   )
 
   //Row click event
-  const onRowClick: GridEventListener<'rowClick'> = (
-    params
-  ) => {
-    navigate("" + params.id)
+  const onRowClick: GridEventListener<'rowClick'> = (params) => {
+    navigate('' + params.id)
   }
 
   return (

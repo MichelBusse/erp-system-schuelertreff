@@ -1,4 +1,5 @@
 import subject from './subject'
+import timeAvailable from './timeAvailable'
 
 interface user {
   role: 'admin' | 'teacher' | 'privateCustomer' | 'schoolCustomer'
@@ -11,6 +12,8 @@ interface user {
   postalCode: string
   email: string
   phone: string
+  timesAvailableParsed: timesAvailableParsed[]
+  timesAvailable: (timeAvailable & { id: string })[]
 }
 
 export type timesAvailableParsed = {
@@ -24,7 +27,6 @@ export interface teacher extends user {
   fee: number
   state: string
   subjects: subject[]
-  timesAvailableParsed: timesAvailableParsed[]
 }
 
 export interface admin extends user {

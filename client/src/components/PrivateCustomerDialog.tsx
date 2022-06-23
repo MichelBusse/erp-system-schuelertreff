@@ -17,7 +17,6 @@ import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
 import { defaultPrivateCustomerFormData } from '../consts'
 import { form } from '../types/form'
-import subject from '../types/subject'
 import { privateCustomer } from '../types/user'
 import { formValidation } from './FormValidation'
 
