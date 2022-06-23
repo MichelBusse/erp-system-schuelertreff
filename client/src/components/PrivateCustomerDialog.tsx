@@ -5,6 +5,7 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  FormHelperText,
   InputLabel,
   MenuItem,
   Select,
@@ -17,6 +18,7 @@ import { useAuth } from '../components/AuthProvider'
 import { form } from '../types/form'
 import subject from '../types/subject'
 import { privateCustomer } from '../types/user'
+import { formValidation } from './FormValidation'
 
 type Props = {
   open: boolean
@@ -44,35 +46,40 @@ const PrivateCustomerDialog: React.FC<Props> = ({
   setCustomers,
 }) => {
   const [data, setData] = useState<form>(defaultFormData)
+  const [errors, setErrors] = useState(defaultFormData)
 
   const { API } = useAuth()
 
   //TODO: validate filled fields
   const submitForm = () => {
-    API.post(`users/privateCustomer`, {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      salutation: data.salutation,
-      city: data.city,
-      postalCode: data.postalCode,
-      street: data.street,
-      email: data.email,
-      phone: data.phone,
-      timesAvailable: data.timesAvailable.map((time) => ({
-        dow: time.dow,
-        start: time.start?.format('HH:mm'),
-        end: time.end?.format('HH:mm'),
-      })),
-    }).then((res) => {
-      setCustomers((s) => [...s, res.data])
-      setOpen(false)
-      setData(defaultFormData)
-    })
+    setErrors(formValidation('privateCustomer', data))
+
+    if (formValidation('privateCustomer', data).validation)
+      API.post(`users/privateCustomer`, {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        salutation: data.salutation,
+        city: data.city,
+        postalCode: data.postalCode,
+        street: data.street,
+        email: data.email,
+        phone: data.phone,
+        timesAvailable: data.timesAvailable.map((time) => ({
+          dow: time.dow,
+          start: time.start?.format('HH:mm'),
+          end: time.end?.format('HH:mm'),
+        })),
+      }).then((res) => {
+        setCustomers((s) => [...s, res.data])
+        setOpen(false)
+        setData(defaultFormData)
+      })
   }
 
   const closeForm = () => {
     setOpen(false)
     setData(defaultFormData)
+    setErrors(defaultFormData)
   }
 
   return (
@@ -96,8 +103,10 @@ const PrivateCustomerDialog: React.FC<Props> = ({
             <MenuItem value="Frau">Frau</MenuItem>
             <MenuItem value="divers">divers</MenuItem>
           </Select>
+          <FormHelperText>{errors.salutation}</FormHelperText>
         </FormControl>
         <TextField
+          helperText={errors.firstName}
           id="firstName"
           label="Vorname"
           variant="outlined"
@@ -109,6 +118,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           }
         />
         <TextField
+          helperText={errors.lastName}
           id="lastName"
           label="Nachname"
           variant="outlined"
@@ -120,6 +130,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           }
         />
         <TextField
+          helperText={errors.city}
           id="city"
           label="Stadt"
           variant="outlined"
@@ -131,6 +142,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           }
         />
         <TextField
+          helperText={errors.postalCode}
           id="postalCode"
           label="Postleitzahl"
           variant="outlined"
@@ -142,6 +154,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           }
         />
         <TextField
+          helperText={errors.street}
           id="street"
           label="Straße"
           variant="outlined"
@@ -153,6 +166,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           }
         />
         <TextField
+          helperText={errors.email}
           id="email"
           label="E-Mail Adresse"
           variant="outlined"
@@ -164,6 +178,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           }
         />
         <TextField
+          helperText={errors.phone}
           id="phone"
           label="Telefonnummer"
           variant="outlined"

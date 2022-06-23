@@ -11,6 +11,7 @@ import { SketchPicker } from 'react-color'
 
 import { useAuth } from '../components/AuthProvider'
 import subject from '../types/subject'
+import { formValidation } from './FormValidation'
 
 type Props = {
   open: boolean
@@ -26,21 +27,26 @@ const defaultFormData = {
 
 const SubjectDialog: React.FC<Props> = ({ open, setOpen, setSubjects }) => {
   const [data, setData] = useState(defaultFormData)
+  const [errors, setErrors] = useState(defaultFormData)
 
   const { API } = useAuth()
 
   //TODO: validate filled fields
   const submitForm = () => {
-    API.post('subjects', data).then((res) => {
-      setSubjects((s) => [...s, res.data])
-      setData(defaultFormData)
-      setOpen(false)
-    })
+    setErrors(formValidation('subject', data))
+
+    if (formValidation('subject', data).validation)
+      API.post('subjects', data).then((res) => {
+        setSubjects((s) => [...s, res.data])
+        setData(defaultFormData)
+        setOpen(false)
+      })
   }
 
   const closeForm = () => {
     setOpen(false)
     setData(defaultFormData)
+    setErrors(defaultFormData)
   }
 
   return (
@@ -48,6 +54,7 @@ const SubjectDialog: React.FC<Props> = ({ open, setOpen, setSubjects }) => {
       <DialogTitle>Fach hinzufügen</DialogTitle>
       <DialogContent>
         <TextField
+          helperText={errors.name}
           id="subjectName"
           label="Fachbezeichnung"
           variant="outlined"
@@ -59,6 +66,7 @@ const SubjectDialog: React.FC<Props> = ({ open, setOpen, setSubjects }) => {
           }
         />
         <TextField
+          helperText={errors.shortForm}
           id="shortForm"
           label="Abkürzung"
           variant="outlined"

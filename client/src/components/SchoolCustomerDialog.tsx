@@ -10,6 +10,7 @@ import { useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
 import { schoolCustomer } from '../types/user'
+import { formValidation } from './FormValidation'
 
 type Props = {
   open: boolean
@@ -33,20 +34,25 @@ const SchoolCustomerDialog: React.FC<Props> = ({
   setCustomers,
 }) => {
   const [data, setData] = useState(defaultFormData)
+  const [errors, setErrors] = useState(defaultFormData)
 
   const { API } = useAuth()
 
   //TODO: validate filled fields
   const submitForm = () => {
-    API.post(`users/schoolCustomer`, data).then((res) => {
-      setCustomers((s) => [...s, res.data])
-      setOpen(false)
-    })
+    setErrors(formValidation('schoolCustomer', data))
+
+    if (formValidation('schoolCustomer', data).validation)
+      API.post(`users/schoolCustomer`, data).then((res) => {
+        setCustomers((s) => [...s, res.data])
+        setOpen(false)
+      })
   }
 
   const closeForm = () => {
     setOpen(false)
     setData(defaultFormData)
+    setErrors(defaultFormData)
   }
 
   return (
@@ -54,6 +60,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({
       <DialogTitle>Lehrkraft hinzufügen</DialogTitle>
       <DialogContent>
         <TextField
+          helperText={errors.schoolName}
           id="schoolName"
           label="Schulname"
           variant="outlined"
@@ -65,6 +72,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({
           }
         />
         <TextField
+          helperText={errors.city}
           id="city"
           label="Stadt"
           variant="outlined"
@@ -76,6 +84,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({
           }
         />
         <TextField
+          helperText={errors.postalCode}
           id="postalCode"
           label="Postleitzahl"
           variant="outlined"
@@ -87,6 +96,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({
           }
         />
         <TextField
+          helperText={errors.street}
           id="street"
           label="Straße"
           variant="outlined"
@@ -98,6 +108,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({
           }
         />
         <TextField
+          helperText={errors.email}
           id="email"
           label="E-Mail Adresse"
           variant="outlined"
@@ -109,6 +120,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({
           }
         />
         <TextField
+          helperText={errors.phone}
           id="phone"
           label="Telefonnummer"
           variant="outlined"

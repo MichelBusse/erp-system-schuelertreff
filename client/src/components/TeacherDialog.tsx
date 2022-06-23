@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  FormHelperText,
   InputLabel,
   MenuItem,
   Select,
@@ -20,6 +21,7 @@ import subject from '../types/subject'
 import { teacher } from '../types/user'
 import AddTimes from './AddTimes'
 import { useAuth } from './AuthProvider'
+import { formValidation } from './FormValidation'
 
 type Props = {
   open: boolean
@@ -44,6 +46,7 @@ const defaultFormData = {
 const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
   const [data, setData] = useState<form>(defaultFormData)
   const [subjects, setSubjects] = useState<subject[]>([])
+  const [errors, setErrors] = useState(defaultFormData)
 
   const { API } = useAuth()
 
@@ -52,23 +55,27 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
   }, [])
 
   const submitForm = () => {
-    API.post(`users/teacher`, {
-      ...data,
-      timesAvailable: data.timesAvailable.map((time) => ({
-        dow: time.dow,
-        start: time.start?.format('HH:mm'),
-        end: time.end?.format('HH:mm'),
-      })),
-    }).then((res) => {
-      setTeachers((s) => [...s, res.data])
-      setOpen(false)
-      setData(defaultFormData)
-    })
+    setErrors(formValidation('teacher', data))
+
+    if (formValidation('teacher', data).validation)
+      API.post(`users/teacher`, {
+        ...data,
+        timesAvailable: data.timesAvailable.map((time) => ({
+          dow: time.dow,
+          start: time.start?.format('HH:mm'),
+          end: time.end?.format('HH:mm'),
+        })),
+      }).then((res) => {
+        setTeachers((s) => [...s, res.data])
+        setOpen(false)
+        setData(defaultFormData)
+      })
   }
 
   const closeForm = () => {
     setOpen(false)
     setData(defaultFormData)
+    setErrors(defaultFormData)
   }
 
   return (
@@ -92,8 +99,10 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
             <MenuItem value="Frau">Frau</MenuItem>
             <MenuItem value="divers">divers</MenuItem>
           </Select>
+          <FormHelperText>{errors.salutation}</FormHelperText>
         </FormControl>
         <TextField
+          helperText={errors.firstName}
           id="firstName"
           label="Vorname"
           variant="outlined"
@@ -105,6 +114,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           }
         />
         <TextField
+          helperText={errors.lastName}
           id="lastName"
           label="Nachname"
           variant="outlined"
@@ -116,6 +126,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           }
         />
         <TextField
+          helperText={errors.city}
           id="city"
           label="Stadt"
           variant="outlined"
@@ -127,6 +138,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           }
         />
         <TextField
+          helperText={errors.postalCode}
           id="postalCode"
           label="Postleitzahl"
           variant="outlined"
@@ -138,6 +150,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           }
         />
         <TextField
+          helperText={errors.street}
           id="street"
           label="Straße"
           variant="outlined"
@@ -149,6 +162,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           }
         />
         <TextField
+          helperText={errors.email}
           id="email"
           label="E-Mail Adresse"
           variant="outlined"
@@ -160,6 +174,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           }
         />
         <TextField
+          helperText={errors.phone}
           id="phone"
           label="Telefonnummer"
           variant="outlined"
