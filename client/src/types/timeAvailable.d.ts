@@ -1,7 +1,7 @@
 import { Dayjs } from 'dayjs'
 
 type timeAvailable = {
-  dow: number | string
+  dow: number
   start: Dayjs | null
   end: Dayjs | null
 }

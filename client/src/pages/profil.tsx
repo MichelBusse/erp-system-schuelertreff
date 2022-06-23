@@ -2,6 +2,8 @@ import { Button, styled, TextField } from '@mui/material'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
+import dayjs from 'dayjs'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { nanoid } from 'nanoid'
 import { useEffect, useState } from 'react'
 
@@ -9,14 +11,21 @@ import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
 import { form } from '../types/form'
 import subject from '../types/subject'
-import timeAvailable from '../types/timeAvailable'
 import styles from './gridList.module.scss'
+
+dayjs.extend(customParseFormat)
 
 const Item = styled(Paper)(() => ({
   display: 'flex',
   alignItems: 'center',
   padding: '10px',
 }))
+
+type timesAvailableParsed = {
+  start: string
+  end: string
+  dow: number
+}
 
 const Profil: React.FC = () => {
   const { API } = useAuth()
@@ -49,8 +58,10 @@ const Profil: React.FC = () => {
         email: res.data.email,
         phone: res.data.phone,
         timesAvailable: res.data.timesAvailableParsed.map(
-          (timeAvailableParsed: timeAvailable) => ({
-            ...timeAvailableParsed,
+          (time: timesAvailableParsed) => ({
+            dow: time.dow,
+            start: dayjs(time.start, 'HH:mm'),
+            end: dayjs(time.start, 'HH:mm'),
             id: nanoid(),
           }),
         ),
@@ -64,8 +75,8 @@ const Profil: React.FC = () => {
       ...data,
       timesAvailable: data.timesAvailable.map((time) => ({
         dow: time.dow,
-        start: time.start,
-        end: time.end,
+        start: time.start?.format('HH:mm'),
+        end: time.end?.format('HH:mm'),
       })),
     })
   }

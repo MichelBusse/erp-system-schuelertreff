@@ -56,8 +56,8 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
       ...data,
       timesAvailable: data.timesAvailable.map((time) => ({
         dow: time.dow,
-        start: time.start,
-        end: time.end,
+        start: time.start?.format('HH:mm'),
+        end: time.end?.format('HH:mm'),
       })),
     }).then((res) => {
       setTeachers((s) => [...s, res.data])

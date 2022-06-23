@@ -17,11 +17,11 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
+import dayjs, { Dayjs } from 'dayjs'
 import { nanoid } from 'nanoid'
 import { useState } from 'react'
 
 import { form } from '../types/form'
-import timeAvailable from '../types/timeAvailable'
 import BetterTimePicker from './BetterTimePicker'
 import EqualStack from './EqualStack'
 
@@ -30,8 +30,14 @@ type Props = {
   setData: React.Dispatch<React.SetStateAction<form>>
 }
 
+type times = {
+  dow: string
+  start: Dayjs | null
+  end: Dayjs | null
+}
+
 const AddTimes: React.FC<Props> = ({ data, setData }) => {
-  const [times, setTimes] = useState<timeAvailable>({
+  const [times, setTimes] = useState<times>({
     dow: '',
     start: null,
     end: null,
@@ -44,9 +50,9 @@ const AddTimes: React.FC<Props> = ({ data, setData }) => {
           ...data.timesAvailable,
           {
             id: nanoid(),
-            dow: times.dow,
-            start: times.start?.format('HH:mm'),
-            end: times.end?.format('HH:mm'),
+            dow: parseInt(times.dow),
+            start: times.start,
+            end: times.end,
           },
         ],
       }))
@@ -78,7 +84,7 @@ const AddTimes: React.FC<Props> = ({ data, setData }) => {
                 //TODO fix types
                 setTimes((data) => ({
                   ...data,
-                  dow: Number(event.target.value),
+                  dow: event.target.value,
                 }))
               }
             >
@@ -123,29 +129,9 @@ const AddTimes: React.FC<Props> = ({ data, setData }) => {
       <Grid item>
         <List dense={true}>
           {data.timesAvailable.map((time) => {
-            let timeText = ''
-            const days = [
-              'Montag',
-              'Dienstag',
-              'Mittwoch',
-              'Donnerstag',
-              'Freitag',
-            ]
-            if (typeof time.start === 'string') {
-              timeText =
-                days[Number(time.dow) - 1] +
-                ': ' +
-                time.start +
-                ' - ' +
-                time.end
-            } else {
-              timeText =
-                days[Number(time.dow) - 1] +
-                ': ' +
-                time.start?.format('HH:mm') +
-                ' - ' +
-                time.end?.format('HH:mm')
-            }
+            const timeText =
+              `${dayjs().day(time.dow).format('dddd')}: ` +
+              `${time.start?.format('HH:mm')} - ${time.end?.format('HH:mm')}`
 
             return (
               <ListItem
