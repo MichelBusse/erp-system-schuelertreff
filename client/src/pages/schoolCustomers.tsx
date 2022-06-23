@@ -12,6 +12,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
 import SchoolCustomerDialog from '../components/SchoolCustomerDialog'
+import { dataGridLocaleText } from '../consts'
 import { schoolCustomer } from '../types/user'
 import styles from './gridList.module.scss'
 
@@ -41,6 +42,9 @@ const cols: GridColumns = [
   {
     field: 'customerEmail',
     headerClassName: 'DataGridHead',
+    filterOperators: getGridStringOperators().filter(
+      (operator) => operator.value === 'contains',
+    ),
     headerName: 'Email',
     minWidth: 300,
     flex: 1,
@@ -48,6 +52,9 @@ const cols: GridColumns = [
   {
     field: 'customerPhone',
     headerClassName: 'DataGridHead',
+    filterOperators: getGridStringOperators().filter(
+      (operator) => operator.value === 'contains',
+    ),
     headerName: 'Phone',
     minWidth: 300,
     flex: 1,
@@ -88,6 +95,7 @@ const SchoolCustomers: React.FC = () => {
         <DataGrid
           headerHeight={0}
           disableSelectionOnClick={true}
+          localeText={dataGridLocaleText}
           components={{
             Toolbar: () => (
               <GridToolbarContainer

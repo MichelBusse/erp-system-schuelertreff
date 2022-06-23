@@ -12,6 +12,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
 import PrivateCustomerDialog from '../components/PrivateCustomerDialog'
+import { dataGridLocaleText } from '../consts'
 import { privateCustomer } from '../types/user'
 import styles from './gridList.module.scss'
 
@@ -42,6 +43,9 @@ const cols: GridColumns = [
     field: 'customerEmail',
     headerClassName: 'DataGridHead',
     headerName: 'Email',
+    filterOperators: getGridStringOperators().filter(
+      (operator) => operator.value === 'contains',
+    ),
     minWidth: 300,
     flex: 1,
   },
@@ -49,6 +53,9 @@ const cols: GridColumns = [
     field: 'customerPhone',
     headerClassName: 'DataGridHead',
     headerName: 'Phone',
+    filterOperators: getGridStringOperators().filter(
+      (operator) => operator.value === 'contains',
+    ),
     minWidth: 300,
     flex: 1,
   },
@@ -86,6 +93,7 @@ const PrivateCustomers: React.FC = () => {
     <div className={styles.wrapper}>
       <div style={{ flexGrow: 1 }}>
         <DataGrid
+          localeText={dataGridLocaleText}
           headerHeight={0}
           disableSelectionOnClick={true}
           components={{

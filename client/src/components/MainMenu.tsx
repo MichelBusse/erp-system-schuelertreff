@@ -18,6 +18,7 @@ import {
 import { Box } from '@mui/system'
 import React, { useState } from 'react'
 import { NavLink as NavLinkBase, NavLinkProps } from 'react-router-dom'
+import LogoutIcon from '@mui/icons-material/Logout'
 
 import logo from '../assets/logo.png'
 import { useAuth } from './AuthProvider'
@@ -117,8 +118,8 @@ const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
             mt: 1,
           }}
         >
-          <span>{decodeToken().username}</span>
-          <Button onClick={() => handleLogout()}>Logout</Button>
+          {open && <span>{decodeToken().username}</span>}
+          <IconButton onClick={() => handleLogout()}><LogoutIcon/></IconButton>
         </Box>
       )}
     </StyledDrawer>

@@ -37,7 +37,7 @@ const Subjects: React.FC = () => {
         {subjects.map((subject) => (
           <Grid key={subject.id} item sm={12} md={6} lg={4} xl={3}>
             <Paper className={styles.card}>
-              {subject.name}
+              {`${subject.name} (${subject.shortForm})`}
               <div
                 style={{
                   width: '100%',

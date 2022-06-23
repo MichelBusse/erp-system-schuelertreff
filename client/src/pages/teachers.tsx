@@ -24,6 +24,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
 import TeacherDialog from '../components/TeacherDialog'
+import { dataGridLocaleText } from '../consts'
 import subject from '../types/subject'
 import { teacher } from '../types/user'
 import styles from './gridList.module.scss'
@@ -136,6 +137,26 @@ const cols: GridColumns = [
       </Stack>
     ),
   },
+  {
+    field: 'city',
+    headerClassName: 'DataGridHead',
+    headerName: 'Stadt',
+    hide: true,
+    filterOperators: getGridStringOperators().filter(
+      (operator) => operator.value === 'contains',
+    ),
+    renderCell: (params) => (
+      <div
+        style={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          paddingLeft: 15,
+        }}
+      >
+        {params.value}
+      </div>
+    ),
+  },
 ]
 
 const Teachers: React.FC = () => {
@@ -154,6 +175,7 @@ const Teachers: React.FC = () => {
     id: teacher.id,
     teacherName: teacher.firstName + ' ' + teacher.lastName,
     subjectName: teacher.subjects,
+    city: teacher.city,
   }))
 
   //space between rows
@@ -169,13 +191,7 @@ const Teachers: React.FC = () => {
     <div className={styles.wrapper}>
       <div style={{ flexGrow: 1 }}>
         <DataGrid
-          localeText={{
-            filterPanelColumns: 'Spalte',
-            filterPanelOperators: 'Operator',
-            filterPanelInputLabel: 'Wert',
-            filterOperatorContains: 'enthält',
-            filterPanelInputPlaceholder: 'Eingabe',
-          }}
+          localeText={dataGridLocaleText}
           headerHeight={0}
           disableSelectionOnClick={true}
           components={{
