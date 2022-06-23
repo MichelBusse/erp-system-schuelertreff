@@ -1,12 +1,12 @@
 .wrapper {
   display: flex;
-  height: 100%;
+  min-height: 100%;
   width: 100%;
   padding: 32px;
-  padding-bottom: 0;
 
   :global(.MuiDataGrid-row) {
     border-radius: 50px;
+    cursor: pointer;
     background-color: white !important;
   }
 

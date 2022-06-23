@@ -51,14 +51,24 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="privateCustomers"
-                element={
-                  <ProtectedRoute>
-                    <Pages.PrivateCustomers />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="privateCustomers">
+                <Route
+                  path=""
+                  element={
+                    <ProtectedRoute>
+                      <Pages.PrivateCustomers />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route 
+                  path=":id"
+                  element={
+                    <ProtectedRoute>
+                      <Pages.PrivateCustomerDetailView />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
               <Route
                 path="schoolCustomers"
                 element={
@@ -67,14 +77,24 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="teachers"
-                element={
-                  <ProtectedRoute>
-                    <Pages.Teachers />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="teachers">
+                <Route
+                  path=""
+                  element={
+                    <ProtectedRoute>
+                      <Pages.Teachers />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path=":id"
+                  element={
+                    <ProtectedRoute>
+                      <Pages.TeacherDetailView />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
               <Route
                 path="subjects"
                 element={
@@ -87,7 +107,7 @@ const App: React.FC = () => {
                 path="profil"
                 element={
                   <ProtectedRoute>
-                    <Pages.Profil />
+                    <Pages.TeacherDetailView />
                   </ProtectedRoute>
                 }
               />

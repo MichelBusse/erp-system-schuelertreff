@@ -4,11 +4,13 @@ import {
   DataGrid,
   getGridStringOperators,
   GridColumns,
+  GridEventListener,
   GridRowSpacingParams,
   GridToolbarContainer,
   GridToolbarFilterButton,
 } from '@mui/x-data-grid'
 import { useCallback, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../components/AuthProvider'
 import PrivateCustomerDialog from '../components/PrivateCustomerDialog'
@@ -64,6 +66,7 @@ const cols: GridColumns = [
 const PrivateCustomers: React.FC = () => {
   const [open, setOpen] = useState(false)
   const [customers, setCustomers] = useState<privateCustomer[]>([])
+  const navigate = useNavigate();
 
   const { API } = useAuth()
 
@@ -89,6 +92,13 @@ const PrivateCustomers: React.FC = () => {
     [],
   )
 
+  //Row click event
+  const onRowClick: GridEventListener<'rowClick'> = (
+    params
+  ) => {
+    navigate("" + params.id)
+  }
+
   return (
     <div className={styles.wrapper}>
       <div style={{ flexGrow: 1 }}>
@@ -96,6 +106,7 @@ const PrivateCustomers: React.FC = () => {
           localeText={dataGridLocaleText}
           headerHeight={0}
           disableSelectionOnClick={true}
+          onRowClick={onRowClick}
           components={{
             Toolbar: () => (
               <GridToolbarContainer

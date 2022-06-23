@@ -15,6 +15,7 @@ import { useState } from 'react'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
+import { defaultPrivateCustomerFormData } from '../consts'
 import { form } from '../types/form'
 import subject from '../types/subject'
 import { privateCustomer } from '../types/user'
@@ -26,27 +27,13 @@ type Props = {
   setCustomers: React.Dispatch<React.SetStateAction<privateCustomer[]>>
 }
 
-const defaultFormData = {
-  firstName: '',
-  lastName: '',
-  salutation: '',
-  city: '',
-  postalCode: '',
-  street: '',
-  email: '',
-  phone: '',
-  subjects: [] as subject[],
-  fee: 0,
-  timesAvailable: [],
-}
-
 const PrivateCustomerDialog: React.FC<Props> = ({
   open,
   setOpen,
   setCustomers,
 }) => {
-  const [data, setData] = useState<form>(defaultFormData)
-  const [errors, setErrors] = useState(defaultFormData)
+  const [data, setData] = useState<form>(defaultPrivateCustomerFormData)
+  const [errors, setErrors] = useState(defaultPrivateCustomerFormData)
 
   const { API } = useAuth()
 
@@ -72,14 +59,14 @@ const PrivateCustomerDialog: React.FC<Props> = ({
       }).then((res) => {
         setCustomers((s) => [...s, res.data])
         setOpen(false)
-        setData(defaultFormData)
+        setData(defaultPrivateCustomerFormData)
       })
   }
 
   const closeForm = () => {
     setOpen(false)
-    setData(defaultFormData)
-    setErrors(defaultFormData)
+    setData(defaultPrivateCustomerFormData)
+    setErrors(defaultPrivateCustomerFormData)
   }
 
   return (

@@ -15,6 +15,7 @@ type Props = {
   minTime?: Dayjs
   maxTime?: Dayjs
   required?: boolean
+  fullWidth?: boolean
 }
 
 const BetterTimePicker: React.FC<Props> = ({
@@ -26,6 +27,7 @@ const BetterTimePicker: React.FC<Props> = ({
   minTime,
   maxTime,
   required,
+  fullWidth
 }) => {
   const [open, setOpen] = useState(false)
 
@@ -45,6 +47,7 @@ const BetterTimePicker: React.FC<Props> = ({
       }}
       renderInput={(params) => (
         <TextField
+        fullWidth={fullWidth}
           {...params}
           variant="standard"
           required={required}

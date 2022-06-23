@@ -13,11 +13,18 @@ interface user {
   phone: string
 }
 
+export type timesAvailableParsed = {
+  start: string
+  end: string
+  dow: number
+}
+
 export interface teacher extends user {
   role: 'teacher'
   fee: number
   state: string
   subjects: subject[]
+  timesAvailableParsed: timesAvailableParsed[]
 }
 
 export interface admin extends user {

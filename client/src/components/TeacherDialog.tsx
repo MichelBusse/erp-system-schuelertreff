@@ -9,6 +9,7 @@ import {
   DialogTitle,
   FormControl,
   FormHelperText,
+  FormLabel,
   InputLabel,
   MenuItem,
   Select,
@@ -22,6 +23,7 @@ import { teacher } from '../types/user'
 import AddTimes from './AddTimes'
 import { useAuth } from './AuthProvider'
 import { formValidation } from './FormValidation'
+import { defaultTeacherFormData } from '../consts'
 
 type Props = {
   open: boolean
@@ -29,24 +31,10 @@ type Props = {
   setTeachers: React.Dispatch<React.SetStateAction<teacher[]>>
 }
 
-const defaultFormData = {
-  firstName: '',
-  lastName: '',
-  salutation: '',
-  city: '',
-  postalCode: '',
-  street: '',
-  email: '',
-  phone: '',
-  subjects: [] as subject[],
-  fee: 0,
-  timesAvailable: [],
-}
-
 const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
-  const [data, setData] = useState<form>(defaultFormData)
+  const [data, setData] = useState<form>(defaultTeacherFormData)
   const [subjects, setSubjects] = useState<subject[]>([])
-  const [errors, setErrors] = useState(defaultFormData)
+  const [errors, setErrors] = useState(defaultTeacherFormData)
 
   const { API } = useAuth()
 
@@ -68,14 +56,14 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
       }).then((res) => {
         setTeachers((s) => [...s, res.data])
         setOpen(false)
-        setData(defaultFormData)
+        setData(defaultTeacherFormData)
       })
   }
 
   const closeForm = () => {
     setOpen(false)
-    setData(defaultFormData)
-    setErrors(defaultFormData)
+    setData(defaultTeacherFormData)
+    setErrors(defaultTeacherFormData)
   }
 
   return (
@@ -209,7 +197,10 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
             setData((data) => ({ ...data, fee: Number(event.target.value) }))
           }
         />
-        <AddTimes data={data} setData={setData} />
+        <FormControl sx={{ marginTop: '10px' }}>
+          <FormLabel>Verfügbarkeit</FormLabel>
+          <AddTimes data={data} setData={setData} />
+        </FormControl>
       </DialogContent>
       <DialogActions>
         <Button onClick={closeForm}>Abbrechen</Button>

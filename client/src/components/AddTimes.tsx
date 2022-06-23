@@ -5,14 +5,12 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import {
   FormControl,
-  FormLabel,
   Grid,
   IconButton,
   InputLabel,
   MenuItem,
   Select,
   Stack,
-  Typography,
 } from '@mui/material'
 import Avatar from '@mui/material/Avatar'
 import List from '@mui/material/List'
@@ -25,7 +23,6 @@ import { useState } from 'react'
 
 import { form } from '../types/form'
 import BetterTimePicker from './BetterTimePicker'
-import EqualStack from './EqualStack'
 
 type Props = {
   data: form
@@ -102,79 +99,80 @@ const AddTimes: React.FC<Props> = ({ data, setData }) => {
 
   return (
     <>
-      <FormControl sx={{ marginTop: '10px' }}>
-        <FormLabel>Verfügbarkeit</FormLabel>
-        <Stack direction="row" spacing={2}>
-          <EqualStack direction="row" spacing={2}>
-            <FormControl>
-              <InputLabel id="DowLable">Wochentag</InputLabel>
-              <Select
-                id="dow"
-                label="Wochentag"
-                value={times.dow}
-                onChange={(event) =>
-                  //TODO fix types
-                  setTimes((data) => ({
-                    ...data,
-                    dow: event.target.value,
-                  }))
-                }
-              >
-                <MenuItem value={1}>Montag</MenuItem>
-                <MenuItem value={2}>Dienstag</MenuItem>
-                <MenuItem value={3}>Mittwoch</MenuItem>
-                <MenuItem value={4}>Donnerstag</MenuItem>
-                <MenuItem value={5}>Freitag</MenuItem>
-              </Select>
-            </FormControl>
-            <BetterTimePicker
-              label="Startzeit"
-              minutesStep={5}
-              required={true}
-              maxTime={times.end?.subtract(30, 'm')}
-              value={times.start}
-              onChange={(value) => {
-                setTimes((data) => ({ ...data, start: value }))
-              }}
-              clearValue={() => {
-                setTimes((data) => ({ ...data, start: null }))
-              }}
-            />
-            <BetterTimePicker
-              label="Endzeit"
-              minutesStep={5}
-              required={true}
-              minTime={times.start?.add(30, 'm')}
-              value={times.end}
-              onChange={(value) => {
-                setTimes((data) => ({ ...data, end: value }))
-              }}
-              clearValue={() => {
-                setTimes((data) => ({ ...data, end: null }))
-              }}
-            />
-          </EqualStack>
-          <IconButton onClick={addTime} sx={{ alignSelf: 'center' }}>
-            <AddIcon />
-          </IconButton>
-        </Stack>
-        <Grid item>
-          <List
-            dense={true}
-            sx={{
-              backgroundColor: '#f5f5f5',
-              borderRadius: '4px',
-              margin: '5px 0',
+      <Stack direction="row" spacing={2} justifyContent={'space-between'}>
+        <Stack direction="row" spacing={2} flexGrow={1}>
+          <FormControl fullWidth>
+            <InputLabel id="DowLable">Wochentag</InputLabel>
+            <Select
+              id="dow"
+              label="Wochentag"
+              value={times.dow}
+              onChange={(event) =>
+                //TODO fix types
+                setTimes((data) => ({
+                  ...data,
+                  dow: event.target.value,
+                }))
+              }
+            >
+              <MenuItem value={1}>Montag</MenuItem>
+              <MenuItem value={2}>Dienstag</MenuItem>
+              <MenuItem value={3}>Mittwoch</MenuItem>
+              <MenuItem value={4}>Donnerstag</MenuItem>
+              <MenuItem value={5}>Freitag</MenuItem>
+            </Select>
+          </FormControl>
+          <BetterTimePicker
+            fullWidth
+            label="Startzeit"
+            minutesStep={5}
+            required={true}
+            maxTime={times.end?.subtract(30, 'm')}
+            value={times.start}
+            onChange={(value) => {
+              setTimes((data) => ({ ...data, start: value }))
             }}
-          >
-            {elements.length > 0 ? (
-              elements
-            ) : (
-              <ListItem key={1}>Immer verfügbar</ListItem>
-            )}
-          </List>
-        </Grid>
-      </FormControl>
+            clearValue={() => {
+              setTimes((data) => ({ ...data, start: null }))
+            }}
+          />
+          <BetterTimePicker
+            fullWidth
+            label="Endzeit"
+            minutesStep={5}
+            required={true}
+            minTime={times.start?.add(30, 'm')}
+            value={times.end}
+            onChange={(value) => {
+              setTimes((data) => ({ ...data, end: value }))
+            }}
+            clearValue={() => {
+              setTimes((data) => ({ ...data, end: null }))
+            }}
+          />
+        </Stack>
+        <IconButton onClick={addTime} sx={{ alignSelf: 'center' }}>
+          <AddIcon />
+        </IconButton>
+      </Stack>
+      <Grid item>
+        <List
+          dense={true}
+          sx={{
+            backgroundColor: '#f5f5f5',
+            borderRadius: '4px',
+            margin: '5px 0',
+          }}
+        >
+          {elements.length > 0 ? (
+            elements
+          ) : (
+            <ListItem key={1}>
+              <ListItemText primary={'Immer verfügbar'} />
+            </ListItem>
+          )}
+        </List>
+      </Grid>
     </>
   )
 }
