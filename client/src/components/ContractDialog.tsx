@@ -170,8 +170,10 @@ const ContractDialog: React.FC<Props> = ({
       const teacher = suggestions[t]
       const suggestion = teacher.suggestions[s]
 
-      const startTime = dayjs(suggestion.start, 'HH:mm')
-      const endTime = dayjs(suggestion.end, 'HH:mm')
+      const startTime =
+        suggestion.start !== '00:00' ? dayjs(suggestion.start, 'HH:mm') : null
+      const endTime =
+        suggestion.end !== '24:00' ? dayjs(suggestion.end, 'HH:mm') : null
 
       setForm1({
         startDate: getNextDow(
@@ -452,11 +454,17 @@ const ContractDialog: React.FC<Props> = ({
                 setForm1((data) => ({ ...data, teacher: e.target.value }))
               }
             >
-              {teachers.map((t) => (
-                <MenuItem key={t.id} value={t.id.toString()}>
-                  {`${t.firstName} ${t.lastName}`}
-                </MenuItem>
-              ))}
+              {teachers
+                .filter(
+                  (t) =>
+                    form0.subject !== null &&
+                    t.subjects.some((s) => s.id === form0.subject?.id),
+                )
+                .map((t) => (
+                  <MenuItem key={t.id} value={t.id.toString()}>
+                    {`${t.firstName} ${t.lastName}`}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
 
