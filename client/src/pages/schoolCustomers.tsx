@@ -1,7 +1,5 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import {
-  IconButton,
-} from '@mui/material'
+import { IconButton } from '@mui/material'
 import {
   DataGrid,
   getGridStringOperators,
@@ -108,7 +106,7 @@ const SchoolCustomers: React.FC = () => {
           getRowSpacing={getRowSpacing}
         />
       </div>
-      <SchoolCustomerDialog 
+      <SchoolCustomerDialog
         open={open}
         setOpen={setOpen}
         setCustomers={setCustomers}

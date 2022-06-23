@@ -16,12 +16,12 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 
+import { form } from '../types/form'
 import subject from '../types/subject'
 import timeAvailable from '../types/timeAvailable'
 import { teacher } from '../types/user'
 import AddTimes from './AddTimes'
 import { useAuth } from './AuthProvider'
-import { form } from '../types/form'
 import { formValidation } from './FormValidation'
 
 type Props = {
@@ -62,20 +62,20 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
 
   const submitForm = () => {
     setErrors(formValidation('teacher', data))
-    
-    if(formValidation('teacher', data).validation)
-    API.post(`users/teacher`, {
-      ...data,
-      timesAvailable: data.timesAvailable.map((time) => ({
-        dow: time.dow,
-        start: time.start?.format('HH:mm'),
-        end: time.end?.format('HH:mm'),
-      })),
-    }).then((res) => {
-      setTeachers((s) => [...s, res.data])
-      setOpen(false)
-      setData(defaultFormData)
-    })
+
+    if (formValidation('teacher', data).validation)
+      API.post(`users/teacher`, {
+        ...data,
+        timesAvailable: data.timesAvailable.map((time) => ({
+          dow: time.dow,
+          start: time.start?.format('HH:mm'),
+          end: time.end?.format('HH:mm'),
+        })),
+      }).then((res) => {
+        setTeachers((s) => [...s, res.data])
+        setOpen(false)
+        setData(defaultFormData)
+      })
   }
 
   const closeForm = () => {

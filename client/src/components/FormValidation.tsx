@@ -1,4 +1,4 @@
-export function formValidation(form: string, data: any):any{
+export function formValidation(form: string, data: any): any {
   const testEmail = (email: string) => /.+@.+\.[A-Za-z]+$/.test(email)
 
   const errorText = {
@@ -12,15 +12,14 @@ export function formValidation(form: string, data: any):any{
     email: 'Email fehlt',
     phone: 'mind. 10 Stellen',
     subjectName: 'Fachbezeichnung fehlt',
-    shortForm: 'Abkürzung fehlt'
+    shortForm: 'Abkürzung fehlt',
   }
 
-  if(form === 'contract'){
+  if (form === 'contract') {
     const temp = {}
-    
   }
 
-  if(form === 'teacher'){
+  if (form === 'teacher') {
     const temp = {
       firstName: '',
       lastName: '',
@@ -30,7 +29,7 @@ export function formValidation(form: string, data: any):any{
       street: '',
       email: '',
       phone: '',
-      validation: false
+      validation: false,
     }
 
     temp.firstName = data.firstName ? '' : errorText.firstName
@@ -51,12 +50,13 @@ export function formValidation(form: string, data: any):any{
       data.street &&
       testEmail(data.email) &&
       data.phone.length > 9
-    ) temp.validation = true
+    )
+      temp.validation = true
 
-    return(temp)
+    return temp
   }
 
-  if(form === 'privateCustomer'){
+  if (form === 'privateCustomer') {
     const temp = {
       firstName: '',
       lastName: '',
@@ -66,7 +66,7 @@ export function formValidation(form: string, data: any):any{
       street: '',
       email: '',
       phone: '',
-      validation: false
+      validation: false,
     }
 
     temp.firstName = data.firstName ? '' : errorText.firstName
@@ -87,12 +87,13 @@ export function formValidation(form: string, data: any):any{
       data.street &&
       testEmail(data.email) &&
       data.phone.length > 9
-    ) temp.validation = true
+    )
+      temp.validation = true
 
-    return(temp)
+    return temp
   }
 
-  if(form === 'schoolCustomer'){
+  if (form === 'schoolCustomer') {
     const temp = {
       schoolName: '',
       city: '',
@@ -100,7 +101,7 @@ export function formValidation(form: string, data: any):any{
       street: '',
       email: '',
       phone: '',
-      validation: false
+      validation: false,
     }
 
     temp.schoolName = data.schoolName ? '' : errorText.schoolName
@@ -117,26 +118,24 @@ export function formValidation(form: string, data: any):any{
       data.street &&
       testEmail(data.email) &&
       data.phone.length > 9
-    ) temp.validation = true
+    )
+      temp.validation = true
 
-    return(temp)
+    return temp
   }
 
-  if(form === 'subject'){
+  if (form === 'subject') {
     const temp = {
       name: '',
       shortForm: '',
-      validation: false
+      validation: false,
     }
 
     temp.name = data.name ? '' : errorText.subjectName
     temp.shortForm = data.schortForm ? '' : errorText.shortForm
 
-    if (
-      data.name &&
-      data.shortForm
-    ) temp.validation = true
+    if (data.name && data.shortForm) temp.validation = true
 
-    return(temp)
+    return temp
   }
 }
