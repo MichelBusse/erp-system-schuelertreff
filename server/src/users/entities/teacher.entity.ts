@@ -26,7 +26,7 @@ export class Teacher extends User {
   })
   state: TeacherState
 
-  @ManyToMany(() => Subject, { cascade: true })
+  @ManyToMany(() => Subject)
   @JoinTable()
   subjects: Subject[]
 }

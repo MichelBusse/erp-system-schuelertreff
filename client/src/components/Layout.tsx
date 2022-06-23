@@ -1,6 +1,7 @@
 import {
   AccountBalance as AccountBalanceIcon,
   Layers as LayersIcon,
+  ManageAccounts as ManageAccountsIcon,
   People as PeopleIcon,
   School as SchoolIcon,
   TableChart as TableChartIcon,
@@ -39,6 +40,11 @@ const menuItems = [
     text: 'Fächer',
     href: '/subjects',
     roles: ['admin'],
+  },
+  {
+    icon: ManageAccountsIcon,
+    text: 'Profil',
+    href: '/profil',
   },
 ]
 

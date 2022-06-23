@@ -1,14 +1,5 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  IconButton,
-  TextField,
-} from '@mui/material'
+import { IconButton } from '@mui/material'
 import {
   DataGrid,
   getGridStringOperators,
@@ -20,17 +11,9 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
-import schoolCustomer from '../types/schoolCustomer'
+import SchoolCustomerDialog from '../components/SchoolCustomerDialog'
+import { schoolCustomer } from '../types/user'
 import styles from './gridList.module.scss'
-
-const defaultFormData = {
-  schoolName: '',
-  city: '',
-  postalCode: '',
-  street: '',
-  email: '',
-  phone: '',
-}
 
 //definition of the columns
 const cols: GridColumns = [
@@ -72,9 +55,8 @@ const cols: GridColumns = [
 ]
 
 const SchoolCustomers: React.FC = () => {
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [open, setOpen] = useState(false)
   const [customers, setCustomers] = useState<schoolCustomer[]>([])
-  const [data, setData] = useState(defaultFormData)
 
   const { API } = useAuth()
 
@@ -82,8 +64,6 @@ const SchoolCustomers: React.FC = () => {
   useEffect(() => {
     API.get(`users/schoolCustomer`).then((res) => setCustomers(res.data))
   }, [])
-
-  console.log(customers)
 
   //creating rows out of the teachers
   const rows = customers.map((customer) => ({
@@ -102,19 +82,6 @@ const SchoolCustomers: React.FC = () => {
     [],
   )
 
-  const openDialog = () => {
-    setData(defaultFormData)
-    setDialogOpen(true)
-  }
-
-  //TODO: validate filled fields
-  const submitForm = () => {
-    API.post(`users/schoolCustomer`, data).then((res) => {
-      setCustomers((s) => [...s, res.data])
-      setDialogOpen(false)
-    })
-  }
-
   return (
     <div className={styles.wrapper}>
       <div style={{ flexGrow: 1 }}>
@@ -127,7 +94,7 @@ const SchoolCustomers: React.FC = () => {
                 className={styles.customGridToolbarContainer}
               >
                 <GridToolbarFilterButton />
-                <IconButton onClick={openDialog}>
+                <IconButton onClick={() => setOpen(true)}>
                   <AddCircleIcon fontSize="large" color="primary" />
                 </IconButton>
               </GridToolbarContainer>
@@ -139,86 +106,11 @@ const SchoolCustomers: React.FC = () => {
           getRowSpacing={getRowSpacing}
         />
       </div>
-
-      <Dialog open={dialogOpen}>
-        <DialogTitle>Lehrkraft hinzufügen</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Geben Sie die Daten der Lehrkraft ein. Pflichtfelder sind mit *
-            markiert.
-          </DialogContentText>
-          <TextField
-            id="schoolName"
-            label="Schulname"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', marginLeft: '0px', width: '94%' }}
-            value={data.schoolName}
-            onChange={(event) =>
-              setData((data) => ({ ...data, schoolName: event.target.value }))
-            }
-          />
-          <TextField
-            id="city"
-            label="Stadt"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', marginLeft: '0px', width: '60%' }}
-            value={data.city}
-            onChange={(event) =>
-              setData((data) => ({ ...data, city: event.target.value }))
-            }
-          />
-          <TextField
-            id="postalCode"
-            label="Postleitzahl"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', width: '30%' }}
-            value={data.postalCode}
-            onChange={(event) =>
-              setData((data) => ({ ...data, postalCode: event.target.value }))
-            }
-          />
-          <TextField
-            id="street"
-            label="Straße"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', marginLeft: '0px', width: '94%' }}
-            value={data.street}
-            onChange={(event) =>
-              setData((data) => ({ ...data, street: event.target.value }))
-            }
-          />
-          <TextField
-            id="email"
-            label="E-Mail Adresse"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', marginLeft: '0px', width: '60%' }}
-            value={data.email}
-            onChange={(event) =>
-              setData((data) => ({ ...data, email: event.target.value }))
-            }
-          />
-          <TextField
-            id="phone"
-            label="Telefonnummer"
-            variant="outlined"
-            required={true}
-            sx={{ margin: '10px', width: '30%' }}
-            value={data.phone}
-            onChange={(event) =>
-              setData((data) => ({ ...data, phone: event.target.value }))
-            }
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Abbrechen</Button>
-          <Button onClick={submitForm}>Hinzufügen</Button>
-        </DialogActions>
-      </Dialog>
+      <SchoolCustomerDialog
+        open={open}
+        setOpen={setOpen}
+        setCustomers={setCustomers}
+      />
     </div>
   )
 }

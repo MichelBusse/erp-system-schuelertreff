@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { EntityNotFoundError } from 'typeorm'
 
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
@@ -18,6 +19,7 @@ import { Role } from 'src/auth/role.enum'
 import { Contract } from './contract.entity'
 import { ContractsService } from './contracts.service'
 import { CreateContractDto } from './dto/create-contract.dto'
+import { SuggestContractsDto } from './dto/suggest-contracts.dto'
 
 dayjs.extend(customParseFormat)
 
@@ -49,10 +51,22 @@ export class ContractsController {
 
   @Post()
   @Roles(Role.ADMIN)
-  create(@Body() dto: CreateContractDto): Promise<Contract> {
+  async create(@Body() dto: CreateContractDto): Promise<Contract> {
     this.validateDto(dto)
 
-    return this.contractsService.create(dto)
+    return this.contractsService.create(dto).catch((err) => {
+      if (err instanceof EntityNotFoundError) {
+        throw new BadRequestException(err.message)
+      }
+
+      throw err
+    })
+  }
+
+  @Get('suggest')
+  @Roles(Role.ADMIN)
+  suggestContracts(@Query() dto: SuggestContractsDto): Promise<Contract[]> {
+    return this.contractsService.suggestContracts(dto)
   }
 
   @Get('myContracts')

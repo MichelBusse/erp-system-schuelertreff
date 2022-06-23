@@ -1,19 +1,20 @@
 import { Type } from 'class-transformer'
 import { IsArray, IsNotEmpty, ValidateNested } from 'class-validator'
 
-import { Salutation } from '../entities/user.entity'
-import { CreateUserDto } from './create-user.dto'
 import { timeAvailable } from './timeAvailable'
 
-export class CreatePrivateCustomerDto extends CreateUserDto {
+export class UpdateUserDto {
   @IsNotEmpty()
-  lastName: string
+  street: string
 
   @IsNotEmpty()
-  firstName: string
+  postalCode: string
 
   @IsNotEmpty()
-  salutation: Salutation
+  city: string
+
+  @IsNotEmpty()
+  phone: string
 
   @IsArray()
   @Type(() => timeAvailable)

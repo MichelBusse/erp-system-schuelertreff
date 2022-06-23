@@ -1,29 +1,15 @@
-import { Type } from 'class-transformer'
-import {
-  ArrayNotEmpty,
-  IsArray,
-  IsInt,
-  Max,
-  Min,
-  ValidateNested,
-} from 'class-validator'
-
-import { Subject } from 'src/subjects/subject.entity'
-import { Customer } from 'src/users/entities/customer.entity'
-import { Teacher } from 'src/users/entities/teacher.entity'
+import { ArrayNotEmpty, IsInt, Max, Min } from 'class-validator'
 
 export class CreateContractDto {
-  @IsArray()
   @ArrayNotEmpty()
-  @ValidateNested({ each: true })
-  @Type(() => Customer)
-  customers: Customer[]
+  @IsInt({ each: true })
+  customers: number[]
 
-  @Type(() => Teacher)
-  teacher: Teacher
+  @IsInt()
+  teacher: number
 
-  @Type(() => Subject)
-  subject: Subject
+  @IsInt()
+  subject: number
 
   startTime: string
 

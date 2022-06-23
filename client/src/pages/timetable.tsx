@@ -10,6 +10,7 @@ import Calendar from '../components/Calendar'
 import ContractDialog from '../components/ContractDialog'
 import HiddenMenu from '../components/HiddenMenu'
 import TeacherCalendar from '../components/TeacherCalendar'
+import { teacher } from '../types/user'
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)
@@ -20,35 +21,28 @@ export type SideMenu = {
 }
 
 const Timetable: React.FC = () => {
+  const { API, hasRole } = useAuth()
+
   const [drawer, setDrawer] = useState<SideMenu>({
     open: false,
     content: <></>,
   })
   const [date, setDate] = useState(dayjs().day(1))
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [open, setOpen] = useState(false)
   const [render, setRender] = useState(0)
-  const { API } = useAuth()
-  const [myRole, setMyRole] = useState('')
+
+  const [refreshCalendar, setRefreshCalendar] = useState(0)
+  const [teachers, setTeachers] = useState<teacher[]>([])
 
   useEffect(() => {
-    API.get('users/me').then((res) => {
-      setMyRole(res.data.role)
-    })
-  }, [])
+    API.get('users/teacher').then((res) => setTeachers(res.data))
+  }, [refreshCalendar])
 
   return (
     <Box
       sx={{
         p: 4,
         height: '100%',
-        // marginRight: drawer.open ? '240px' : 0,
-        // transition: theme.transitions.create('margin', {
-        //   easing: theme.transitions.easing.easeInOut,
-        //   duration:
-        //     theme.transitions.duration[
-        //       drawer.open ? 'leavingScreen' : 'enteringScreen'
-        //     ],
-        // }),
       }}
     >
       <Box
@@ -59,7 +53,7 @@ const Timetable: React.FC = () => {
           alignItems: 'center',
         }}
       >
-        {myRole == 'admin' ? (
+        {hasRole('admin') ? (
           <Calendar
             date={date}
             setDrawer={setDrawer}
@@ -68,12 +62,14 @@ const Timetable: React.FC = () => {
               // dialog component is re-created each time
               // -> data will be fetched on button press
               setRender(render + 1)
-              setDialogOpen(true)
+              setOpen(true)
             }}
+            refresh={refreshCalendar}
+            teachers={teachers}
           />
         ) : null}
 
-        {myRole == 'teacher' ? (
+        {hasRole('teacher') ? (
           <TeacherCalendar
             date={date}
             setDrawer={setDrawer}
@@ -90,8 +86,10 @@ const Timetable: React.FC = () => {
       {!!render && (
         <ContractDialog
           key={render}
-          open={dialogOpen}
-          setOpen={setDialogOpen}
+          open={open}
+          setOpen={setOpen}
+          onSuccess={() => setRefreshCalendar((r) => r + 1)}
+          teachers={teachers}
         />
       )}
     </Box>

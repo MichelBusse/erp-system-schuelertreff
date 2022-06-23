@@ -5,7 +5,6 @@ import {
   Get,
   Param,
   Post,
-  Query,
   Request,
 } from '@nestjs/common'
 
@@ -17,6 +16,7 @@ import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
 import {
   Admin,
   Customer,
@@ -111,11 +111,11 @@ export class UsersController {
     return user
   }
 
-  @Get('teacher/available')
-  @Roles(Role.ADMIN)
-  async findAvailableTeachers(
-    @Query('subject') subjectId: number,
-  ): Promise<Teacher[]> {
-    return this.usersService.findAvailableTeachers(subjectId)
+  @Post(':id')
+  async updateUser(
+    @Param('id') id: number,
+    @Body() dto: UpdateUserDto,
+  ): Promise<User> {
+    return this.usersService.updateUser(id, dto)
   }
 }
