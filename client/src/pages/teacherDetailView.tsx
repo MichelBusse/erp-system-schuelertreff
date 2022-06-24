@@ -24,6 +24,7 @@ import { useSnackbar } from 'notistack'
 import { defaultTeacherFormData } from '../consts'
 import { formValidation } from '../components/FormValidation'
 import subject from '../types/subject'
+import { Degree } from '../types/enums'
 
 dayjs.extend(customParseFormat)
 
@@ -45,7 +46,6 @@ const TeacherDetailView: React.FC = () => {
 
   useEffect(() => {
     API.get('users/teacher/' + requestedId).then((res) => {
-
       //Convert default value to "Immer verfügbar" in list
       const newTimesAvailable =
         res.data.timesAvailableParsed.length === 1 &&
@@ -72,6 +72,7 @@ const TeacherDetailView: React.FC = () => {
         phone: res.data.phone,
         timesAvailable: newTimesAvailable,
         subjects: res.data.subjects,
+        degree: res.data.degree
       }))
     })
   }, [])
@@ -112,7 +113,7 @@ const TeacherDetailView: React.FC = () => {
         <Stack direction="column" alignItems={'stretch'}>
           <h3>Person:</h3>
           <Stack direction="row" columnGap={2}>
-            <FormControl fullWidth>
+            <FormControl fullWidth sx={{ width: '240px' }}>
               <InputLabel id="SalutationLable">Anrede *</InputLabel>
               <Select
                 id="Salutation"
@@ -181,21 +182,6 @@ const TeacherDetailView: React.FC = () => {
               }}
             />
             <TextField
-              label="Postleitzahl"
-              helperText={errors.postalCode}
-              fullWidth={true}
-              onChange={(event) =>
-                setData((data) => ({
-                  ...data,
-                  postalCode: event.target.value,
-                }))
-              }
-              value={data.postalCode}
-              InputProps={{
-                readOnly: false,
-              }}
-            />
-            <TextField
               label="Stadt"
               helperText={errors.city}
               fullWidth={true}
@@ -206,6 +192,22 @@ const TeacherDetailView: React.FC = () => {
                 }))
               }
               value={data.city}
+              InputProps={{
+                readOnly: false,
+              }}
+            />
+            <TextField
+              label="Postleitzahl"
+              sx={{ width: '300px' }}
+              helperText={errors.postalCode}
+              fullWidth={true}
+              onChange={(event) =>
+                setData((data) => ({
+                  ...data,
+                  postalCode: event.target.value,
+                }))
+              }
+              value={data.postalCode}
               InputProps={{
                 readOnly: false,
               }}
@@ -243,14 +245,36 @@ const TeacherDetailView: React.FC = () => {
             />
           </Stack>
           <h3>Lehrerdaten:</h3>
-          <Stack>
+          <Stack direction={'row'} columnGap={2}>
+            <FormControl sx={{ width: '300px' }}>
+              <InputLabel id="DegreeLable">Höchster Abschluss</InputLabel>
+              <Select
+                id="Degree"
+                label="Höchster Abschluss"
+                value={data.degree}
+                required
+                onChange={(event) =>
+                  setData((data) => ({
+                    ...data,
+                    degree: event.target.value,
+                  }))
+                }
+              >
+                <MenuItem value={Degree.NOINFO}>Keine Angabe</MenuItem>
+                <MenuItem value={Degree.HIGHSCHOOL}>Abitur</MenuItem>
+                <MenuItem value={Degree.BACHELOR}>Bachelor</MenuItem>
+                <MenuItem value={Degree.MASTER}>Master</MenuItem>
+              </Select>
+              <FormHelperText>{errors.degree}</FormHelperText>
+            </FormControl>
             <Autocomplete
+              fullWidth
               multiple
               id="subjects"
               options={subjects}
               getOptionLabel={(option) => option.name}
               renderInput={(params) => (
-                <TextField {...params} variant="standard" label="Fächer *" />
+                <TextField {...params} variant="outlined" label="Fächer *" />
               )}
               value={data.subjects}
               onChange={(_, value) =>

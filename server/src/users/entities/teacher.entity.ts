@@ -12,6 +12,15 @@ export enum TeacherState {
   QUIT = 'quit',
 }
 
+export enum Degree
+{
+  NOINFO = 'noinfo',
+  HIGHSCHOOL = 'highschool',
+  BACHELOR = 'bachelor',
+  MASTER = 'master',
+}
+
+
 @ChildEntity()
 export class Teacher extends User {
   role = Role.TEACHER
@@ -25,6 +34,13 @@ export class Teacher extends User {
     enum: TeacherState,
   })
   state: TeacherState
+
+  @Column({
+    type: 'enum',
+    default: Degree.NOINFO,
+    enum: Degree,
+  })
+  degree: Degree
 
   @ManyToMany(() => Subject)
   @JoinTable()

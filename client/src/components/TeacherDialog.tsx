@@ -13,6 +13,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Stack,
   TextField,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
@@ -24,6 +25,7 @@ import AddTimes from './AddTimes'
 import { useAuth } from './AuthProvider'
 import { formValidation } from './FormValidation'
 import { defaultTeacherFormData } from '../consts'
+import { Degree } from '../types/enums'
 
 type Props = {
   open: boolean
@@ -69,138 +71,182 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
   return (
     <Dialog open={open}>
       <DialogTitle>Lehrkraft hinzufügen</DialogTitle>
-      <DialogContent>
-        <FormControl
-          fullWidth
-          sx={{ width: '25%', marginRight: '75%', marginTop: '15px' }}
+      <DialogContent sx={{ boxSizing: 'border-box' }}>
+        <Stack
+          direction={'column'}
+          rowGap={3}
+          alignItems={'stretch'}
+          sx={{ paddingTop: '15px' }}
         >
-          <InputLabel id="SalutationLable">Anrede *</InputLabel>
-          <Select
-            id="Salutation"
-            label="Anrede"
-            value={data.salutation}
-            onChange={(event) =>
-              setData((data) => ({ ...data, salutation: event.target.value }))
-            }
-          >
-            <MenuItem value="Herr">Herr</MenuItem>
-            <MenuItem value="Frau">Frau</MenuItem>
-            <MenuItem value="divers">divers</MenuItem>
-          </Select>
-          <FormHelperText>{errors.salutation}</FormHelperText>
-        </FormControl>
-        <TextField
-          helperText={errors.firstName}
-          id="firstName"
-          label="Vorname"
-          variant="outlined"
-          required={true}
-          sx={{ margin: '10px', marginLeft: '0px', width: '45%' }}
-          value={data.firstName}
-          onChange={(event) =>
-            setData((data) => ({ ...data, firstName: event.target.value }))
-          }
-        />
-        <TextField
-          helperText={errors.lastName}
-          id="lastName"
-          label="Nachname"
-          variant="outlined"
-          required={true}
-          sx={{ margin: '10px', width: '45%' }}
-          value={data.lastName}
-          onChange={(event) =>
-            setData((data) => ({ ...data, lastName: event.target.value }))
-          }
-        />
-        <TextField
-          helperText={errors.city}
-          id="city"
-          label="Stadt"
-          variant="outlined"
-          required={true}
-          sx={{ margin: '10px', marginLeft: '0px', width: '60%' }}
-          value={data.city}
-          onChange={(event) =>
-            setData((data) => ({ ...data, city: event.target.value }))
-          }
-        />
-        <TextField
-          helperText={errors.postalCode}
-          id="postalCode"
-          label="Postleitzahl"
-          variant="outlined"
-          required={true}
-          sx={{ margin: '10px', width: '30%' }}
-          value={data.postalCode}
-          onChange={(event) =>
-            setData((data) => ({ ...data, postalCode: event.target.value }))
-          }
-        />
-        <TextField
-          helperText={errors.street}
-          id="street"
-          label="Straße"
-          variant="outlined"
-          required={true}
-          sx={{ margin: '10px', marginLeft: '0px', width: '94%' }}
-          value={data.street}
-          onChange={(event) =>
-            setData((data) => ({ ...data, street: event.target.value }))
-          }
-        />
-        <TextField
-          helperText={errors.email}
-          id="email"
-          label="E-Mail Adresse"
-          variant="outlined"
-          required={true}
-          sx={{ margin: '10px', marginLeft: '0px', width: '60%' }}
-          value={data.email}
-          onChange={(event) =>
-            setData((data) => ({ ...data, email: event.target.value }))
-          }
-        />
-        <TextField
-          helperText={errors.phone}
-          id="phone"
-          label="Telefonnummer"
-          variant="outlined"
-          required={true}
-          sx={{ margin: '10px', width: '30%' }}
-          value={data.phone}
-          onChange={(event) =>
-            setData((data) => ({ ...data, phone: event.target.value }))
-          }
-        />
-        <Autocomplete
-          multiple
-          id="subjects"
-          options={subjects}
-          getOptionLabel={(option) => option.name}
-          renderInput={(params) => (
-            <TextField {...params} variant="standard" label="Fächer *" />
-          )}
-          value={data.subjects}
-          onChange={(_, value) =>
-            setData((data) => ({ ...data, subjects: value }))
-          }
-        />
-        <TextField
-          type="number"
-          id="fee"
-          label="Lohn"
-          variant="outlined"
-          sx={{ marginTop: '20px', width: '15%' }}
-          value={data.fee}
-          onChange={(event) =>
-            setData((data) => ({ ...data, fee: Number(event.target.value) }))
-          }
-        />
-        <FormControl sx={{ marginTop: '10px' }}>
-          <FormLabel>Verfügbarkeit</FormLabel>
-          <AddTimes data={data} setData={setData} />
-        </FormControl>
+          <Stack direction={'row'} columnGap={2}>
+            <FormControl sx={{ width: '240px' }}>
+              <InputLabel id="SalutationLable">Anrede</InputLabel>
+              <Select
+                id="Salutation"
+                label="Anrede"
+                value={data.salutation}
+                onChange={(event) =>
+                  setData((data) => ({
+                    ...data,
+                    salutation: event.target.value,
+                  }))
+                }
+              >
+                <MenuItem value="Herr">Herr</MenuItem>
+                <MenuItem value="Frau">Frau</MenuItem>
+                <MenuItem value="divers">divers</MenuItem>
+              </Select>
+              <FormHelperText>{errors.salutation}</FormHelperText>
+            </FormControl>
+            <TextField
+              helperText={errors.firstName}
+              id="firstName"
+              label="Vorname"
+              variant="outlined"
+              required={true}
+              fullWidth
+              value={data.firstName}
+              onChange={(event) =>
+                setData((data) => ({ ...data, firstName: event.target.value }))
+              }
+            />
+            <TextField
+              helperText={errors.lastName}
+              id="lastName"
+              label="Nachname"
+              variant="outlined"
+              required={true}
+              fullWidth
+              value={data.lastName}
+              onChange={(event) =>
+                setData((data) => ({ ...data, lastName: event.target.value }))
+              }
+            />
+          </Stack>
+          <Stack direction={'row'} columnGap={2}>
+            <TextField
+              fullWidth
+              helperText={errors.city}
+              id="city"
+              label="Stadt"
+              variant="outlined"
+              required={true}
+              value={data.city}
+              onChange={(event) =>
+                setData((data) => ({ ...data, city: event.target.value }))
+              }
+            />
+            <TextField
+              helperText={errors.postalCode}
+              id="postalCode"
+              label="Postleitzahl"
+              variant="outlined"
+              required={true}
+              sx={{ width: '300px' }}
+              value={data.postalCode}
+              onChange={(event) =>
+                setData((data) => ({ ...data, postalCode: event.target.value }))
+              }
+            />
+          </Stack>
+          <Stack direction={'row'} columnGap={2}>
+            <TextField
+              fullWidth
+              helperText={errors.street}
+              id="street"
+              label="Straße"
+              variant="outlined"
+              required={true}
+              value={data.street}
+              onChange={(event) =>
+                setData((data) => ({ ...data, street: event.target.value }))
+              }
+            />
+          </Stack>
+          <Stack direction={'row'} columnGap={2}>
+            <TextField
+              fullWidth
+              helperText={errors.email}
+              id="email"
+              label="E-Mail Adresse"
+              variant="outlined"
+              required={true}
+              value={data.email}
+              onChange={(event) =>
+                setData((data) => ({ ...data, email: event.target.value }))
+              }
+            />
+            <TextField
+              helperText={errors.phone}
+              id="phone"
+              label="Telefonnummer"
+              variant="outlined"
+              required={true}
+              value={data.phone}
+              sx={{ width: '50%' }}
+              onChange={(event) =>
+                setData((data) => ({ ...data, phone: event.target.value }))
+              }
+            />
+          </Stack>
+          <Stack direction={'row'} columnGap={2}>
+            <Autocomplete
+              multiple
+              fullWidth
+              id="subjects"
+              options={subjects}
+              getOptionLabel={(option) => option.name}
+              renderInput={(params) => (
+                <TextField {...params} variant="outlined" label="Fächer *" />
+              )}
+              value={data.subjects}
+              onChange={(_, value) =>
+                setData((data) => ({ ...data, subjects: value }))
+              }
+            />
+          </Stack>
+          <Stack direction="row" columnGap={2}>
+            <TextField
+              type="number"
+              id="fee"
+              label="Lohn"
+              variant="outlined"
+              sx={{ width: '15%' }}
+              value={data.fee}
+              onChange={(event) =>
+                setData((data) => ({
+                  ...data,
+                  fee: Number(event.target.value),
+                }))
+              }
+            />
+            <FormControl fullWidth>
+              <InputLabel id="DegreeLable">Höchster Abschluss</InputLabel>
+              <Select
+                id="Degree"
+                label="Höchster Abschluss"
+                value={data.degree}
+                required
+                onChange={(event) =>
+                  setData((data) => ({
+                    ...data,
+                    degree: event.target.value,
+                  }))
+                }
+              >
+                <MenuItem value={Degree.NOINFO}>Keine Angabe</MenuItem>
+                <MenuItem value={Degree.HIGHSCHOOL}>Abitur</MenuItem>
+                <MenuItem value={Degree.BACHELOR}>Bachelor</MenuItem>
+                <MenuItem value={Degree.MASTER}>Master</MenuItem>
+              </Select>
+              <FormHelperText>{errors.degree}</FormHelperText>
+            </FormControl>
+          </Stack>
+          <FormControl sx={{ marginTop: '10px' }}>
+            <FormLabel>Verfügbarkeit</FormLabel>
+            <AddTimes data={data} setData={setData} />
+          </FormControl>
+        </Stack>
       </DialogContent>
       <DialogActions>
         <Button onClick={closeForm}>Abbrechen</Button>

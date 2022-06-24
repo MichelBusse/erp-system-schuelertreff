@@ -3,7 +3,10 @@ import {
   Autocomplete,
   Box,
   Chip,
+  FormControl,
   IconButton,
+  InputLabel,
+  NativeSelect,
   Stack,
   TextField,
 } from '@mui/material'
@@ -27,6 +30,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../components/AuthProvider'
 import TeacherDialog from '../components/TeacherDialog'
 import { dataGridLocaleText } from '../consts'
+import { Degree } from '../types/enums'
 import subject from '../types/subject'
 import { teacher } from '../types/user'
 import styles from './gridList.module.scss'
@@ -72,7 +76,35 @@ function SubjectsFilterInputValue(props: GridFilterInputValueProps) {
   )
 }
 
-//definition of subject filter operator
+function DegreeFilterInputValue(props: GridFilterInputValueProps) {
+  const { item, applyValue, focusElementRef } = props
+
+  return (
+    <FormControl fullWidth>
+      <InputLabel variant="standard" htmlFor="degree-select">
+        Höchster Abschluss
+      </InputLabel>
+      <NativeSelect
+        inputProps={{
+          name: 'degree',
+          id: 'degree-select',
+        }}
+        defaultValue={Degree.NOINFO}
+        required
+        onChange={(event) => {
+          applyValue({ ...item, value: event.target.value })
+        }}
+      >
+        <option value={Degree.NOINFO}>Keine Angabe</option>
+        <option value={Degree.HIGHSCHOOL}>Abitur</option>
+        <option value={Degree.BACHELOR}>Bachelor</option>
+        <option value={Degree.MASTER}>Master</option>
+      </NativeSelect>
+    </FormControl>
+  )
+}
+
+//definition of filter operators
 const subjectOperator: GridFilterOperator = {
   label: 'enthalten',
   value: 'includes',
@@ -92,6 +124,42 @@ const subjectOperator: GridFilterOperator = {
     }
   },
   InputComponent: SubjectsFilterInputValue,
+  InputComponentProps: { type: 'string' },
+}
+const degreeOperator: GridFilterOperator = {
+  label: 'mindestens',
+  value: 'mininum',
+  getApplyFilterFn: (filterItem: GridFilterItem, column: GridColDef) => {
+    if (
+      !filterItem.columnField ||
+      !filterItem.value ||
+      !filterItem.operatorValue
+    ) {
+      return null
+    }
+
+    return (params: GridCellParams): boolean => {
+      switch (filterItem.value) {
+        case Degree.NOINFO:
+          return true
+        case Degree.HIGHSCHOOL:
+          return (
+            params.value === Degree.HIGHSCHOOL ||
+            params.value === Degree.BACHELOR ||
+            params.value === Degree.MASTER
+          )
+        case Degree.BACHELOR:
+          return (
+            params.value === Degree.BACHELOR || params.value === Degree.MASTER
+          )
+        case Degree.MASTER:
+          return params.value === Degree.MASTER
+        default:
+          return false
+      }
+    }
+  },
+  InputComponent: DegreeFilterInputValue,
   InputComponentProps: { type: 'string' },
 }
 
@@ -157,6 +225,24 @@ const cols: GridColumns = [
       </div>
     ),
   },
+  {
+    field: 'degree',
+    headerClassName: 'DataGridHead',
+    headerName: 'Abschluss',
+    hide: true,
+    filterOperators: [degreeOperator],
+    renderCell: (params) => (
+      <div
+        style={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          paddingLeft: 15,
+        }}
+      >
+        {params.value}
+      </div>
+    ),
+  },
 ]
 
 const Teachers: React.FC = () => {
@@ -180,6 +266,7 @@ const Teachers: React.FC = () => {
     teacherName: teacher.firstName + ' ' + teacher.lastName,
     subjectName: teacher.subjects,
     city: teacher.city,
+    degree: teacher.degree,
   }))
 
   //space between rows

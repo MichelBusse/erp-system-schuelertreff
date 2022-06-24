@@ -12,5 +12,6 @@ export type form = {
   phone: string
   subjects: subject[]
   fee: number
+  degree: string
   timesAvailable: (timeAvailable & { id: string })[]
 }

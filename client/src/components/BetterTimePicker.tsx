@@ -49,7 +49,7 @@ const BetterTimePicker: React.FC<Props> = ({
         <TextField
         fullWidth={fullWidth}
           {...params}
-          variant="standard"
+          variant="outlined"
           required={required}
           inputProps={{
             ...params.inputProps,

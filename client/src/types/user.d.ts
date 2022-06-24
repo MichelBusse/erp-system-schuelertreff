@@ -1,3 +1,4 @@
+import { Degree } from './enums'
 import subject from './subject'
 import timeAvailable from './timeAvailable'
 
@@ -26,6 +27,7 @@ export interface teacher extends user {
   role: 'teacher'
   fee: number
   state: string
+  degree: Degree
   subjects: subject[]
 }
 

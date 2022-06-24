@@ -21,6 +21,7 @@ export const defaultTeacherFormData = {
   phone: '',
   subjects: [] as subject[],
   fee: 0,
+  degree: '',
   timesAvailable: [],
 }
 
