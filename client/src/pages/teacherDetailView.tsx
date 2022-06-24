@@ -17,7 +17,7 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { nanoid } from 'nanoid'
 import AddTimes from '../components/AddTimes'
-import { form } from '../types/form'
+import { teacherForm } from '../types/form'
 import { timesAvailableParsed } from '../types/user'
 import styles from '../pages/gridList.module.scss'
 import { useSnackbar } from 'notistack'
@@ -41,7 +41,7 @@ const TeacherDetailView: React.FC = () => {
 
   let requestedId = id ? id : 'me'
 
-  const [data, setData] = useState<form>(defaultTeacherFormData)
+  const [data, setData] = useState<teacherForm>(defaultTeacherFormData)
   const [errors, setErrors] = useState(defaultTeacherFormData)
 
   useEffect(() => {

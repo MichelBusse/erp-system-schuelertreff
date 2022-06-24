@@ -1,7 +1,7 @@
 import subject from './subject'
 import timeAvailable from './timeAvailable'
 
-export type form = {
+interface userForm {
   firstName: string
   lastName: string
   salutation: string
@@ -10,9 +10,16 @@ export type form = {
   street: string
   email: string
   phone: string
+  timesAvailable: (timeAvailable & { id: string })[]
+}
+
+export interface teacherForm extends userForm {
   subjects: subject[]
-  fee: number
+  fee: number | null
   degree: string
   schoolTypes: string[]
-  timesAvailable: (timeAvailable & { id: string })[]
+}
+
+export interface privateCustomerForm extends userForm {
+  grade: number | null
 }

@@ -2,17 +2,18 @@ export function formValidation(form: string, data: any): any {
   const testEmail = (email: string) => /.+@.+\.[A-Za-z]+$/.test(email)
 
   const errorText = {
-    schoolName: 'Schulname fehlt',
-    firstName: 'Vorname fehlt',
-    lastName: 'Nachname fehlt',
-    salutation: 'Anrede fehlt',
-    city: 'Stadt fehlt',
+    schoolName: 'fehlt',
+    firstName: 'fehlt',
+    lastName: 'fehlt',
+    salutation: 'fehlt',
+    city: 'fehlt',
     postalCode: 'genau 5 Stellen',
-    street: 'Straße fehlt',
-    email: 'Email fehlt',
+    street: 'fehlt',
+    email: 'fehlt',
     phone: 'mind. 10 Stellen',
-    subjectName: 'Fachbezeichnung fehlt',
-    shortForm: 'Abkürzung fehlt',
+    subjectName: 'fehlt',
+    shortForm: 'fehlt',
+    grade: '1 bis 13'
   }
 
   if (form === 'contract') {
@@ -67,6 +68,7 @@ export function formValidation(form: string, data: any): any {
       email: '',
       phone: '',
       validation: false,
+      grade: ''
     }
 
     temp.firstName = data.firstName ? '' : errorText.firstName
@@ -77,6 +79,7 @@ export function formValidation(form: string, data: any): any {
     temp.street = data.street ? '' : errorText.street
     temp.email = testEmail(data.email) ? '' : errorText.email
     temp.phone = data.phone.length > 9 ? '' : errorText.phone
+    temp.grade = data.grade > 0 && data.grade < 14 ? '' : errorText.grade
 
     if (
       data.firstName &&
@@ -138,4 +141,5 @@ export function formValidation(form: string, data: any): any {
 
     return temp
   }
+
 }

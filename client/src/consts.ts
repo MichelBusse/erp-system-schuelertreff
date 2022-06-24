@@ -20,7 +20,7 @@ export const defaultTeacherFormData = {
   email: '',
   phone: '',
   subjects: [] as subject[],
-  fee: 0,
+  fee: null,
   degree: '',
   schoolTypes: [],
   timesAvailable: [],
@@ -35,7 +35,6 @@ export const defaultPrivateCustomerFormData = {
   street: '',
   email: '',
   phone: '',
-  subjects: [] as subject[],
-  fee: 0,
+  grade: null,
   timesAvailable: [],
 }

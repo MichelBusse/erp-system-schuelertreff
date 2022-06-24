@@ -18,7 +18,7 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 
-import { form } from '../types/form'
+import { teacherForm } from '../types/form'
 import subject from '../types/subject'
 import { teacher } from '../types/user'
 import AddTimes from './AddTimes'
@@ -34,7 +34,7 @@ type Props = {
 }
 
 const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
-  const [data, setData] = useState<form>(defaultTeacherFormData)
+  const [data, setData] = useState<teacherForm>(defaultTeacherFormData)
   const [subjects, setSubjects] = useState<subject[]>([])
   const [errors, setErrors] = useState(defaultTeacherFormData)
 
@@ -245,7 +245,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
               id="fee"
               label="Lohn"
               variant="outlined"
-              sx={{ width: '15%' }}
+              sx={{ width: '100px' }}
               value={data.fee}
               onChange={(event) =>
                 setData((data) => ({

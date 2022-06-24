@@ -16,7 +16,7 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { nanoid } from 'nanoid'
 import AddTimes from '../components/AddTimes'
-import { form } from '../types/form'
+import { privateCustomerForm } from '../types/form'
 import { timesAvailableParsed } from '../types/user'
 import styles from '../pages/gridList.module.scss'
 import { useSnackbar } from 'notistack'
@@ -33,11 +33,13 @@ const PrivateCustomerDetailView: React.FC = () => {
 
   let requestedId = id ? id : 'me'
 
-  const [data, setData] = useState<form>(defaultPrivateCustomerFormData)
+  const [data, setData] = useState<privateCustomerForm>(
+    defaultPrivateCustomerFormData,
+  )
   const [errors, setErrors] = useState(defaultPrivateCustomerFormData)
 
   useEffect(() => {
-    API.get('users/' + requestedId).then((res) => {
+    API.get('users/privateCustomer/' + requestedId).then((res) => {
       const newTimesAvailable =
         res.data.timesAvailableParsed.length === 1 &&
         res.data.timesAvailableParsed[0].dow === 1 &&
@@ -62,6 +64,7 @@ const PrivateCustomerDetailView: React.FC = () => {
         email: res.data.email,
         phone: res.data.phone,
         timesAvailable: newTimesAvailable,
+        grade: res.data.grade,
       }))
     })
   }, [])
@@ -70,7 +73,7 @@ const PrivateCustomerDetailView: React.FC = () => {
     setErrors(formValidation('privateCustomer', data))
 
     if (formValidation('privateCustomer', data).validation) {
-      API.post('users/' + requestedId, {
+      API.post('users/privateCustomer/' + requestedId, {
         ...data,
         timesAvailable: data.timesAvailable.map((time) => ({
           dow: time.dow,
@@ -230,6 +233,25 @@ const PrivateCustomerDetailView: React.FC = () => {
                 }))
               }
               value={data.phone}
+            />
+          </Stack>
+          <h3>Schüler</h3>
+          <Stack direction="row" columnGap={2}>
+            <TextField
+              type="number"
+              id="grade"
+              label="Klasse"
+              variant="outlined"
+              helperText={errors.grade}
+              sx={{ width: '100px' }}
+              value={data.grade}
+              InputProps={{ inputProps: { min: 0, max: 13 } }}
+              onChange={(event) =>
+                setData((data) => ({
+                  ...data,
+                  grade: Number(event.target.value),
+                }))
+              }
             />
           </Stack>
           <h3>Verfügbarkeit:</h3>

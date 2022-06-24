@@ -55,7 +55,6 @@ export class Teacher extends User {
     type: 'enum',
     enum: SchoolType, 
     array: true, 
-    default: {}
   })
   schoolTypes: SchoolType[]
 

@@ -16,6 +16,7 @@ import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
+import { UpdatePrivateCustomerDto } from './dto/update-privateCustomer.dto'
 import { UpdateTeacherDto } from './dto/update-teacher.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import {
@@ -60,15 +61,15 @@ export class UsersController {
     return this.usersService.findAllTeachers()
   }
 
-  @Get('me')
+  @Get('privateCustomer/me')
   getMe(@Request() req) {
-    return this.usersService.findOne(req.user.id)
+    return this.usersService.findOnePrivateCustomer(req.user.id)
   }
 
-  @Get(':id')
+  @Get('privateCustomer/:id')
   @Roles(Role.ADMIN)
-  findOne(@Param('id') id: number): Promise<User> {
-    return this.usersService.findOne(id)
+  findOne(@Param('id') id: number): Promise<PrivateCustomer> {
+    return this.usersService.findOnePrivateCustomer(id)
   }
 
 
@@ -115,21 +116,21 @@ export class UsersController {
     return user
   }
 
-  @Post('me')
-  async updateUser(
+  @Post('privateCustomer/me')
+  async updatePrivateCustomer(
     @Request() req,
-    @Body() dto: UpdateUserDto,
+    @Body() dto: UpdatePrivateCustomerDto,
   ): Promise<User> {
-    return this.usersService.updateUser(req.user.id, dto)
+    return this.usersService.updatePrivateCustomer(req.user.id, dto)
   }
 
-  @Post(':id')
+  @Post('privateCustomer/:id')
   @Roles(Role.ADMIN)
-  async updateUserAdmin(
+  async updatePrivateCustomerAdmin(
     @Param('id') id: number,
-    @Body() dto: UpdateUserDto,
+    @Body() dto: UpdatePrivateCustomerDto,
   ): Promise<User> {
-    return this.usersService.updateUserAdmin(id, dto)
+    return this.usersService.updatePrivateCustomerAdmin(id, dto)
   }
 
   @Post('teacher/me')

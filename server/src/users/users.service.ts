@@ -9,6 +9,7 @@ import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
 import { timeAvailable } from './dto/timeAvailable'
+import { UpdatePrivateCustomerDto } from './dto/update-privateCustomer.dto'
 import { UpdateTeacherDto } from './dto/update-teacher.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import {
@@ -217,7 +218,7 @@ export class UsersService {
   }
 
 
-  async updateUser(id: number, dto: UpdateUserDto): Promise<User> {
+  async updatePrivateCustomer(id: number, dto: UpdatePrivateCustomerDto): Promise<User> {
     const user = await this.findOne(id)
 
     return this.usersRepository.save({
@@ -226,6 +227,17 @@ export class UsersService {
       postalCode: dto.postalCode,
       city: dto.city,
       phone: dto.phone,
+      grade: dto.grade,
+      timesAvailable: formatTimesAvailable(dto.timesAvailable),
+    })
+  }
+
+  async updatePrivateCustomerAdmin(id: number, dto: UpdatePrivateCustomerDto): Promise<User> {
+    const user = await this.findOne(id)
+
+    return this.usersRepository.save({
+      ...user,
+      ...dto,
       timesAvailable: formatTimesAvailable(dto.timesAvailable),
     })
   }
