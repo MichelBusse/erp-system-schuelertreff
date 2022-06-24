@@ -60,7 +60,7 @@ const App: React.FC = () => {
                     </ProtectedRoute>
                   }
                 />
-                <Route 
+                <Route
                   path=":id"
                   element={
                     <ProtectedRoute>

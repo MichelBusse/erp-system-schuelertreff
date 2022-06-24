@@ -18,14 +18,14 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 
+import { defaultTeacherFormData } from '../consts'
+import { Degree, SchoolType } from '../types/enums'
 import { teacherForm } from '../types/form'
 import subject from '../types/subject'
 import { teacher } from '../types/user'
 import AddTimes from './AddTimes'
 import { useAuth } from './AuthProvider'
 import { formValidation } from './FormValidation'
-import { defaultTeacherFormData } from '../consts'
-import { Degree, SchoolType } from '../types/enums'
 
 type Props = {
   open: boolean

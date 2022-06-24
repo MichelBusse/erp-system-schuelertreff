@@ -14,7 +14,6 @@ import {
   DataGrid,
   getGridStringOperators,
   GridCellParams,
-  GridColDef,
   GridColumns,
   GridEventListener,
   GridFilterInputValueProps,
@@ -37,7 +36,7 @@ import styles from './gridList.module.scss'
 
 //definition of subject filter input
 function SubjectsFilterInputValue(props: GridFilterInputValueProps) {
-  const { item, applyValue, focusElementRef } = props
+  const { item, applyValue } = props
   const { API } = useAuth()
   const [subjects, setSubjects] = useState<subject[]>([])
 
@@ -77,7 +76,7 @@ function SubjectsFilterInputValue(props: GridFilterInputValueProps) {
 }
 
 function DegreeFilterInputValue(props: GridFilterInputValueProps) {
-  const { item, applyValue, focusElementRef } = props
+  const { item, applyValue } = props
 
   return (
     <FormControl fullWidth>
@@ -108,7 +107,7 @@ function DegreeFilterInputValue(props: GridFilterInputValueProps) {
 const subjectOperator: GridFilterOperator = {
   label: 'enthalten',
   value: 'includes',
-  getApplyFilterFn: (filterItem: GridFilterItem, column: GridColDef) => {
+  getApplyFilterFn: (filterItem: GridFilterItem) => {
     if (
       !filterItem.columnField ||
       !filterItem.value ||
@@ -129,7 +128,7 @@ const subjectOperator: GridFilterOperator = {
 const degreeOperator: GridFilterOperator = {
   label: 'mindestens',
   value: 'mininum',
-  getApplyFilterFn: (filterItem: GridFilterItem, column: GridColDef) => {
+  getApplyFilterFn: (filterItem: GridFilterItem ) => {
     if (
       !filterItem.columnField ||
       !filterItem.value ||

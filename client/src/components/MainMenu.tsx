@@ -2,8 +2,8 @@ import {
   ChevronLeft as ChevronLeftIcon,
   Menu as MenuIcon,
 } from '@mui/icons-material'
+import LogoutIcon from '@mui/icons-material/Logout'
 import {
-  Button,
   Divider,
   Drawer,
   IconButton,
@@ -18,7 +18,6 @@ import {
 import { Box } from '@mui/system'
 import React, { useState } from 'react'
 import { NavLink as NavLinkBase, NavLinkProps } from 'react-router-dom'
-import LogoutIcon from '@mui/icons-material/Logout'
 
 import logo from '../assets/logo.png'
 import { useAuth } from './AuthProvider'
@@ -119,7 +118,9 @@ const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
           }}
         >
           {open && <span>{decodeToken().username}</span>}
-          <IconButton onClick={() => handleLogout()}><LogoutIcon/></IconButton>
+          <IconButton onClick={() => handleLogout()}>
+            <LogoutIcon />
+          </IconButton>
         </Box>
       )}
     </StyledDrawer>

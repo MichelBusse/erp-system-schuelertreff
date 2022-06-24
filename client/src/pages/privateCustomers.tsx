@@ -94,10 +94,8 @@ const PrivateCustomers: React.FC = () => {
   )
 
   //Row click event
-  const onRowClick: GridEventListener<'rowClick'> = (
-    params
-  ) => {
-    navigate("" + params.id)
+  const onRowClick: GridEventListener<'rowClick'> = (params) => {
+    navigate('' + params.id)
   }
 
   return (

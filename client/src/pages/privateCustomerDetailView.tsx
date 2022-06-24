@@ -1,6 +1,3 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { useAuth } from '../components/AuthProvider'
 import {
   Button,
   FormControl,
@@ -15,13 +12,17 @@ import Box from '@mui/material/Box'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { nanoid } from 'nanoid'
+import { useSnackbar } from 'notistack'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+
 import AddTimes from '../components/AddTimes'
+import { useAuth } from '../components/AuthProvider'
+import { formValidation } from '../components/FormValidation'
+import { defaultPrivateCustomerFormData } from '../consts'
+import styles from '../pages/gridList.module.scss'
 import { privateCustomerForm } from '../types/form'
 import { timesAvailableParsed } from '../types/user'
-import styles from '../pages/gridList.module.scss'
-import { useSnackbar } from 'notistack'
-import { defaultPrivateCustomerFormData } from '../consts'
-import { formValidation } from '../components/FormValidation'
 
 dayjs.extend(customParseFormat)
 
@@ -31,7 +32,7 @@ const PrivateCustomerDetailView: React.FC = () => {
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
 
-  let requestedId = id ? id : 'me'
+  const requestedId = id ? id : 'me'
 
   const [data, setData] = useState<privateCustomerForm>(
     defaultPrivateCustomerFormData,

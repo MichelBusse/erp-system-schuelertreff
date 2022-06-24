@@ -1,6 +1,3 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { useAuth } from '../components/AuthProvider'
 import {
   Autocomplete,
   Button,
@@ -16,15 +13,19 @@ import Box from '@mui/material/Box'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { nanoid } from 'nanoid'
-import AddTimes from '../components/AddTimes'
-import { teacherForm } from '../types/form'
-import { timesAvailableParsed } from '../types/user'
-import styles from '../pages/gridList.module.scss'
 import { useSnackbar } from 'notistack'
-import { defaultTeacherFormData } from '../consts'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+
+import AddTimes from '../components/AddTimes'
+import { useAuth } from '../components/AuthProvider'
 import { formValidation } from '../components/FormValidation'
-import subject from '../types/subject'
+import { defaultTeacherFormData } from '../consts'
+import styles from '../pages/gridList.module.scss'
 import { Degree, SchoolType } from '../types/enums'
+import { teacherForm } from '../types/form'
+import subject from '../types/subject'
+import { timesAvailableParsed } from '../types/user'
 
 dayjs.extend(customParseFormat)
 
@@ -39,7 +40,7 @@ const TeacherDetailView: React.FC = () => {
     API.get(`subjects`).then((res) => setSubjects(res.data))
   }, [])
 
-  let requestedId = id ? id : 'me'
+  const requestedId = id ? id : 'me'
 
   const [data, setData] = useState<teacherForm>(defaultTeacherFormData)
   const [errors, setErrors] = useState(defaultTeacherFormData)
@@ -73,7 +74,7 @@ const TeacherDetailView: React.FC = () => {
         timesAvailable: newTimesAvailable,
         subjects: res.data.subjects,
         degree: res.data.degree,
-        schoolTypes: res.data.schoolTypes
+        schoolTypes: res.data.schoolTypes,
       }))
     })
   }, [])

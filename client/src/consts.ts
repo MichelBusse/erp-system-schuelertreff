@@ -1,8 +1,8 @@
-import { GridLocaleText } from "@mui/x-data-grid";
-import subject from "./types/subject";
+import { GridLocaleText } from '@mui/x-data-grid'
 
+import subject from './types/subject'
 
-export const dataGridLocaleText : Partial<GridLocaleText> = {
+export const dataGridLocaleText: Partial<GridLocaleText> = {
   filterPanelColumns: 'Spalte',
   filterPanelOperators: 'Operator',
   filterPanelInputLabel: 'Wert',

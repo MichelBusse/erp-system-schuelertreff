@@ -13,11 +13,7 @@ export function formValidation(form: string, data: any): any {
     phone: 'mind. 10 Stellen',
     subjectName: 'fehlt',
     shortForm: 'fehlt',
-    grade: '1 bis 13'
-  }
-
-  if (form === 'contract') {
-    const temp = {}
+    grade: '1 bis 13',
   }
 
   if (form === 'teacher') {
@@ -68,7 +64,7 @@ export function formValidation(form: string, data: any): any {
       email: '',
       phone: '',
       validation: false,
-      grade: ''
+      grade: '',
     }
 
     temp.firstName = data.firstName ? '' : errorText.firstName
@@ -141,5 +137,4 @@ export function formValidation(form: string, data: any): any {
 
     return temp
   }
-
 }

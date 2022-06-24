@@ -11,13 +11,13 @@ const Subjects: React.FC = () => {
   const [error, setError] = useState('')
   const [open, setOpen] = useState(false)
   const [subjects, setSubjects] = useState<subject[]>([])
-  const { API, decodeToken } = useAuth()
+  const { API } = useAuth()
 
   //Get subjects from DB
   useEffect(() => {
     API.get('subjects')
       .then((res) => setSubjects(res.data))
-      .catch((error) => {
+      .catch(() => {
         setError('Seite konnte nicht geladen werden.')
       })
   }, [])

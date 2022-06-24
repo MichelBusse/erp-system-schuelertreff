@@ -27,7 +27,7 @@ const BetterTimePicker: React.FC<Props> = ({
   minTime,
   maxTime,
   required,
-  fullWidth
+  fullWidth,
 }) => {
   const [open, setOpen] = useState(false)
 
@@ -47,7 +47,7 @@ const BetterTimePicker: React.FC<Props> = ({
       }}
       renderInput={(params) => (
         <TextField
-        fullWidth={fullWidth}
+          fullWidth={fullWidth}
           {...params}
           variant="outlined"
           required={required}
