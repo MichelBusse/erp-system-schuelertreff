@@ -14,6 +14,14 @@ export enum Salutation {
   DIVERS = 'divers',
 }
 
+export enum SchoolType
+{
+  GRUNDSCHULE = 'grundschule',
+  OBERSCHULE = 'oberschule',
+  GYMSEK1 = 'sek1',
+  GYMSEK2 = 'sek2',
+}
+
 // the week of 2001-01-01 is used as dummy, DOW and time is important here
 export const maxTimeRange = '[2001-01-01 00:00, 2001-01-08 00:00)'
 

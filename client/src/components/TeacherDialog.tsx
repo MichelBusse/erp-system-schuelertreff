@@ -25,7 +25,7 @@ import AddTimes from './AddTimes'
 import { useAuth } from './AuthProvider'
 import { formValidation } from './FormValidation'
 import { defaultTeacherFormData } from '../consts'
-import { Degree } from '../types/enums'
+import { Degree, SchoolType } from '../types/enums'
 
 type Props = {
   open: boolean
@@ -186,6 +186,40 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
               sx={{ width: '50%' }}
               onChange={(event) =>
                 setData((data) => ({ ...data, phone: event.target.value }))
+              }
+            />
+          </Stack>
+          <Stack direction={'row'} columnGap={2}>
+            <Autocomplete
+              fullWidth
+              multiple
+              id="schoolTypes"
+              options={[
+                SchoolType.GRUNDSCHULE,
+                SchoolType.OBERSCHULE,
+                SchoolType.GYMSEK1,
+                SchoolType.GYMSEK2,
+              ]}
+              getOptionLabel={(option) => {
+                switch (option) {
+                  case SchoolType.GRUNDSCHULE:
+                    return 'Grundschule'
+                  case SchoolType.OBERSCHULE:
+                    return 'Oberschule'
+                  case SchoolType.GYMSEK1:
+                    return 'Gymnasium Sek. 1'
+                  case SchoolType.GYMSEK2:
+                    return 'Gymnasium Sek. 2'
+                  default:
+                    return ''
+                }
+              }}
+              renderInput={(params) => (
+                <TextField {...params} variant="outlined" label="Schularten" />
+              )}
+              value={data.schoolTypes}
+              onChange={(_, value) =>
+                setData((data) => ({ ...data, schoolTypes: value }))
               }
             />
           </Stack>

@@ -250,6 +250,7 @@ export class UsersService {
       email: dto.email,
       phone: dto.phone,
       city: dto.city,
+      schoolTypes: dto.schoolTypes,
       timesAvailable: formatTimesAvailable(dto.timesAvailable),
     })
   }

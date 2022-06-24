@@ -4,7 +4,7 @@ import { IsArray, IsNotEmpty, ValidateNested } from 'class-validator'
 import { Subject } from 'src/subjects/subject.entity'
 import { Degree } from '../entities/teacher.entity'
 
-import { Salutation } from '../entities/user.entity'
+import { Salutation, SchoolType } from '../entities/user.entity'
 import { CreateUserDto } from './create-user.dto'
 import { timeAvailable } from './timeAvailable'
 
@@ -20,6 +20,9 @@ export class CreateTeacherDto extends CreateUserDto {
 
   @IsNotEmpty()
   degree: Degree
+
+  @IsArray()
+  schoolTypes: SchoolType[]
 
   fee: number
 

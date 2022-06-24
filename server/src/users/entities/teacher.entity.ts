@@ -4,6 +4,7 @@ import { Role } from 'src/auth/role.enum'
 import { Subject } from 'src/subjects/subject.entity'
 
 import { User } from './user.entity'
+import { ColumnCommonOptions } from 'typeorm/decorator/options/ColumnCommonOptions'
 
 export enum TeacherState {
   APPLIED = 'applied',
@@ -18,6 +19,14 @@ export enum Degree
   HIGHSCHOOL = 'highschool',
   BACHELOR = 'bachelor',
   MASTER = 'master',
+}
+
+export enum SchoolType
+{
+  GRUNDSCHULE = 'grundschule',
+  OBERSCHULE = 'oberschule',
+  GYMSEK1 = 'sek1',
+  GYMSEK2 = 'sek2',
 }
 
 
@@ -41,6 +50,14 @@ export class Teacher extends User {
     enum: Degree,
   })
   degree: Degree
+
+  @Column({
+    type: 'enum',
+    enum: SchoolType, 
+    array: true, 
+    default: {}
+  })
+  schoolTypes: SchoolType[]
 
   @ManyToMany(() => Subject)
   @JoinTable()

@@ -24,7 +24,7 @@ import { useSnackbar } from 'notistack'
 import { defaultTeacherFormData } from '../consts'
 import { formValidation } from '../components/FormValidation'
 import subject from '../types/subject'
-import { Degree } from '../types/enums'
+import { Degree, SchoolType } from '../types/enums'
 
 dayjs.extend(customParseFormat)
 
@@ -72,7 +72,8 @@ const TeacherDetailView: React.FC = () => {
         phone: res.data.phone,
         timesAvailable: newTimesAvailable,
         subjects: res.data.subjects,
-        degree: res.data.degree
+        degree: res.data.degree,
+        schoolTypes: res.data.schoolTypes
       }))
     })
   }, [])
@@ -245,42 +246,83 @@ const TeacherDetailView: React.FC = () => {
             />
           </Stack>
           <h3>Lehrerdaten:</h3>
-          <Stack direction={'row'} columnGap={2}>
-            <FormControl sx={{ width: '300px' }}>
-              <InputLabel id="DegreeLable">Höchster Abschluss</InputLabel>
-              <Select
-                id="Degree"
-                label="Höchster Abschluss"
-                value={data.degree}
-                required
-                onChange={(event) =>
-                  setData((data) => ({
-                    ...data,
-                    degree: event.target.value,
-                  }))
+          <Stack direction={'column'} rowGap={2}>
+            <Stack direction={'row'} columnGap={2}>
+              <FormControl sx={{ width: '300px' }}>
+                <InputLabel id="DegreeLable">Höchster Abschluss</InputLabel>
+                <Select
+                  id="Degree"
+                  label="Höchster Abschluss"
+                  value={data.degree}
+                  required
+                  readOnly={requestedId === 'me'}
+                  onChange={(event) =>
+                    setData((data) => ({
+                      ...data,
+                      degree: event.target.value,
+                    }))
+                  }
+                >
+                  <MenuItem value={Degree.NOINFO}>Keine Angabe</MenuItem>
+                  <MenuItem value={Degree.HIGHSCHOOL}>Abitur</MenuItem>
+                  <MenuItem value={Degree.BACHELOR}>Bachelor</MenuItem>
+                  <MenuItem value={Degree.MASTER}>Master</MenuItem>
+                </Select>
+                <FormHelperText>{errors.degree}</FormHelperText>
+              </FormControl>
+              <Autocomplete
+                fullWidth
+                multiple
+                id="schoolTypes"
+                options={[
+                  SchoolType.GRUNDSCHULE,
+                  SchoolType.OBERSCHULE,
+                  SchoolType.GYMSEK1,
+                  SchoolType.GYMSEK2,
+                ]}
+                getOptionLabel={(option) => {
+                  switch (option) {
+                    case SchoolType.GRUNDSCHULE:
+                      return 'Grundschule'
+                    case SchoolType.OBERSCHULE:
+                      return 'Oberschule'
+                    case SchoolType.GYMSEK1:
+                      return 'Gymnasium Sek. 1'
+                    case SchoolType.GYMSEK2:
+                      return 'Gymnasium Sek. 2'
+                    default:
+                      return ''
+                  }
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    label="Schularten"
+                  />
+                )}
+                value={data.schoolTypes}
+                onChange={(_, value) =>
+                  setData((data) => ({ ...data, schoolTypes: value }))
                 }
-              >
-                <MenuItem value={Degree.NOINFO}>Keine Angabe</MenuItem>
-                <MenuItem value={Degree.HIGHSCHOOL}>Abitur</MenuItem>
-                <MenuItem value={Degree.BACHELOR}>Bachelor</MenuItem>
-                <MenuItem value={Degree.MASTER}>Master</MenuItem>
-              </Select>
-              <FormHelperText>{errors.degree}</FormHelperText>
-            </FormControl>
-            <Autocomplete
-              fullWidth
-              multiple
-              id="subjects"
-              options={subjects}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
-                <TextField {...params} variant="outlined" label="Fächer *" />
-              )}
-              value={data.subjects}
-              onChange={(_, value) =>
-                setData((data) => ({ ...data, subjects: value }))
-              }
-            />
+              />
+            </Stack>
+            <Stack>
+              <Autocomplete
+                fullWidth
+                multiple
+                id="subjects"
+                options={subjects}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} variant="outlined" label="Fächer *" />
+                )}
+                value={data.subjects}
+                onChange={(_, value) =>
+                  setData((data) => ({ ...data, subjects: value }))
+                }
+              />
+            </Stack>
           </Stack>
           <h3>Verfügbarkeit:</h3>
           <Box>
