@@ -33,7 +33,7 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
   const { API } = useAuth()
   const [contracts, setContracts] = useState<contract[]>([])
 
-  const rowHeight = 692
+  const rowHeight = 777
   const startTimeAM = 7
   const numberOfHours = 14
   const hourHeight = rowHeight / numberOfHours
@@ -103,10 +103,12 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
               key={i}
               className="timeCell"
               style={{
-                height: '50px',
+                color: '#7b878880',
+                fontWeight: 'bold',
+                height: hourHeight,
                 width: '50px',
                 borderTopStyle: 'solid',
-                borderTopColor: '#7b878850',
+                borderTopColor: '#7b878860',
               }}
             >
               {startTimeAM + i} Uhr
