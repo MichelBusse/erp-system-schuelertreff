@@ -11,6 +11,7 @@ import ContractDialog from '../components/ContractDialog'
 import HiddenMenu from '../components/HiddenMenu'
 import TeacherCalendar from '../components/TeacherCalendar'
 import { teacher } from '../types/user'
+import ContractEditDialog from '../components/ContractEditDialog'
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)
@@ -29,6 +30,11 @@ const Timetable: React.FC = () => {
   })
   const [date, setDate] = useState(dayjs().day(1))
   const [open, setOpen] = useState(false)
+  const [contractDetailsDialog, setContractDetailsDialog] = useState<{
+    open: boolean
+    id: number
+  }>({ open: false, id: -1 })
+
   const [render, setRender] = useState(0)
 
   const [refreshCalendar, setRefreshCalendar] = useState(0)
@@ -64,6 +70,9 @@ const Timetable: React.FC = () => {
               setRender(render + 1)
               setOpen(true)
             }}
+            openContractDetailsDialog={(id) => {
+              setContractDetailsDialog({ id: id, open: true })
+            }}
             refresh={refreshCalendar}
             teachers={teachers}
           />
@@ -83,14 +92,20 @@ const Timetable: React.FC = () => {
         close={() => setDrawer((d) => ({ ...d, open: false }))}
       />
 
+      <ContractEditDialog
+        dialogInfo={contractDetailsDialog}
+        setDialogInfo={(open : boolean, id : number) => setContractDetailsDialog({open: open, id: id})}
+      />
       {!!render && (
-        <ContractDialog
-          key={render}
-          open={open}
-          setOpen={setOpen}
-          onSuccess={() => setRefreshCalendar((r) => r + 1)}
-          teachers={teachers}
-        />
+        <>
+          <ContractDialog
+            key={render}
+            open={open}
+            setOpen={setOpen}
+            onSuccess={() => setRefreshCalendar((r) => r + 1)}
+            teachers={teachers}
+          />
+        </>
       )}
     </Box>
   )

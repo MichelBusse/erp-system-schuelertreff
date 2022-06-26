@@ -375,7 +375,6 @@ const TeacherDetailView: React.FC = () => {
       <Dialog
         open={dialogOpen}
         keepMounted
-        onClose={deleteUser}
         aria-describedby="alert-dialog-slide-description"
       >
         <DialogTitle>{"Lehrer:in wirklich löschen?"}</DialogTitle>

@@ -21,12 +21,12 @@ import dayjs, { Dayjs } from 'dayjs'
 import { nanoid } from 'nanoid'
 import { useState } from 'react'
 
-import { form } from '../types/form'
+import { userForm } from '../types/form'
 import BetterTimePicker from './BetterTimePicker'
 
 type Props = {
-  data: form
-  setData: React.Dispatch<React.SetStateAction<form>>
+  data: userForm
+  setData: React.Dispatch<React.SetStateAction<any>>
 }
 
 type times = {
@@ -43,7 +43,7 @@ const AddTimes: React.FC<Props> = ({ data, setData }) => {
   })
   const addTime = () => {
     if (times.dow && times.start && times.end) {
-      setData((data) => ({
+      setData((data : any) => ({
         ...data,
         timesAvailable: [
           ...data.timesAvailable,
@@ -66,7 +66,7 @@ const AddTimes: React.FC<Props> = ({ data, setData }) => {
 
   async function deleteTime(id: string) {
     const newTimes = data.timesAvailable.filter((time) => time.id !== id)
-    setData((data) => ({ ...data, timesAvailable: newTimes }))
+    setData((data : any) => ({ ...data, timesAvailable: newTimes }))
   }
 
   const elements = data.timesAvailable.map((time) => {

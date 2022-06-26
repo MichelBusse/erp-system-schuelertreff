@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
-import { Fab, Paper, Stack, Typography } from '@mui/material'
+import { Button, Fab, Paper, Stack, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import {
   DataGrid,
@@ -11,8 +11,8 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 
 import { SideMenu } from '../pages/timetable'
-import subject from '../types/subject'
-import { customer, teacher } from '../types/user'
+import { contract } from '../types/contract'
+import { teacher } from '../types/user'
 import { useAuth } from './AuthProvider'
 import styles from './Calendar.module.scss'
 import CalendarControl from './CalendarControl'
@@ -22,27 +22,18 @@ type Props = {
   setDrawer: (open: SideMenu) => void
   setDate: (date: Dayjs) => void
   openDialog: () => void
+  openContractDetailsDialog: (id: number) => void
   refresh?: number
   teachers: teacher[]
 }
 
-type contract = {
-  id: number
-  startTime: string
-  endTime: string
-  startDate: string
-  endDate: string
-  interval: 1
-  subject: subject
-  customers: customer[]
-  teacher: number
-}
 
 const Calendar: React.FC<Props> = ({
   date,
   setDrawer,
   setDate,
   openDialog,
+  openContractDetailsDialog,
   refresh,
   teachers,
 }) => {
@@ -141,7 +132,7 @@ const Calendar: React.FC<Props> = ({
             params.colDef.field !== 'teacher' &&
             (params.value ?? []).length > 0
           ) {
-            setDrawer({ open: true, content: drawerContent(params) })
+            setDrawer({ open: true, content: drawerContent(params, openContractDetailsDialog) })
           }
         }}
       />
@@ -162,7 +153,7 @@ const Calendar: React.FC<Props> = ({
   )
 }
 
-const drawerContent = (params: GridCellParams) => (
+const drawerContent = (params: GridCellParams, openContractDetailsDialog: (id:number) => (void)) => (
   <>
     <span>{params.colDef.headerName?.replace('\n', ' / ')}</span>
     <Typography variant="h5" mb={3}>
@@ -193,6 +184,9 @@ const drawerContent = (params: GridCellParams) => (
               </li>
             ))}
           </ul>
+          <Button onClick={() => openContractDetailsDialog(c.id)}>
+            Vertrag bearbeiten
+          </Button>
         </Stack>
       ))}
     </Stack>

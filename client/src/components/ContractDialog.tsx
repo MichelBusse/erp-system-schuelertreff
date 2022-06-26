@@ -263,7 +263,7 @@ const ContractDialog: React.FC<Props> = ({
                 {...params}
                 required
                 size="medium"
-                variant="standard"
+                variant="outlined"
                 label="Kunde(n)"
               />
             )}
@@ -281,7 +281,7 @@ const ContractDialog: React.FC<Props> = ({
                 <TextField
                   {...params}
                   required
-                  variant="standard"
+                  variant="outlined"
                   label="Fach"
                 />
               )}
@@ -289,7 +289,7 @@ const ContractDialog: React.FC<Props> = ({
             <TextField
               required
               label="Wochenintervall"
-              variant="standard"
+              variant="outlined"
               type="number"
               value={form0.interval}
               onChange={(e) => {
@@ -325,7 +325,7 @@ const ContractDialog: React.FC<Props> = ({
               }}
               shouldDisableDate={(date) => [0, 6].includes(date.day())}
               renderInput={(params) => (
-                <TextField {...params} variant="standard" />
+                <TextField {...params} variant="outlined" />
               )}
               InputAdornmentProps={{
                 position: 'start',
@@ -357,7 +357,7 @@ const ContractDialog: React.FC<Props> = ({
               }}
               shouldDisableDate={(date) => [0, 6].includes(date.day())}
               renderInput={(params) => (
-                <TextField {...params} variant="standard" />
+                <TextField {...params} variant="outlined" />
               )}
               InputAdornmentProps={{
                 position: 'start',
@@ -421,7 +421,7 @@ const ContractDialog: React.FC<Props> = ({
       label: 'Termin auswählen',
       content: (
         <Stack spacing={2} marginTop={1}>
-          <FormControl variant="standard" fullWidth>
+          <FormControl variant="outlined" fullWidth>
             <InputLabel htmlFor="suggestion-select">
               {suggestions.length > 0 ? 'Vorschläge' : 'Keine Vorschläge'}
             </InputLabel>
@@ -453,7 +453,7 @@ const ContractDialog: React.FC<Props> = ({
             </Select>
           </FormControl>
 
-          <FormControl variant="standard" fullWidth required>
+          <FormControl variant="outlined" fullWidth required>
             <InputLabel htmlFor="teacher-select">Lehrkraft</InputLabel>
             <Select
               id="teacher-select"
@@ -497,7 +497,7 @@ const ContractDialog: React.FC<Props> = ({
                 (selSuggestion !== '' && day.day() !== form1.dow)
               }
               renderInput={(params) => (
-                <TextField {...params} required variant="standard" />
+                <TextField {...params} required variant="outlined" />
               )}
               InputAdornmentProps={{
                 position: 'start',
@@ -535,7 +535,7 @@ const ContractDialog: React.FC<Props> = ({
                 )
               }
               renderInput={(params) => (
-                <TextField {...params} variant="standard" />
+                <TextField {...params} variant="outlined" />
               )}
               InputAdornmentProps={{
                 position: 'start',

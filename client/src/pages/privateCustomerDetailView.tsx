@@ -303,7 +303,6 @@ const PrivateCustomerDetailView: React.FC = () => {
       <Dialog
         open={dialogOpen}
         keepMounted
-        onClose={deleteUser}
         aria-describedby="alert-dialog-slide-description"
       >
         <DialogTitle>{"Schüler:in wirklich löschen?"}</DialogTitle>

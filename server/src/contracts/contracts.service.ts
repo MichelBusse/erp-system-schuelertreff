@@ -47,7 +47,9 @@ export class ContractsService {
   }
 
   async findOne(id: string): Promise<Contract> {
-    return this.contractsRepository.findOne(id)
+    return this.contractsRepository.findOne(id, {
+      relations: ['subject', 'teacher', 'customers'],
+    })
   }
 
   async suggestContracts(dto: SuggestContractsDto): Promise<any[]> {

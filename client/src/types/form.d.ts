@@ -1,7 +1,7 @@
 import subject from './subject'
 import timeAvailable from './timeAvailable'
 
-interface userForm {
+export interface userForm {
   firstName: string
   lastName: string
   salutation: string
