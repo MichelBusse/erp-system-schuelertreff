@@ -18,7 +18,6 @@ import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
 import { UpdatePrivateCustomerDto } from './dto/update-privateCustomer.dto'
 import { UpdateTeacherDto } from './dto/update-teacher.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
 import {
   Admin,
   Customer,
@@ -47,8 +46,8 @@ export class UsersController {
   }
 
   @Get('privateCustomer')
-  findAllPrivateCustomers(): Promise<PrivateCustomer[]> {
-    return this.usersService.findAllPrivateCustomers()
+  findAppliedPrivateCustomers(): Promise<PrivateCustomer[]> {
+    return this.usersService.findAppliedPrivateCustomers()
   }
 
   @Get('schoolCustomer')
@@ -57,8 +56,8 @@ export class UsersController {
   }
 
   @Get('teacher')
-  findAllTeachers(): Promise<Teacher[]> {
-    return this.usersService.findAllTeachers()
+  findAppliedTeachers(): Promise<Teacher[]> {
+    return this.usersService.findAppliedTeachers()
   }
 
   @Get('privateCustomer/me')
@@ -71,7 +70,6 @@ export class UsersController {
   findOne(@Param('id') id: number): Promise<PrivateCustomer> {
     return this.usersService.findOnePrivateCustomer(id)
   }
-
 
   @Get('teacher/me')
   getMeAsTeacher(@Request() req) {
@@ -120,7 +118,7 @@ export class UsersController {
   async updatePrivateCustomer(
     @Request() req,
     @Body() dto: UpdatePrivateCustomerDto,
-  ): Promise<User> {
+  ): Promise<PrivateCustomer> {
     return this.usersService.updatePrivateCustomer(req.user.id, dto)
   }
 
@@ -129,7 +127,7 @@ export class UsersController {
   async updatePrivateCustomerAdmin(
     @Param('id') id: number,
     @Body() dto: UpdatePrivateCustomerDto,
-  ): Promise<User> {
+  ): Promise<PrivateCustomer> {
     return this.usersService.updatePrivateCustomerAdmin(id, dto)
   }
 
@@ -137,8 +135,7 @@ export class UsersController {
   async updateTeacher(
     @Request() req,
     @Body() dto: UpdateTeacherDto,
-  ): Promise<User> {
-
+  ): Promise<Teacher> {
     return this.usersService.updateTeacher(req.user.id, dto)
   }
 
@@ -147,9 +144,20 @@ export class UsersController {
   async updateTeacherAdmin(
     @Param('id') id: number,
     @Body() dto: UpdateTeacherDto,
-  ): Promise<User> {
-
+  ): Promise<Teacher> {
     return this.usersService.updateTeacherAdmin(id, dto)
+  }
+
+  @Delete('teacher/:id')
+  @Roles(Role.ADMIN)
+  async deleteTeacher(@Param('id') id: number): Promise<void> {
+    return this.usersService.deleteTeacher(id)
+  }
+
+  @Delete('privateCustomer/:id')
+  @Roles(Role.ADMIN)
+  async deletePrivateCustomer(@Param('id') id: number): Promise<void> {
+    return this.usersService.deletePrivateCustomer(id)
   }
 
   @Post('admin')
@@ -161,5 +169,4 @@ export class UsersController {
 
     return user
   }
-
 }

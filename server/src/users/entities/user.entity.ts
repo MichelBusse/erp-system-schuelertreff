@@ -1,6 +1,7 @@
 import {
   Check,
   Column,
+  DeleteDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   TableInheritance,

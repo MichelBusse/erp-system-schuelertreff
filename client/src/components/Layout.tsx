@@ -29,12 +29,12 @@ const menuItems = [
     href: '/privateCustomers',
     roles: ['admin'],
   },
-  {
+  /*{
     icon: AccountBalanceIcon,
     text: 'Schulen',
     href: '/schoolCustomers',
     roles: ['admin'],
-  },
+  },*/
   {
     icon: LayersIcon,
     text: 'Fächer',

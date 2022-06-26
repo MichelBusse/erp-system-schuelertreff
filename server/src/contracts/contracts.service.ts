@@ -165,8 +165,6 @@ export class ContractsService {
   async remove(id: string): Promise<void> {
     const contract = await this.contractsRepository.findOne(id)
 
-    console.log(contract.startDate)
-
     if (dayjs().isBefore(contract.startDate)) {
       this.contractsRepository.delete(id)
     } else {

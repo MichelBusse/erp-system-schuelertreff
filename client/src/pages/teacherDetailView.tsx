@@ -1,6 +1,11 @@
 import {
   Autocomplete,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   FormHelperText,
   InputLabel,
@@ -35,6 +40,7 @@ const TeacherDetailView: React.FC = () => {
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
   const [subjects, setSubjects] = useState<subject[]>([])
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
 
   useEffect(() => {
     API.get(`subjects`).then((res) => setSubjects(res.data))
@@ -98,8 +104,18 @@ const TeacherDetailView: React.FC = () => {
   }
 
   const deleteUser = () => {
-    console.log('deleteTeacher')
+    setDialogOpen(false)
+
+    API.delete('users/teacher/' + requestedId).then((res) => {
+      enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gelöscht')
+      navigate('/teachers')
+    }).catch((reason) => {
+      enqueueSnackbar(data.firstName + ' ' + data.lastName + ' kann nicht gelöscht werden, da er noch laufende Verträge hat')
+    })
+
   }
+
+
 
   return (
     <div className={styles.wrapper}>
@@ -346,7 +362,7 @@ const TeacherDetailView: React.FC = () => {
             {id && (
               <Button
                 variant="outlined"
-                onClick={deleteUser}
+                onClick={() => setDialogOpen(true)}
                 sx={{ marginLeft: 'auto' }}
                 color="error"
               >
@@ -356,6 +372,23 @@ const TeacherDetailView: React.FC = () => {
           </Stack>
         </Stack>
       </Box>
+      <Dialog
+        open={dialogOpen}
+        keepMounted
+        onClose={deleteUser}
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle>{"Lehrer:in wirklich löschen?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+              Lehrer:innen können nur gelöscht werden, wenn sie in keinen laufenden oder zukünftigen Verträgen mehr eingeplant sind.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)}>Abbrechen</Button>
+          <Button onClick={deleteUser}>Löschen</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }

@@ -1,5 +1,10 @@
 import {
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   FormHelperText,
   InputLabel,
@@ -31,6 +36,7 @@ const PrivateCustomerDetailView: React.FC = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
 
   const requestedId = id ? id : 'me'
 
@@ -89,7 +95,15 @@ const PrivateCustomerDetailView: React.FC = () => {
   }
 
   const deleteUser = () => {
-    console.log('deletePrivateCustomer')
+    setDialogOpen(false)
+
+    API.delete('users/privateCustomer/' + requestedId).then((res) => {
+      enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gelöscht')
+      navigate('/privateCustomers')
+    }).catch((reason) => {
+      enqueueSnackbar(data.firstName + ' ' + data.lastName + ' kann nicht gelöscht werden, da er noch laufende Verträge hat')
+    })
+
   }
 
   return (
@@ -107,7 +121,7 @@ const PrivateCustomerDetailView: React.FC = () => {
           <h3>Person:</h3>
           <Stack direction="row" columnGap={2}>
             <FormControl fullWidth>
-              <InputLabel id="SalutationLable">Anrede *</InputLabel>
+              <InputLabel id="SalutationLable">Anrede</InputLabel>
               <Select
                 id="Salutation"
                 label="Anrede"
@@ -276,7 +290,7 @@ const PrivateCustomerDetailView: React.FC = () => {
             {id && (
               <Button
                 variant="outlined"
-                onClick={deleteUser}
+                onClick={() => setDialogOpen(true)}
                 sx={{ marginLeft: 'auto' }}
                 color="error"
               >
@@ -286,6 +300,23 @@ const PrivateCustomerDetailView: React.FC = () => {
           </Stack>
         </Stack>
       </Box>
+      <Dialog
+        open={dialogOpen}
+        keepMounted
+        onClose={deleteUser}
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle>{"Schüler:in wirklich löschen?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+              Schüler:innen können nur gelöscht werden, wenn sie in keinen laufenden oder zukünftigen Verträgen mehr eingeplant sind.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)}>Abbrechen</Button>
+          <Button onClick={deleteUser}>Löschen</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }

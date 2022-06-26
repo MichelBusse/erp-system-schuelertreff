@@ -10,7 +10,7 @@ export enum TeacherState {
   APPLIED = 'applied',
   EMPLOYED = 'employed',
   SUSPENDED = 'suspended',
-  QUIT = 'quit',
+  DELETED = 'deleted',
 }
 
 export enum Degree
