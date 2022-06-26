@@ -53,8 +53,9 @@ export class Teacher extends User {
 
   @Column({
     type: 'enum',
-    enum: SchoolType, 
-    array: true, 
+    enum: SchoolType,
+    array: true,
+    default: '{}',
   })
   schoolTypes: SchoolType[]
 

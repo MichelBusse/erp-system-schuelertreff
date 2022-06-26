@@ -38,6 +38,16 @@ export class AppService implements OnApplicationBootstrap {
         STYPE = tstzmultirange,
         INITCOND = '{[,]}'
       );
+
+      CREATE or REPLACE FUNCTION union_tstzmultirange(a tstzmultirange, b tstzmultirange)
+        returns tstzmultirange language plpgsql as
+          'begin return a + b; end';
+
+      CREATE or REPLACE AGGREGATE union_multirange ( tstzmultirange ) (
+        SFUNC = union_tstzmultirange,
+        STYPE = tstzmultirange,
+        INITCOND = '{}'
+      );
     `)
 
     await runner.release()

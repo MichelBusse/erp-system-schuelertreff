@@ -4,12 +4,13 @@ import dayjs, { Dayjs } from 'dayjs'
 import { Brackets, Connection, Repository } from 'typeorm'
 
 import { timeAvailable } from 'src/users/dto/timeAvailable'
-import { Customer, User } from 'src/users/entities'
+import { Customer, PrivateCustomer, Teacher, User } from 'src/users/entities'
 import { parseMultirange, UsersService } from 'src/users/users.service'
 
 import { Contract } from './contract.entity'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
+import { TeacherState } from 'src/users/entities/teacher.entity'
 
 @Injectable()
 export class ContractsService {
@@ -84,16 +85,42 @@ export class ContractsService {
     const mainQuery = qb
       .select('*')
       .from((subq) => {
-        return subq
+        const sq = subq
           .select('t.id', 'teacherId')
           .addSelect('t.firstName', 'firstName')
           .addSelect('t.lastName', 'lastName')
-          .addSelect('t.timesAvailable * ' + cTimes.getQuery(), 'possibleTimes')
-          .from(User, 't')
+          .addSelect(
+            `
+              t.timesAvailable
+              * ${cTimes.getQuery()}
+              - union_multirange((
+                '{[2001-01-0' || extract(dow from "con"."startDate") || ' ' || "con"."startTime" ||
+                ', 2001-01-0' || extract(dow from "con"."startDate") || ' ' || "con"."endTime" || ')}'
+              )::tstzmultirange)
+            `,
+            'possibleTimes',
+          )
+          .from(Contract, 'con')
+          .addFrom(User, 't')
           .leftJoin('t.subjects', 'subject')
           .where('t.type = :tt', { tt: 'Teacher' })
+          .andWhere(`t.state = 'applied'`)
           .andWhere('subject.id = :subjectId', { subjectId: dto.subjectId })
-          .setParameters(cTimes.getParameters())
+          .andWhere('t.id = con.teacherId')
+          .andWhere('con.endDate > :minDate', {
+            minDate: dto.minDate ?? dayjs().format('YYYY-MM-DD'),
+          })
+
+        if (typeof dto.maxDate !== 'undefined')
+          sq.andWhere('con.startDate < :maxDate', { maxDate: dto.maxDate })
+
+        if (dto.interval !== 1) sq.andWhere('con.interval = 1')
+
+        sq.groupBy('t.id')
+
+        sq.setParameters(cTimes.getParameters())
+
+        return sq
       }, 's')
       .where(`s."possibleTimes" <> '{}'::tstzmultirange`)
 

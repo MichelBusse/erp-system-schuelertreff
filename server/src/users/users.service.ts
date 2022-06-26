@@ -136,7 +136,9 @@ export class UsersService {
   }
 
   async findAppliedPrivateCustomers(): Promise<PrivateCustomer[]> {
-    return this.privateCustomersRepository.find({where: {state: CustomerState.APPLIED}}).then(transformUsers)
+    return this.privateCustomersRepository
+      .find({ where: { customerState: CustomerState.APPLIED } })
+      .then(transformUsers)
   }
 
   async findAllSchoolCustomers(): Promise<SchoolCustomer[]> {
@@ -147,7 +149,7 @@ export class UsersService {
     return this.teachersRepository
       .find({
         relations: ['subjects'],
-        where: { state: TeacherState.APPLIED }
+        where: { state: TeacherState.APPLIED },
       })
       .then(transformUsers)
   }
@@ -293,8 +295,6 @@ export class UsersService {
   async deleteTeacher(id: number) {
     const qb = this.connection.createQueryBuilder()
 
-    
-
     const contractQuery = qb
       .select('c.id')
       .addSelect('c.endDate')
@@ -313,9 +313,11 @@ export class UsersService {
         }
       }
       if (allowedToRemove) {
-        this.teachersRepository.update(id, {state: TeacherState.DELETED})
+        this.teachersRepository.update(id, { state: TeacherState.DELETED })
       } else {
-        throw new BadRequestException('Teacher cannot be deleted: there are ongoing or future contracts with this teacher')
+        throw new BadRequestException(
+          'Teacher cannot be deleted: there are ongoing or future contracts with this teacher',
+        )
       }
     } else {
       this.teachersRepository.delete(id)
@@ -329,7 +331,7 @@ export class UsersService {
       .select('c.id')
       .addSelect('c.endDate')
       .from(Contract, 'c')
-      .leftJoin("c.customers", "customer")
+      .leftJoin('c.customers', 'customer')
       .where('customer.id = :id', { id: id })
 
     const customersContracs = await contractQuery.getMany()
@@ -344,15 +346,18 @@ export class UsersService {
         }
       }
       if (allowedToRemove) {
-        this.privateCustomersRepository.update(id, {state: CustomerState.DELETED})
+        this.privateCustomersRepository.update(id, {
+          customerState: CustomerState.DELETED,
+        })
       } else {
-        throw new BadRequestException('Customer cannot be deleted: there are ongoing or future contracts with this customer')
+        throw new BadRequestException(
+          'Customer cannot be deleted: there are ongoing or future contracts with this customer',
+        )
       }
     } else {
       this.privateCustomersRepository.delete(id)
     }
   }
-
 
   /* SELECT c.id from Contract as c LEFT JOIN Teacher as t WHERE t.id =*/
 
