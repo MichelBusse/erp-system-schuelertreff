@@ -361,7 +361,7 @@ const ContractDialog: React.FC<Props> = ({
             <DatePicker
               label="Enddatum"
               mask="__.__.____"
-              minDate={form0.startDate?.add(8, 'day') ?? undefined}
+              minDate={form0.startDate?.add(7, 'day') ?? undefined}
               defaultCalendarMonth={form0.startDate ?? undefined}
               disabled={form0.startDate === null}
               value={form0.endDate}
@@ -483,11 +483,11 @@ const ContractDialog: React.FC<Props> = ({
                   }))
                 }}
               >
-                <MenuItem value={1}>Montag</MenuItem>
-                <MenuItem value={2}>Dienstag</MenuItem>
-                <MenuItem value={3}>Mittwoch</MenuItem>
-                <MenuItem value={4}>Donnerstag</MenuItem>
-                <MenuItem value={5}>Freitag</MenuItem>
+                <MenuItem value={1}>{`Montag (Start: ${form0.startDate ? getNextDow(1, form0.startDate).format("DD.MM.YYYY") : ""})`}</MenuItem>
+                <MenuItem value={2}>{`Dienstag (Start: ${form0.startDate ? getNextDow(2, form0.startDate).format("DD.MM.YYYY") : ""})`}</MenuItem>
+                <MenuItem value={3}>{`Mittwoch (Start: ${form0.startDate ? getNextDow(3, form0.startDate).format("DD.MM.YYYY") : ""})`}</MenuItem>
+                <MenuItem value={4}>{`Donnerstag (Start:${form0.startDate ? getNextDow(4, form0.startDate).format("DD.MM.YYYY") : ""})`}</MenuItem>
+                <MenuItem value={5}>{`Freitag (Start: ${form0.startDate ? getNextDow(5, form0.startDate).format("DD.MM.YYYY") : ""})`}</MenuItem>
               </Select>
             </FormControl>
           </EqualStack>

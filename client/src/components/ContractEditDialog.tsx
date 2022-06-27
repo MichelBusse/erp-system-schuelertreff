@@ -32,6 +32,7 @@ dayjs.extend(customParseFormat)
 type Props = {
   dialogInfo: { open: boolean; id: number }
   setDialogInfo: (open: boolean, id: number) => void
+  onSuccess?: () => void
 }
 
 type form = {
@@ -46,7 +47,11 @@ type form = {
   subject: subject | null
 }
 
-const ContractEditDialog: React.FC<Props> = ({ dialogInfo, setDialogInfo }) => {
+const ContractEditDialog: React.FC<Props> = ({
+  dialogInfo,
+  setDialogInfo,
+  onSuccess = () => {},
+}) => {
   const { API } = useAuth()
   const [customers, setCustomers] = useState<customer[]>([])
   const { enqueueSnackbar } = useSnackbar()
@@ -114,6 +119,7 @@ const ContractEditDialog: React.FC<Props> = ({ dialogInfo, setDialogInfo }) => {
       }).then(() => {
         enqueueSnackbar('Vertrag geändert')
         setDialogInfo(false, -1)
+        onSuccess()
       })
   }
 
@@ -122,6 +128,7 @@ const ContractEditDialog: React.FC<Props> = ({ dialogInfo, setDialogInfo }) => {
       API.delete('contracts/' + dialogInfo.id).then(() => {
         enqueueSnackbar('Vertrag beendet')
         setDialogInfo(false, -1)
+        onSuccess()
       })
   }
   const cancel = () => {
@@ -179,21 +186,62 @@ const ContractEditDialog: React.FC<Props> = ({ dialogInfo, setDialogInfo }) => {
             )}
           />
           <Stack direction={'row'} columnGap={2}>
-            <TextField
-              label="Startdatum"
-              fullWidth
-              value={
-                prevContract.startDate
-                  ? prevContract.startDate.format('DD.MM.YYYY')
-                  : ''
-              }
-              InputProps={{ readOnly: true }}
-            />
+            {prevContract.startDate?.isBefore(dayjs()) ? (
+              <TextField
+                label="Startdatum"
+                fullWidth
+                value={
+                  prevContract.startDate
+                    ? prevContract.startDate.format('DD.MM.YYYY')
+                    : ''
+                }
+                InputProps={{ readOnly: true }}
+              />
+            ) : (
+              <DatePicker
+                label="Startdatum"
+                mask="__.__.____"
+                minDate={dayjs().add(1, 'd')}
+                value={data.startDate}
+                onChange={(value) => {
+                  setData((data) => ({
+                    ...data,
+                    startDate: value,
+                    endDate: value ? value.add(1, 'year') : null,
+                  }))
+                }}
+                shouldDisableDate={(date) => [0, 6].includes(date.day())}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    required
+                    variant="outlined"
+                    fullWidth
+                  />
+                )}
+                InputAdornmentProps={{
+                  position: 'start',
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <IconButtonAdornment
+                      icon={ClearIcon}
+                      hidden={data.startDate === null}
+                      onClick={() =>
+                        setData((data) => ({
+                          ...data,
+                          startDate: null,
+                        }))
+                      }
+                    />
+                  ),
+                }}
+              />
+            )}
             <DatePicker
               label="Enddatum"
               mask="__.__.____"
-              minDate={data.startDate?.add(8, 'day') ?? undefined}
-              defaultCalendarMonth={data.startDate ?? undefined}
+              minDate={data.startDate?.add(1, 'day') ?? undefined}
               disabled={data.startDate === null}
               value={data.endDate}
               onChange={(value) => {

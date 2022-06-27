@@ -60,7 +60,6 @@ export class ContractsController {
     })
   }
 
-
   @Get('suggest')
   @Roles(Role.ADMIN)
   suggestContracts(@Query() dto: SuggestContractsDto): Promise<Contract[]> {
@@ -89,22 +88,34 @@ export class ContractsController {
 
   @Post(':id')
   @Roles(Role.ADMIN)
-  async renew(@Param('id') id: string, @Body() dto: CreateContractDto): Promise<Contract> {
+  async update(
+    @Param('id') id: string,
+    @Body() dto: CreateContractDto,
+  ): Promise<Contract> {
     this.validateDto(dto)
-    this.contractsService.endContract(id)
 
-    return this.contractsService.create(dto).catch((err) => {
-      if (err instanceof EntityNotFoundError) {
-        throw new BadRequestException(err.message)
-      }
+    if (dayjs(dto.startDate).isAfter(dayjs())) {    // If contract starts in future, then update excestingcontract 
 
-      throw err
-    })
+      this.contractsService.updateContract(id, dto)
+
+    } else if(dayjs(dto.endDate).isAfter(dayjs())) { //If contract has already started and does not have ended yet, then end it and create new with updated params
+      this.contractsService.endOrDeleteContract(id)
+
+      return this.contractsService.create(dto).catch((err) => {
+        if (err instanceof EntityNotFoundError) {
+          throw new BadRequestException(err.message)
+        }
+
+        throw err
+      })
+    } else { //Past contracts cannot be updated
+      throw new BadRequestException("Cannot update past contracts")
+    }
   }
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  remove(@Param('id') id: string): Promise<UpdateResult> {
-    return this.contractsService.endContract(id)
+  endOrDelete(@Param('id') id: string): Promise<void> {
+    return this.contractsService.endOrDeleteContract(id)
   }
 }

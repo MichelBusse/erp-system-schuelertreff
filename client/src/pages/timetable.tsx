@@ -94,7 +94,13 @@ const Timetable: React.FC = () => {
 
       <ContractEditDialog
         dialogInfo={contractDetailsDialog}
-        setDialogInfo={(open : boolean, id : number) => setContractDetailsDialog({open: open, id: id})}
+        setDialogInfo={(open: boolean, id: number) =>
+          setContractDetailsDialog({ open: open, id: id })
+        }
+        onSuccess={() => {
+          setDrawer({ open: false, content: <></> })
+          setRefreshCalendar((r) => r + 1)
+        }}
       />
       {!!render && (
         <>
