@@ -189,11 +189,6 @@ const drawerContent = (
               </li>
             ))}
           </ul>
-          {dayjs(c.endDate).isAfter(dayjs()) && (
-            <Button onClick={() => openContractDetailsDialog(c.id)}>
-              Vertrag bearbeiten
-            </Button>
-          )}
         </Stack>
       ))}
     </Stack>
