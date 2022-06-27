@@ -103,8 +103,8 @@ const ContractDialog: React.FC<Props> = ({
     customers: [],
     subject: null,
     interval: 1,
-    startDate: null,
-    endDate: null,
+    startDate: dayjs().add(1, 'day'),
+    endDate: dayjs().add(1, 'day').add(1, 'year'),
     startTime: null,
     endTime: null,
   })
@@ -133,7 +133,9 @@ const ContractDialog: React.FC<Props> = ({
   const validForm0 = !!(
     form0.customers.length &&
     form0.subject &&
-    form0.interval
+    form0.interval &&
+    form0.startDate &&
+    form0.endDate
   )
 
   const handleSubmit0 = () => {
@@ -154,6 +156,16 @@ const ContractDialog: React.FC<Props> = ({
         updateSelSuggestion('')
         setSuggestions(res.data)
         setActiveStep(1)
+        setForm1({
+          startDate: form0.startDate,
+          endDate: form0.endDate,
+          startTime: form0.startTime,
+          endTime: form0.endTime,
+          minTime: form0.startTime,
+          maxTime: form0.endTime,
+          teacher: '',
+          dow: null,
+        })
       })
       .catch((err) => {
         console.error(err)
@@ -171,17 +183,18 @@ const ContractDialog: React.FC<Props> = ({
       const teacher = suggestions[t]
       const suggestion = teacher.suggestions[s]
 
-      const startTime =
-        suggestion.start !== '00:00' ? dayjs(suggestion.start, 'HH:mm') : null
+      const startTime = dayjs(suggestion.start, 'HH:mm')
       const endTime =
-        suggestion.end !== '24:00' ? dayjs(suggestion.end, 'HH:mm') : null
+        suggestion.end !== '24:00'
+          ? dayjs(suggestion.end, 'HH:mm')
+          : dayjs(suggestion.end, 'HH:mm').subtract(5, 'minute')
+
 
       setForm1({
-        startDate: getNextDow(
-          suggestion.dow,
-          form0.startDate ?? dayjs('00:00', 'HH:mm').add(1, 'day'),
-        ),
-        endDate: null,
+        startDate: form0.startDate
+          ? getNextDow(suggestion.dow, form0.startDate)
+          : null,
+        endDate: form0.endDate,
         startTime: startTime,
         endTime: endTime,
         minTime: startTime,
@@ -191,8 +204,8 @@ const ContractDialog: React.FC<Props> = ({
       })
     } else {
       setForm1({
-        startDate: null,
-        endDate: null,
+        startDate: form0.startDate,
+        endDate: form0.endDate,
         startTime: null,
         endTime: null,
         minTime: null,
@@ -320,12 +333,12 @@ const ContractDialog: React.FC<Props> = ({
                 setForm0((data) => ({
                   ...data,
                   startDate: value,
-                  endDate: null,
+                  endDate: value ? value.add(1, 'year') : null,
                 }))
               }}
               shouldDisableDate={(date) => [0, 6].includes(date.day())}
               renderInput={(params) => (
-                <TextField {...params} variant="outlined" />
+                <TextField {...params} required variant="outlined" />
               )}
               InputAdornmentProps={{
                 position: 'start',
@@ -348,7 +361,7 @@ const ContractDialog: React.FC<Props> = ({
             <DatePicker
               label="Enddatum"
               mask="__.__.____"
-              minDate={form0.startDate ?? undefined}
+              minDate={form0.startDate?.add(8, 'day') ?? undefined}
               defaultCalendarMonth={form0.startDate ?? undefined}
               disabled={form0.startDate === null}
               value={form0.endDate}
@@ -357,7 +370,7 @@ const ContractDialog: React.FC<Props> = ({
               }}
               shouldDisableDate={(date) => [0, 6].includes(date.day())}
               renderInput={(params) => (
-                <TextField {...params} variant="outlined" />
+                <TextField {...params} required variant="outlined" />
               )}
               InputAdornmentProps={{
                 position: 'start',
@@ -372,32 +385,6 @@ const ContractDialog: React.FC<Props> = ({
                     }
                   />
                 ),
-              }}
-            />
-          </EqualStack>
-          <EqualStack direction="row" spacing={2}>
-            <BetterTimePicker
-              label="Startzeit"
-              minutesStep={5}
-              maxTime={form0.endTime?.subtract(45, 'm')}
-              value={form0.startTime}
-              onChange={(value) => {
-                setForm0((data) => ({ ...data, startTime: value }))
-              }}
-              clearValue={() => {
-                setForm0((data) => ({ ...data, startTime: null }))
-              }}
-            />
-            <BetterTimePicker
-              label="Endzeit"
-              minutesStep={5}
-              minTime={form0.startTime?.add(45, 'm')}
-              value={form0.endTime}
-              onChange={(value) => {
-                setForm0((data) => ({ ...data, endTime: value }))
-              }}
-              clearValue={() => {
-                setForm0((data) => ({ ...data, endTime: null }))
               }}
             />
           </EqualStack>
@@ -427,6 +414,7 @@ const ContractDialog: React.FC<Props> = ({
             </InputLabel>
             <Select
               id="suggestion-select"
+              label={suggestions.length > 0 ? 'Vorschläge' : 'Keine Vorschläge'}
               disabled={suggestions.length === 0}
               value={selSuggestion}
               onChange={(e) => updateSelSuggestion(e.target.value)}
@@ -457,6 +445,7 @@ const ContractDialog: React.FC<Props> = ({
             <InputLabel htmlFor="teacher-select">Lehrkraft</InputLabel>
             <Select
               id="teacher-select"
+              label={'Lehrkraft'}
               disabled={selSuggestion !== ''}
               value={form1.teacher}
               onChange={(e) =>
@@ -478,80 +467,29 @@ const ContractDialog: React.FC<Props> = ({
           </FormControl>
 
           <EqualStack direction="row" spacing={2}>
-            <DatePicker
-              label="Startdatum"
-              mask="__.__.____"
-              minDate={form0.startDate ?? dayjs().add(1, 'd')}
-              maxDate={form0.endDate ?? undefined}
-              defaultCalendarMonth={form0.startDate ?? undefined}
-              value={form1.startDate}
-              onChange={(value) => {
-                setForm1((data) => ({
-                  ...data,
-                  startDate: value,
-                  endDate: null,
-                }))
-              }}
-              shouldDisableDate={(day) =>
-                [0, 6].includes(day.day()) ||
-                (selSuggestion !== '' && day.day() !== form1.dow)
-              }
-              renderInput={(params) => (
-                <TextField {...params} required variant="outlined" />
-              )}
-              InputAdornmentProps={{
-                position: 'start',
-              }}
-              InputProps={{
-                endAdornment: (
-                  <IconButtonAdornment
-                    icon={ClearIcon}
-                    hidden={form1.startDate === null}
-                    onClick={() =>
-                      setForm1((data) => ({
-                        ...data,
-                        startDate: null,
-                      }))
-                    }
-                  />
-                ),
-              }}
-            />
-            <DatePicker
-              label="Enddatum"
-              mask="__.__.____"
-              minDate={form1.startDate ?? undefined}
-              maxDate={form0.endDate ?? undefined}
-              defaultCalendarMonth={form1.startDate ?? undefined}
-              disabled={form1.startDate === null}
-              value={form1.endDate}
-              onChange={(value) => {
-                setForm1((data) => ({ ...data, endDate: value }))
-              }}
-              shouldDisableDate={(day) =>
-                !!(
-                  form1.startDate &&
-                  day.diff(form1.startDate, 'd') % (7 * form0.interval)
-                )
-              }
-              renderInput={(params) => (
-                <TextField {...params} variant="outlined" />
-              )}
-              InputAdornmentProps={{
-                position: 'start',
-              }}
-              InputProps={{
-                endAdornment: (
-                  <IconButtonAdornment
-                    icon={ClearIcon}
-                    hidden={form1.endDate === null}
-                    onClick={() =>
-                      setForm1((data) => ({ ...data, endDate: null }))
-                    }
-                  />
-                ),
-              }}
-            />
+            <FormControl variant="outlined" fullWidth required>
+              <InputLabel htmlFor="weekday-select">Wochentag</InputLabel>
+              <Select
+                id="weekday-select"
+                label={'Wochentag'}
+                value={(form1.startDate && form1.startDate.day()) || null}
+                disabled={selSuggestion !== ''}
+                onChange={(e) => {
+                  setForm1((data) => ({
+                    ...data,
+                    startDate: form0.startDate
+                      ? getNextDow(e.target.value as number, form0.startDate)
+                      : null,
+                  }))
+                }}
+              >
+                <MenuItem value={1}>Montag</MenuItem>
+                <MenuItem value={2}>Dienstag</MenuItem>
+                <MenuItem value={3}>Mittwoch</MenuItem>
+                <MenuItem value={4}>Donnerstag</MenuItem>
+                <MenuItem value={5}>Freitag</MenuItem>
+              </Select>
+            </FormControl>
           </EqualStack>
           <EqualStack direction="row" spacing={2}>
             <BetterTimePicker

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
 import dayjs, { Dayjs } from 'dayjs'
-import { Brackets, Connection, Repository } from 'typeorm'
+import { Brackets, Connection, Repository, UpdateResult } from 'typeorm'
 
 import { timeAvailable } from 'src/users/dto/timeAvailable'
 import { Customer, PrivateCustomer, Teacher, User } from 'src/users/entities'
@@ -50,6 +50,12 @@ export class ContractsService {
   async findOne(id: string): Promise<Contract> {
     return this.contractsRepository.findOne(id, {
       relations: ['subject', 'teacher', 'customers'],
+    })
+  }
+
+  async endContract(id: string): Promise<UpdateResult> {
+    return this.contractsRepository.update(id, {
+      endDate: dayjs().add(1, "day").format("YYYY-MM-DD")
     })
   }
 
@@ -166,6 +172,7 @@ export class ContractsService {
 
     return suggestions
   }
+
 
   async checkOverlap(
     teacherId: number,

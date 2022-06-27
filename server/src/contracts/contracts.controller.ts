@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
-import { EntityNotFoundError } from 'typeorm'
+import { EntityNotFoundError, UpdateResult } from 'typeorm'
 
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
@@ -39,9 +39,6 @@ export class ContractsController {
     if ([0, 6].includes(startDate.day()))
       throw new BadRequestException('invalid day of week')
 
-    if (endDate.diff(startDate, 'd') % (7 * dto.interval))
-      throw new BadRequestException('invalid endDate')
-
     if (endTime.diff(startTime, 'm') < 30)
       throw new BadRequestException('endTime must be >= 30min after startTime')
 
@@ -62,6 +59,7 @@ export class ContractsController {
       throw err
     })
   }
+
 
   @Get('suggest')
   @Roles(Role.ADMIN)
@@ -89,9 +87,24 @@ export class ContractsController {
     return this.contractsService.findOne(id)
   }
 
+  @Post(':id')
+  @Roles(Role.ADMIN)
+  async renew(@Param('id') id: string, @Body() dto: CreateContractDto): Promise<Contract> {
+    this.validateDto(dto)
+    this.contractsService.endContract(id)
+
+    return this.contractsService.create(dto).catch((err) => {
+      if (err instanceof EntityNotFoundError) {
+        throw new BadRequestException(err.message)
+      }
+
+      throw err
+    })
+  }
+
   @Delete(':id')
   @Roles(Role.ADMIN)
-  remove(@Param('id') id: string): Promise<void> {
-    return this.contractsService.remove(id)
+  remove(@Param('id') id: string): Promise<UpdateResult> {
+    return this.contractsService.endContract(id)
   }
 }

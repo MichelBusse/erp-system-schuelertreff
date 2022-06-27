@@ -14,6 +14,5 @@ export function maxDate(...dates: [Dayjs, ...Dayjs[]]) {
 
 export function getNextDow(dow: number, date: Dayjs = dayjs()) {
   if (dow < date.day()) dow += 7
-
   return date.day(dow)
 }
