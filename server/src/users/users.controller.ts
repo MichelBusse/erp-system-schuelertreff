@@ -54,9 +54,18 @@ export class UsersController {
     return this.usersService.findAllPrivateCustomers()
   }
 
+  @Public()
   @Get('classCustomer')
   findAllClassCustomers(): Promise<ClassCustomer[]> {
     return this.usersService.findAllClassCustomers()
+  }
+
+  @Public()
+  @Get('classCustomer/:schoolCustomerId')
+  findAllClassesOfSchool(
+    @Param('schoolCustomerId') schoolCustomerId: number
+  ): Promise<ClassCustomer[]> {
+    return this.usersService.findAllClassesOfSchool(schoolCustomerId)
   }
 
   @Get('schoolCustomer')
@@ -107,8 +116,7 @@ export class UsersController {
   }
 
   @Post('classCustomer')
-  @Public()
-  //@Roles(Role.ADMIN)
+  @Roles(Role.ADMIN)
   async createClassCustomer(
     @Body() dto: CreateClassCustomerDto,
   ): Promise<ClassCustomer> {

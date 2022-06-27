@@ -20,6 +20,7 @@ import { Contract } from './contract.entity'
 import { ContractsService } from './contracts.service'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
+import { Public } from 'src/auth/decorators/public.decorator'
 
 dayjs.extend(customParseFormat)
 
@@ -78,7 +79,8 @@ export class ContractsController {
   }
 
   @Get()
-  @Roles(Role.ADMIN)
+  @Public()
+  //@Roles(Role.ADMIN)
   findAll(): Promise<Contract[]> {
     return this.contractsService.findAll()
   }

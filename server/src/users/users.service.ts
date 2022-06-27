@@ -180,6 +180,30 @@ export class UsersService {
       .then(transformUser)
   }
 
+  async findAllClassesOfSchool(schoolCustomerId?: number): Promise<ClassCustomer[]> {
+    const q = this.classCustomersRepository
+      .createQueryBuilder('c')
+      .leftJoin('c.schoolCustomer', 'schoolCustomer')
+      .select([
+        'c',
+        'schoolCustomer.id',
+        'schoolCustomer.street',
+        'schoolCustomer.city',
+        'schoolCustomer.postalCode',
+        'schoolCustomer.schoolName',
+        'schoolCustomer.schoolTypes',
+      ])
+      // .loadAllRelationIds({
+      //   relations: ['teacher'],
+      // })
+      .where(
+        'c.schoolCustomerId = :schoolCustomerId',
+        { schoolCustomerId: schoolCustomerId },
+      )
+
+    return q.getMany()
+  }
+
   /**
    * Removes the {@link User} with the given id
    * @param id
@@ -211,11 +235,11 @@ export class UsersService {
       ...dto,
       timesAvailable: formatTimesAvailable(dto.timesAvailable),
       mayAuthenticate: false,
-      street: '',
-      city: '',
-      postalCode: '',
-      email: '',
-      phone: '',
+      street: null,
+      city: null,
+      postalCode: null,
+      email: null,
+      phone: null,
       schoolCustomer: { id: dto.schoolCustomer },
     })
 

@@ -47,20 +47,20 @@ export abstract class User {
   })
   salutation: Salutation
 
-  @Column()
+  @Column({ nullable: true })
   street: string
 
-  @Column()
+  @Column({ nullable: true })
   city: string
 
-  @Column()
+  @Column({ nullable: true })
   postalCode: string
 
   //TODO: E-Mail validation
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: true })
   email: string
 
-  @Column()
+  @Column({ nullable: true })
   phone: string
 
   @Column({ select: false, nullable: true })
