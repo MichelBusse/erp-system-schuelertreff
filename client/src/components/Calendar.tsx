@@ -8,7 +8,7 @@ import {
   GridRowsProp,
 } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { SideMenu } from '../pages/timetable'
 import { contract } from '../types/contract'
@@ -26,6 +26,7 @@ type Props = {
   refresh?: number
   teachers: teacher[]
 }
+
 
 const Calendar: React.FC<Props> = ({
   date,
@@ -131,54 +132,7 @@ const Calendar: React.FC<Props> = ({
             params.colDef.field !== 'teacher' &&
             (params.value ?? []).length > 0
           ) {
-            setDrawer({
-              open: true,
-              content: (
-                <>
-                  <span>{params.colDef.headerName?.replace('\n', ' / ')}</span>
-                  <Typography variant="h5" mb={3}>
-                    {params.row.teacher}
-                  </Typography>
-                  <Stack spacing={2}>
-                    {(params.value as contract[])?.map((c) => (
-                      <Stack
-                        key={c.id}
-                        spacing={0.5}
-                        sx={{
-                          backgroundColor: c.subject.color + 50,
-                          p: 1,
-                          borderRadius: 2,
-                        }}
-                      >
-                        <span>
-                          {c.startTime.substring(0, 5) +
-                            ' - ' +
-                            c.endTime.substring(0, 5)}
-                        </span>
-                        <span>{c.subject.name}</span>
-                        <span>Kunden:</span>
-                        <ul className={styles.list}>
-                          {c.customers.map((s) => (
-                            <li key={s.id}>
-                              {s.role === 'schoolCustomer'
-                                ? s.schoolName
-                                : s.firstName + ' ' + s.lastName}
-                            </li>
-                          ))}
-                        </ul>
-                        {dayjs(c.endDate).isAfter(dayjs()) && (
-                          <Button
-                            onClick={() => openContractDetailsDialog(c.id)}
-                          >
-                            Vertrag bearbeiten
-                          </Button>
-                        )}
-                      </Stack>
-                    ))}
-                  </Stack>
-                </>
-              ),
-            })
+            setDrawer({ open: true, content: drawerContent(params, openContractDetailsDialog) })
           }
         }}
       />
@@ -198,5 +152,45 @@ const Calendar: React.FC<Props> = ({
     </Paper>
   )
 }
+
+const drawerContent = (params: GridCellParams, openContractDetailsDialog: (id:number) => (void)) => (
+  <>
+    <span>{params.colDef.headerName?.replace('\n', ' / ')}</span>
+    <Typography variant="h5" mb={3}>
+      {params.row.teacher}
+    </Typography>
+    <Stack spacing={2}>
+      {(params.value as contract[])?.map((c) => (
+        <Stack
+          key={c.id}
+          spacing={0.5}
+          sx={{
+            backgroundColor: c.subject.color + 50,
+            p: 1,
+            borderRadius: 2,
+          }}
+        >
+          <span>
+            {c.startTime.substring(0, 5) + ' - ' + c.endTime.substring(0, 5)}
+          </span>
+          <span>{c.subject.name}</span>
+          <span>Kunden:</span>
+          <ul className={styles.list}>
+            {c.customers.map((s) => (
+              <li key={s.id}>
+                {s.role === 'schoolCustomer'
+                  ? s.schoolName
+                  : s.firstName + ' ' + s.lastName}
+              </li>
+            ))}
+          </ul>
+          {dayjs(c.endDate).isAfter(dayjs()) && <Button onClick={() => openContractDetailsDialog(c.id)}>
+            Vertrag bearbeiten
+          </Button>}
+        </Stack>
+      ))}
+    </Stack>
+  </>
+)
 
 export default Calendar
