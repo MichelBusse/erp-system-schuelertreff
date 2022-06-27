@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 import { Repository } from 'typeorm'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
+import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
@@ -14,12 +15,14 @@ import { UpdateTeacherDto } from './dto/update-teacher.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import {
   Admin,
+  ClassCustomer,
   Customer,
   PrivateCustomer,
   SchoolCustomer,
   Teacher,
   User,
 } from './entities'
+
 import { TeacherState } from './entities/teacher.entity'
 import { maxTimeRange } from './entities/user.entity'
 
@@ -83,6 +86,9 @@ export class UsersService {
     @InjectRepository(PrivateCustomer)
     private readonly privateCustomersRepository: Repository<PrivateCustomer>,
 
+    @InjectRepository(ClassCustomer)
+    private readonly classCustomersRepository: Repository<ClassCustomer>,
+
     @InjectRepository(SchoolCustomer)
     private readonly schoolCustomersRepository: Repository<SchoolCustomer>,
 
@@ -132,6 +138,10 @@ export class UsersService {
 
   async findAllPrivateCustomers(): Promise<PrivateCustomer[]> {
     return this.privateCustomersRepository.find().then(transformUsers)
+  }
+
+  async findAllClassCustomers(): Promise<ClassCustomer[]> {
+    return this.classCustomersRepository.find().then(transformUsers)
   }
 
   async findAllSchoolCustomers(): Promise<SchoolCustomer[]> {
@@ -194,12 +204,29 @@ export class UsersService {
     return this.privateCustomersRepository.save(privateCustomer)
   }
 
+  async createClassCustomer(
+    dto: CreateClassCustomerDto,
+  ): Promise<ClassCustomer> {
+    const classCustomer = this.classCustomersRepository.create({
+      ...dto,
+      timesAvailable: formatTimesAvailable(dto.timesAvailable),
+      mayAuthenticate: false,
+      street: '',
+      city: '',
+      postalCode: '',
+      email: '',
+      phone: '',
+      schoolCustomer: { id: dto.schoolCustomer },
+    })
+
+    return this.classCustomersRepository.save(classCustomer)
+  }
+
   async createSchoolCustomer(
     dto: CreateSchoolCustomerDto,
   ): Promise<SchoolCustomer> {
     const schoolCustomer = this.schoolCustomersRepository.create({
       ...dto,
-      timesAvailable: formatTimesAvailable(dto.timesAvailable),
       mayAuthenticate: false,
     })
 

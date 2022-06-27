@@ -8,6 +8,4 @@ import { Customer } from './customer.entity'
 export class PrivateCustomer extends Customer {
   role = Role.PRIVATECUSTOMER
 
-  @Column()
-  grade: number
 }

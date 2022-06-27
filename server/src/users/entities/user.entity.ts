@@ -8,6 +8,14 @@ import {
 
 import { Role } from 'src/auth/role.enum'
 
+export enum SchoolType
+{
+  GRUNDSCHULE = 'grundschule',
+  OBERSCHULE = 'oberschule',
+  GYMSEK1 = 'sek1',
+  GYMSEK2 = 'sek2',
+}
+
 export enum Salutation {
   FRAU = 'Frau',
   HERR = 'Herr',
@@ -70,4 +78,11 @@ export abstract class User {
     nullable: false,
   })
   timesAvailable: string
+
+  @Column({
+    type: 'enum',
+    enum: SchoolType, 
+    array: true, 
+  })
+  schoolTypes: SchoolType[]
 }

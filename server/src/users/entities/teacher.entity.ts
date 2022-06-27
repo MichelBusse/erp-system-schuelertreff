@@ -21,14 +21,6 @@ export enum Degree
   MASTER = 'master',
 }
 
-export enum SchoolType
-{
-  GRUNDSCHULE = 'grundschule',
-  OBERSCHULE = 'oberschule',
-  GYMSEK1 = 'sek1',
-  GYMSEK2 = 'sek2',
-}
-
 
 @ChildEntity()
 export class Teacher extends User {
@@ -50,13 +42,6 @@ export class Teacher extends User {
     enum: Degree,
   })
   degree: Degree
-
-  @Column({
-    type: 'enum',
-    enum: SchoolType, 
-    array: true, 
-  })
-  schoolTypes: SchoolType[]
 
   @ManyToMany(() => Subject)
   @JoinTable()

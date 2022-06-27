@@ -61,6 +61,7 @@ export class AppService implements OnApplicationBootstrap {
         postalCode: '',
         email: adminUser,
         phone: '',
+        schoolTypes: [],
       })
 
       this.usersService.setPassword(user.id, password)

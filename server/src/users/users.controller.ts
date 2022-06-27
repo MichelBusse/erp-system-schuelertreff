@@ -9,16 +9,18 @@ import {
 } from '@nestjs/common'
 
 import { AuthService } from 'src/auth/auth.service'
+import { Public } from 'src/auth/decorators/public.decorator'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
+import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
 import { UpdatePrivateCustomerDto } from './dto/update-privateCustomer.dto'
 import { UpdateTeacherDto } from './dto/update-teacher.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
+
 import {
   Admin,
   Customer,
@@ -26,6 +28,7 @@ import {
   SchoolCustomer,
   Teacher,
   User,
+  ClassCustomer,
 } from './entities'
 import { UsersService } from './users.service'
 
@@ -49,6 +52,11 @@ export class UsersController {
   @Get('privateCustomer')
   findAllPrivateCustomers(): Promise<PrivateCustomer[]> {
     return this.usersService.findAllPrivateCustomers()
+  }
+
+  @Get('classCustomer')
+  findAllClassCustomers(): Promise<ClassCustomer[]> {
+    return this.usersService.findAllClassCustomers()
   }
 
   @Get('schoolCustomer')
@@ -96,6 +104,15 @@ export class UsersController {
     @Body() dto: CreatePrivateCustomerDto,
   ): Promise<PrivateCustomer> {
     return this.usersService.createPrivateCustomer(dto)
+  }
+
+  @Post('classCustomer')
+  @Public()
+  //@Roles(Role.ADMIN)
+  async createClassCustomer(
+    @Body() dto: CreateClassCustomerDto,
+  ): Promise<ClassCustomer> {
+    return this.usersService.createClassCustomer(dto)
   }
 
   @Post('schoolCustomer')

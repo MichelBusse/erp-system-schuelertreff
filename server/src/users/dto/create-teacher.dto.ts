@@ -2,7 +2,7 @@ import { Type } from 'class-transformer'
 import { IsArray, IsNotEmpty, ValidateNested } from 'class-validator'
 
 import { Subject } from 'src/subjects/subject.entity'
-import { Degree, SchoolType } from '../entities/teacher.entity'
+import { Degree } from '../entities/teacher.entity'
 
 import { Salutation } from '../entities/user.entity'
 import { CreateUserDto } from './create-user.dto'
@@ -20,9 +20,6 @@ export class CreateTeacherDto extends CreateUserDto {
 
   @IsNotEmpty()
   degree: Degree
-
-  @IsArray()
-  schoolTypes: SchoolType[]
 
   fee: number
 

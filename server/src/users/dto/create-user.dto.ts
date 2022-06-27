@@ -1,3 +1,6 @@
+import { IsArray } from "class-validator"
+import { SchoolType } from "../entities/user.entity"
+
 export abstract class CreateUserDto {
   street: string
 
@@ -8,4 +11,7 @@ export abstract class CreateUserDto {
   email: string
 
   phone: string
+
+  @IsArray()
+  schoolTypes: SchoolType[]
 }
