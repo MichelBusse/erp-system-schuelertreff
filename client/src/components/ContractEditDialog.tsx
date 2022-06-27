@@ -1,3 +1,4 @@
+import ClearIcon from '@mui/icons-material/Clear'
 import {
   Autocomplete,
   Button,
@@ -12,20 +13,19 @@ import {
   Stack,
   TextField,
 } from '@mui/material'
-import ClearIcon from '@mui/icons-material/Clear'
+import { DatePicker } from '@mui/x-date-pickers'
 import dayjs, { Dayjs } from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { useAuth } from './AuthProvider'
-import BetterTimePicker from './BetterTimePicker'
-import { DatePicker } from '@mui/x-date-pickers'
-import IconButtonAdornment from './IconButtonAdornment'
+import subject from '../types/subject'
 import { customer, teacher } from '../types/user'
 import { getNextDow } from '../utils/date'
-import subject from '../types/subject'
+import { useAuth } from './AuthProvider'
+import BetterTimePicker from './BetterTimePicker'
+import IconButtonAdornment from './IconButtonAdornment'
 
 dayjs.extend(customParseFormat)
 
@@ -55,7 +55,6 @@ const ContractEditDialog: React.FC<Props> = ({
   const { API } = useAuth()
   const [customers, setCustomers] = useState<customer[]>([])
   const { enqueueSnackbar } = useSnackbar()
-  const navigate = useNavigate()
 
   useEffect(() => {
     API.get('users/customer').then((res) => setCustomers(res.data))
@@ -89,7 +88,7 @@ const ContractEditDialog: React.FC<Props> = ({
     if (dialogInfo.id === -1) return
 
     API.get('contracts/' + dialogInfo.id).then((res) => {
-      let contract = {
+      const contract = {
         startDate: dayjs(res.data.startDate),
         endDate: dayjs(res.data.endDate),
         startTime: dayjs(res.data.startTime, 'HH:mm'),

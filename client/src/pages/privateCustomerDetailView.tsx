@@ -97,13 +97,19 @@ const PrivateCustomerDetailView: React.FC = () => {
   const deleteUser = () => {
     setDialogOpen(false)
 
-    API.delete('users/privateCustomer/' + requestedId).then((res) => {
-      enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gelöscht')
-      navigate('/privateCustomers')
-    }).catch((reason) => {
-      enqueueSnackbar(data.firstName + ' ' + data.lastName + ' kann nicht gelöscht werden, da er noch laufende Verträge hat')
-    })
-
+    API.delete('users/privateCustomer/' + requestedId)
+      .then(() => {
+        enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gelöscht')
+        navigate('/privateCustomers')
+      })
+      .catch(() => {
+        enqueueSnackbar(
+          data.firstName +
+            ' ' +
+            data.lastName +
+            ' kann nicht gelöscht werden, da er noch laufende Verträge hat',
+        )
+      })
   }
 
   return (
@@ -305,10 +311,11 @@ const PrivateCustomerDetailView: React.FC = () => {
         keepMounted
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>{"Schüler:in wirklich löschen?"}</DialogTitle>
+        <DialogTitle>{'Schüler:in wirklich löschen?'}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-              Schüler:innen können nur gelöscht werden, wenn sie in keinen laufenden oder zukünftigen Verträgen mehr eingeplant sind.
+            Schüler:innen können nur gelöscht werden, wenn sie in keinen
+            laufenden oder zukünftigen Verträgen mehr eingeplant sind.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

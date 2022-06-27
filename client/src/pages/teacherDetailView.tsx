@@ -106,16 +106,20 @@ const TeacherDetailView: React.FC = () => {
   const deleteUser = () => {
     setDialogOpen(false)
 
-    API.delete('users/teacher/' + requestedId).then((res) => {
-      enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gelöscht')
-      navigate('/teachers')
-    }).catch((reason) => {
-      enqueueSnackbar(data.firstName + ' ' + data.lastName + ' kann nicht gelöscht werden, da er noch laufende Verträge hat')
-    })
-
+    API.delete('users/teacher/' + requestedId)
+      .then(() => {
+        enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gelöscht')
+        navigate('/teachers')
+      })
+      .catch(() => {
+        enqueueSnackbar(
+          data.firstName +
+            ' ' +
+            data.lastName +
+            ' kann nicht gelöscht werden, da er noch laufende Verträge hat',
+        )
+      })
   }
-
-
 
   return (
     <div className={styles.wrapper}>
@@ -377,10 +381,11 @@ const TeacherDetailView: React.FC = () => {
         keepMounted
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>{"Lehrer:in wirklich löschen?"}</DialogTitle>
+        <DialogTitle>{'Lehrer:in wirklich löschen?'}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-              Lehrer:innen können nur gelöscht werden, wenn sie in keinen laufenden oder zukünftigen Verträgen mehr eingeplant sind.
+            Lehrer:innen können nur gelöscht werden, wenn sie in keinen
+            laufenden oder zukünftigen Verträgen mehr eingeplant sind.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

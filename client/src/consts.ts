@@ -1,6 +1,6 @@
 import { GridLocaleText } from '@mui/x-data-grid'
-import { privateCustomerForm, teacherForm } from './types/form'
 
+import { privateCustomerForm, teacherForm } from './types/form'
 import subject from './types/subject'
 
 export const dataGridLocaleText: Partial<GridLocaleText> = {
@@ -11,7 +11,7 @@ export const dataGridLocaleText: Partial<GridLocaleText> = {
   filterPanelInputPlaceholder: 'Eingabe',
 }
 
-export const defaultTeacherFormData : teacherForm = {
+export const defaultTeacherFormData: teacherForm = {
   firstName: '',
   lastName: '',
   salutation: '',
@@ -27,7 +27,7 @@ export const defaultTeacherFormData : teacherForm = {
   timesAvailable: [],
 }
 
-export const defaultPrivateCustomerFormData : privateCustomerForm = {
+export const defaultPrivateCustomerFormData: privateCustomerForm = {
   firstName: '',
   lastName: '',
   salutation: '',

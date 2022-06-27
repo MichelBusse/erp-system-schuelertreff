@@ -1,5 +1,4 @@
 import {
-  AccountBalance as AccountBalanceIcon,
   Layers as LayersIcon,
   ManageAccounts as ManageAccountsIcon,
   People as PeopleIcon,

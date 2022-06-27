@@ -43,7 +43,7 @@ const AddTimes: React.FC<Props> = ({ data, setData }) => {
   })
   const addTime = () => {
     if (times.dow && times.start && times.end) {
-      setData((data : any) => ({
+      setData((data: any) => ({
         ...data,
         timesAvailable: [
           ...data.timesAvailable,
@@ -66,7 +66,7 @@ const AddTimes: React.FC<Props> = ({ data, setData }) => {
 
   async function deleteTime(id: string) {
     const newTimes = data.timesAvailable.filter((time) => time.id !== id)
-    setData((data : any) => ({ ...data, timesAvailable: newTimes }))
+    setData((data: any) => ({ ...data, timesAvailable: newTimes }))
   }
 
   const elements = data.timesAvailable.map((time) => {

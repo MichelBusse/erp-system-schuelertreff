@@ -1,5 +1,5 @@
-import subject from "./subject"
-import { customer } from "./user"
+import subject from './subject'
+import { customer } from './user'
 
 export type contract = {
   id: number

@@ -27,7 +27,6 @@ type Props = {
   teachers: teacher[]
 }
 
-
 const Calendar: React.FC<Props> = ({
   date,
   setDrawer,
@@ -132,7 +131,10 @@ const Calendar: React.FC<Props> = ({
             params.colDef.field !== 'teacher' &&
             (params.value ?? []).length > 0
           ) {
-            setDrawer({ open: true, content: drawerContent(params, openContractDetailsDialog) })
+            setDrawer({
+              open: true,
+              content: drawerContent(params, openContractDetailsDialog),
+            })
           }
         }}
       />
@@ -153,7 +155,10 @@ const Calendar: React.FC<Props> = ({
   )
 }
 
-const drawerContent = (params: GridCellParams, openContractDetailsDialog: (id:number) => (void)) => (
+const drawerContent = (
+  params: GridCellParams,
+  openContractDetailsDialog: (id: number) => void,
+) => (
   <>
     <span>{params.colDef.headerName?.replace('\n', ' / ')}</span>
     <Typography variant="h5" mb={3}>
@@ -184,9 +189,11 @@ const drawerContent = (params: GridCellParams, openContractDetailsDialog: (id:nu
               </li>
             ))}
           </ul>
-          {dayjs(c.endDate).isAfter(dayjs()) && <Button onClick={() => openContractDetailsDialog(c.id)}>
-            Vertrag bearbeiten
-          </Button>}
+          {dayjs(c.endDate).isAfter(dayjs()) && (
+            <Button onClick={() => openContractDetailsDialog(c.id)}>
+              Vertrag bearbeiten
+            </Button>
+          )}
         </Stack>
       ))}
     </Stack>

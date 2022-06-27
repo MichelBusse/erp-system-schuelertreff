@@ -128,7 +128,7 @@ const subjectOperator: GridFilterOperator = {
 const degreeOperator: GridFilterOperator = {
   label: 'mindestens',
   value: 'mininum',
-  getApplyFilterFn: (filterItem: GridFilterItem ) => {
+  getApplyFilterFn: (filterItem: GridFilterItem) => {
     if (
       !filterItem.columnField ||
       !filterItem.value ||

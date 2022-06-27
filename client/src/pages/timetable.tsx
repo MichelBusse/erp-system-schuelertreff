@@ -8,10 +8,10 @@ import { ReactElement, useEffect, useState } from 'react'
 import { useAuth } from '../components/AuthProvider'
 import Calendar from '../components/Calendar'
 import ContractDialog from '../components/ContractDialog'
+import ContractEditDialog from '../components/ContractEditDialog'
 import HiddenMenu from '../components/HiddenMenu'
 import TeacherCalendar from '../components/TeacherCalendar'
 import { teacher } from '../types/user'
-import ContractEditDialog from '../components/ContractEditDialog'
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)

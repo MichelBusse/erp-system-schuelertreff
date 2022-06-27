@@ -189,7 +189,6 @@ const ContractDialog: React.FC<Props> = ({
           ? dayjs(suggestion.end, 'HH:mm')
           : dayjs(suggestion.end, 'HH:mm').subtract(5, 'minute')
 
-
       setForm1({
         startDate: form0.startDate
           ? getNextDow(suggestion.dow, form0.startDate)
@@ -483,11 +482,31 @@ const ContractDialog: React.FC<Props> = ({
                   }))
                 }}
               >
-                <MenuItem value={1}>{`Montag (Start: ${form0.startDate ? getNextDow(1, form0.startDate).format("DD.MM.YYYY") : ""})`}</MenuItem>
-                <MenuItem value={2}>{`Dienstag (Start: ${form0.startDate ? getNextDow(2, form0.startDate).format("DD.MM.YYYY") : ""})`}</MenuItem>
-                <MenuItem value={3}>{`Mittwoch (Start: ${form0.startDate ? getNextDow(3, form0.startDate).format("DD.MM.YYYY") : ""})`}</MenuItem>
-                <MenuItem value={4}>{`Donnerstag (Start:${form0.startDate ? getNextDow(4, form0.startDate).format("DD.MM.YYYY") : ""})`}</MenuItem>
-                <MenuItem value={5}>{`Freitag (Start: ${form0.startDate ? getNextDow(5, form0.startDate).format("DD.MM.YYYY") : ""})`}</MenuItem>
+                <MenuItem value={1}>{`Montag (Start: ${
+                  form0.startDate
+                    ? getNextDow(1, form0.startDate).format('DD.MM.YYYY')
+                    : ''
+                })`}</MenuItem>
+                <MenuItem value={2}>{`Dienstag (Start: ${
+                  form0.startDate
+                    ? getNextDow(2, form0.startDate).format('DD.MM.YYYY')
+                    : ''
+                })`}</MenuItem>
+                <MenuItem value={3}>{`Mittwoch (Start: ${
+                  form0.startDate
+                    ? getNextDow(3, form0.startDate).format('DD.MM.YYYY')
+                    : ''
+                })`}</MenuItem>
+                <MenuItem value={4}>{`Donnerstag (Start:${
+                  form0.startDate
+                    ? getNextDow(4, form0.startDate).format('DD.MM.YYYY')
+                    : ''
+                })`}</MenuItem>
+                <MenuItem value={5}>{`Freitag (Start: ${
+                  form0.startDate
+                    ? getNextDow(5, form0.startDate).format('DD.MM.YYYY')
+                    : ''
+                })`}</MenuItem>
               </Select>
             </FormControl>
           </EqualStack>
