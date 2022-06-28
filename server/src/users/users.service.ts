@@ -201,7 +201,7 @@ export class UsersService {
         { schoolCustomerId: schoolCustomerId },
       )
 
-    return q.getMany()
+    return q.getMany().then(transformUsers)
   }
 
   /**

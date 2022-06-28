@@ -69,14 +69,24 @@ const App: React.FC = () => {
                   }
                 />
               </Route>
-              <Route
-                path="schoolCustomers"
-                element={
-                  <ProtectedRoute>
-                    <Pages.SchoolCustomers />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="schoolCustomers">
+                <Route
+                  path=""
+                  element={
+                    <ProtectedRoute>
+                      <Pages.SchoolCustomers />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path=":id"
+                  element={
+                    <ProtectedRoute>
+                      <Pages.SchoolCustomerDetailView />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
               <Route path="teachers">
                 <Route
                   path=""

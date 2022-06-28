@@ -3,7 +3,7 @@ import subject from './subject'
 import timeAvailable from './timeAvailable'
 
 interface user {
-  role: 'admin' | 'teacher' | 'privateCustomer' | 'schoolCustomer'
+  role: 'admin' | 'teacher' | 'privateCustomer' | 'schoolCustomer' | 'classCustomer'
   id: number
   lastName: string
   firstName: string
@@ -40,9 +40,16 @@ export interface privateCustomer extends user {
 }
 
 export interface schoolCustomer
-  extends Omit<user, 'lastName' | 'firstName' | 'salutation'> {
+  extends Omit<user, 'lastName' | 'firstName'> {
   role: 'schoolCustomer'
   schoolName: string
+}
+
+export interface classCustomer
+  extends Omit<user, 'lastName' | 'firstName' | 'salutation' | 'street' | 'city' | 'postalCode' | 'email' | 'phone'> {
+  role: 'classCustomer'
+  className: string
+  numberOfStudents: number
 }
 
 export type customer = privateCustomer | schoolCustomer

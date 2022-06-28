@@ -20,6 +20,19 @@ export interface teacherForm extends userForm {
   schoolTypes: string[]
 }
 
+export interface schoolCustomerForm
+  extends Omit<userForm, 'lastName' | 'firstName' | 'salutation' | 'timesAvailable'> {
+  schoolName: string
+  schoolTypes: string[]
+}
+
+export interface classCustomerForm
+  extends Omit<userForm, 'lastName' | 'firstName' | 'salutation' | 'street' | 'city' | 'postalCode' | 'email' | 'phone'> {
+  className: string
+  numberOfStudents: number
+  grade: number
+}
+
 export interface privateCustomerForm extends userForm {
   grade: number | null
 }

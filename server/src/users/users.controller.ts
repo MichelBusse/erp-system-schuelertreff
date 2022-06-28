@@ -69,6 +69,7 @@ export class UsersController {
   }
 
   @Get('schoolCustomer')
+  @Public()
   findAllSchoolCustomers(): Promise<SchoolCustomer[]> {
     return this.usersService.findAllSchoolCustomers()
   }
@@ -76,6 +77,13 @@ export class UsersController {
   @Get('teacher')
   findAllTeachers(): Promise<Teacher[]> {
     return this.usersService.findAllTeachers()
+  }
+
+  @Get('schoolCustomer/:id')
+  @Public()
+  //@Roles(Role.ADMIN)
+  findOneSchoolCustomer(@Param('id') id: number): Promise<SchoolCustomer> {
+    return this.usersService.findOneSchoolCustomer(id)
   }
 
   @Get('privateCustomer/me')

@@ -38,3 +38,20 @@ export const defaultPrivateCustomerFormData = {
   grade: null,
   timesAvailable: [],
 }
+
+export const defaultSchoolCustomerFormData = {
+  schoolName: '',
+  city: '',
+  postalCode: '',
+  street: '',
+  email: '',
+  phone: '',
+  schoolTypes: [''],
+}
+
+export const defaultClassCustomerFormData = {
+  className: '',
+  numberOfStudents: 0,
+  grade: 0,
+  timesAvailable: [],
+}

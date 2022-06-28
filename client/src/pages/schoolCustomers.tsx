@@ -4,10 +4,12 @@ import {
   DataGrid,
   getGridStringOperators,
   GridColumns,
+  GridEventListener,
   GridRowSpacingParams,
   GridToolbarContainer,
   GridToolbarFilterButton,
 } from '@mui/x-data-grid'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
@@ -64,13 +66,15 @@ const cols: GridColumns = [
 const SchoolCustomers: React.FC = () => {
   const [open, setOpen] = useState(false)
   const [customers, setCustomers] = useState<schoolCustomer[]>([])
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const { API } = useAuth()
 
   //Get subjects, teachers from DB
   useEffect(() => {
     API.get(`users/schoolCustomer`).then((res) => setCustomers(res.data))
-  }, [])
+  }, [location])
 
   //creating rows out of the teachers
   const rows = customers.map((customer) => ({
@@ -89,12 +93,18 @@ const SchoolCustomers: React.FC = () => {
     [],
   )
 
+  //Row click event
+  const onRowClick: GridEventListener<'rowClick'> = (params) => {
+    navigate('' + params.id)
+  }
+
   return (
     <div className={styles.wrapper}>
       <div style={{ flexGrow: 1 }}>
         <DataGrid
           headerHeight={0}
           disableSelectionOnClick={true}
+          onRowClick={onRowClick}
           localeText={dataGridLocaleText}
           components={{
             Toolbar: () => (
@@ -114,6 +124,7 @@ const SchoolCustomers: React.FC = () => {
           getRowSpacing={getRowSpacing}
         />
       </div>
+      
       <SchoolCustomerDialog
         open={open}
         setOpen={setOpen}
