@@ -327,7 +327,12 @@ const TeacherDetailView: React.FC = () => {
           </Stack>
           <h3>Verfügbarkeit:</h3>
           <Box>
-            <AddTimes data={data} setData={setData} />
+            <AddTimes
+              value={data.timesAvailable}
+              setValue={(newValue) =>
+                setData((data) => ({ ...data, timesAvailable: newValue }))
+              }
+            />
           </Box>
           <Stack direction={'row'} columnGap={5} sx={{ marginTop: '15px' }}>
             {id && (

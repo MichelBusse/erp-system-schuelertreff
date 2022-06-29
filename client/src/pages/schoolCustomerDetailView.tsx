@@ -178,7 +178,12 @@ const SchoolCustomerDetailView: React.FC = () => {
               </AccordionSummary>
               <AccordionDetails>
               <Box>
-                <AddTimes data={classCustomer} setData={setClassCustomers} />
+                <AddTimes
+                  value={classCustomer.timesAvailable}
+                  setValue={(newValue) =>
+                    setClassCustomers((data) => ({ ...data, timesAvailable: newValue }))
+                  }
+                />
               </Box>
               </AccordionDetails>
             </Accordion>

@@ -21,13 +21,8 @@ import dayjs, { Dayjs } from 'dayjs'
 import { nanoid } from 'nanoid'
 import { useState } from 'react'
 
-import { form } from '../types/form'
 import BetterTimePicker from './BetterTimePicker'
-
-type Props = {
-  data: form
-  setData: React.Dispatch<React.SetStateAction<form>>
-}
+import timeAvailable from '../types/timeAvailable'
 
 type times = {
   dow: string
@@ -35,7 +30,12 @@ type times = {
   end: Dayjs | null
 }
 
-const AddTimes: React.FC<Props> = ({ data, setData }) => {
+type Props = {
+  value: timeAvailable[]
+  setValue: (newValue: timeAvailable[]) => void
+}
+
+const AddTimes: React.FC<Props> = ({ value, setValue }) => {
   const [times, setTimes] = useState<times>({
     dow: '',
     start: null,
@@ -43,18 +43,15 @@ const AddTimes: React.FC<Props> = ({ data, setData }) => {
   })
   const addTime = () => {
     if (times.dow && times.start && times.end) {
-      setData((data) => ({
-        ...data,
-        timesAvailable: [
-          ...data.timesAvailable,
-          {
-            id: nanoid(),
-            dow: parseInt(times.dow),
-            start: times.start,
-            end: times.end,
-          },
-        ],
-      }))
+      setValue([
+        ...value,
+        {
+          id: nanoid(),
+          dow: parseInt(times.dow),
+          start: times.start,
+          end: times.end,
+        },
+      ])
 
       setTimes({
         dow: '',
@@ -65,11 +62,10 @@ const AddTimes: React.FC<Props> = ({ data, setData }) => {
   }
 
   async function deleteTime(id: string) {
-    const newTimes = data.timesAvailable.filter((time) => time.id !== id)
-    setData((data) => ({ ...data, timesAvailable: newTimes }))
+    setValue(value.filter((time) => time.id !== id))
   }
 
-  const elements = data.timesAvailable.map((time) => {
+  const elements = value.map((time) => {
     const timeText =
       `${dayjs().day(time.dow).format('dddd')}: ` +
       `${time.start?.format('HH:mm')} - ${time.end?.format('HH:mm')}`

@@ -14,7 +14,7 @@ interface user {
   email: string
   phone: string
   timesAvailableParsed: timesAvailableParsed[]
-  timesAvailable: (timeAvailable & { id: string })[]
+  timesAvailable: timeAvailable[]
 }
 
 export type timesAvailableParsed = {

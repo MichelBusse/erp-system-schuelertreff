@@ -10,7 +10,7 @@ interface userForm {
   street: string
   email: string
   phone: string
-  timesAvailable: (timeAvailable & { id: string })[]
+  timesAvailable: timeAvailable[]
 }
 
 export interface teacherForm extends userForm {
