@@ -18,8 +18,9 @@ import dayjs, { Dayjs } from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
-import { contractForm } from '../types/form'
 
+import { snackbarOptions } from '../consts'
+import { contractForm } from '../types/form'
 import subject from '../types/subject'
 import { customer, teacher } from '../types/user'
 import { getNextDow } from '../utils/date'
@@ -34,7 +35,6 @@ type Props = {
   setDialogInfo: (open: boolean, id: number) => void
   onSuccess?: () => void
 }
-
 
 const ContractEditDialog: React.FC<Props> = ({
   dialogInfo,
@@ -105,7 +105,7 @@ const ContractEditDialog: React.FC<Props> = ({
         startTime: data.startTime?.format('HH:mm'),
         endTime: data.endTime?.format('HH:mm'),
       }).then(() => {
-        enqueueSnackbar('Vertrag geändert')
+        enqueueSnackbar('Vertrag geändert', snackbarOptions)
         setDialogInfo(false, -1)
         onSuccess()
       })
@@ -114,7 +114,7 @@ const ContractEditDialog: React.FC<Props> = ({
   const deleteContract = () => {
     if (window.confirm('Vertrag wirklich beenden?'))
       API.delete('contracts/' + dialogInfo.id).then(() => {
-        enqueueSnackbar('Vertrag beendet')
+        enqueueSnackbar('Vertrag beendet', snackbarOptions)
         setDialogInfo(false, -1)
         onSuccess()
       })

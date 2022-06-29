@@ -24,9 +24,10 @@ import {
 import { DatePicker } from '@mui/x-date-pickers'
 import dayjs, { Dayjs } from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
-import { OptionsObject as SnackbarOptions, useSnackbar } from 'notistack'
+import { useSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 
+import { snackbarOptionsError } from '../consts'
 import subject from '../types/subject'
 import { customer, teacher } from '../types/user'
 import { getNextDow } from '../utils/date'
@@ -67,14 +68,6 @@ type form1 = {
   maxTime: Dayjs | null
   teacher: string
   dow: number | null
-}
-
-const snackbarOptions: SnackbarOptions = {
-  variant: 'error',
-  anchorOrigin: {
-    vertical: 'bottom',
-    horizontal: 'right',
-  },
 }
 
 type Props = {
@@ -169,7 +162,7 @@ const ContractDialog: React.FC<Props> = ({
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
       })
       .finally(() => setLoading0(false))
   }
@@ -241,7 +234,7 @@ const ContractDialog: React.FC<Props> = ({
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
       })
       .finally(() => setLoading1(false))
   }

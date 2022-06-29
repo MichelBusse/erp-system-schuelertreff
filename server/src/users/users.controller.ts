@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -93,6 +94,9 @@ export class UsersController {
   async createPrivateCustomer(
     @Body() dto: CreatePrivateCustomerDto,
   ): Promise<PrivateCustomer> {
+    if (await this.usersService.checkDuplicateEmail(dto.email))
+      throw new BadRequestException('Email ist bereits im System registriert.')
+
     return this.usersService.createPrivateCustomer(dto)
   }
 
@@ -101,12 +105,18 @@ export class UsersController {
   async createSchoolCustomer(
     @Body() dto: CreateSchoolCustomerDto,
   ): Promise<SchoolCustomer> {
+    if (await this.usersService.checkDuplicateEmail(dto.email))
+      throw new BadRequestException('Email ist bereits im System registriert.')
+
     return this.usersService.createSchoolCustomer(dto)
   }
 
   @Post('teacher')
   @Roles(Role.ADMIN)
   async createTeacher(@Body() dto: CreateTeacherDto): Promise<Teacher> {
+    if (await this.usersService.checkDuplicateEmail(dto.email))
+      throw new BadRequestException('Email ist bereits im System registriert.')
+
     const user = await this.usersService.createTeacher(dto)
 
     this.authService.initReset(user)

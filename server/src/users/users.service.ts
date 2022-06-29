@@ -2,8 +2,9 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
 import * as argon2 from 'argon2'
 import dayjs from 'dayjs'
-import { Contract } from 'src/contracts/contract.entity'
 import { Connection, Repository } from 'typeorm'
+
+import { Contract } from 'src/contracts/contract.entity'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
@@ -94,6 +95,16 @@ export class UsersService {
     @InjectConnection()
     private connection: Connection,
   ) {}
+
+  /**
+   * Check if email is already in DB
+   */
+  async checkDuplicateEmail(email: string): Promise<boolean> {
+    return this.usersRepository
+      .findOneOrFail({ where: { email: email } })
+      .then(() => true)
+      .catch(() => false)
+  }
 
   /**
    * Generate a salted password hash using argon2id
