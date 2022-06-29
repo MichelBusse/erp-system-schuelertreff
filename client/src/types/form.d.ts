@@ -8,7 +8,6 @@ import { customer, teacher } from './user'
 export interface userForm {
   firstName: string
   lastName: string
-  salutation: string
   city: string
   postalCode: string
   street: string

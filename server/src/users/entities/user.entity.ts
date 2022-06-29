@@ -8,12 +8,6 @@ import {
 
 import { Role } from 'src/auth/role.enum'
 
-export enum Salutation {
-  FRAU = 'Frau',
-  HERR = 'Herr',
-  DIVERS = 'divers',
-}
-
 // the week of 2001-01-01 is used as dummy, DOW and time is important here
 export const maxTimeRange = '[2001-01-01 00:00, 2001-01-08 00:00)'
 
@@ -31,13 +25,6 @@ export abstract class User {
 
   @Column({ nullable: true })
   firstName: string
-
-  @Column({
-    type: 'enum',
-    enum: Salutation,
-    nullable: true,
-  })
-  salutation: Salutation
 
   @Column()
   street: string

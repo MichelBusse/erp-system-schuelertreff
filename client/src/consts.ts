@@ -15,7 +15,6 @@ export const dataGridLocaleText: Partial<GridLocaleText> = {
 export const defaultTeacherFormData: teacherForm = {
   firstName: '',
   lastName: '',
-  salutation: '',
   city: '',
   postalCode: '',
   street: '',
@@ -31,7 +30,6 @@ export const defaultTeacherFormData: teacherForm = {
 export const defaultPrivateCustomerFormData: privateCustomerForm = {
   firstName: '',
   lastName: '',
-  salutation: '',
   city: '',
   postalCode: '',
   street: '',

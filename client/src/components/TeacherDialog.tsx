@@ -94,25 +94,6 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           sx={{ paddingTop: '15px' }}
         >
           <Stack direction={'row'} columnGap={2}>
-            <FormControl sx={{ width: '240px' }}>
-              <InputLabel id="SalutationLable">Anrede</InputLabel>
-              <Select
-                id="Salutation"
-                label="Anrede"
-                value={data.salutation}
-                onChange={(event) =>
-                  setData((data) => ({
-                    ...data,
-                    salutation: event.target.value,
-                  }))
-                }
-              >
-                <MenuItem value="Herr">Herr</MenuItem>
-                <MenuItem value="Frau">Frau</MenuItem>
-                <MenuItem value="divers">divers</MenuItem>
-              </Select>
-              <FormHelperText>{errors.salutation}</FormHelperText>
-            </FormControl>
             <TextField
               helperText={errors.firstName}
               id="firstName"

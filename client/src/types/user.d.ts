@@ -7,7 +7,6 @@ interface user {
   id: number
   lastName: string
   firstName: string
-  salutation: string
   street: string
   city: string
   postalCode: string
@@ -39,8 +38,7 @@ export interface privateCustomer extends user {
   role: 'privateCustomer'
 }
 
-export interface schoolCustomer
-  extends Omit<user, 'lastName' | 'firstName' | 'salutation'> {
+export interface schoolCustomer extends Omit<user, 'lastName' | 'firstName'> {
   role: 'schoolCustomer'
   schoolName: string
 }

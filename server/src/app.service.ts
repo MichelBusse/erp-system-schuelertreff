@@ -4,7 +4,6 @@ import { InjectConnection } from '@nestjs/typeorm'
 import { nanoid } from 'nanoid'
 import { Connection } from 'typeorm'
 
-import { Salutation } from './users/entities/user.entity'
 import { UsersService } from './users/users.service'
 
 @Injectable()
@@ -65,7 +64,6 @@ export class AppService implements OnApplicationBootstrap {
       const user = await this.usersService.createAdmin({
         lastName: 'Administrator',
         firstName: '',
-        salutation: Salutation.HERR,
         street: '',
         city: '',
         postalCode: '',
