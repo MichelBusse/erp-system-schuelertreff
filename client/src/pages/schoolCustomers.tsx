@@ -90,7 +90,7 @@ const SchoolCustomers: React.FC = () => {
   )
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} style={{ minHeight: '100vh' }}>
       <div style={{ flexGrow: 1 }}>
         <DataGrid
           headerHeight={0}

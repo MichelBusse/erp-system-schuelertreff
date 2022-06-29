@@ -31,7 +31,7 @@ export class Teacher extends User {
   role = Role.TEACHER
 
   //TODO: decimal value
-  @Column()
+  @Column({ nullable: true })
   fee: number
 
   @Column({

@@ -1,6 +1,6 @@
-export function formValidation(form: string, data: any): any {
-  const testEmail = (email: string) => /.+@.+\.[A-Za-z]+$/.test(email)
+export const testEmail = (email: string) => /.+@.+\.[A-Za-z]+$/.test(email)
 
+export function formValidation(form: string, data: any): any {
   const errorText = {
     schoolName: 'fehlt',
     firstName: 'fehlt',

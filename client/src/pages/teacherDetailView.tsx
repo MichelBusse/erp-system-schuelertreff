@@ -24,7 +24,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
-import { formValidation } from '../components/FormValidation'
 import {
   defaultTeacherFormData,
   snackbarOptions,
@@ -35,6 +34,7 @@ import { Degree, SchoolType } from '../types/enums'
 import { teacherForm } from '../types/form'
 import subject from '../types/subject'
 import { timesAvailableParsed } from '../types/user'
+import { formValidation } from '../utils/formValidation'
 
 dayjs.extend(customParseFormat)
 
@@ -132,7 +132,7 @@ const TeacherDetailView: React.FC = () => {
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} style={{ minHeight: '100vh' }}>
       <Box
         sx={{
           flexGrow: 1,

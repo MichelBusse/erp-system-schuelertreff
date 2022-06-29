@@ -5,11 +5,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  FormControl,
-  FormHelperText,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TextField,
 } from '@mui/material'
@@ -23,7 +18,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
-import { formValidation } from '../components/FormValidation'
 import {
   defaultPrivateCustomerFormData,
   snackbarOptions,
@@ -32,6 +26,7 @@ import {
 import styles from '../pages/gridList.module.scss'
 import { privateCustomerForm } from '../types/form'
 import { timesAvailableParsed } from '../types/user'
+import { formValidation } from '../utils/formValidation'
 
 dayjs.extend(customParseFormat)
 

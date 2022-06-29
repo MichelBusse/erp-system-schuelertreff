@@ -228,7 +228,6 @@ export class UsersService {
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
     const teacher = this.teachersRepository.create({
       ...dto,
-      timesAvailable: formatTimesAvailable(dto.timesAvailable),
       state: TeacherState.APPLIED,
       mayAuthenticate: true,
     })

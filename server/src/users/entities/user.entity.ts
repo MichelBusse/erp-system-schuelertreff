@@ -26,20 +26,19 @@ export abstract class User {
   @Column({ nullable: true })
   firstName: string
 
-  @Column()
+  @Column({ nullable: true })
   street: string
 
-  @Column()
+  @Column({ nullable: true })
   city: string
 
-  @Column()
+  @Column({ nullable: true })
   postalCode: string
 
-  //TODO: E-Mail validation
   @Column({ unique: true })
   email: string
 
-  @Column()
+  @Column({ nullable: true })
   phone: string
 
   @Column({ select: false, nullable: true })
@@ -48,7 +47,10 @@ export abstract class User {
   @Column({ select: false })
   mayAuthenticate: boolean
 
-  @Column({ type: 'timestamptz', default: new Date(0) })
+  @Column({
+    type: 'timestamptz',
+    default: new Date(0),
+  })
   jwtValidAfter: Date
 
   @Column({

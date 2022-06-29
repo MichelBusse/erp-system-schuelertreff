@@ -1,13 +1,6 @@
-import { Type } from 'class-transformer'
-import { IsArray, IsNotEmpty, ValidateNested } from 'class-validator'
+import { IsNotEmpty } from 'class-validator'
 
-import { Subject } from 'src/subjects/subject.entity'
-
-import { Degree, SchoolType } from '../entities/teacher.entity'
-import { CreateUserDto } from './create-user.dto'
-import { timeAvailable } from './timeAvailable'
-
-export class CreateTeacherDto extends CreateUserDto {
+export class CreateTeacherDto {
   @IsNotEmpty()
   lastName: string
 
@@ -15,19 +8,5 @@ export class CreateTeacherDto extends CreateUserDto {
   firstName: string
 
   @IsNotEmpty()
-  degree: Degree
-
-  @IsArray()
-  schoolTypes: SchoolType[]
-
-  fee: number
-
-  @Type(() => Subject)
-  @ValidateNested({ each: true })
-  subjects: Subject[]
-
-  @IsArray()
-  @Type(() => timeAvailable)
-  @ValidateNested({ each: true })
-  timesAvailable: timeAvailable[]
+  email: string
 }

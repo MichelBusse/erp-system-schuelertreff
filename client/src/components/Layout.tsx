@@ -60,7 +60,7 @@ const Layout: React.FC = () => {
         sx={{
           backgroundColor: theme.palette.grey[100],
           flexGrow: 1,
-          minHeight: '100vh',
+          height: '100vh',
           overflow: 'auto',
         }}
       >

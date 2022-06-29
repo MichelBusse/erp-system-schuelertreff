@@ -5,11 +5,7 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
-  FormHelperText,
   FormLabel,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TextField,
 } from '@mui/material'
@@ -22,7 +18,7 @@ import { useAuth } from '../components/AuthProvider'
 import { defaultPrivateCustomerFormData, snackbarOptionsError } from '../consts'
 import { privateCustomerForm } from '../types/form'
 import { privateCustomer } from '../types/user'
-import { formValidation } from './FormValidation'
+import { formValidation } from '../utils/formValidation'
 
 type Props = {
   open: boolean
