@@ -25,10 +25,15 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
 import { formValidation } from '../components/FormValidation'
-import { defaultClassCustomerFormData, defaultSchoolCustomerFormData } from '../consts'
+import {
+  defaultClassCustomerFormData,
+  defaultSchoolCustomerFormData,
+} from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { classCustomerForm, schoolCustomerForm } from '../types/form'
 import { schoolCustomer, timesAvailableParsed } from '../types/user'
+import timeAvailable from '../types/timeAvailable'
+import { ContactMailSharp } from '@mui/icons-material'
 
 const SchoolCustomerDetailView: React.FC = () => {
   const { API } = useAuth()
@@ -39,12 +44,13 @@ const SchoolCustomerDetailView: React.FC = () => {
   const requestedId = id ? id : 'me'
 
   const [classCustomers, setClassCustomers] = useState<classCustomerForm[]>([])
-  const [schoolCustomer, setSchoolCustomer] = useState<schoolCustomerForm>(defaultSchoolCustomerFormData)
+  const [schoolCustomer, setSchoolCustomer] = useState<schoolCustomerForm>(
+    defaultSchoolCustomerFormData,
+  )
   const [errors, setErrors] = useState(defaultClassCustomerFormData)
 
   useEffect(() => {
     API.get('users/schoolCustomer/' + requestedId).then((res) => {
-      console.log(res.data)
       setSchoolCustomer((data) => ({
         ...data,
         schoolName: res.data.schoolName,
@@ -54,32 +60,32 @@ const SchoolCustomerDetailView: React.FC = () => {
         email: res.data.email,
         phone: res.data.phone,
         schoolTypes: res.data.schoolTypes,
-      }
-      ))
-      
+      }))
     })
   }, [])
 
   useEffect(() => {
     API.get('users/classCustomer/' + requestedId).then((res) => {
-
       res.data.map((classCustomer: any) => {
         const newTimesAvailable =
-        classCustomer.timesAvailableParsed.length === 1 &&
-        classCustomer.timesAvailableParsed[0].dow === 1 &&
-        classCustomer.timesAvailableParsed[0].start === '00:00' &&
-        classCustomer.timesAvailableParsed[0].end === '00:00'
-          ? []
-          : classCustomer.timesAvailableParsed.map((time: timesAvailableParsed) => ({
-              dow: time.dow,
-              start: dayjs(time.start, 'HH:mm'),
-              end: dayjs(time.end, 'HH:mm'),
-              id: nanoid(),
-            }))
+          classCustomer.timesAvailableParsed.length === 1 &&
+          classCustomer.timesAvailableParsed[0].dow === 1 &&
+          classCustomer.timesAvailableParsed[0].start === '00:00' &&
+          classCustomer.timesAvailableParsed[0].end === '00:00'
+            ? []
+            : classCustomer.timesAvailableParsed.map(
+                (time: timesAvailableParsed) => ({
+                  dow: time.dow,
+                  start: dayjs(time.start, 'HH:mm'),
+                  end: dayjs(time.end, 'HH:mm'),
+                  id: nanoid(),
+                }),
+              )
 
         setClassCustomers((data: classCustomerForm[]) => [
           ...data,
           {
+            id: classCustomer.id,
             className: classCustomer.className,
             numberOfStudents: classCustomer.numberOfStudents,
             grade: classCustomer.grade,
@@ -112,6 +118,18 @@ const SchoolCustomerDetailView: React.FC = () => {
   //   console.log('deletePrivateCustomer')
   // }
 
+  const updateClassCustomer = (newValue: timeAvailable[], index: number) => {
+
+
+
+
+    setClassCustomers((classCustomers) => {
+      let newClassCustomers = [...classCustomers]
+      newClassCustomers[index] = { ...classCustomers[index], timesAvailable: newValue }
+
+      return(newClassCustomers)
+  })}
+
   return (
     <div className={styles.wrapper}>
       <Box
@@ -124,7 +142,10 @@ const SchoolCustomerDetailView: React.FC = () => {
         }}
       >
         <Stack direction="column" alignItems={'stretch'}>
-          <h1>{schoolCustomer.schoolName} ({schoolCustomer.schoolTypes.map((Type) => Type+' ' )})</h1>
+          <h1>
+            {schoolCustomer.schoolName} (
+            {schoolCustomer.schoolTypes.map((Type) => Type + ' ')})
+          </h1>
           <h3>Adresse:</h3>
           <Stack direction="row" columnGap={2}>
             <TextField
@@ -167,7 +188,7 @@ const SchoolCustomerDetailView: React.FC = () => {
             />
           </Stack>
           <h3>Klassen:</h3>
-          {classCustomers.map((classCustomer) => (
+          {classCustomers.map((classCustomer, index) => (
             <Accordion key={classCustomer.className}>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
@@ -177,14 +198,14 @@ const SchoolCustomerDetailView: React.FC = () => {
                 <Typography>{classCustomer.className}</Typography>
               </AccordionSummary>
               <AccordionDetails>
-              <Box>
-                <AddTimes
-                  value={classCustomer.timesAvailable}
-                  setValue={(newValue) =>
-                    setClassCustomers((data) => ({ ...data, timesAvailable: newValue }))
-                  }
-                />
-              </Box>
+                <Box>
+                  <AddTimes
+                    value={classCustomer.timesAvailable}
+                    setValue={(newValue) =>
+                      updateClassCustomer(newValue, index)
+                    }
+                  />
+                </Box>
               </AccordionDetails>
             </Accordion>
           ))}
