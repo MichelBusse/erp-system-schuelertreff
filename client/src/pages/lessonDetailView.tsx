@@ -13,6 +13,7 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../components/AuthProvider'
+import ContractEditDialog from '../components/ContractEditDialog'
 import styles from '../pages/gridList.module.scss'
 import { contractForm, lessonForm } from '../types/form'
 import { LessonState } from '../types/lesson'
@@ -22,7 +23,14 @@ const LessonDetailView: React.FC = () => {
   const navigate = useNavigate()
   const { contractId, date } = useParams()
   const [id, setId] = useState<number | null>(null)
+  const { decodeToken } = useAuth()
+  const [refresh, setRefresh] = useState(0)
+
   const { enqueueSnackbar } = useSnackbar()
+  const [contractDetailsDialog, setContractDetailsDialog] = useState<{
+    open: boolean
+    id: number
+  }>({ open: false, id: -1 })
 
   const [contract, setContract] = useState<contractForm>({
     startTime: null,
@@ -62,7 +70,7 @@ const LessonDetailView: React.FC = () => {
       setId(res.data.lesson?.id)
       setData(lesson)
     })
-  }, [])
+  }, [refresh])
 
   const submitForm = () => {
     API.post('lessons/' + (id ?? ''), {
@@ -93,8 +101,7 @@ const LessonDetailView: React.FC = () => {
               variant="outlined"
               fullWidth={true}
               label="Fach"
-              defaultValue={' '}
-              value={contract.subject?.name}
+              value={contract.subject ? contract.subject.name : ''}
               InputProps={{
                 readOnly: true,
               }}
@@ -102,9 +109,8 @@ const LessonDetailView: React.FC = () => {
             <TextField
               variant="outlined"
               fullWidth={true}
-              defaultValue={' '}
               label="Datum"
-              value={dayjs(date, 'YYYY-MM-DD').format('DD.MM.YYYY')}
+              value={dayjs(date, 'YYYY-MM-DD').format('dddd / DD.MM.YYYY') ?? ''}
               InputProps={{
                 readOnly: true,
               }}
@@ -114,15 +120,15 @@ const LessonDetailView: React.FC = () => {
             <TextField
               label="Startzeit"
               fullWidth
-              defaultValue={' '}
-              value={contract.startTime?.format('HH:mm')}
+              value={
+                contract.startTime ? contract.startTime.format('HH:mm') : ''
+              }
               InputProps={{ readOnly: true }}
             />
             <TextField
               label="Endzeit"
               fullWidth
-              defaultValue={' '}
-              value={contract.endTime?.format('HH:mm')}
+              value={contract.endTime ? contract.endTime.format('HH:mm') : ''}
               InputProps={{ readOnly: true }}
             />
           </Stack>
@@ -130,14 +136,15 @@ const LessonDetailView: React.FC = () => {
             variant="outlined"
             fullWidth={true}
             label="Kunde(n)"
-            defaultValue={' '}
-            value={contract.customers
-              .map((c) => {
-                return c.role === 'schoolCustomer'
-                  ? c.schoolName
-                  : c.firstName + ' ' + c.lastName + ' '
-              })
-              .join(', ')}
+            value={
+              contract.customers
+                .map((c) => {
+                  return c.role === 'schoolCustomer'
+                    ? c.schoolName
+                    : c.firstName + ' ' + c.lastName + ' '
+                })
+                .join(', ') ?? ''
+            }
             InputProps={{
               readOnly: true,
             }}
@@ -179,20 +186,49 @@ const LessonDetailView: React.FC = () => {
             <TextField
               label="Startdatum"
               fullWidth
-              defaultValue={' '}
-              value={contract.startDate?.format('DD.MM.YYYY')}
+              value={
+                contract.startDate
+                  ? contract.startDate.format('DD.MM.YYYY')
+                  : ''
+              }
               InputProps={{ readOnly: true }}
             />
             <TextField
               label="Enddatum"
               fullWidth
-              defaultValue={' '}
-              value={contract.endDate?.format('DD.MM.YYYY')}
+              value={
+                contract.endDate ? contract.endDate.format('DD.MM.YYYY') : ''
+              }
               InputProps={{ readOnly: true }}
             />
           </Stack>
+          <Stack direction={'row'} columnGap={2}>
+            {decodeToken().role === 'admin' &&
+              dayjs(contract.endDate).isAfter(dayjs()) && (
+                <Button
+                  variant="contained"
+                  onClick={() =>
+                    setContractDetailsDialog({
+                      open: true,
+                      id: contractId as unknown as number,
+                    })
+                  }
+                >
+                  Vertrag bearbeiten
+                </Button>
+              )}
+          </Stack>
         </Stack>
       </Box>
+      <ContractEditDialog
+        dialogInfo={contractDetailsDialog}
+        setDialogInfo={(open: boolean, id: number) =>
+          setContractDetailsDialog({ open: open, id: id })
+        }
+        onSuccess={() => {
+          setRefresh((re) => (++re))
+        }}
+      />
     </div>
   )
 }

@@ -35,10 +35,6 @@ const Timetable: React.FC = () => {
   })
   const [date, setDate] = useState(dayjs().day(1))
   const [open, setOpen] = useState(false)
-  const [contractDetailsDialog, setContractDetailsDialog] = useState<{
-    open: boolean
-    id: number
-  }>({ open: false, id: -1 })
 
   const [render, setRender] = useState(0)
 
@@ -128,13 +124,6 @@ const Timetable: React.FC = () => {
                       contract={c}
                       existingLesson={existingLesson}
                       date={dayjs(drawer.params?.colDef.headerName,'dddd\nDD.MM.YYYY')}
-                      openContractDetailsDialog={
-                        hasRole('admin')
-                          ? (id) => {
-                              setContractDetailsDialog({ id: id, open: true })
-                            }
-                          : null
-                      }
                     />
                   )
                 })}
@@ -153,16 +142,6 @@ const Timetable: React.FC = () => {
         </Stack>
       </Drawer>
 
-      <ContractEditDialog
-        dialogInfo={contractDetailsDialog}
-        setDialogInfo={(open: boolean, id: number) =>
-          setContractDetailsDialog({ open: open, id: id })
-        }
-        onSuccess={() => {
-          setDrawer({ open: false, params: null, lessons: [] })
-          setRefreshCalendar((r) => r + 1)
-        }}
-      />
       {!!render && (
         <>
           <ContractDialog

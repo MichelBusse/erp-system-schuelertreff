@@ -42,7 +42,7 @@ const Subjects: React.FC = () => {
                 style={{
                   width: '100%',
                   height: 90,
-                  backgroundColor: subject.color,
+                  backgroundColor: subject.color + '95',
                   opacity: 0.5,
                   marginTop: 10,
                 }}

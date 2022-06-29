@@ -46,7 +46,7 @@ export class LessonsService {
       relations: ['contract', 'contract.teacher'],
     })
 
-    if (teacherId && lesson.contract.teacher.id === teacherId) {
+    if (!teacherId || (teacherId && lesson.contract.teacher.id === teacherId)) {
       lesson.state = createLessonDto.state
 
       return this.lessonsRepository.save(lesson)

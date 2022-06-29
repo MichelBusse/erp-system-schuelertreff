@@ -74,7 +74,7 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
           <Box
             key={c.id}
             sx={{
-              backgroundColor: c.subject.color + '95',
+              backgroundColor: c.subject.color + '70',
               height: hourHeight * hours,
               width: 180,
               position: 'absolute',

@@ -68,7 +68,6 @@ const Calendar: React.FC<Props> = ({
     })
   }, [date, refresh])
 
-  console.log(lessons)
 
   const getCellValue: GridColDef['valueGetter'] = ({ id, colDef: { field } }) =>
     contracts[id as number]?.filter(
@@ -89,7 +88,7 @@ const Calendar: React.FC<Props> = ({
         <Box
           key={c.id}
           sx={{
-            backgroundColor: c.subject.color + '95',
+            backgroundColor: c.subject.color + '70',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',

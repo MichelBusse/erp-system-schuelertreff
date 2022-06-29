@@ -44,6 +44,7 @@ const menuItems = [
     icon: ManageAccountsIcon,
     text: 'Profil',
     href: '/profil',
+    roles: ['teacher'],
   },
 ]
 

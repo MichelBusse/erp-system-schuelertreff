@@ -1,3 +1,4 @@
+import { contract } from "./contract"
 
 export enum LessonState {
   IDLE = 'idle',
@@ -10,5 +11,5 @@ export type lesson = {
   date: string,
   state: LessonState,
   teacher: number[],
-  contract: number
+  contract: contract
 }

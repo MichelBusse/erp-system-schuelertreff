@@ -14,11 +14,10 @@ import styles from './Calendar.module.scss'
 type Props = {
   contract: contract
   existingLesson: lesson | null,
-  openContractDetailsDialog: ((id: number) => void) | null,
   date: Dayjs
 }
 
-const LessonOverview: React.FC<Props> = ({ contract, existingLesson, openContractDetailsDialog, date }) => {
+const LessonOverview: React.FC<Props> = ({ contract, existingLesson, date }) => {
   const navigate = useNavigate()
 
   return (
@@ -27,7 +26,7 @@ const LessonOverview: React.FC<Props> = ({ contract, existingLesson, openContrac
       spacing={0.5}
       sx={{
         backgroundColor: contract.subject.color + 50,
-        p: 1,
+        p: 2,
         borderRadius: 2,
         cursor: "pointer"
       }}
@@ -64,11 +63,6 @@ const LessonOverview: React.FC<Props> = ({ contract, existingLesson, openContrac
           label="Gehalten"
         />
       </FormGroup>
-      {openContractDetailsDialog && dayjs(contract.endDate).isAfter(dayjs()) && (
-        <Button onClick={() => openContractDetailsDialog(contract.id)}>
-          Vertrag bearbeiten
-        </Button>
-      )}
     </Stack>
   )
 }
