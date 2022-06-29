@@ -1,23 +1,22 @@
-import {
-  Button,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-  Stack,
-} from '@mui/material'
-import dayjs, { Dayjs } from 'dayjs'
+import { Checkbox, FormControlLabel, FormGroup, Stack } from '@mui/material'
+import { Dayjs } from 'dayjs'
 import { useNavigate } from 'react-router-dom'
+
 import { contract } from '../types/contract'
 import { lesson, LessonState } from '../types/lesson'
 import styles from './Calendar.module.scss'
 
 type Props = {
   contract: contract
-  existingLesson: lesson | null,
+  existingLesson: lesson | null
   date: Dayjs
 }
 
-const LessonOverview: React.FC<Props> = ({ contract, existingLesson, date }) => {
+const LessonOverview: React.FC<Props> = ({
+  contract,
+  existingLesson,
+  date,
+}) => {
   const navigate = useNavigate()
 
   return (
@@ -28,9 +27,11 @@ const LessonOverview: React.FC<Props> = ({ contract, existingLesson, date }) => 
         backgroundColor: contract.subject.color + 50,
         p: 2,
         borderRadius: 2,
-        cursor: "pointer"
+        cursor: 'pointer',
       }}
-      onClick={() => {navigate(contract.id + "/" + date.format("YYYY-MM-DD"))}}
+      onClick={() => {
+        navigate(contract.id + '/' + date.format('YYYY-MM-DD'))
+      }}
     >
       <span>
         {contract.startTime.substring(0, 5) +

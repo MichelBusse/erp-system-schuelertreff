@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
-import { EntityNotFoundError, UpdateResult } from 'typeorm'
+import { EntityNotFoundError } from 'typeorm'
 
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
@@ -94,11 +94,12 @@ export class ContractsController {
   ): Promise<Contract> {
     this.validateDto(dto)
 
-    if (dayjs(dto.startDate).isAfter(dayjs())) {    // If contract starts in future, then update excestingcontract 
+    if (dayjs(dto.startDate).isAfter(dayjs())) {
+      // If contract starts in future, then update excestingcontract
 
       this.contractsService.updateContract(id, dto)
-
-    } else if(dayjs(dto.endDate).isAfter(dayjs())) { //If contract has already started and does not have ended yet, then end it and create new with updated params
+    } else if (dayjs(dto.endDate).isAfter(dayjs())) {
+      //If contract has already started and does not have ended yet, then end it and create new with updated params
       this.contractsService.endOrDeleteContract(id)
 
       return this.contractsService.create(dto).catch((err) => {
@@ -108,8 +109,9 @@ export class ContractsController {
 
         throw err
       })
-    } else { //Past contracts cannot be updated
-      throw new BadRequestException("Cannot update past contracts")
+    } else {
+      //Past contracts cannot be updated
+      throw new BadRequestException('Cannot update past contracts')
     }
   }
 

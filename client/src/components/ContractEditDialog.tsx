@@ -14,15 +14,14 @@ import {
   TextField,
 } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
 import { snackbarOptions } from '../consts'
 import { contractForm } from '../types/form'
-import subject from '../types/subject'
-import { customer, teacher } from '../types/user'
+import { customer } from '../types/user'
 import { getNextDow } from '../utils/date'
 import { useAuth } from './AuthProvider'
 import BetterTimePicker from './BetterTimePicker'

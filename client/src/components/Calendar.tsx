@@ -1,27 +1,13 @@
 import AddIcon from '@mui/icons-material/Add'
-import {
-  Button,
-  Checkbox,
-  Fab,
-  FormControlLabel,
-  FormGroup,
-  Paper,
-  Stack,
-  Typography,
-} from '@mui/material'
+import { Fab, Paper } from '@mui/material'
 import { Box } from '@mui/system'
-import {
-  DataGrid,
-  GridCellParams,
-  GridColDef,
-  GridRowsProp,
-} from '@mui/x-data-grid'
+import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 
 import { DrawerParameters } from '../pages/timetable'
 import { contract } from '../types/contract'
-import { lesson, LessonState } from '../types/lesson'
+import { lesson } from '../types/lesson'
 import { teacher } from '../types/user'
 import { useAuth } from './AuthProvider'
 import styles from './Calendar.module.scss'
@@ -67,7 +53,6 @@ const Calendar: React.FC<Props> = ({
       setLessons(res.data.lessons)
     })
   }, [date, refresh])
-
 
   const getCellValue: GridColDef['valueGetter'] = ({ id, colDef: { field } }) =>
     contracts[id as number]?.filter(
@@ -121,7 +106,6 @@ const Calendar: React.FC<Props> = ({
     teacher: `${t.firstName} ${t.lastName}`,
   }))
 
-
   return (
     <Paper
       className={styles.wrapper}
@@ -147,7 +131,7 @@ const Calendar: React.FC<Props> = ({
             setDrawer({
               open: true,
               params: params,
-              lessons: lessons
+              lessons: lessons,
             })
           }
         }}

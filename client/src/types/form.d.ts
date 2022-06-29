@@ -1,5 +1,5 @@
 import { Dayjs } from 'dayjs'
-import { contract } from './contract'
+
 import { LessonState } from './lesson'
 import subject from './subject'
 import timeAvailable from './timeAvailable'
@@ -29,7 +29,7 @@ export interface privateCustomerForm extends userForm {
 }
 
 export interface lessonForm {
-  state: LessonState,
+  state: LessonState
 }
 
 export type contractForm = {

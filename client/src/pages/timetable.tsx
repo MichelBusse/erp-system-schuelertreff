@@ -1,20 +1,19 @@
 import 'dayjs/locale/de'
 
 import { Box, Button, Drawer, Stack, Typography } from '@mui/material'
+import { GridCellParams } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
-import { ReactElement, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
 import Calendar from '../components/Calendar'
 import ContractDialog from '../components/ContractDialog'
-import ContractEditDialog from '../components/ContractEditDialog'
-import TeacherCalendar from '../components/TeacherCalendar'
-import { teacher } from '../types/user'
-import { GridCellParams } from '@mui/x-data-grid'
-import { contract } from '../types/contract'
 import LessonOverview from '../components/LessonOverview'
+import TeacherCalendar from '../components/TeacherCalendar'
+import { contract } from '../types/contract'
 import { lesson } from '../types/lesson'
+import { teacher } from '../types/user'
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)
@@ -90,9 +89,12 @@ const Timetable: React.FC = () => {
         onClose={() => setDrawer((d) => ({ ...d, open: false }))}
         anchor={'right'}
         variant="persistent"
-
       >
-        <Stack direction={'column'} minWidth={300} sx={{ padding: '1em', height:"100%" }}>
+        <Stack
+          direction={'column'}
+          minWidth={300}
+          sx={{ padding: '1em', height: '100%' }}
+        >
           {drawer.params && (
             <>
               <span>
@@ -104,7 +106,7 @@ const Timetable: React.FC = () => {
               <Stack spacing={2}>
                 {(drawer.params.value as contract[])?.map((c) => {
                   let existingLesson = null
-                  console.log(drawer.lessons);
+                  console.log(drawer.lessons)
                   for (const lesson of drawer.lessons) {
                     if (
                       lesson.contract.id === c.id &&
@@ -123,7 +125,10 @@ const Timetable: React.FC = () => {
                       key={c.id}
                       contract={c}
                       existingLesson={existingLesson}
-                      date={dayjs(drawer.params?.colDef.headerName,'dddd\nDD.MM.YYYY')}
+                      date={dayjs(
+                        drawer.params?.colDef.headerName,
+                        'dddd\nDD.MM.YYYY',
+                      )}
                     />
                   )
                 })}
@@ -134,7 +139,9 @@ const Timetable: React.FC = () => {
           <Button
             variant="text"
             size="medium"
-            onClick={() => setDrawer({ open: false, params: null, lessons: [] })}
+            onClick={() =>
+              setDrawer({ open: false, params: null, lessons: [] })
+            }
             sx={{ marginTop: 'auto' }}
           >
             schließen

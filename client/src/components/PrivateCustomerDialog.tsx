@@ -71,7 +71,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
         .catch((error) => {
           if (axios.isAxiosError(error) && error.response?.status === 400) {
             enqueueSnackbar(
-              (error.response.data as any).message,
+              (error.response.data as { message: string }).message,
               snackbarOptionsError,
             )
           } else {

@@ -1,7 +1,7 @@
 import { Type } from 'class-transformer'
 import { IsArray, IsNotEmpty, ValidateNested } from 'class-validator'
-import { Salutation } from '../entities/user.entity'
 
+import { Salutation } from '../entities/user.entity'
 import { timeAvailable } from './timeAvailable'
 
 export class UpdateUserDto {

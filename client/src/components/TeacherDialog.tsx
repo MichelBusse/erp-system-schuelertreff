@@ -67,7 +67,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
         .catch((error) => {
           if (axios.isAxiosError(error) && error.response?.status === 400) {
             enqueueSnackbar(
-              (error.response.data as any).message,
+              (error.response.data as { message: string }).message,
               snackbarOptionsError,
             )
           } else {

@@ -1,16 +1,15 @@
-import { Paper, Stack, Typography } from '@mui/material'
+import { Paper } from '@mui/material'
 import { Box } from '@mui/system'
-import { DataGrid, GridCellParams, GridColDef } from '@mui/x-data-grid'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
-import { DrawerParameters } from '../pages/timetable'
 
+import { DrawerParameters } from '../pages/timetable'
 import { lesson } from '../types/lesson'
 import subject from '../types/subject'
 import { customer } from '../types/user'
 import { useAuth } from './AuthProvider'
 import CalendarControl from './CalendarControl'
-import LessonOverview from './LessonOverview'
 import styles from './TeacherCalendar.module.scss'
 
 type Props = {
@@ -134,7 +133,6 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
       }),
     ),
   ]
-
 
   return (
     <Paper

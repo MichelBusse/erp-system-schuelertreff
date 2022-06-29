@@ -1,4 +1,4 @@
-import { contract } from "./contract"
+import { contract } from './contract'
 
 export enum LessonState {
   IDLE = 'idle',
@@ -7,9 +7,9 @@ export enum LessonState {
 }
 
 export type lesson = {
-  id: number,
-  date: string,
-  state: LessonState,
-  teacher: number[],
+  id: number
+  date: string
+  state: LessonState
+  teacher: number[]
   contract: contract
 }

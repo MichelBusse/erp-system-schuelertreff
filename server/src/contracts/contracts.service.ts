@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
 import dayjs, { Dayjs } from 'dayjs'
-import { Brackets, Connection, Repository, UpdateResult } from 'typeorm'
+import { Brackets, Connection, Repository } from 'typeorm'
 
 import { timeAvailable } from 'src/users/dto/timeAvailable'
 import { Customer, User } from 'src/users/entities'
@@ -47,18 +47,16 @@ export class ContractsService {
   }
 
   async findOne(id: string, teacherId?: number): Promise<Contract> {
-
-    let contract = await this.contractsRepository.findOne(id, {
+    const contract = await this.contractsRepository.findOne(id, {
       relations: ['subject', 'teacher', 'customers'],
     })
 
-    if(!(teacherId && contract.teacher.id !== teacherId)){
-      return contract;
-    }else{
-      return null;
+    if (!(teacherId && contract.teacher.id !== teacherId)) {
+      return contract
+    } else {
+      return null
     }
   }
-  
 
   async endOrDeleteContract(id: string): Promise<void> {
     const contract = await this.contractsRepository.findOneOrFail(id)
@@ -80,8 +78,7 @@ export class ContractsService {
   }
 
   async updateContract(id: string, dto: CreateContractDto): Promise<void> {
-
-    let contract: any = await this.contractsRepository.findOne(id);
+    let contract: any = await this.contractsRepository.findOne(id)
 
     contract = {
       ...contract,
@@ -97,7 +94,7 @@ export class ContractsService {
       ),
     }
 
-    await this.contractsRepository.save(contract);
+    await this.contractsRepository.save(contract)
   }
 
   async suggestContracts(dto: SuggestContractsDto): Promise<any[]> {

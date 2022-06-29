@@ -2,7 +2,9 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import dayjs, { Dayjs } from 'dayjs'
 import { Repository } from 'typeorm'
+
 import { ContractsService } from 'src/contracts/contracts.service'
+
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Lesson } from './lesson.entity'
 
@@ -32,8 +34,10 @@ export class LessonsService {
       lesson.contract = contract
 
       return this.lessonsRepository.save(lesson)
-    }else{
-      throw new BadRequestException('You do not have permission to create this lesson')
+    } else {
+      throw new BadRequestException(
+        'You do not have permission to create this lesson',
+      )
     }
   }
 
@@ -50,8 +54,10 @@ export class LessonsService {
       lesson.state = createLessonDto.state
 
       return this.lessonsRepository.save(lesson)
-    }else{
-      throw new BadRequestException('You do not have permission to create this lesson')
+    } else {
+      throw new BadRequestException(
+        'You do not have permission to create this lesson',
+      )
     }
   }
 
@@ -67,7 +73,7 @@ export class LessonsService {
       .leftJoin('l.contract', 'c')
       .select(['l'])
       .where('c.id = :contractId', { contractId: contractId })
-      .andWhere('l.date::date = :lessonDate::date', {lessonDate: date})
+      .andWhere('l.date::date = :lessonDate::date', { lessonDate: date })
     if (teacherId)
       lessonQuery.andWhere('c.teacherId = :teacherId', { teacherId: teacherId })
 

@@ -63,11 +63,10 @@ export class AuthService {
       subject: 'Schülertreff: Passwort-Reset',
       text: 'Lege unter folgendem Link dein neues Passwort fest: \n' + link,
     }
+
     try {
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          return console.log(error)
-        }
+      transporter.sendMail(mailOptions, (error) => {
+        if (error) console.log(error)
       })
     } catch {
       console.log('Failed to send Reminder Mail to ' + user.email)
