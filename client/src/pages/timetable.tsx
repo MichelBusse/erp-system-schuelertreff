@@ -1,6 +1,6 @@
 import 'dayjs/locale/de'
 
-import { Box } from '@mui/material'
+import { Box, Button, Drawer, Stack, Typography } from '@mui/material'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { ReactElement, useEffect, useState } from 'react'
@@ -9,24 +9,29 @@ import { useAuth } from '../components/AuthProvider'
 import Calendar from '../components/Calendar'
 import ContractDialog from '../components/ContractDialog'
 import ContractEditDialog from '../components/ContractEditDialog'
-import HiddenMenu from '../components/HiddenMenu'
 import TeacherCalendar from '../components/TeacherCalendar'
 import { teacher } from '../types/user'
+import { GridCellParams } from '@mui/x-data-grid'
+import { contract } from '../types/contract'
+import LessonOverview from '../components/LessonOverview'
+import { lesson } from '../types/lesson'
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)
 
-export type SideMenu = {
+export type DrawerParameters = {
   open: boolean
-  content: ReactElement
+  params: GridCellParams | null
+  lessons: lesson[]
 }
 
 const Timetable: React.FC = () => {
   const { API, hasRole } = useAuth()
 
-  const [drawer, setDrawer] = useState<SideMenu>({
+  const [drawer, setDrawer] = useState<DrawerParameters>({
     open: false,
-    content: <></>,
+    params: null,
+    lessons: [],
   })
   const [date, setDate] = useState(dayjs().day(1))
   const [open, setOpen] = useState(false)
@@ -70,9 +75,6 @@ const Timetable: React.FC = () => {
               setRender(render + 1)
               setOpen(true)
             }}
-            openContractDetailsDialog={(id) => {
-              setContractDetailsDialog({ id: id, open: true })
-            }}
             refresh={refreshCalendar}
             teachers={teachers}
           />
@@ -87,10 +89,69 @@ const Timetable: React.FC = () => {
         ) : null}
       </Box>
 
-      <HiddenMenu
-        state={drawer}
-        close={() => setDrawer((d) => ({ ...d, open: false }))}
-      />
+      <Drawer
+        open={drawer.open}
+        onClose={() => setDrawer((d) => ({ ...d, open: false }))}
+        anchor={'right'}
+        variant="persistent"
+
+      >
+        <Stack direction={'column'} minWidth={300} sx={{ padding: '1em', height:"100%" }}>
+          {drawer.params && (
+            <>
+              <span>
+                {drawer.params.colDef.headerName?.replace('\n', ' / ')}
+              </span>
+              <Typography variant="h5" mb={3}>
+                {drawer.params.row.teacher}
+              </Typography>
+              <Stack spacing={2}>
+                {(drawer.params.value as contract[])?.map((c) => {
+                  let existingLesson = null
+                  console.log(drawer.lessons);
+                  for (const lesson of drawer.lessons) {
+                    if (
+                      lesson.contract.id === c.id &&
+                      dayjs(lesson.date).format('DD/MM/YYYY') ===
+                        dayjs(
+                          drawer.params?.colDef.headerName,
+                          'dddd\nDD.MM.YYYY',
+                        ).format('DD/MM/YYYY')
+                    ) {
+                      existingLesson = lesson
+                      break
+                    }
+                  }
+                  return (
+                    <LessonOverview
+                      key={c.id}
+                      contract={c}
+                      existingLesson={existingLesson}
+                      date={dayjs(drawer.params?.colDef.headerName,'dddd\nDD.MM.YYYY')}
+                      openContractDetailsDialog={
+                        hasRole('admin')
+                          ? (id) => {
+                              setContractDetailsDialog({ id: id, open: true })
+                            }
+                          : null
+                      }
+                    />
+                  )
+                })}
+              </Stack>
+            </>
+          )}
+
+          <Button
+            variant="text"
+            size="medium"
+            onClick={() => setDrawer({ open: false, params: null, lessons: [] })}
+            sx={{ marginTop: 'auto' }}
+          >
+            schließen
+          </Button>
+        </Stack>
+      </Drawer>
 
       <ContractEditDialog
         dialogInfo={contractDetailsDialog}
@@ -98,7 +159,7 @@ const Timetable: React.FC = () => {
           setContractDetailsDialog({ open: open, id: id })
         }
         onSuccess={() => {
-          setDrawer({ open: false, content: <></> })
+          setDrawer({ open: false, params: null, lessons: [] })
           setRefreshCalendar((r) => r + 1)
         }}
       />

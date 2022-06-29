@@ -43,14 +43,24 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="timetable"
-                element={
-                  <ProtectedRoute>
-                    <Pages.Timetable />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="timetable">
+                <Route
+                  path=""
+                  element={
+                    <ProtectedRoute>
+                      <Pages.Timetable />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path=":contractId/:date"
+                  element={
+                    <ProtectedRoute>
+                      <Pages.LessonDetailView />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
               <Route path="privateCustomers">
                 <Route
                   path=""

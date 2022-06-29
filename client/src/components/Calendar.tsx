@@ -1,5 +1,14 @@
 import AddIcon from '@mui/icons-material/Add'
-import { Button, Fab, Paper, Stack, Typography } from '@mui/material'
+import {
+  Button,
+  Checkbox,
+  Fab,
+  FormControlLabel,
+  FormGroup,
+  Paper,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { Box } from '@mui/system'
 import {
   DataGrid,
@@ -10,8 +19,9 @@ import {
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 
-import { SideMenu } from '../pages/timetable'
+import { DrawerParameters } from '../pages/timetable'
 import { contract } from '../types/contract'
+import { lesson, LessonState } from '../types/lesson'
 import { teacher } from '../types/user'
 import { useAuth } from './AuthProvider'
 import styles from './Calendar.module.scss'
@@ -19,10 +29,9 @@ import CalendarControl from './CalendarControl'
 
 type Props = {
   date: Dayjs
-  setDrawer: (open: SideMenu) => void
+  setDrawer: (params: DrawerParameters) => void
   setDate: (date: Dayjs) => void
   openDialog: () => void
-  openContractDetailsDialog: (id: number) => void
   refresh?: number
   teachers: teacher[]
 }
@@ -32,13 +41,13 @@ const Calendar: React.FC<Props> = ({
   setDrawer,
   setDate,
   openDialog,
-  openContractDetailsDialog,
   refresh,
   teachers,
 }) => {
   const { API } = useAuth()
 
   const [contracts, setContracts] = useState<Record<number, contract[]>>([])
+  const [lessons, setLessons] = useState<lesson[]>([])
 
   useEffect(() => {
     API.get('lessons/week', {
@@ -48,15 +57,18 @@ const Calendar: React.FC<Props> = ({
     }).then((res) => {
       const contractsByTeacher: Record<number, contract[]> = {}
 
-      res.data.map((c: contract) => {
+      res.data.contracts.map((c: contract) => {
         contractsByTeacher[c.teacher] = (
           contractsByTeacher[c.teacher] ?? []
         ).concat(c)
       })
 
       setContracts(contractsByTeacher)
+      setLessons(res.data.lessons)
     })
   }, [date, refresh])
+
+  console.log(lessons)
 
   const getCellValue: GridColDef['valueGetter'] = ({ id, colDef: { field } }) =>
     contracts[id as number]?.filter(
@@ -110,6 +122,7 @@ const Calendar: React.FC<Props> = ({
     teacher: `${t.firstName} ${t.lastName}`,
   }))
 
+
   return (
     <Paper
       className={styles.wrapper}
@@ -131,9 +144,11 @@ const Calendar: React.FC<Props> = ({
             params.colDef.field !== 'teacher' &&
             (params.value ?? []).length > 0
           ) {
+            console.log(params)
             setDrawer({
               open: true,
-              content: drawerContent(params, openContractDetailsDialog),
+              params: params,
+              lessons: lessons
             })
           }
         }}
@@ -154,50 +169,5 @@ const Calendar: React.FC<Props> = ({
     </Paper>
   )
 }
-
-const drawerContent = (
-  params: GridCellParams,
-  openContractDetailsDialog: (id: number) => void,
-) => (
-  <>
-    <span>{params.colDef.headerName?.replace('\n', ' / ')}</span>
-    <Typography variant="h5" mb={3}>
-      {params.row.teacher}
-    </Typography>
-    <Stack spacing={2}>
-      {(params.value as contract[])?.map((c) => (
-        <Stack
-          key={c.id}
-          spacing={0.5}
-          sx={{
-            backgroundColor: c.subject.color + 50,
-            p: 1,
-            borderRadius: 2,
-          }}
-        >
-          <span>
-            {c.startTime.substring(0, 5) + ' - ' + c.endTime.substring(0, 5)}
-          </span>
-          <span>{c.subject.name}</span>
-          <span>Kunden:</span>
-          <ul className={styles.list}>
-            {c.customers.map((s) => (
-              <li key={s.id}>
-                {s.role === 'schoolCustomer'
-                  ? s.schoolName
-                  : s.firstName + ' ' + s.lastName}
-              </li>
-            ))}
-          </ul>
-          {dayjs(c.endDate).isAfter(dayjs()) && (
-            <Button onClick={() => openContractDetailsDialog(c.id)}>
-              Vertrag bearbeiten
-            </Button>
-          )}
-        </Stack>
-      ))}
-    </Stack>
-  </>
-)
 
 export default Calendar

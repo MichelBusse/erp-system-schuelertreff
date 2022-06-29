@@ -6,11 +6,13 @@ import {
   Param,
   Post,
   Query,
+  Request,
 } from '@nestjs/common'
 import dayjs from 'dayjs'
 
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
+import { Contract } from 'src/contracts/contract.entity'
 
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Lesson } from './lesson.entity'
@@ -20,25 +22,68 @@ import { LessonsService } from './lessons.service'
 export class LessonsController {
   constructor(private readonly lessonsService: LessonsService) {}
 
+  @Get('myLessons')
+  findMyContracts(
+    @Request() req,
+    @Query('of') date: string,
+  ): Promise<{ contracts: Contract[]; lessons: Lesson[] }> {
+    return this.lessonsService.findByWeek(dayjs(date), req.user.id)
+  }
+
   @Get('week')
+  @Roles(Role.ADMIN)
   getWeek(@Query('of') date: string) {
     return this.lessonsService.findByWeek(dayjs(date))
   }
 
-  @Post()
-  @Roles(Role.ADMIN)
-  create(@Body() createLessonDto: CreateLessonDto): Promise<Lesson> {
-    return this.lessonsService.create(createLessonDto)
+  @Post('')
+  create(
+    @Request() req,
+    @Body() createLessonDto: CreateLessonDto,
+  ): Promise<Lesson> {
+    if(req.user.role === Role.ADMIN){
+      return this.lessonsService.create(createLessonDto)
+    }else{
+      return this.lessonsService.create(createLessonDto, req.user.id)
+    }
+  }
+
+  @Post(':id')
+  update(
+    @Param('id') id: number,
+    @Request() req,
+    @Body() createLessonDto: CreateLessonDto,
+  ): Promise<Lesson> {
+    if(req.user.role === Role.ADMIN){
+      return this.lessonsService.update(id, createLessonDto)
+    }else{
+      return this.lessonsService.update(id, createLessonDto, req.user.id)
+    }
   }
 
   @Get()
+  @Roles(Role.ADMIN)
   findAll(): Promise<Lesson[]> {
     return this.lessonsService.findAll()
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<Lesson> {
-    return this.lessonsService.findOne(id)
+  @Get(':contractId/:date')
+  @Roles(Role.TEACHER)
+  findOne(
+    @Request() req,
+    @Param('contractId') id: string,
+    @Param('date') date: string,
+  ): Promise<{ contract: Contract; lesson: Lesson }> {
+    return this.lessonsService.findOne(id, date, req.user.id)
+  }
+
+  @Get(':contractId/:date')
+  @Roles(Role.ADMIN)
+  findOneAsAdmin(
+    @Param('contractId') id: string,
+    @Param('date') date: string,
+  ): Promise<{ contract: Contract; lesson: Lesson }> {
+    return this.lessonsService.findOne(id, date)
   }
 
   @Delete(':id')

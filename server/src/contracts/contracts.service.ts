@@ -4,13 +4,12 @@ import dayjs, { Dayjs } from 'dayjs'
 import { Brackets, Connection, Repository, UpdateResult } from 'typeorm'
 
 import { timeAvailable } from 'src/users/dto/timeAvailable'
-import { Customer, PrivateCustomer, Teacher, User } from 'src/users/entities'
+import { Customer, User } from 'src/users/entities'
 import { parseMultirange, UsersService } from 'src/users/users.service'
 
 import { Contract } from './contract.entity'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
-import { TeacherState } from 'src/users/entities/teacher.entity'
 
 @Injectable()
 export class ContractsService {
@@ -47,11 +46,19 @@ export class ContractsService {
     })
   }
 
-  async findOne(id: string): Promise<Contract> {
-    return this.contractsRepository.findOne(id, {
+  async findOne(id: string, teacherId?: number): Promise<Contract> {
+
+    let contract = await this.contractsRepository.findOne(id, {
       relations: ['subject', 'teacher', 'customers'],
     })
+
+    if(!(teacherId && contract.teacher.id !== teacherId)){
+      return contract;
+    }else{
+      return null;
+    }
   }
+  
 
   async endOrDeleteContract(id: string): Promise<void> {
     const contract = await this.contractsRepository.findOneOrFail(id)

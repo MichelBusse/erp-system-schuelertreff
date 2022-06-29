@@ -3,17 +3,19 @@ import { Box } from '@mui/system'
 import { DataGrid, GridCellParams, GridColDef } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
+import { DrawerParameters } from '../pages/timetable'
 
-import { SideMenu } from '../pages/timetable'
+import { lesson } from '../types/lesson'
 import subject from '../types/subject'
 import { customer } from '../types/user'
 import { useAuth } from './AuthProvider'
 import CalendarControl from './CalendarControl'
+import LessonOverview from './LessonOverview'
 import styles from './TeacherCalendar.module.scss'
 
 type Props = {
   date: Dayjs
-  setDrawer: (open: SideMenu) => void
+  setDrawer: (params: DrawerParameters) => void
   setDate: (date: Dayjs) => void
 }
 
@@ -32,6 +34,7 @@ type contract = {
 const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
   const { API } = useAuth()
   const [contracts, setContracts] = useState<contract[]>([])
+  const [lessons, setLessons] = useState<lesson[]>([])
 
   const rowHeight = 777
   const startTimeAM = 7
@@ -39,11 +42,14 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
   const hourHeight = rowHeight / numberOfHours
 
   useEffect(() => {
-    API.get('contracts/myContracts', {
+    API.get('lessons/myLessons', {
       params: {
         of: date.format('YYYY-MM-DD'),
       },
-    }).then((res) => setContracts(res.data))
+    }).then((res) => {
+      setContracts(res.data.contracts)
+      setLessons(res.data.lessons)
+    })
   }, [date])
 
   const getCellValue: GridColDef['valueGetter'] = ({ colDef: { field } }) =>
@@ -129,6 +135,7 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
     ),
   ]
 
+
   return (
     <Paper
       className={styles.wrapper}
@@ -152,49 +159,12 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
             params.colDef.field !== 'teacher' &&
             (params.value ?? []).length > 0
           ) {
-            setDrawer({ open: true, content: drawerContent(params) })
+            setDrawer({ open: true, params: params, lessons: lessons })
           }
         }}
       />
     </Paper>
   )
 }
-
-const drawerContent = (params: GridCellParams) => (
-  <>
-    <span>{params.colDef.headerName?.replace('\n', ' / ')}</span>
-    <Typography variant="h5" mb={3}>
-      {params.row.teacher}
-    </Typography>
-    <Stack spacing={2}>
-      {(params.value as contract[])?.map((c) => (
-        <Stack
-          key={c.id}
-          spacing={0.5}
-          sx={{
-            backgroundColor: c.subject.color + 50,
-            p: 1,
-            borderRadius: 2,
-          }}
-        >
-          <span>
-            {c.startTime.substring(0, 5) + ' - ' + c.endTime.substring(0, 5)}
-          </span>
-          <span>{c.subject.name}</span>
-          <span>Kunden:</span>
-          <ul className={styles.list}>
-            {c.customers.map((s) => (
-              <li key={s.id}>
-                {s.role === 'schoolCustomer'
-                  ? s.schoolName
-                  : s.firstName + ' ' + s.lastName}
-              </li>
-            ))}
-          </ul>
-        </Stack>
-      ))}
-    </Stack>
-  </>
-)
 
 export default TeacherCalendar

@@ -18,7 +18,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { contractForm } from '../types/form'
 
 import subject from '../types/subject'
 import { customer, teacher } from '../types/user'
@@ -35,17 +35,6 @@ type Props = {
   onSuccess?: () => void
 }
 
-type form = {
-  startDate: Dayjs | null
-  endDate: Dayjs | null
-  startTime: Dayjs | null
-  endTime: Dayjs | null
-  teacher: teacher | null
-  dow: number | null
-  interval: number
-  customers: customer[]
-  subject: subject | null
-}
 
 const ContractEditDialog: React.FC<Props> = ({
   dialogInfo,
@@ -60,7 +49,7 @@ const ContractEditDialog: React.FC<Props> = ({
     API.get('users/customer').then((res) => setCustomers(res.data))
   }, [])
 
-  const [data, setData] = useState<form>({
+  const [data, setData] = useState<contractForm>({
     startDate: null,
     endDate: null,
     startTime: null,
@@ -72,7 +61,7 @@ const ContractEditDialog: React.FC<Props> = ({
     subject: null,
   })
 
-  const [prevContract, setPrevContract] = useState<form>({
+  const [prevContract, setPrevContract] = useState<contractForm>({
     startDate: null,
     endDate: null,
     startTime: null,

@@ -1,5 +1,9 @@
+import { Dayjs } from 'dayjs'
+import { contract } from './contract'
+import { LessonState } from './lesson'
 import subject from './subject'
 import timeAvailable from './timeAvailable'
+import { customer, teacher } from './user'
 
 export interface userForm {
   firstName: string
@@ -22,4 +26,20 @@ export interface teacherForm extends userForm {
 
 export interface privateCustomerForm extends userForm {
   grade: number | null
+}
+
+export interface lessonForm {
+  state: LessonState,
+}
+
+export type contractForm = {
+  startDate: Dayjs | null
+  endDate: Dayjs | null
+  startTime: Dayjs | null
+  endTime: Dayjs | null
+  teacher: teacher | null
+  dow: number | null
+  interval: number
+  customers: customer[]
+  subject: subject | null
 }

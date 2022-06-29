@@ -39,7 +39,7 @@ export interface privateCustomer extends user {
   role: 'privateCustomer'
 }
 
-export interface schoolCustomer
+export interface schoolCustomer 
   extends Omit<user, 'lastName' | 'firstName' | 'salutation'> {
   role: 'schoolCustomer'
   schoolName: string

@@ -139,7 +139,7 @@ const TeacherDetailView: React.FC = () => {
               <InputLabel id="SalutationLable">Anrede *</InputLabel>
               <Select
                 id="Salutation"
-                label="Anrede"
+                label="Anrede *"
                 value={data.salutation}
                 onChange={(event) =>
                   setData((data) => ({
