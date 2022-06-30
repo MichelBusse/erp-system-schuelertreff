@@ -1,7 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 
 import { Contract } from 'src/contracts/contract.entity'
-import { Teacher } from 'src/users/entities/teacher.entity'
 
 export enum LessonState {
   IDLE = 'idle',
@@ -20,7 +19,7 @@ export class Lesson {
   @Column({
     type: 'enum',
     enum: LessonState,
-    default: LessonState.IDLE
+    default: LessonState.IDLE,
   })
   state: LessonState
 

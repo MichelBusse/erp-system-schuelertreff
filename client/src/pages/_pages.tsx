@@ -1,7 +1,7 @@
 import NotFound from './404'
+import LessonDetailView from './lessonDetailView'
 import Login from './login'
 import PrivateCustomerDetailView from './privateCustomerDetailView'
-import LessonDetailView from './lessonDetailView'
 import PrivateCustomers from './privateCustomers'
 import Reset from './reset'
 import SchoolCustomers from './schoolCustomers'
@@ -21,5 +21,5 @@ export default {
   Timetable,
   TeacherDetailView,
   PrivateCustomerDetailView,
-  LessonDetailView
+  LessonDetailView,
 }

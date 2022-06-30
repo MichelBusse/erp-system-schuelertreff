@@ -12,8 +12,10 @@ import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+
 import { useAuth } from '../components/AuthProvider'
 import ContractEditDialog from '../components/ContractEditDialog'
+import { snackbarOptions } from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { contractForm, lessonForm } from '../types/form'
 import { LessonState } from '../types/lesson'
@@ -78,7 +80,7 @@ const LessonDetailView: React.FC = () => {
       contractId: contractId,
       ...data,
     }).then(() => {
-      enqueueSnackbar('Stunde gespeichert')
+      enqueueSnackbar('Stunde gespeichert', snackbarOptions)
       navigate('/timetable')
     })
   }
@@ -110,7 +112,9 @@ const LessonDetailView: React.FC = () => {
               variant="outlined"
               fullWidth={true}
               label="Datum"
-              value={dayjs(date, 'YYYY-MM-DD').format('dddd / DD.MM.YYYY') ?? ''}
+              value={
+                dayjs(date, 'YYYY-MM-DD').format('dddd / DD.MM.YYYY') ?? ''
+              }
               InputProps={{
                 readOnly: true,
               }}
@@ -226,7 +230,7 @@ const LessonDetailView: React.FC = () => {
           setContractDetailsDialog({ open: open, id: id })
         }
         onSuccess={() => {
-          setRefresh((re) => (++re))
+          setRefresh((re) => ++re)
         }}
       />
     </div>

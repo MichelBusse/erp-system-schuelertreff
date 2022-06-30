@@ -2,8 +2,8 @@ import { Type } from 'class-transformer'
 import { IsArray, IsNotEmpty, ValidateNested } from 'class-validator'
 
 import { Subject } from 'src/subjects/subject.entity'
-import { Degree, SchoolType } from '../entities/teacher.entity'
 
+import { Degree, SchoolType } from '../entities/teacher.entity'
 import { Salutation } from '../entities/user.entity'
 import { CreateUserDto } from './create-user.dto'
 import { timeAvailable } from './timeAvailable'

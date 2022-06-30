@@ -25,7 +25,11 @@ import { useNavigate, useParams } from 'react-router-dom'
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
 import { formValidation } from '../components/FormValidation'
-import { defaultTeacherFormData } from '../consts'
+import {
+  defaultTeacherFormData,
+  snackbarOptions,
+  snackbarOptionsError,
+} from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { Degree, SchoolType } from '../types/enums'
 import { teacherForm } from '../types/form'
@@ -97,7 +101,10 @@ const TeacherDetailView: React.FC = () => {
           end: time.end?.format('HH:mm'),
         })),
       }).then(() => {
-        enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gespeichert')
+        enqueueSnackbar(
+          data.firstName + ' ' + data.lastName + ' gespeichert',
+          snackbarOptions,
+        )
         if (id) navigate('/teachers')
       })
     }
@@ -108,7 +115,10 @@ const TeacherDetailView: React.FC = () => {
 
     API.delete('users/teacher/' + requestedId)
       .then(() => {
-        enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gelöscht')
+        enqueueSnackbar(
+          data.firstName + ' ' + data.lastName + ' gelöscht',
+          snackbarOptions,
+        )
         navigate('/teachers')
       })
       .catch(() => {
@@ -116,7 +126,8 @@ const TeacherDetailView: React.FC = () => {
           data.firstName +
             ' ' +
             data.lastName +
-            ' kann nicht gelöscht werden, da er noch laufende Verträge hat',
+            ' kann nicht gelöscht werden, da noch laufende Verträge existieren.',
+          snackbarOptionsError,
         )
       })
   }

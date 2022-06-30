@@ -2,16 +2,15 @@ import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import * as argon2 from 'argon2'
+import nodemailer from 'nodemailer'
 
 import { User } from 'src/users/entities/user.entity'
 import { UsersService } from 'src/users/users.service'
-const nodemailer = require("nodemailer");
-
 
 const transporter = nodemailer.createTransport({
-  host: "smtp",
+  host: 'smtp',
   port: 25,
-});
+})
 
 @Injectable()
 export class AuthService {
@@ -58,24 +57,19 @@ export class AuthService {
     //TODO: send email to user
     console.log(`reset link for ${user.email} - ${link}`)
 
-    let mailOptions = {
-      from: "noreply@m-to-b.com",
+    const mailOptions = {
+      from: 'noreply@m-to-b.com',
       to: user.email,
-      subject:
-        "Schülertreff: Passwort-Reset",
-      text:
-        "Lege unter folgendem Link dein neues Passwort fest: \n" + link
-    };
+      subject: 'Schülertreff: Passwort-Reset',
+      text: 'Lege unter folgendem Link dein neues Passwort fest: \n' + link,
+    }
+
     try {
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          return console.log(error);
-        }
-      });
+      transporter.sendMail(mailOptions, (error) => {
+        if (error) console.log(error)
+      })
     } catch {
-      console.log(
-        "Failed to send Reminder Mail to " + user.email
-      );
+      console.log('Failed to send Reminder Mail to ' + user.email)
     }
   }
 

@@ -16,9 +16,11 @@ import {
   Stack,
   TextField,
 } from '@mui/material'
+import axios from 'axios'
+import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
-import { defaultTeacherFormData } from '../consts'
+import { defaultTeacherFormData, snackbarOptionsError } from '../consts'
 import { Degree, SchoolType } from '../types/enums'
 import { teacherForm } from '../types/form'
 import subject from '../types/subject'
@@ -39,6 +41,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
   const [errors, setErrors] = useState(defaultTeacherFormData)
 
   const { API } = useAuth()
+  const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
     API.get(`subjects`).then((res) => setSubjects(res.data))
@@ -55,11 +58,23 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           start: time.start?.format('HH:mm'),
           end: time.end?.format('HH:mm'),
         })),
-      }).then((res) => {
-        setTeachers((s) => [...s, res.data])
-        setOpen(false)
-        setData(defaultTeacherFormData)
       })
+        .then((res) => {
+          setTeachers((s) => [...s, res.data])
+          setOpen(false)
+          setData(defaultTeacherFormData)
+        })
+        .catch((error) => {
+          if (axios.isAxiosError(error) && error.response?.status === 400) {
+            enqueueSnackbar(
+              (error.response.data as { message: string }).message,
+              snackbarOptionsError,
+            )
+          } else {
+            console.error(error)
+            enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+          }
+        })
   }
 
   const closeForm = () => {

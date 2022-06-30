@@ -24,7 +24,11 @@ import { useNavigate, useParams } from 'react-router-dom'
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
 import { formValidation } from '../components/FormValidation'
-import { defaultPrivateCustomerFormData } from '../consts'
+import {
+  defaultPrivateCustomerFormData,
+  snackbarOptions,
+  snackbarOptionsError,
+} from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { privateCustomerForm } from '../types/form'
 import { timesAvailableParsed } from '../types/user'
@@ -88,7 +92,10 @@ const PrivateCustomerDetailView: React.FC = () => {
           end: time.end?.format('HH:mm'),
         })),
       }).then(() => {
-        enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gespeichert')
+        enqueueSnackbar(
+          data.firstName + ' ' + data.lastName + ' gespeichert',
+          snackbarOptions,
+        )
         if (id) navigate('/privateCustomers')
       })
     }
@@ -99,7 +106,10 @@ const PrivateCustomerDetailView: React.FC = () => {
 
     API.delete('users/privateCustomer/' + requestedId)
       .then(() => {
-        enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gelöscht')
+        enqueueSnackbar(
+          data.firstName + ' ' + data.lastName + ' gelöscht',
+          snackbarOptions,
+        )
         navigate('/privateCustomers')
       })
       .catch(() => {
@@ -107,7 +117,8 @@ const PrivateCustomerDetailView: React.FC = () => {
           data.firstName +
             ' ' +
             data.lastName +
-            ' kann nicht gelöscht werden, da er noch laufende Verträge hat',
+            ' kann nicht gelöscht werden, da noch laufende Verträge existieren.',
+          snackbarOptionsError,
         )
       })
   }

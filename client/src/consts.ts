@@ -1,4 +1,5 @@
 import { GridLocaleText } from '@mui/x-data-grid'
+import { OptionsObject as SnackbarOptions } from 'notistack'
 
 import { privateCustomerForm, teacherForm } from './types/form'
 import subject from './types/subject'
@@ -38,4 +39,16 @@ export const defaultPrivateCustomerFormData: privateCustomerForm = {
   phone: '',
   grade: null,
   timesAvailable: [],
+}
+
+export const snackbarOptions: SnackbarOptions = {
+  anchorOrigin: {
+    vertical: 'bottom',
+    horizontal: 'left',
+  },
+}
+
+export const snackbarOptionsError: SnackbarOptions = {
+  ...snackbarOptions,
+  variant: 'error',
 }

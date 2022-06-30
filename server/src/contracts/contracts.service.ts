@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
 import dayjs, { Dayjs } from 'dayjs'
-import { Brackets, Connection, Repository, UpdateResult } from 'typeorm'
+import { Brackets, Connection, Repository } from 'typeorm'
 
 import { timeAvailable } from 'src/users/dto/timeAvailable'
 import { Customer, User } from 'src/users/entities'

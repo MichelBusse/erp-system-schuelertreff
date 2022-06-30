@@ -41,9 +41,9 @@ export class LessonsController {
     @Request() req,
     @Body() createLessonDto: CreateLessonDto,
   ): Promise<Lesson> {
-    if(req.user.role === Role.ADMIN){
+    if (req.user.role === Role.ADMIN) {
       return this.lessonsService.create(createLessonDto)
-    }else{
+    } else {
       return this.lessonsService.create(createLessonDto, req.user.id)
     }
   }
@@ -54,9 +54,9 @@ export class LessonsController {
     @Request() req,
     @Body() createLessonDto: CreateLessonDto,
   ): Promise<Lesson> {
-    if(req.user.role === Role.ADMIN){
+    if (req.user.role === Role.ADMIN) {
       return this.lessonsService.update(id, createLessonDto)
-    }else{
+    } else {
       return this.lessonsService.update(id, createLessonDto, req.user.id)
     }
   }
@@ -73,13 +73,12 @@ export class LessonsController {
     @Param('contractId') id: string,
     @Param('date') date: string,
   ): Promise<{ contract: Contract; lesson: Lesson }> {
-    if(req.user.role === Role.ADMIN){
+    if (req.user.role === Role.ADMIN) {
       return this.lessonsService.findOne(id, date)
-    }else{
+    } else {
       return this.lessonsService.findOne(id, date, req.user.id)
     }
   }
-
 
   @Delete(':id')
   @Roles(Role.ADMIN)

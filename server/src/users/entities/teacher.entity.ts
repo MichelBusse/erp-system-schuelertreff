@@ -4,7 +4,6 @@ import { Role } from 'src/auth/role.enum'
 import { Subject } from 'src/subjects/subject.entity'
 
 import { User } from './user.entity'
-import { ColumnCommonOptions } from 'typeorm/decorator/options/ColumnCommonOptions'
 
 export enum TeacherState {
   APPLIED = 'applied',
@@ -13,22 +12,19 @@ export enum TeacherState {
   DELETED = 'deleted',
 }
 
-export enum Degree
-{
+export enum Degree {
   NOINFO = 'noinfo',
   HIGHSCHOOL = 'highschool',
   BACHELOR = 'bachelor',
   MASTER = 'master',
 }
 
-export enum SchoolType
-{
+export enum SchoolType {
   GRUNDSCHULE = 'grundschule',
   OBERSCHULE = 'oberschule',
   GYMSEK1 = 'sek1',
   GYMSEK2 = 'sek2',
 }
-
 
 @ChildEntity()
 export class Teacher extends User {
