@@ -40,7 +40,6 @@ export const defaultPrivateCustomerFormData = {
 }
 
 export const defaultSchoolCustomerFormData = {
-  id: 0,
   schoolName: '',
   city: '',
   postalCode: '',
@@ -55,4 +54,5 @@ export const defaultClassCustomerFormData = {
   numberOfStudents: 0,
   grade: 0,
   timesAvailable: [],
+  schoolTypes: []
 }

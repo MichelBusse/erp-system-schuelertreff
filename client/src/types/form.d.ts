@@ -28,10 +28,10 @@ export interface schoolCustomerForm
 
 export interface classCustomerForm
   extends Omit<userForm, 'lastName' | 'firstName' | 'salutation' | 'street' | 'city' | 'postalCode' | 'email' | 'phone'> {
-  id: number
   className: string
   numberOfStudents: number
   grade: number
+  schoolTypes: string[]
 }
 
 export interface privateCustomerForm extends userForm {

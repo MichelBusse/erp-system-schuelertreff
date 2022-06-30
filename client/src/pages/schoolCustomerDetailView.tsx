@@ -2,11 +2,14 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Autocomplete,
   Button,
+  DialogActions,
   FormControl,
   FormHelperText,
   InputLabel,
   MenuItem,
+  Paper,
   Select,
   Stack,
   TextField,
@@ -19,6 +22,7 @@ import { nanoid } from 'nanoid'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { SchoolType } from '../types/enums'
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
@@ -47,6 +51,9 @@ const SchoolCustomerDetailView: React.FC = () => {
   const [schoolCustomer, setSchoolCustomer] = useState<schoolCustomerForm>(
     defaultSchoolCustomerFormData,
   )
+  const [newClassCustomer, setNewClassCustomer] = useState<classCustomerForm>(
+    defaultClassCustomerFormData,
+  )
   const [errors, setErrors] = useState(defaultClassCustomerFormData)
 
   useEffect(() => {
@@ -66,6 +73,7 @@ const SchoolCustomerDetailView: React.FC = () => {
 
   useEffect(() => {
     API.get('users/classCustomer/' + requestedId).then((res) => {
+      setClassCustomers([])
       res.data.map((classCustomer: any) => {
         const newTimesAvailable =
           classCustomer.timesAvailableParsed.length === 1 &&
@@ -85,50 +93,68 @@ const SchoolCustomerDetailView: React.FC = () => {
         setClassCustomers((data: classCustomerForm[]) => [
           ...data,
           {
-            id: classCustomer.id,
             className: classCustomer.className,
             numberOfStudents: classCustomer.numberOfStudents,
             grade: classCustomer.grade,
             timesAvailable: newTimesAvailable,
+            schoolTypes: classCustomer.schoolTypes,
           },
         ])
       })
     })
   }, [])
 
-  // const submitForm = () => {
-  //   setErrors(formValidation('privateCustomer', data))
+  const submitForm = () => {
+    //   setErrors(formValidation('privateCustomer', data))
+    //   if (formValidation('privateCustomer', data).validation) {
+    //     API.post('users/privateCustomer/' + requestedId, {
+    //       ...data,
+    //       timesAvailable: data.timesAvailable.map((time) => ({
+    //         dow: time.dow,
+    //         start: time.start?.format('HH:mm'),
+    //         end: time.end?.format('HH:mm'),
+    //       })),
+    //     }).then(() => {
+    //       enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gespeichert')
+    //       if (id) navigate('/privateCustomers')
+    //     })
+    //   }
+  }
 
-  //   if (formValidation('privateCustomer', data).validation) {
-  //     API.post('users/privateCustomer/' + requestedId, {
-  //       ...data,
-  //       timesAvailable: data.timesAvailable.map((time) => ({
-  //         dow: time.dow,
-  //         start: time.start?.format('HH:mm'),
-  //         end: time.end?.format('HH:mm'),
-  //       })),
-  //     }).then(() => {
-  //       enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gespeichert')
-  //       if (id) navigate('/privateCustomers')
-  //     })
-  //   }
-  // }
-
-  // const deleteUser = () => {
-  //   console.log('deletePrivateCustomer')
-  // }
+  const deleteUser = () => {
+    console.log('deletePrivateCustomer')
+  }
 
   const updateClassCustomer = (newValue: timeAvailable[], index: number) => {
-
-
-
-
     setClassCustomers((classCustomers) => {
       let newClassCustomers = [...classCustomers]
-      newClassCustomers[index] = { ...classCustomers[index], timesAvailable: newValue }
+      newClassCustomers[index] = {
+        ...classCustomers[index],
+        timesAvailable: newValue,
+      }
 
-      return(newClassCustomers)
-  })}
+      return newClassCustomers
+    })
+  }
+
+  const addClass = () => {
+    if (
+      newClassCustomer.className &&
+      newClassCustomer.numberOfStudents != 0 &&
+      newClassCustomer.schoolTypes.length != 0
+    ) {
+      setClassCustomers((ClassCustomers) => [
+        ...classCustomers,
+        newClassCustomer,
+      ])
+
+      setNewClassCustomer(defaultClassCustomerFormData)
+    }
+  }
+
+  const cancelAddClass = () => {
+    setNewClassCustomer(defaultClassCustomerFormData)
+  }
 
   return (
     <div className={styles.wrapper}>
@@ -188,27 +214,157 @@ const SchoolCustomerDetailView: React.FC = () => {
             />
           </Stack>
           <h3>Klassen:</h3>
-          {classCustomers.map((classCustomer, index) => (
-            <Accordion key={classCustomer.className}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-              >
-                <Typography>{classCustomer.className}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Box>
-                  <AddTimes
-                    value={classCustomer.timesAvailable}
-                    setValue={(newValue) =>
-                      updateClassCustomer(newValue, index)
+          <Stack direction="column" rowGap={2}>
+            <Box sx={{ bgcolor: 'background.default' }}>
+              {classCustomers.map((classCustomer, index) => (
+                <Accordion key={classCustomer.className}>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                  >
+                    <Typography sx={{ width: '20%' }}>
+                      {classCustomer.className}
+                    </Typography>
+                    <Typography sx={{ width: '20%', color: 'text.secondary' }}>
+                      {classCustomer.numberOfStudents} Schüler
+                    </Typography>
+                    <Typography sx={{ width: '20%', color: 'text.secondary' }}>
+                      {classCustomer.schoolTypes}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Box>
+                      <AddTimes
+                        value={classCustomer.timesAvailable}
+                        setValue={(newValue) =>
+                          updateClassCustomer(newValue, index)
+                        }
+                      />
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
+              ))}
+            </Box>
+            <Stack
+              direction="column"
+              rowGap={2}
+              sx={{
+                padding: '15px',
+                backgroundColor: '#D9D9D9',
+                borderRadius: '5px',
+              }}
+            >
+              <Stack direction="row" columnGap={2}>
+                <TextField
+                  size="small"
+                  id="className"
+                  label="Klassenname"
+                  variant="outlined"
+                  required={true}
+                  sx={{ width: '15%' }}
+                  value={newClassCustomer.className}
+                  onChange={(event) =>
+                    setNewClassCustomer((data) => ({
+                      ...data,
+                      className: event.target.value,
+                    }))
+                  }
+                />
+                <TextField
+                  size="small"
+                  type="number"
+                  id="numberOfStudents"
+                  label="Schüler"
+                  variant="outlined"
+                  sx={{ width: '7%' }}
+                  value={newClassCustomer.numberOfStudents}
+                  InputProps={{ inputProps: { min: 0, max: 50 } }}
+                  onChange={(event) =>
+                    setNewClassCustomer((data) => ({
+                      ...data,
+                      numberOfStudents: Number(event.target.value),
+                    }))
+                  }
+                />
+                <Autocomplete
+                  multiple
+                  size="small"
+                  sx={{ width: '25%' }}
+                  id="schoolTypes"
+                  options={schoolCustomer.schoolTypes}
+                  getOptionLabel={(option) => {
+                    switch (option) {
+                      case SchoolType.GRUNDSCHULE:
+                        return 'Grundschule'
+                      case SchoolType.OBERSCHULE:
+                        return 'Oberschule'
+                      case SchoolType.GYMSEK1:
+                        return 'Gymnasium Sek. 1'
+                      case SchoolType.GYMSEK2:
+                        return 'Gymnasium Sek. 2'
+                      default:
+                        return ''
                     }
-                  />
-                </Box>
-              </AccordionDetails>
-            </Accordion>
-          ))}
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="outlined"
+                      label="Schularten"
+                    />
+                  )}
+                  value={newClassCustomer.schoolTypes}
+                  onChange={(_, value) =>
+                    setNewClassCustomer((data) => ({
+                      ...data,
+                      schoolTypes: value,
+                    }))
+                  }
+                />
+              </Stack>
+              <Box>
+                <AddTimes
+                  value={newClassCustomer.timesAvailable}
+                  setValue={(newValue) =>
+                    setNewClassCustomer((classCustomer) => ({
+                      ...classCustomer,
+                      timesAvailable: newValue,
+                    }))
+                  }
+                />
+                <DialogActions>
+                  <Button onClick={cancelAddClass}>Abbrechen</Button>
+                  <Button onClick={addClass}>Hinzufügen</Button>
+                </DialogActions>
+              </Box>
+            </Stack>
+          </Stack>
+          <Stack direction={'row'} columnGap={5} sx={{ marginTop: '15px' }}>
+            {id && (
+              <Button
+                onClick={() => {
+                  navigate('/schoolCustomers')
+                }}
+                variant="outlined"
+              >
+                Abbrechen
+              </Button>
+            )}
+            <Button onClick={submitForm} variant="contained">
+              Speichern
+            </Button>
+            {id && (
+              <Button
+                variant="outlined"
+                onClick={deleteUser}
+                sx={{ marginLeft: 'auto' }}
+                color="error"
+              >
+                Entfernen
+              </Button>
+            )}
+          </Stack>
         </Stack>
       </Box>
     </div>
