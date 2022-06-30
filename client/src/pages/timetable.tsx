@@ -106,7 +106,6 @@ const Timetable: React.FC = () => {
               <Stack spacing={2}>
                 {(drawer.params.value as contract[])?.map((c) => {
                   let existingLesson = null
-                  console.log(drawer.lessons)
                   for (const lesson of drawer.lessons) {
                     if (
                       lesson.contract.id === c.id &&

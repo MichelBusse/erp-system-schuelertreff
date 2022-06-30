@@ -7,6 +7,7 @@ import { ContractsService } from 'src/contracts/contracts.service'
 
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Lesson } from './lesson.entity'
+import { ContractState } from 'src/contracts/contract.entity'
 
 @Injectable()
 export class LessonsService {
@@ -29,6 +30,11 @@ export class LessonsService {
     )
 
     if (contract) {
+      if (contract.state !== ContractState.ACCEPTED)
+        throw new BadRequestException(
+          'You cannot create lessons of unaccepted contracts',
+        )
+
       lesson.date = createLessonDto.date
       lesson.state = createLessonDto.state
       lesson.contract = contract
@@ -50,7 +56,10 @@ export class LessonsService {
       relations: ['contract', 'contract.teacher'],
     })
 
-    if (!teacherId || (teacherId && lesson.contract.teacher.id === teacherId)) {
+    if (
+      lesson.contract.state === ContractState.ACCEPTED &&
+      (!teacherId || (teacherId && lesson.contract.teacher.id === teacherId))
+    ) {
       lesson.state = createLessonDto.state
 
       return this.lessonsRepository.save(lesson)
@@ -104,7 +113,14 @@ export class LessonsService {
       dayjs(week),
       teacherId,
     )
+    const pendingContracts = await this.contractsService.findAllPending(
+      teacherId,
+    )
 
-    return { lessons: lessonsOfWeek, contracts: contractsOfWeek }
+    return {
+      lessons: lessonsOfWeek,
+      contracts: contractsOfWeek,
+      pendingContracts: pendingContracts,
+    }
   }
 }

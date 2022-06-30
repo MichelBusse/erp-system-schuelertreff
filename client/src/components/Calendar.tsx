@@ -6,8 +6,8 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 
 import { DrawerParameters } from '../pages/timetable'
-import { contract } from '../types/contract'
-import { lesson } from '../types/lesson'
+import { contract, ContractState } from '../types/contract'
+import { lesson, LessonState } from '../types/lesson'
 import { teacher } from '../types/user'
 import { useAuth } from './AuthProvider'
 import styles from './Calendar.module.scss'
@@ -43,11 +43,19 @@ const Calendar: React.FC<Props> = ({
     }).then((res) => {
       const contractsByTeacher: Record<number, contract[]> = {}
 
-      res.data.contracts.map((c: contract) => {
-        contractsByTeacher[c.teacher] = (
-          contractsByTeacher[c.teacher] ?? []
-        ).concat(c)
-      })
+      res.data.contracts
+        .sort((a: contract, b: contract) => {
+          return dayjs(a.startTime, 'HH:mm').isAfter(
+            dayjs(b.startTime, 'HH:mm'),
+          )
+            ? 1
+            : -1
+        })
+        .map((c: contract) => {
+          contractsByTeacher[c.teacher] = (
+            contractsByTeacher[c.teacher] ?? []
+          ).concat(c)
+        })
 
       setContracts(contractsByTeacher)
       setLessons(res.data.lessons)
@@ -69,20 +77,22 @@ const Calendar: React.FC<Props> = ({
         cursor: (params.value ?? []).length > 0 ? 'pointer' : 'normal',
       }}
     >
-      {(params.value as contract[])?.map((c) => (
-        <Box
-          key={c.id}
-          sx={{
-            backgroundColor: c.subject.color + '70',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            boxShadow: `0 0 2px ${c.subject.color} inset`,
-          }}
-        >
-          {c.subject.shortForm}
-        </Box>
-      ))}
+      {(params.value as contract[])?.map((c) => {
+        return (
+          <Box
+            key={c.id}
+            sx={{
+              backgroundColor: c.subject.color + '70',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              boxShadow: `0 0 2px ${c.subject.color} inset`,
+            }}
+          >
+            {c.subject.shortForm}
+          </Box>
+        )
+      })}
     </Box>
   )
 
@@ -127,7 +137,6 @@ const Calendar: React.FC<Props> = ({
             params.colDef.field !== 'teacher' &&
             (params.value ?? []).length > 0
           ) {
-            console.log(params)
             setDrawer({
               open: true,
               params: params,
