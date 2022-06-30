@@ -3,11 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm'
 import dayjs, { Dayjs } from 'dayjs'
 import { Repository } from 'typeorm'
 
+import { ContractState } from 'src/contracts/contract.entity'
 import { ContractsService } from 'src/contracts/contracts.service'
 
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Lesson } from './lesson.entity'
-import { ContractState } from 'src/contracts/contract.entity'
 
 @Injectable()
 export class LessonsService {

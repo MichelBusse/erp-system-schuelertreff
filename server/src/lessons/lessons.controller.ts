@@ -26,7 +26,11 @@ export class LessonsController {
   findMyContracts(
     @Request() req,
     @Query('of') date: string,
-  ): Promise<{ contracts: Contract[], lessons: Lesson[], pendingContracts: Contract[]}> {
+  ): Promise<{
+    contracts: Contract[]
+    lessons: Lesson[]
+    pendingContracts: Contract[]
+  }> {
     return this.lessonsService.findByWeek(dayjs(date), req.user.id)
   }
 

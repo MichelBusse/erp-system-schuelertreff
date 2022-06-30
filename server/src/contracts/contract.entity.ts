@@ -17,7 +17,6 @@ export enum ContractState {
   DECLINED = 'declined',
 }
 
-
 @Entity()
 export class Contract {
   @PrimaryGeneratedColumn()
@@ -26,7 +25,7 @@ export class Contract {
   @Column({
     type: 'enum',
     enum: ContractState,
-    default: ContractState.PENDING
+    default: ContractState.PENDING,
   })
   state: ContractState
 

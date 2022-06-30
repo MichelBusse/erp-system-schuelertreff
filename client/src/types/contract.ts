@@ -1,7 +1,6 @@
 import subject from './subject'
 import { customer } from './user'
 
-
 export enum ContractState {
   PENDING = 'pending',
   ACCEPTED = 'accepted',

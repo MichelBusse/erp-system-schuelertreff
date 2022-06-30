@@ -28,6 +28,7 @@ import { useSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 
 import { snackbarOptionsError } from '../consts'
+import { ContractState } from '../types/contract'
 import subject from '../types/subject'
 import { customer, teacher } from '../types/user'
 import { getNextDow } from '../utils/date'
@@ -35,7 +36,6 @@ import { useAuth } from './AuthProvider'
 import BetterTimePicker from './BetterTimePicker'
 import EqualStack from './EqualStack'
 import IconButtonAdornment from './IconButtonAdornment'
-import { ContractState } from '../types/contract'
 
 dayjs.extend(customParseFormat)
 
@@ -233,7 +233,7 @@ const ContractDialog: React.FC<Props> = ({
       endDate: form1.endDate?.format('YYYY-MM-DD'),
       startTime: form1.startTime?.format('HH:mm'),
       endTime: form1.endTime?.format('HH:mm'),
-      state: form1.state
+      state: form1.state,
     })
       .then(() => {
         onSuccess()

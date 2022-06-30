@@ -3,18 +3,15 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  IconButton,
   Stack,
   Typography,
 } from '@mui/material'
-import { contract, ContractState } from '../types/contract'
-import CheckIcon from '@mui/icons-material/Check'
-import CloseIcon from '@mui/icons-material/Close'
-import { useAuth } from './AuthProvider'
-import { SettingsPowerRounded } from '@mui/icons-material'
-import { useSnackbar } from 'notistack'
-import dayjs from 'dayjs'
 import { Box } from '@mui/system'
+import dayjs from 'dayjs'
+import { useSnackbar } from 'notistack'
+
+import { contract, ContractState } from '../types/contract'
+import { useAuth } from './AuthProvider'
 
 type Props = {
   contracts: contract[]
@@ -58,6 +55,7 @@ const AcceptContractsDialog: React.FC<Props> = ({
                   padding: '15px',
                   borderRadius: '5px',
                 }}
+                key={c.id}
               >
                 <Stack rowGap={2}>
                   <Stack direction={'row'} columnGap={2}>

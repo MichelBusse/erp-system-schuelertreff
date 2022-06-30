@@ -17,9 +17,9 @@ import { Role } from 'src/auth/role.enum'
 
 import { Contract } from './contract.entity'
 import { ContractsService } from './contracts.service'
+import { AcceptOrDeclineContractDto } from './dto/accept-or-decline-contract-dto'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
-import { AcceptOrDeclineContractDto } from './dto/accept-or-decline-contract-dto'
 
 dayjs.extend(customParseFormat)
 
@@ -88,10 +88,7 @@ export class ContractsController {
 
   @Post(':id')
   @Roles(Role.ADMIN)
-  update(
-    @Param('id') id: string,
-    @Body() dto: CreateContractDto,
-  ): void {
+  update(@Param('id') id: string, @Body() dto: CreateContractDto): void {
     this.validateDto(dto)
 
     if (dayjs(dto.startDate).isAfter(dayjs())) {

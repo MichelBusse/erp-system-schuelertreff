@@ -3,10 +3,9 @@ import { Box } from '@mui/system'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
-import { DrawerParameters } from '../pages/timetable'
-import { contract, ContractState } from '../types/contract'
 
 import { DrawerParameters } from '../pages/timetable'
+import { contract } from '../types/contract'
 import { lesson } from '../types/lesson'
 import AcceptContractsDialog from './AcceptContractsDialog'
 import { useAuth } from './AuthProvider'
@@ -54,11 +53,7 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
   }, [date, refresh])
 
   const getCellValue: GridColDef['valueGetter'] = ({ colDef: { field } }) =>
-    contracts?.filter(
-      (c) =>
-        c.state === ContractState.ACCEPTED &&
-        dayjs(c.startDate).day().toString() === field,
-    )
+    contracts?.filter((c) => dayjs(c.startDate).day().toString() === field)
 
   const renderCell: GridColDef['renderCell'] = (params) => (
     <Box

@@ -8,9 +8,9 @@ import { Customer, User } from 'src/users/entities'
 import { parseMultirange, UsersService } from 'src/users/users.service'
 
 import { Contract, ContractState } from './contract.entity'
+import { AcceptOrDeclineContractDto } from './dto/accept-or-decline-contract-dto'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
-import { AcceptOrDeclineContractDto } from './dto/accept-or-decline-contract-dto'
 
 @Injectable()
 export class ContractsService {
@@ -61,7 +61,7 @@ export class ContractsService {
   }
 
   async findOne(id: string, teacherId?: number): Promise<Contract> {
-    let contract = await this.contractsRepository.findOne(id, {
+    const contract = await this.contractsRepository.findOne(id, {
       relations: ['subject', 'teacher', 'customers'],
     })
 
@@ -111,14 +111,17 @@ export class ContractsService {
     await this.contractsRepository.save(contract)
   }
 
-  async acceptOrDeclineContract(id: string, dto: AcceptOrDeclineContractDto): Promise<void> {
+  async acceptOrDeclineContract(
+    id: string,
+    dto: AcceptOrDeclineContractDto,
+  ): Promise<void> {
     let contract: any = await this.contractsRepository.findOne(id)
 
     contract = {
       ...contract,
       ...dto,
     }
-    
+
     await this.contractsRepository.save(contract)
   }
 
