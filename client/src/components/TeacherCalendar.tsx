@@ -37,7 +37,15 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
         of: date.format('YYYY-MM-DD'),
       },
     }).then((res) => {
-      setContracts(res.data.contracts)
+      setContracts(
+        res.data.contracts.sort((a: contract, b: contract) => {
+          return dayjs(a.startTime, 'HH:mm').isAfter(
+            dayjs(b.startTime, 'HH:mm'),
+          )
+            ? 1
+            : -1
+        }),
+      )
       setPendingContracts(res.data.pendingContracts)
       setDialogOpen(res.data.pendingContracts.length > 0)
       setLessons(res.data.lessons)
@@ -112,7 +120,7 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
                 borderTopStyle: 'solid',
                 borderTopColor: '#7b878860',
                 textAlign: 'right',
-                padding: '3px'
+                padding: '3px',
               }}
             >
               {startTimeAM + i} Uhr
@@ -162,7 +170,14 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
           }}
         />
       </Paper>
-      <AcceptContractsDialog contracts={pendingContracts} open={dialogOpen} setOpen={(open) => {setDialogOpen(open)}} refresh={() => setRefresh((re) => (++re))}/>
+      <AcceptContractsDialog
+        contracts={pendingContracts}
+        open={dialogOpen}
+        setOpen={(open) => {
+          setDialogOpen(open)
+        }}
+        refresh={() => setRefresh((re) => ++re)}
+      />
     </>
   )
 }

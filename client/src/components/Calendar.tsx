@@ -41,14 +41,21 @@ const Calendar: React.FC<Props> = ({
         of: date.format('YYYY-MM-DD'),
       },
     }).then((res) => {
-      console.log(res.data)
       const contractsByTeacher: Record<number, contract[]> = {}
 
-      res.data.contracts.map((c: contract) => {
-        contractsByTeacher[c.teacher] = (
-          contractsByTeacher[c.teacher] ?? []
-        ).concat(c)
-      })
+      res.data.contracts
+        .sort((a: contract, b: contract) => {
+          return dayjs(a.startTime, 'HH:mm').isAfter(
+            dayjs(b.startTime, 'HH:mm'),
+          )
+            ? 1
+            : -1
+        })
+        .map((c: contract) => {
+          contractsByTeacher[c.teacher] = (
+            contractsByTeacher[c.teacher] ?? []
+          ).concat(c)
+        })
 
       setContracts(contractsByTeacher)
       setLessons(res.data.lessons)
@@ -130,7 +137,6 @@ const Calendar: React.FC<Props> = ({
             params.colDef.field !== 'teacher' &&
             (params.value ?? []).length > 0
           ) {
-            console.log(params)
             setDrawer({
               open: true,
               params: params,
