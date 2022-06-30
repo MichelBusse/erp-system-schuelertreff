@@ -137,6 +137,10 @@ const SchoolCustomerDetailView: React.FC = () => {
     })
   }
 
+  const deleteClass = (index: number) => {
+    setClassCustomers(classCustomers.filter((_, i) => i !== index))
+  }
+
   const addClass = () => {
     if (
       newClassCustomer.className &&
@@ -219,7 +223,6 @@ const SchoolCustomerDetailView: React.FC = () => {
               {classCustomers.map((classCustomer, index) => (
                 <Accordion key={classCustomer.className}>
                   <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1a-content"
                     id="panel1a-header"
                   >
@@ -232,6 +235,15 @@ const SchoolCustomerDetailView: React.FC = () => {
                     <Typography sx={{ width: '20%', color: 'text.secondary' }}>
                       {classCustomer.schoolTypes}
                     </Typography>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => (setClassCustomers(classCustomers.filter((_, i) => i !== index)))}
+                      sx={{ marginLeft: 'auto' }}
+                      color="error"
+                    >
+                      Entfernen
+                    </Button>
                   </AccordionSummary>
                   <AccordionDetails>
                     <Box>
@@ -255,6 +267,7 @@ const SchoolCustomerDetailView: React.FC = () => {
                 borderRadius: '5px',
               }}
             >
+              <Typography sx={{fontWeight: "bold"}}>Klasse hinzufügen</Typography>
               <Stack direction="row" columnGap={2}>
                 <TextField
                   size="small"
