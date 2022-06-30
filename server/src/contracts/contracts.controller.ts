@@ -7,11 +7,10 @@ import {
   Param,
   Post,
   Query,
-  Request,
 } from '@nestjs/common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
-import { EntityNotFoundError, UpdateResult } from 'typeorm'
+import { EntityNotFoundError } from 'typeorm'
 
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
@@ -20,6 +19,7 @@ import { Contract } from './contract.entity'
 import { ContractsService } from './contracts.service'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
+import { AcceptOrDeclineContractDto } from './dto/accept-or-decline-contract-dto'
 
 dayjs.extend(customParseFormat)
 
@@ -66,14 +66,6 @@ export class ContractsController {
     return this.contractsService.suggestContracts(dto)
   }
 
-  @Get('myContracts')
-  findMyContracts(
-    @Request() req,
-    @Query('of') date: string,
-  ): Promise<Contract[]> {
-    return this.contractsService.findByWeek(dayjs(date), req.user.id)
-  }
-
   @Get()
   @Roles(Role.ADMIN)
   findAll(): Promise<Contract[]> {
@@ -86,30 +78,40 @@ export class ContractsController {
     return this.contractsService.findOne(id)
   }
 
+  @Post('acceptOrDecline/:id')
+  acceptOrDecline(
+    @Param('id') id: string,
+    @Body() dto: AcceptOrDeclineContractDto,
+  ): void {
+    this.contractsService.acceptOrDeclineContract(id, dto)
+  }
+
   @Post(':id')
   @Roles(Role.ADMIN)
-  async update(
+  update(
     @Param('id') id: string,
     @Body() dto: CreateContractDto,
-  ): Promise<Contract> {
+  ): void {
     this.validateDto(dto)
 
-    if (dayjs(dto.startDate).isAfter(dayjs())) {    // If contract starts in future, then update excestingcontract 
+    if (dayjs(dto.startDate).isAfter(dayjs())) {
+      // If contract starts in future, then update excestingcontract
 
       this.contractsService.updateContract(id, dto)
-
-    } else if(dayjs(dto.endDate).isAfter(dayjs())) { //If contract has already started and does not have ended yet, then end it and create new with updated params
+    } else if (dayjs(dto.endDate).isAfter(dayjs())) {
+      //If contract has already started and does not have ended yet, then end it and create new with updated params
       this.contractsService.endOrDeleteContract(id)
 
-      return this.contractsService.create(dto).catch((err) => {
+      this.contractsService.create(dto).catch((err) => {
         if (err instanceof EntityNotFoundError) {
           throw new BadRequestException(err.message)
         }
 
         throw err
       })
-    } else { //Past contracts cannot be updated
-      throw new BadRequestException("Cannot update past contracts")
+    } else {
+      //Past contracts cannot be updated
+      throw new BadRequestException('Cannot update past contracts')
     }
   }
 

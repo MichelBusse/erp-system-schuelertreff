@@ -4,13 +4,12 @@ import { DataGrid, GridCellParams, GridColDef } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 import { DrawerParameters } from '../pages/timetable'
+import { contract, ContractState } from '../types/contract'
 
 import { lesson } from '../types/lesson'
-import subject from '../types/subject'
-import { customer } from '../types/user'
+import AcceptContractsDialog from './AcceptContractsDialog'
 import { useAuth } from './AuthProvider'
 import CalendarControl from './CalendarControl'
-import LessonOverview from './LessonOverview'
 import styles from './TeacherCalendar.module.scss'
 
 type Props = {
@@ -19,22 +18,13 @@ type Props = {
   setDate: (date: Dayjs) => void
 }
 
-type contract = {
-  id: number
-  startTime: string
-  endTime: string
-  startDate: string
-  endDate: string
-  interval: 1
-  subject: subject
-  customers: customer[]
-  teacher: number
-}
-
 const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
   const { API } = useAuth()
   const [contracts, setContracts] = useState<contract[]>([])
+  const [pendingContracts, setPendingContracts] = useState<contract[]>([])
   const [lessons, setLessons] = useState<lesson[]>([])
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+  const [refresh, setRefresh] = useState<number>(0)
 
   const rowHeight = 777
   const startTimeAM = 7
@@ -48,12 +38,18 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
       },
     }).then((res) => {
       setContracts(res.data.contracts)
+      setPendingContracts(res.data.pendingContracts)
+      setDialogOpen(res.data.pendingContracts.length > 0)
       setLessons(res.data.lessons)
     })
-  }, [date])
+  }, [date, refresh])
 
   const getCellValue: GridColDef['valueGetter'] = ({ colDef: { field } }) =>
-    contracts?.filter((c) => dayjs(c.startDate).day().toString() === field)
+    contracts?.filter(
+      (c) =>
+        c.state === ContractState.ACCEPTED &&
+        dayjs(c.startDate).day().toString() === field,
+    )
 
   const renderCell: GridColDef['renderCell'] = (params) => (
     <Box
@@ -115,6 +111,8 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
                 width: '50px',
                 borderTopStyle: 'solid',
                 borderTopColor: '#7b878860',
+                textAlign: 'right',
+                padding: '3px'
               }}
             >
               {startTimeAM + i} Uhr
@@ -135,35 +133,37 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
     ),
   ]
 
-
   return (
-    <Paper
-      className={styles.wrapper}
-      sx={{ width: columns.reduce((p, c) => p + (c.width ?? 100), 0) }}
-    >
-      <CalendarControl date={date} setDate={setDate} />
+    <>
+      <Paper
+        className={styles.wrapper}
+        sx={{ width: columns.reduce((p, c) => p + (c.width ?? 100), 0) }}
+      >
+        <CalendarControl date={date} setDate={setDate} />
 
-      <DataGrid
-        getRowHeight={() => rowHeight}
-        hideFooter={true}
-        style={{
-          flexGrow: 1,
-          border: 'none',
-        }}
-        rows={[{ id: 0 }]}
-        columns={columns}
-        disableColumnMenu={true}
-        disableSelectionOnClick={true}
-        onCellClick={(params) => {
-          if (
-            params.colDef.field !== 'teacher' &&
-            (params.value ?? []).length > 0
-          ) {
-            setDrawer({ open: true, params: params, lessons: lessons })
-          }
-        }}
-      />
-    </Paper>
+        <DataGrid
+          getRowHeight={() => rowHeight}
+          hideFooter={true}
+          style={{
+            flexGrow: 1,
+            border: 'none',
+          }}
+          rows={[{ id: 0 }]}
+          columns={columns}
+          disableColumnMenu={true}
+          disableSelectionOnClick={true}
+          onCellClick={(params) => {
+            if (
+              params.colDef.field !== 'teacher' &&
+              (params.value ?? []).length > 0
+            ) {
+              setDrawer({ open: true, params: params, lessons: lessons })
+            }
+          }}
+        />
+      </Paper>
+      <AcceptContractsDialog contracts={pendingContracts} open={dialogOpen} setOpen={(open) => {setDialogOpen(open)}} refresh={() => setRefresh((re) => (++re))}/>
+    </>
   )
 }
 

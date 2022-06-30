@@ -11,10 +11,24 @@ import { Subject } from 'src/subjects/subject.entity'
 import { Customer } from 'src/users/entities/customer.entity'
 import { Teacher } from 'src/users/entities/teacher.entity'
 
+export enum ContractState {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  DECLINED = 'declined',
+}
+
+
 @Entity()
 export class Contract {
   @PrimaryGeneratedColumn()
   id: number
+
+  @Column({
+    type: 'enum',
+    enum: ContractState,
+    default: ContractState.PENDING
+  })
+  state: ContractState
 
   @ManyToMany(() => Customer)
   @JoinTable()

@@ -7,9 +7,10 @@ import { timeAvailable } from 'src/users/dto/timeAvailable'
 import { Customer, User } from 'src/users/entities'
 import { parseMultirange, UsersService } from 'src/users/users.service'
 
-import { Contract } from './contract.entity'
+import { Contract, ContractState } from './contract.entity'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
+import { AcceptOrDeclineContractDto } from './dto/accept-or-decline-contract-dto'
 
 @Injectable()
 export class ContractsService {
@@ -46,19 +47,30 @@ export class ContractsService {
     })
   }
 
-  async findOne(id: string, teacherId?: number): Promise<Contract> {
+  async findAllPending(teacherId): Promise<Contract[]> {
+    const contracts = this.contractsRepository
+      .createQueryBuilder('c')
+      .select(['c', 's'])
+      .leftJoin('c.subject', 's')
+      .where('c.state = :contractState', {
+        contractState: ContractState.PENDING,
+      })
+      .andWhere('c.teacherId = :teacherId', { teacherId: teacherId })
 
+    return contracts.getMany()
+  }
+
+  async findOne(id: string, teacherId?: number): Promise<Contract> {
     let contract = await this.contractsRepository.findOne(id, {
       relations: ['subject', 'teacher', 'customers'],
     })
 
-    if(!(teacherId && contract.teacher.id !== teacherId)){
-      return contract;
-    }else{
-      return null;
+    if (!(teacherId && contract.teacher.id !== teacherId)) {
+      return contract
+    } else {
+      return null
     }
   }
-  
 
   async endOrDeleteContract(id: string): Promise<void> {
     const contract = await this.contractsRepository.findOneOrFail(id)
@@ -80,8 +92,7 @@ export class ContractsService {
   }
 
   async updateContract(id: string, dto: CreateContractDto): Promise<void> {
-
-    let contract: any = await this.contractsRepository.findOne(id);
+    let contract: any = await this.contractsRepository.findOne(id)
 
     contract = {
       ...contract,
@@ -97,7 +108,18 @@ export class ContractsService {
       ),
     }
 
-    await this.contractsRepository.save(contract);
+    await this.contractsRepository.save(contract)
+  }
+
+  async acceptOrDeclineContract(id: string, dto: AcceptOrDeclineContractDto): Promise<void> {
+    let contract: any = await this.contractsRepository.findOne(id)
+
+    contract = {
+      ...contract,
+      ...dto,
+    }
+    
+    await this.contractsRepository.save(contract)
   }
 
   async suggestContracts(dto: SuggestContractsDto): Promise<any[]> {
@@ -150,6 +172,9 @@ export class ContractsService {
             .orWhere(`customer.id IN (:...cid)`, { cid: dto.customers })
         }),
       )
+      .andWhere('con.state = :contractState', {
+        contractState: ContractState.ACCEPTED,
+      })
       .andWhere('con.endDate > :minDate', {
         minDate: dto.minDate ?? dayjs().format('YYYY-MM-DD'),
       })
@@ -245,6 +270,9 @@ export class ContractsService {
       .leftJoin('c.customers', 'customer')
       .leftJoin('c.teacher', 'teacher')
       .where('extract(dow from c.startDate) = :dow')
+      .andWhere('c.state = :contractState', {
+        contractState: ContractState.ACCEPTED,
+      })
       .andWhere('c.startTime < :end::time')
       .andWhere('c.endTime > :start::time')
       .andWhere(
@@ -280,6 +308,9 @@ export class ContractsService {
         { week: week.format() },
       )
       .andWhere(`c.endDate >= date_trunc('week', :week::date)`)
+      .andWhere('c.state = :contractState', {
+        contractState: ContractState.ACCEPTED,
+      })
       .andWhere(
         `extract( days from ( date_trunc('week', c.startDate) - date_trunc('week', :week::date) ) ) / 7 % c.interval = 0`,
       )

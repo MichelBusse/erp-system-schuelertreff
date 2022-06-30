@@ -5,6 +5,7 @@ import { Repository } from 'typeorm'
 import { ContractsService } from 'src/contracts/contracts.service'
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Lesson } from './lesson.entity'
+import { ContractState } from 'src/contracts/contract.entity'
 
 @Injectable()
 export class LessonsService {
@@ -27,13 +28,20 @@ export class LessonsService {
     )
 
     if (contract) {
+      if (contract.state !== ContractState.ACCEPTED)
+        throw new BadRequestException(
+          'You cannot create lessons of unaccepted contracts',
+        )
+
       lesson.date = createLessonDto.date
       lesson.state = createLessonDto.state
       lesson.contract = contract
 
       return this.lessonsRepository.save(lesson)
-    }else{
-      throw new BadRequestException('You do not have permission to create this lesson')
+    } else {
+      throw new BadRequestException(
+        'You do not have permission to create this lesson',
+      )
     }
   }
 
@@ -46,12 +54,17 @@ export class LessonsService {
       relations: ['contract', 'contract.teacher'],
     })
 
-    if (!teacherId || (teacherId && lesson.contract.teacher.id === teacherId)) {
+    if (
+      lesson.contract.state === ContractState.ACCEPTED &&
+      (!teacherId || (teacherId && lesson.contract.teacher.id === teacherId))
+    ) {
       lesson.state = createLessonDto.state
 
       return this.lessonsRepository.save(lesson)
-    }else{
-      throw new BadRequestException('You do not have permission to create this lesson')
+    } else {
+      throw new BadRequestException(
+        'You do not have permission to create this lesson',
+      )
     }
   }
 
@@ -67,7 +80,7 @@ export class LessonsService {
       .leftJoin('l.contract', 'c')
       .select(['l'])
       .where('c.id = :contractId', { contractId: contractId })
-      .andWhere('l.date::date = :lessonDate::date', {lessonDate: date})
+      .andWhere('l.date::date = :lessonDate::date', { lessonDate: date })
     if (teacherId)
       lessonQuery.andWhere('c.teacherId = :teacherId', { teacherId: teacherId })
 
@@ -98,7 +111,14 @@ export class LessonsService {
       dayjs(week),
       teacherId,
     )
+    const pendingContracts = await this.contractsService.findAllPending(
+      teacherId,
+    )
 
-    return { lessons: lessonsOfWeek, contracts: contractsOfWeek }
+    return {
+      lessons: lessonsOfWeek,
+      contracts: contractsOfWeek,
+      pendingContracts: pendingContracts,
+    }
   }
 }

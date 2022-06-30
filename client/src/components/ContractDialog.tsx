@@ -34,6 +34,7 @@ import { useAuth } from './AuthProvider'
 import BetterTimePicker from './BetterTimePicker'
 import EqualStack from './EqualStack'
 import IconButtonAdornment from './IconButtonAdornment'
+import { ContractState } from '../types/contract'
 
 dayjs.extend(customParseFormat)
 
@@ -67,6 +68,7 @@ type form1 = {
   maxTime: Dayjs | null
   teacher: string
   dow: number | null
+  state: ContractState
 }
 
 const snackbarOptions: SnackbarOptions = {
@@ -122,6 +124,7 @@ const ContractDialog: React.FC<Props> = ({
     maxTime: null,
     teacher: '',
     dow: null,
+    state: ContractState.PENDING,
   })
 
   // get customers, subjects from DB
@@ -165,6 +168,7 @@ const ContractDialog: React.FC<Props> = ({
           maxTime: form0.endTime,
           teacher: '',
           dow: null,
+          state: ContractState.PENDING,
         })
       })
       .catch((err) => {
@@ -200,6 +204,7 @@ const ContractDialog: React.FC<Props> = ({
         maxTime: endTime,
         teacher: teacher.teacherId.toString(),
         dow: suggestion.dow,
+        state: ContractState.PENDING,
       })
     } else {
       setForm1({
@@ -211,6 +216,7 @@ const ContractDialog: React.FC<Props> = ({
         maxTime: null,
         teacher: '',
         dow: null,
+        state: ContractState.PENDING,
       })
     }
   }
@@ -234,6 +240,7 @@ const ContractDialog: React.FC<Props> = ({
       endDate: form1.endDate?.format('YYYY-MM-DD'),
       startTime: form1.startTime?.format('HH:mm'),
       endTime: form1.endTime?.format('HH:mm'),
+      state: form1.state
     })
       .then(() => {
         onSuccess()
@@ -367,7 +374,6 @@ const ContractDialog: React.FC<Props> = ({
               onChange={(value) => {
                 setForm0((data) => ({ ...data, endDate: value }))
               }}
-              shouldDisableDate={(date) => [0, 6].includes(date.day())}
               renderInput={(params) => (
                 <TextField {...params} required variant="outlined" />
               )}
@@ -464,7 +470,6 @@ const ContractDialog: React.FC<Props> = ({
                 ))}
             </Select>
           </FormControl>
-
           <EqualStack direction="row" spacing={2}>
             <FormControl variant="outlined" fullWidth required>
               <InputLabel htmlFor="weekday-select">Wochentag</InputLabel>
@@ -540,6 +545,27 @@ const ContractDialog: React.FC<Props> = ({
               }}
             />
           </EqualStack>
+          <FormControl variant="outlined" fullWidth required>
+            <InputLabel htmlFor="contract-state-select">Annehmen</InputLabel>
+            <Select
+              id="contract-state-select"
+              label={'Annehmen'}
+              value={form1.state}
+              onChange={(e) =>
+                setForm1((data) => ({
+                  ...data,
+                  state: e.target.value as ContractState,
+                }))
+              }
+            >
+              <MenuItem key={1} value={ContractState.PENDING}>
+                Von Lehrkraft abfragen
+              </MenuItem>
+              <MenuItem key={2} value={ContractState.ACCEPTED}>
+                Automatisch annehmen
+              </MenuItem>
+            </Select>
+          </FormControl>
         </Stack>
       ),
       actions: (

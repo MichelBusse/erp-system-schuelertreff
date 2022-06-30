@@ -1,26 +1,12 @@
 import AddIcon from '@mui/icons-material/Add'
-import {
-  Button,
-  Checkbox,
-  Fab,
-  FormControlLabel,
-  FormGroup,
-  Paper,
-  Stack,
-  Typography,
-} from '@mui/material'
+import { Fab, Paper } from '@mui/material'
 import { Box } from '@mui/system'
-import {
-  DataGrid,
-  GridCellParams,
-  GridColDef,
-  GridRowsProp,
-} from '@mui/x-data-grid'
+import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 
 import { DrawerParameters } from '../pages/timetable'
-import { contract } from '../types/contract'
+import { contract, ContractState } from '../types/contract'
 import { lesson, LessonState } from '../types/lesson'
 import { teacher } from '../types/user'
 import { useAuth } from './AuthProvider'
@@ -55,6 +41,7 @@ const Calendar: React.FC<Props> = ({
         of: date.format('YYYY-MM-DD'),
       },
     }).then((res) => {
+      console.log(res.data)
       const contractsByTeacher: Record<number, contract[]> = {}
 
       res.data.contracts.map((c: contract) => {
@@ -67,7 +54,6 @@ const Calendar: React.FC<Props> = ({
       setLessons(res.data.lessons)
     })
   }, [date, refresh])
-
 
   const getCellValue: GridColDef['valueGetter'] = ({ id, colDef: { field } }) =>
     contracts[id as number]?.filter(
@@ -84,20 +70,22 @@ const Calendar: React.FC<Props> = ({
         cursor: (params.value ?? []).length > 0 ? 'pointer' : 'normal',
       }}
     >
-      {(params.value as contract[])?.map((c) => (
-        <Box
-          key={c.id}
-          sx={{
-            backgroundColor: c.subject.color + '70',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            boxShadow: `0 0 2px ${c.subject.color} inset`,
-          }}
-        >
-          {c.subject.shortForm}
-        </Box>
-      ))}
+      {(params.value as contract[])?.map((c) => {
+        return (
+          <Box
+            key={c.id}
+            sx={{
+              backgroundColor: c.subject.color + '70',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              boxShadow: `0 0 2px ${c.subject.color} inset`,
+            }}
+          >
+            {c.subject.shortForm}
+          </Box>
+        )
+      })}
     </Box>
   )
 
@@ -120,7 +108,6 @@ const Calendar: React.FC<Props> = ({
     id: t.id,
     teacher: `${t.firstName} ${t.lastName}`,
   }))
-
 
   return (
     <Paper
@@ -147,7 +134,7 @@ const Calendar: React.FC<Props> = ({
             setDrawer({
               open: true,
               params: params,
-              lessons: lessons
+              lessons: lessons,
             })
           }
         }}
