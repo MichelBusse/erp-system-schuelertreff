@@ -14,6 +14,8 @@ import { useAuth } from '../components/AuthProvider'
 import { schoolCustomer } from '../types/user'
 import { formValidation } from './FormValidation'
 import { SchoolType } from '../types/enums'
+import { schoolCustomerForm } from '../types/form'
+import { defaultSchoolCustomerFormData } from '../consts'
 
 type Props = {
   open: boolean
@@ -37,8 +39,10 @@ const SchoolCustomerDialog: React.FC<Props> = ({
   setOpen,
   setCustomers,
 }) => {
-  const [data, setData] = useState(defaultFormData)
-  const [errors, setErrors] = useState(defaultFormData)
+  const [data, setData] = useState<schoolCustomerForm>(
+    defaultSchoolCustomerFormData,
+  )
+  const [errors, setErrors] = useState(defaultSchoolCustomerFormData)
 
   const { API } = useAuth()
 
@@ -55,8 +59,8 @@ const SchoolCustomerDialog: React.FC<Props> = ({
 
   const closeForm = () => {
     setOpen(false)
-    setData(defaultFormData)
-    setErrors(defaultFormData)
+    setData(defaultSchoolCustomerFormData)
+    setErrors(defaultSchoolCustomerFormData)
   }
 
   return (
@@ -111,7 +115,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({
               renderInput={(params) => (
                 <TextField {...params} variant="outlined" label="Schularten" />
               )}
-              value={data.schoolType}
+              value={data.schoolTypes}
               onChange={(_, value) =>
                 setData((data) => ({ ...data, schoolTypes: value }))
               }

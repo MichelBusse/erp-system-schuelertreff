@@ -46,7 +46,7 @@ export const defaultSchoolCustomerFormData = {
   street: '',
   email: '',
   phone: '',
-  schoolTypes: [''],
+  schoolTypes: [],
 }
 
 export const defaultClassCustomerFormData = {
