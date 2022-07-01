@@ -6,6 +6,7 @@ import { Subject } from 'src/subjects/subject.entity'
 import { User } from './user.entity'
 
 export enum TeacherState {
+  CREATED = 'created',
   APPLIED = 'applied',
   EMPLOYED = 'employed',
   SUSPENDED = 'suspended',

@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
 import * as argon2 from 'argon2'
 import dayjs from 'dayjs'
-import { Connection, Repository } from 'typeorm'
+import { Connection, Not, Repository } from 'typeorm'
 
 import { Contract } from 'src/contracts/contract.entity'
 
@@ -160,7 +160,7 @@ export class UsersService {
     return this.teachersRepository
       .find({
         relations: ['subjects'],
-        where: { state: TeacherState.APPLIED },
+        where: { state: Not(TeacherState.DELETED) },
       })
       .then(transformUsers)
   }

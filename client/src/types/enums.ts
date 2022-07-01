@@ -1,3 +1,11 @@
+export enum TeacherState {
+  CREATED = 'created',
+  APPLIED = 'applied',
+  EMPLOYED = 'employed',
+  SUSPENDED = 'suspended',
+  DELETED = 'deleted',
+}
+
 export enum Degree {
   NOINFO = 'noinfo',
   HIGHSCHOOL = 'highschool',
