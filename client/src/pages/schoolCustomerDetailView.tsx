@@ -5,45 +5,33 @@ import {
   Autocomplete,
   Button,
   DialogActions,
-  FormControl,
-  FormHelperText,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
   Stack,
   TextField,
   Typography,
 } from '@mui/material'
 import Box from '@mui/material/Box'
 import dayjs from 'dayjs'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { nanoid } from 'nanoid'
-import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { SchoolType } from '../types/enums'
 
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
-import { formValidation } from '../components/FormValidation'
 import {
   defaultClassCustomerFormData,
   defaultSchoolCustomerFormData,
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { classCustomerForm, schoolCustomerForm } from '../types/form'
-import { schoolCustomer, timesAvailableParsed } from '../types/user'
+import { timesAvailableParsed } from '../types/user'
 import timeAvailable from '../types/timeAvailable'
-import { ContactMailSharp } from '@mui/icons-material'
 
 const SchoolCustomerDetailView: React.FC = () => {
   const { API } = useAuth()
   const { id } = useParams()
   const navigate = useNavigate()
-  const { enqueueSnackbar } = useSnackbar()
 
   const requestedId = id ? id : 'me'
 
@@ -54,7 +42,6 @@ const SchoolCustomerDetailView: React.FC = () => {
   const [newClassCustomer, setNewClassCustomer] = useState<classCustomerForm>(
     defaultClassCustomerFormData,
   )
-  const [errors, setErrors] = useState(defaultClassCustomerFormData)
 
   useEffect(() => {
     API.get('users/schoolCustomer/' + requestedId).then((res) => {

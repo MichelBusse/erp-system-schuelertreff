@@ -52,6 +52,6 @@ export interface classCustomer
   numberOfStudents: number
 }
 
-export type customer = privateCustomer | schoolCustomer
+export type customer = privateCustomer | classCustomer
 
 export default user

@@ -1,7 +1,7 @@
 import 'dayjs/locale/de'
 
 import ClearIcon from '@mui/icons-material/Clear'
-import { LoadingButton } from '@mui/lab'
+import { LoadingButton, loadingButtonClasses } from '@mui/lab'
 import {
   Autocomplete,
   Box,
@@ -15,6 +15,7 @@ import {
   ListSubheader,
   MenuItem,
   Select,
+  SelectChangeEvent,
   Stack,
   Step,
   StepLabel,
@@ -28,7 +29,7 @@ import { OptionsObject as SnackbarOptions, useSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 
 import subject from '../types/subject'
-import { customer, teacher } from '../types/user'
+import { customer, schoolCustomer, teacher } from '../types/user'
 import { getNextDow } from '../utils/date'
 import { useAuth } from './AuthProvider'
 import BetterTimePicker from './BetterTimePicker'
@@ -49,6 +50,10 @@ type suggestion = {
 }
 
 type form0 = {
+  schoolCustomer: {
+    id: number
+    schoolName: string
+  } | null
   customers: customer[]
   subject: subject | null
   interval: number
@@ -95,11 +100,20 @@ const ContractDialog: React.FC<Props> = ({
 
   const [activeStep, setActiveStep] = useState(0)
 
+  // step 9
+  const [loading9, setLoading9] = useState(false)
+  const [form9, setForm9] = useState<string>("")
+
   // step 0
+  const [schoolCustomers, setSchoolCustomers] = useState<schoolCustomer[]>([])
   const [customers, setCustomers] = useState<customer[]>([])
   const [subjects, setSubjects] = useState<subject[]>([])
   const [loading0, setLoading0] = useState(false)
   const [form0, setForm0] = useState<form0>({
+    schoolCustomer: {
+      id: 0,
+      schoolName: "",
+    },
     customers: [],
     subject: null,
     interval: 1,
@@ -124,17 +138,79 @@ const ContractDialog: React.FC<Props> = ({
     dow: null,
   })
 
-  // get customers, subjects from DB
-  useEffect(() => {
-    API.get('users/customer').then((res) => setCustomers(res.data))
-    API.get('subjects').then((res) => setSubjects(res.data))
-  }, [])
+  const validForm9 = !!(
+    form9
+  )
+
+  const handleChange9 = (event: SelectChangeEvent) => {
+    setForm9(event.target.value as string);
+  };
+
+  const handleSubmit9 = () => {
+    setLoading9(true)
+    
+    if(form9 === "privateCustomer"){
+      // get customers, subjects from DB
+      API.get('users/privateCustomer')
+      .then((res) => setCustomers(res.data))
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
+      })
+
+      API.get('subjects')
+      .then((res) => {
+        setSubjects(res.data)
+        setActiveStep(1)
+      })
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
+      })
+      .finally(() => setLoading9(false))
+    }
+
+    if(form9 === "schoolCustomer"){
+      console.log("drin2")
+      // get customers, subjects from DB
+      API.get('users/schoolCustomer')
+      .then((res) => setSchoolCustomers(res.data))
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
+      })
+
+      API.get('subjects')
+      .then((res) => {
+        setSubjects(res.data)
+        setActiveStep(1)
+      })
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
+      })
+      .finally(() => setLoading9(false))
+    }
+  }
 
   const validForm0 = !!(
     form0.customers.length &&
     form0.subject &&
     form0.interval
   )
+
+  const activateClassSelect = !!(
+    form0.schoolCustomer.id != 0
+  )
+
+  const loadClasses = (id: number) => {
+    API.get('users/classCustomer/' + id)
+      .then((res) => setCustomers(res.data))
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
+      })
+  }
 
   const handleSubmit0 = () => {
     setLoading0(true)
@@ -153,7 +229,7 @@ const ContractDialog: React.FC<Props> = ({
       .then((res) => {
         updateSelSuggestion('')
         setSuggestions(res.data)
-        setActiveStep(1)
+        setActiveStep(2)
       })
       .catch((err) => {
         console.error(err)
@@ -234,40 +310,144 @@ const ContractDialog: React.FC<Props> = ({
       .finally(() => setLoading1(false))
   }
 
+  const privateCustomerSelect = () => {
+    return(
+      <Autocomplete
+        fullWidth
+        multiple
+        size="small"
+        options={customers}
+        getOptionLabel={(o) =>
+          o.firstName + ' ' + o.lastName
+        }
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+        value={form0.customers}
+        onChange={(_, value) =>
+          setForm0((data) => ({ ...data, customers: value }))
+        }
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            required
+            size="medium"
+            variant="standard"
+            label="Kunde(n)"
+          />
+        )}
+      />
+    )
+  }
+
+  const schoolCustomerSelect = () => {
+    return(
+    <>
+      <Autocomplete
+        fullWidth
+        size="small"
+        options={schoolCustomers}
+        getOptionLabel={(o) =>
+          o.schoolName
+        }
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+        value={form0.schoolCustomer}
+        onChange={(_, value) => {
+          setForm0((data) => ({ ...data, schoolCustomer: value }))
+          loadClasses(value.id)}
+        }
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            required
+            size="medium"
+            variant="standard"
+            label="Schule"
+          />
+        )}
+      />
+      <Autocomplete
+        disabled = {!activateClassSelect}
+        fullWidth
+        multiple
+        size="small"
+        options={customers}
+        getOptionLabel={(o) =>
+          o.className
+        }
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+        value={form0.customers}
+        onChange={(_, value) =>
+          setForm0((data) => ({ ...data, customers: value }))
+        }
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            required
+            size="medium"
+            variant="standard"
+            label="Klasse(n)"
+          />
+        )}
+      />
+    </>
+    )
+  }
+
+  const chooseSelect = () => {
+    if(form9 === "privateCustomer"){
+      return(privateCustomerSelect())
+    }
+    if(form9 === "schoolCustomer"){
+      return(schoolCustomerSelect())
+    }
+  }
+
   const steps: {
     label: string
     content: React.ReactNode
     actions: React.ReactNode
   }[] = [
     {
+      label: 'Vertragspartner',
+      content: (
+        <Stack spacing={2} marginTop={1}>
+          <FormControl fullWidth>
+            <InputLabel id="demo-simple-select-label">Vertragspartner</InputLabel>
+            <Select
+              labelId="contractPartner"
+              id="contractPartner"
+              value={form9}
+              label="Vertragspartner"
+              onChange={handleChange9}
+            >
+              <MenuItem value={"privateCustomer"}>Privatkunde</MenuItem>
+              <MenuItem value={"schoolCustomer"}>Schule</MenuItem>
+            </Select>
+          </FormControl>
+        </Stack>  
+      ),
+      actions: (
+        <>
+          <Button onClick={() => setOpen(false)}>Abbrechen</Button>
+          <LoadingButton
+            variant="contained"
+            onClick={handleSubmit9}
+            loading={loading9}
+            disabled={!validForm9}
+          >
+            Weiter
+          </LoadingButton>
+        </>
+      ),
+    },
+
+
+
+
+    {
       label: 'Filterkonditionen',
       content: (
         <Stack spacing={2} marginTop={1}>
-          <Autocomplete
-            fullWidth
-            multiple
-            size="small"
-            options={customers}
-            getOptionLabel={(o) =>
-              o.role === 'schoolCustomer'
-                ? o.schoolName
-                : o.firstName + ' ' + o.lastName
-            }
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            value={form0.customers}
-            onChange={(_, value) =>
-              setForm0((data) => ({ ...data, customers: value }))
-            }
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                required
-                size="medium"
-                variant="standard"
-                label="Kunde(n)"
-              />
-            )}
-          />
+          {chooseSelect()}
           <EqualStack direction="row" spacing={2}>
             <Autocomplete
               options={subjects}
@@ -406,6 +586,7 @@ const ContractDialog: React.FC<Props> = ({
       actions: (
         <>
           <Button onClick={() => setOpen(false)}>Abbrechen</Button>
+          <Button onClick={() => setActiveStep(0)}>Zurück</Button>
           <LoadingButton
             variant="contained"
             onClick={handleSubmit0}
@@ -417,6 +598,9 @@ const ContractDialog: React.FC<Props> = ({
         </>
       ),
     },
+
+
+    
     {
       label: 'Termin auswählen',
       content: (
@@ -587,7 +771,8 @@ const ContractDialog: React.FC<Props> = ({
       ),
       actions: (
         <>
-          <Button onClick={() => setActiveStep(0)}>Zurück</Button>
+          <Button onClick={() => setOpen(false)}>Abbrechen</Button>
+          <Button onClick={() => setActiveStep(1)}>Zurück</Button>
           <LoadingButton
             variant="contained"
             onClick={handleSubmit1}
