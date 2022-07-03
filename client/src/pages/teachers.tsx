@@ -28,7 +28,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../components/AuthProvider'
 import TeacherDialog from '../components/TeacherDialog'
-import { dataGridLocaleText } from '../consts'
+import { dataGridLocaleText, teacherStateToString } from '../consts'
 import { Degree, TeacherState } from '../types/enums'
 import subject from '../types/subject'
 import { teacher } from '../types/user'
@@ -124,11 +124,11 @@ const StateFilterInputValue: React.FC<GridFilterInputValueProps> = ({
       }}
     >
       <option value={''}></option>
-      <option value={TeacherState.CREATED}>Erstellt</option>
-      <option value={TeacherState.APPLIED}>Beworben</option>
-      <option value={TeacherState.EMPLOYED}>Angestellt</option>
-      <option value={TeacherState.SUSPENDED}>Suspendiert</option>
-      <option value={TeacherState.DELETED}>Gelöscht</option>
+      {Object.values(TeacherState).map((state) => (
+        <option key={state} value={state}>
+          {teacherStateToString[state]}
+        </option>
+      ))}
     </NativeSelect>
   </FormControl>
 )
@@ -275,6 +275,7 @@ const cols: GridColumns = [
     field: 'state',
     headerClassName: 'DataGridHead',
     headerName: 'Status',
+    minWidth: 150,
     filterOperators: [stateOperator],
     renderCell: (params) => (
       <div
@@ -284,7 +285,7 @@ const cols: GridColumns = [
           paddingLeft: 15,
         }}
       >
-        {params.value}
+        {teacherStateToString[params.value as TeacherState]}
       </div>
     ),
   },

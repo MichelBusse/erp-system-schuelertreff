@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import useInterval from 'react-useinterval'
 
 import { NavigateState } from '../App'
+import { Role } from '../types/user'
 
 const KEY = 'token'
 const MINUTE = 60000
@@ -23,7 +24,7 @@ export type AuthContextValue = {
   handleLogout: () => void
   isAuthed: () => boolean
   decodeToken: () => JwtType
-  hasRole: (role: string) => boolean
+  hasRole: (role: Role) => boolean
   API: AxiosInstance
 }
 
@@ -100,7 +101,7 @@ const AuthProvider: React.FC = ({ children }) => {
       })
   }
 
-  const hasRole = (role: string) => isAuthed() && decodeToken().role === role
+  const hasRole = (role: Role) => isAuthed() && decodeToken().role === role
 
   // if logged in, refresh token every minute to keep it active
   useInterval(() => {

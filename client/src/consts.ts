@@ -1,6 +1,7 @@
 import { GridLocaleText } from '@mui/x-data-grid'
 import { OptionsObject as SnackbarOptions } from 'notistack'
 
+import { TeacherState } from './types/enums'
 import { privateCustomerForm, teacherForm } from './types/form'
 import subject from './types/subject'
 
@@ -49,4 +50,12 @@ export const snackbarOptions: SnackbarOptions = {
 export const snackbarOptionsError: SnackbarOptions = {
   ...snackbarOptions,
   variant: 'error',
+}
+
+export const teacherStateToString: { [key in TeacherState]: string } = {
+  created: 'Registriert',
+  applied: 'Beworben',
+  employed: 'Angestellt',
+  suspended: 'Suspendiert',
+  deleted: 'Gelöscht',
 }

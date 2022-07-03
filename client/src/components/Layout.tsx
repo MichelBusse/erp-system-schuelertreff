@@ -5,7 +5,7 @@ import {
   School as SchoolIcon,
   TableChart as TableChartIcon,
 } from '@mui/icons-material'
-import { Box, CssBaseline, useTheme } from '@mui/material'
+import { Box, useTheme } from '@mui/material'
 import { Outlet } from 'react-router-dom'
 
 import MainMenu from './MainMenu'
@@ -43,7 +43,7 @@ const menuItems = [
   {
     icon: ManageAccountsIcon,
     text: 'Profil',
-    href: '/profil',
+    href: '/profile',
     roles: ['teacher'],
   },
 ]
@@ -53,7 +53,6 @@ const Layout: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
       <MainMenu items={menuItems} />
       <Box
         component="main"

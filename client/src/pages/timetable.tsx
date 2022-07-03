@@ -13,7 +13,7 @@ import LessonOverview from '../components/LessonOverview'
 import TeacherCalendar from '../components/TeacherCalendar'
 import { contract } from '../types/contract'
 import { lesson } from '../types/lesson'
-import { teacher } from '../types/user'
+import { Role, teacher } from '../types/user'
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)
@@ -59,7 +59,7 @@ const Timetable: React.FC = () => {
           alignItems: 'center',
         }}
       >
-        {hasRole('admin') ? (
+        {hasRole(Role.ADMIN) ? (
           <Calendar
             date={date}
             setDrawer={setDrawer}
@@ -75,7 +75,7 @@ const Timetable: React.FC = () => {
           />
         ) : null}
 
-        {hasRole('teacher') ? (
+        {hasRole(Role.TEACHER) ? (
           <TeacherCalendar
             date={date}
             setDrawer={setDrawer}

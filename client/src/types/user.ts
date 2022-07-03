@@ -2,6 +2,13 @@ import { Degree } from './enums'
 import subject from './subject'
 import timeAvailable from './timeAvailable'
 
+export enum Role {
+  PRIVATECUSTOMER = 'privateCustomer',
+  SCHOOLCUSTOMER = 'schoolCustomer',
+  TEACHER = 'teacher',
+  ADMIN = 'admin',
+}
+
 interface user {
   role: 'admin' | 'teacher' | 'privateCustomer' | 'schoolCustomer'
   id: number

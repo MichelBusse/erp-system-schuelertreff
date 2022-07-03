@@ -149,6 +149,7 @@ const TeacherDetailView: React.FC = () => {
               helperText={errors.firstName}
               fullWidth={true}
               label="Vorname"
+              disabled={requestedId === 'me'}
               onChange={(event) =>
                 setData((data) => ({
                   ...data,
@@ -164,6 +165,7 @@ const TeacherDetailView: React.FC = () => {
               helperText={errors.lastName}
               fullWidth={true}
               label="Nachname"
+              disabled={requestedId === 'me'}
               onChange={(event) =>
                 setData((data) => ({
                   ...data,
@@ -231,6 +233,7 @@ const TeacherDetailView: React.FC = () => {
               fullWidth={true}
               helperText={errors.email}
               label="Email"
+              disabled
               onChange={(event) =>
                 setData((data) => ({
                   ...data,
@@ -265,8 +268,7 @@ const TeacherDetailView: React.FC = () => {
                   id="Degree"
                   label="Höchster Abschluss"
                   value={data.degree}
-                  required
-                  readOnly={requestedId === 'me'}
+                  disabled={requestedId === 'me'}
                   onChange={(event) =>
                     setData((data) => ({
                       ...data,
