@@ -39,8 +39,9 @@ const ProtectedRoute: React.FC<{ roles?: Role[] }> = ({
       hasRole(Role.TEACHER)
     ) {
       API.get('users/teacher/me').then((res) => {
-        if ((res.data.state as TeacherState) !== TeacherState.EMPLOYED)
+        if ((res.data.state as TeacherState) !== TeacherState.EMPLOYED) {
           navigate('/application', { replace: true })
+        }
       })
     }
   }, [])

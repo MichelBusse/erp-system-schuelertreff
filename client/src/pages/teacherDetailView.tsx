@@ -30,6 +30,7 @@ import {
   defaultTeacherFormData,
   snackbarOptions,
   snackbarOptionsError,
+  teacherStateToString,
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { Degree, SchoolType, TeacherState } from '../types/enums'
@@ -94,12 +95,13 @@ const TeacherDetailView: React.FC = () => {
     API.get('users/teacher/' + requestedId).then((res) => updateData(res.data))
   }, [])
 
-  const submitForm = () => {
+  const submitForm = (override: Partial<teacherForm> = {}) => {
     setErrors(formValidation('teacher', data))
 
     if (formValidation('teacher', data).validation) {
       API.post('users/teacher/' + requestedId, {
         ...data,
+        ...override,
         timesAvailable: data.timesAvailable.map((time) => ({
           dow: time.dow,
           start: time.start?.format('HH:mm'),
@@ -270,14 +272,60 @@ const TeacherDetailView: React.FC = () => {
           </Stack>
           <Typography variant="h6">Lehrkraftdaten:</Typography>
           <Stack direction={'column'} rowGap={2}>
+            <Autocomplete
+              fullWidth
+              multiple
+              id="schoolTypes"
+              options={[
+                SchoolType.GRUNDSCHULE,
+                SchoolType.OBERSCHULE,
+                SchoolType.GYMSEK1,
+                SchoolType.GYMSEK2,
+              ]}
+              getOptionLabel={(option) => {
+                switch (option) {
+                  case SchoolType.GRUNDSCHULE:
+                    return 'Grundschule'
+                  case SchoolType.OBERSCHULE:
+                    return 'Oberschule'
+                  case SchoolType.GYMSEK1:
+                    return 'Gymnasium Sek. 1'
+                  case SchoolType.GYMSEK2:
+                    return 'Gymnasium Sek. 2'
+                  default:
+                    return ''
+                }
+              }}
+              renderInput={(params) => (
+                <TextField {...params} variant="outlined" label="Schularten" />
+              )}
+              value={data.schoolTypes}
+              onChange={(_, value) =>
+                setData((data) => ({ ...data, schoolTypes: value }))
+              }
+            />
+            <Autocomplete
+              fullWidth
+              multiple
+              id="subjects"
+              options={subjects}
+              getOptionLabel={(option) => option.name}
+              renderInput={(params) => (
+                <TextField {...params} variant="outlined" label="Fächer *" />
+              )}
+              value={data.subjects}
+              onChange={(_, value) =>
+                setData((data) => ({ ...data, subjects: value }))
+              }
+            />
             <Stack direction={'row'} columnGap={2}>
-              <FormControl sx={{ width: '300px' }}>
+              <FormControl fullWidth>
                 <InputLabel id="DegreeLable">Höchster Abschluss</InputLabel>
                 <Select
                   id="Degree"
                   label="Höchster Abschluss"
-                  value={data.degree}
                   disabled={requestedId === 'me'}
+                  value={data.degree}
                   onChange={(event) =>
                     setData((data) => ({
                       ...data,
@@ -292,60 +340,28 @@ const TeacherDetailView: React.FC = () => {
                 </Select>
                 <FormHelperText>{errors.degree}</FormHelperText>
               </FormControl>
-              <Autocomplete
-                fullWidth
-                multiple
-                id="schoolTypes"
-                options={[
-                  SchoolType.GRUNDSCHULE,
-                  SchoolType.OBERSCHULE,
-                  SchoolType.GYMSEK1,
-                  SchoolType.GYMSEK2,
-                ]}
-                getOptionLabel={(option) => {
-                  switch (option) {
-                    case SchoolType.GRUNDSCHULE:
-                      return 'Grundschule'
-                    case SchoolType.OBERSCHULE:
-                      return 'Oberschule'
-                    case SchoolType.GYMSEK1:
-                      return 'Gymnasium Sek. 1'
-                    case SchoolType.GYMSEK2:
-                      return 'Gymnasium Sek. 2'
-                    default:
-                      return ''
-                  }
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    variant="outlined"
-                    label="Schularten"
-                  />
-                )}
-                value={data.schoolTypes}
-                onChange={(_, value) =>
-                  setData((data) => ({ ...data, schoolTypes: value }))
+              <TextField
+                type="number"
+                id="fee"
+                label="Lohn"
+                variant="outlined"
+                disabled={requestedId === 'me'}
+                value={data.fee ?? ''}
+                onChange={(event) =>
+                  setData((data) => ({
+                    ...data,
+                    fee: Number(event.target.value),
+                  }))
                 }
               />
             </Stack>
-            <Stack>
-              <Autocomplete
-                fullWidth
-                multiple
-                id="subjects"
-                options={subjects}
-                getOptionLabel={(option) => option.name}
-                renderInput={(params) => (
-                  <TextField {...params} variant="outlined" label="Fächer *" />
-                )}
-                value={data.subjects}
-                onChange={(_, value) =>
-                  setData((data) => ({ ...data, subjects: value }))
-                }
-              />
-            </Stack>
+            {requestedId !== 'me' && (
+              <Typography>
+                Status: {teacherStateToString[data.state]}
+              </Typography>
+            )}
           </Stack>
+
           <Typography variant="h6">Verfügbarkeit:</Typography>
           <Box>
             <AddTimes data={data} setData={setData} />
@@ -363,12 +379,22 @@ const TeacherDetailView: React.FC = () => {
             )}
             <Button
               variant="contained"
-              onClick={submitForm}
+              onClick={() => submitForm()}
               // TODO: rework form validation to provide more direct feedback to user
               // disabled={!formValidation('teacher', data).validation}
             >
               Speichern
             </Button>
+            {id && data.state === TeacherState.APPLIED && (
+              <Button
+                variant="contained"
+                color="success"
+                disabled={data.degree === Degree.NOINFO || !data.fee}
+                onClick={() => submitForm({ state: TeacherState.EMPLOYED })}
+              >
+                Bewerbung annehmen
+              </Button>
+            )}
             {id && (
               <Button
                 variant="outlined"
