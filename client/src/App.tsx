@@ -10,7 +10,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useAuth } from './components/AuthProvider'
 import Layout from './components/Layout'
 import Pages from './pages/_pages'
-import { Forbidden, NotFound } from './pages/error'
+import * as Error from './pages/error'
 import { TeacherState } from './types/enums'
 import { Role } from './types/user'
 
@@ -36,7 +36,7 @@ const ProtectedRoute: React.FC<{ roles?: Role[] }> = ({
   if (!isAuthed()) {
     return <Navigate to="/login" replace state={{ from: location }} />
   } else if (roles.length > 0 && !roles.some((r) => r === decodeToken().role)) {
-    return <Forbidden />
+    return <Error.Forbidden />
   }
 
   return <>{children}</>
@@ -159,7 +159,7 @@ const App: React.FC = () => {
               <Route path=":token" element={<Pages.Reset />} />
             </Route>
 
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<Error.NotFound />} />
           </Routes>
         </SnackbarProvider>
       </ThemeProvider>
