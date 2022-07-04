@@ -243,7 +243,7 @@ const cols: GridColumns = [
     filterOperators: [subjectOperator],
     renderCell: (params) => (
       <Stack direction="row" spacing={2}>
-        {params.value.map((subject: subject) => (
+        {params.value?.map((subject: subject) => (
           <Chip
             key={subject.id}
             label={subject.name}
