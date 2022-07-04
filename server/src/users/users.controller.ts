@@ -146,7 +146,16 @@ export class UsersController {
     @Request() req,
     @Body() dto: UpdateTeacherDto,
   ): Promise<Teacher> {
-    return this.usersService.updateTeacher(req.user.id, dto)
+    return this.usersService.updateTeacher(req.user.id, {
+      street: dto.street,
+      postalCode: dto.postalCode,
+      subjects: dto.subjects,
+      phone: dto.phone,
+      city: dto.city,
+      schoolTypes: dto.schoolTypes,
+      // TODO: email could easily be updated, but should be verified first
+      // email: dto.email,
+    })
   }
 
   @Post('teacher/:id')
@@ -155,7 +164,7 @@ export class UsersController {
     @Param('id') id: number,
     @Body() dto: UpdateTeacherDto,
   ): Promise<Teacher> {
-    return this.usersService.updateTeacherAdmin(id, dto)
+    return this.usersService.updateTeacher(id, dto)
   }
 
   @Delete('teacher/:id')

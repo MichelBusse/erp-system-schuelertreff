@@ -1,5 +1,7 @@
+import CheckIcon from '@mui/icons-material/Check'
 import {
   Autocomplete,
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -13,8 +15,8 @@ import {
   Select,
   Stack,
   TextField,
+  Typography,
 } from '@mui/material'
-import Box from '@mui/material/Box'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { nanoid } from 'nanoid'
@@ -30,10 +32,10 @@ import {
   snackbarOptionsError,
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
-import { Degree, SchoolType } from '../types/enums'
+import { Degree, SchoolType, TeacherState } from '../types/enums'
 import { teacherForm } from '../types/form'
 import subject from '../types/subject'
-import { timesAvailableParsed } from '../types/user'
+import { teacher, timesAvailableParsed } from '../types/user'
 import { formValidation } from '../utils/formValidation'
 
 dayjs.extend(customParseFormat)
@@ -43,6 +45,7 @@ const TeacherDetailView: React.FC = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
+
   const [subjects, setSubjects] = useState<subject[]>([])
   const [dialogOpen, setDialogOpen] = useState<boolean>(false)
 
@@ -55,37 +58,40 @@ const TeacherDetailView: React.FC = () => {
   const [data, setData] = useState<teacherForm>(defaultTeacherFormData)
   const [errors, setErrors] = useState(defaultTeacherFormData)
 
-  useEffect(() => {
-    API.get('users/teacher/' + requestedId).then((res) => {
-      //Convert default value to "Immer verfügbar" in list
-      const newTimesAvailable =
-        res.data.timesAvailableParsed.length === 1 &&
-        res.data.timesAvailableParsed[0].dow === 1 &&
-        res.data.timesAvailableParsed[0].start === '00:00' &&
-        res.data.timesAvailableParsed[0].end === '00:00'
-          ? []
-          : res.data.timesAvailableParsed.map((time: timesAvailableParsed) => ({
-              dow: time.dow,
-              start: dayjs(time.start, 'HH:mm'),
-              end: dayjs(time.end, 'HH:mm'),
-              id: nanoid(),
-            }))
+  const updateData = (newData: teacher) => {
+    //Convert default value to "Immer verfügbar" in list
+    const newTimesAvailable =
+      newData.timesAvailableParsed.length === 1 &&
+      newData.timesAvailableParsed[0].dow === 1 &&
+      newData.timesAvailableParsed[0].start === '00:00' &&
+      newData.timesAvailableParsed[0].end === '00:00'
+        ? []
+        : newData.timesAvailableParsed.map((time: timesAvailableParsed) => ({
+            dow: time.dow,
+            start: dayjs(time.start, 'HH:mm'),
+            end: dayjs(time.end, 'HH:mm'),
+            id: nanoid(),
+          }))
 
-      setData((data) => ({
-        ...data,
-        firstName: res.data.firstName,
-        lastName: res.data.lastName,
-        city: res.data.city,
-        postalCode: res.data.postalCode,
-        street: res.data.street,
-        email: res.data.email,
-        phone: res.data.phone,
-        timesAvailable: newTimesAvailable,
-        subjects: res.data.subjects,
-        degree: res.data.degree,
-        schoolTypes: res.data.schoolTypes,
-      }))
+    setData({
+      firstName: newData.firstName,
+      lastName: newData.lastName,
+      city: newData.city,
+      postalCode: newData.postalCode,
+      street: newData.street,
+      email: newData.email,
+      phone: newData.phone,
+      subjects: newData.subjects,
+      degree: newData.degree,
+      schoolTypes: newData.schoolTypes,
+      state: newData.state,
+      fee: newData.fee,
+      timesAvailable: newTimesAvailable,
     })
+  }
+
+  useEffect(() => {
+    API.get('users/teacher/' + requestedId).then((res) => updateData(res.data))
   }, [])
 
   const submitForm = () => {
@@ -99,11 +105,14 @@ const TeacherDetailView: React.FC = () => {
           start: time.start?.format('HH:mm'),
           end: time.end?.format('HH:mm'),
         })),
-      }).then(() => {
+      }).then((res) => {
         enqueueSnackbar(
           data.firstName + ' ' + data.lastName + ' gespeichert',
           snackbarOptions,
         )
+
+        updateData(res.data)
+
         if (id) navigate('/teachers')
       })
     }
@@ -142,8 +151,8 @@ const TeacherDetailView: React.FC = () => {
           borderRadius: '25px',
         }}
       >
-        <Stack direction="column" alignItems={'stretch'}>
-          <h3>Person:</h3>
+        <Stack direction="column" alignItems="stretch" spacing={2}>
+          <Typography variant="h6">Person:</Typography>
           <Stack direction="row" columnGap={2}>
             <TextField
               helperText={errors.firstName}
@@ -178,7 +187,7 @@ const TeacherDetailView: React.FC = () => {
               }}
             />
           </Stack>
-          <h3>Adresse:</h3>
+          <Typography variant="h6">Adresse:</Typography>
           <Stack direction="row" columnGap={2}>
             <TextField
               helperText={errors.street}
@@ -227,7 +236,7 @@ const TeacherDetailView: React.FC = () => {
               }}
             />
           </Stack>
-          <h3>Kontakt:</h3>
+          <Typography variant="h6">Kontakt:</Typography>
           <Stack direction="row" columnGap={2}>
             <TextField
               fullWidth={true}
@@ -259,7 +268,7 @@ const TeacherDetailView: React.FC = () => {
               value={data.phone}
             />
           </Stack>
-          <h3>Lehrerdaten:</h3>
+          <Typography variant="h6">Lehrkraftdaten:</Typography>
           <Stack direction={'column'} rowGap={2}>
             <Stack direction={'row'} columnGap={2}>
               <FormControl sx={{ width: '300px' }}>
@@ -337,7 +346,7 @@ const TeacherDetailView: React.FC = () => {
               />
             </Stack>
           </Stack>
-          <h3>Verfügbarkeit:</h3>
+          <Typography variant="h6">Verfügbarkeit:</Typography>
           <Box>
             <AddTimes data={data} setData={setData} />
           </Box>
@@ -352,7 +361,12 @@ const TeacherDetailView: React.FC = () => {
                 Abbrechen
               </Button>
             )}
-            <Button onClick={submitForm} variant="contained">
+            <Button
+              variant="contained"
+              onClick={submitForm}
+              // TODO: rework form validation to provide more direct feedback to user
+              // disabled={!formValidation('teacher', data).validation}
+            >
               Speichern
             </Button>
             {id && (
@@ -366,6 +380,15 @@ const TeacherDetailView: React.FC = () => {
               </Button>
             )}
           </Stack>
+
+          {requestedId === 'me' && data.state === TeacherState.APPLIED && (
+            <Stack direction="row" alignItems="center" gap={1}>
+              <CheckIcon color="success" />
+              <Typography variant="subtitle1">
+                Alle benötigten Daten wurden hinterlegt und werden nun geprüft.
+              </Typography>
+            </Stack>
+          )}
         </Stack>
       </Box>
       <Dialog
@@ -373,11 +396,11 @@ const TeacherDetailView: React.FC = () => {
         keepMounted
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>{'Lehrer:in wirklich löschen?'}</DialogTitle>
+        <DialogTitle>{'Lehrkraft wirklich löschen?'}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            Lehrer:innen können nur gelöscht werden, wenn sie in keinen
-            laufenden oder zukünftigen Verträgen mehr eingeplant sind.
+            Lehrkräfte können nur gelöscht werden, wenn sie in keinen laufenden
+            oder zukünftigen Verträgen mehr eingeplant sind.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

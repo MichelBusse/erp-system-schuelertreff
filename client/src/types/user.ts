@@ -1,4 +1,4 @@
-import { Degree } from './enums'
+import { Degree, SchoolType, TeacherState } from './enums'
 import subject from './subject'
 import timeAvailable from './timeAvailable'
 
@@ -32,9 +32,10 @@ export type timesAvailableParsed = {
 export interface teacher extends user {
   role: 'teacher'
   fee: number
-  state: string
+  state: TeacherState
   degree: Degree
   subjects: subject[]
+  schoolTypes: SchoolType[]
 }
 
 export interface admin extends user {
