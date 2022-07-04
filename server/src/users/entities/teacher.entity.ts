@@ -6,6 +6,7 @@ import { Subject } from 'src/subjects/subject.entity'
 import { User } from './user.entity'
 
 export enum TeacherState {
+  CREATED = 'created',
   APPLIED = 'applied',
   EMPLOYED = 'employed',
   SUSPENDED = 'suspended',
@@ -31,7 +32,7 @@ export class Teacher extends User {
   role = Role.TEACHER
 
   //TODO: decimal value
-  @Column()
+  @Column({ nullable: true })
   fee: number
 
   @Column({

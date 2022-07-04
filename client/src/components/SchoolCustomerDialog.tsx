@@ -10,7 +10,7 @@ import { useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
 import { schoolCustomer } from '../types/user'
-import { formValidation } from './FormValidation'
+import { formValidation } from '../utils/formValidation'
 
 type Props = {
   open: boolean

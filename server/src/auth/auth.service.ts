@@ -4,8 +4,10 @@ import { JwtService } from '@nestjs/jwt'
 import * as argon2 from 'argon2'
 import nodemailer from 'nodemailer'
 
-import { User } from 'src/users/entities/user.entity'
+import { Teacher, User } from 'src/users/entities'
 import { UsersService } from 'src/users/users.service'
+
+import { Role } from './role.enum'
 
 const transporter = nodemailer.createTransport({
   host: 'smtp',
@@ -39,7 +41,15 @@ export class AuthService {
   }
 
   async login(user: User) {
-    const payload = { username: user.email, sub: user.id, role: user.role }
+    const payload = {
+      username: user.email,
+      sub: user.id,
+      role: user.role,
+      state: undefined,
+    }
+
+    if (user.role === Role.TEACHER)
+      payload.state = (user as unknown as Teacher).state
 
     return {
       access_token: this.jwtService.sign(payload),

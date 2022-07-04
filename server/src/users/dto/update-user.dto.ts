@@ -1,34 +1,43 @@
 import { Type } from 'class-transformer'
-import { IsArray, IsNotEmpty, ValidateNested } from 'class-validator'
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  ValidateNested,
+} from 'class-validator'
 
-import { Salutation } from '../entities/user.entity'
 import { timeAvailable } from './timeAvailable'
 
 export class UpdateUserDto {
+  @IsOptional()
   @IsNotEmpty()
   firstName: string
 
+  @IsOptional()
   @IsNotEmpty()
   lastName: string
 
-  @IsNotEmpty()
-  salutation: Salutation
-
+  @IsOptional()
   @IsNotEmpty()
   email: string
 
+  @IsOptional()
   @IsNotEmpty()
   street: string
 
+  @IsOptional()
   @IsNotEmpty()
   postalCode: string
 
+  @IsOptional()
   @IsNotEmpty()
   city: string
 
+  @IsOptional()
   @IsNotEmpty()
   phone: string
 
+  @IsOptional()
   @IsArray()
   @Type(() => timeAvailable)
   @ValidateNested({ each: true })

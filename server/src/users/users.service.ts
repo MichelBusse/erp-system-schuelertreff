@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
 import * as argon2 from 'argon2'
 import dayjs from 'dayjs'
-import { Connection, Repository } from 'typeorm'
+import { Connection, Not, Repository } from 'typeorm'
 
 import { Contract } from 'src/contracts/contract.entity'
 
@@ -160,7 +160,7 @@ export class UsersService {
     return this.teachersRepository
       .find({
         relations: ['subjects'],
-        where: { state: TeacherState.APPLIED },
+        where: { state: Not(TeacherState.DELETED) },
       })
       .then(transformUsers)
   }
@@ -228,8 +228,7 @@ export class UsersService {
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
     const teacher = this.teachersRepository.create({
       ...dto,
-      timesAvailable: formatTimesAvailable(dto.timesAvailable),
-      state: TeacherState.APPLIED,
+      state: TeacherState.CREATED,
       mayAuthenticate: true,
     })
 
@@ -276,31 +275,33 @@ export class UsersService {
     })
   }
 
-  async updateTeacher(id: number, dto: UpdateTeacherDto): Promise<Teacher> {
-    const user = await this.findOne(id)
-    return this.teachersRepository.save({
-      ...user,
-      street: dto.street,
-      postalCode: dto.postalCode,
-      subjects: dto.subjects,
-      email: dto.email,
-      phone: dto.phone,
-      city: dto.city,
-      schoolTypes: dto.schoolTypes,
-      timesAvailable: formatTimesAvailable(dto.timesAvailable),
-    })
-  }
-
-  async updateTeacherAdmin(
+  async updateTeacher(
     id: number,
-    dto: UpdateTeacherDto,
+    dto: Partial<UpdateTeacherDto>,
   ): Promise<Teacher> {
-    const user = await this.findOne(id)
-    return this.teachersRepository.save({
+    const user = await this.findOneTeacher(id)
+
+    const updatedTeacher: Teacher = {
       ...user,
       ...dto,
-      timesAvailable: formatTimesAvailable(dto.timesAvailable),
-    })
+      timesAvailable:
+        typeof dto.timesAvailable !== 'undefined'
+          ? formatTimesAvailable(dto.timesAvailable)
+          : user.timesAvailable,
+    }
+
+    // check if state can be updated
+    if (
+      updatedTeacher.state === TeacherState.CREATED &&
+      updatedTeacher.street &&
+      updatedTeacher.city &&
+      updatedTeacher.postalCode &&
+      updatedTeacher.phone
+    ) {
+      updatedTeacher.state = TeacherState.APPLIED
+    }
+
+    return this.teachersRepository.save(updatedTeacher)
   }
 
   async deleteTeacher(id: number) {

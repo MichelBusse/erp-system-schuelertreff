@@ -5,11 +5,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  FormControl,
-  FormHelperText,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TextField,
 } from '@mui/material'
@@ -23,7 +18,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
-import { formValidation } from '../components/FormValidation'
 import {
   defaultPrivateCustomerFormData,
   snackbarOptions,
@@ -32,6 +26,7 @@ import {
 import styles from '../pages/gridList.module.scss'
 import { privateCustomerForm } from '../types/form'
 import { timesAvailableParsed } from '../types/user'
+import { formValidation } from '../utils/formValidation'
 
 dayjs.extend(customParseFormat)
 
@@ -68,7 +63,6 @@ const PrivateCustomerDetailView: React.FC = () => {
         ...data,
         firstName: res.data.firstName,
         lastName: res.data.lastName,
-        salutation: res.data.salutation,
         city: res.data.city,
         postalCode: res.data.postalCode,
         street: res.data.street,
@@ -137,26 +131,6 @@ const PrivateCustomerDetailView: React.FC = () => {
         <Stack direction="column" alignItems={'stretch'}>
           <h3>Person:</h3>
           <Stack direction="row" columnGap={2}>
-            <FormControl fullWidth>
-              <InputLabel id="SalutationLable">Anrede</InputLabel>
-              <Select
-                id="Salutation"
-                label="Anrede"
-                value={data.salutation}
-                onChange={(event) =>
-                  setData((data) => ({
-                    ...data,
-                    salutation: event.target.value,
-                  }))
-                }
-                disabled={requestedId === 'me'}
-              >
-                <MenuItem value="Herr">Herr</MenuItem>
-                <MenuItem value="Frau">Frau</MenuItem>
-                <MenuItem value="divers">divers</MenuItem>
-              </Select>
-              <FormHelperText>{errors.salutation}</FormHelperText>
-            </FormControl>
             <TextField
               helperText={errors.firstName}
               fullWidth={true}

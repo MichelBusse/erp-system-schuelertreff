@@ -1,11 +1,10 @@
-export function formValidation(form: string, data: any): any {
-  const testEmail = (email: string) => /.+@.+\.[A-Za-z]+$/.test(email)
+export const testEmail = (email: string) => /.+@.+\.[A-Za-z]+$/.test(email)
 
+export function formValidation(form: string, data: any): any {
   const errorText = {
     schoolName: 'fehlt',
     firstName: 'fehlt',
     lastName: 'fehlt',
-    salutation: 'fehlt',
     city: 'fehlt',
     postalCode: 'genau 5 Stellen',
     street: 'fehlt',
@@ -20,7 +19,6 @@ export function formValidation(form: string, data: any): any {
     const temp = {
       firstName: '',
       lastName: '',
-      salutation: '',
       city: '',
       postalCode: '',
       street: '',
@@ -31,7 +29,6 @@ export function formValidation(form: string, data: any): any {
 
     temp.firstName = data.firstName ? '' : errorText.firstName
     temp.lastName = data.lastName ? '' : errorText.lastName
-    temp.salutation = data.salutation ? '' : errorText.salutation
     temp.city = data.city ? '' : errorText.city
     temp.postalCode = data.postalCode.length == 5 ? '' : errorText.postalCode
     temp.street = data.street ? '' : errorText.street
@@ -41,7 +38,6 @@ export function formValidation(form: string, data: any): any {
     if (
       data.firstName &&
       data.lastName &&
-      data.salutation &&
       data.city &&
       data.postalCode.length == 5 &&
       data.street &&
@@ -57,7 +53,6 @@ export function formValidation(form: string, data: any): any {
     const temp = {
       firstName: '',
       lastName: '',
-      salutation: '',
       city: '',
       postalCode: '',
       street: '',
@@ -69,7 +64,6 @@ export function formValidation(form: string, data: any): any {
 
     temp.firstName = data.firstName ? '' : errorText.firstName
     temp.lastName = data.lastName ? '' : errorText.lastName
-    temp.salutation = data.salutation ? '' : errorText.salutation
     temp.city = data.city ? '' : errorText.city
     temp.postalCode = data.postalCode.length == 5 ? '' : errorText.postalCode
     temp.street = data.street ? '' : errorText.street
@@ -80,7 +74,6 @@ export function formValidation(form: string, data: any): any {
     if (
       data.firstName &&
       data.lastName &&
-      data.salutation &&
       data.city &&
       data.postalCode.length == 5 &&
       data.street &&

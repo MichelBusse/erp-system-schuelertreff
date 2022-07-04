@@ -1,8 +1,8 @@
 import { GridLocaleText } from '@mui/x-data-grid'
 import { OptionsObject as SnackbarOptions } from 'notistack'
 
+import { TeacherState } from './types/enums'
 import { privateCustomerForm, teacherForm } from './types/form'
-import subject from './types/subject'
 
 export const dataGridLocaleText: Partial<GridLocaleText> = {
   filterPanelColumns: 'Spalte',
@@ -15,23 +15,22 @@ export const dataGridLocaleText: Partial<GridLocaleText> = {
 export const defaultTeacherFormData: teacherForm = {
   firstName: '',
   lastName: '',
-  salutation: '',
   city: '',
   postalCode: '',
   street: '',
   email: '',
   phone: '',
-  subjects: [] as subject[],
+  subjects: [],
   fee: null,
   degree: '',
   schoolTypes: [],
   timesAvailable: [],
+  state: TeacherState.CREATED,
 }
 
 export const defaultPrivateCustomerFormData: privateCustomerForm = {
   firstName: '',
   lastName: '',
-  salutation: '',
   city: '',
   postalCode: '',
   street: '',
@@ -51,4 +50,12 @@ export const snackbarOptions: SnackbarOptions = {
 export const snackbarOptionsError: SnackbarOptions = {
   ...snackbarOptions,
   variant: 'error',
+}
+
+export const teacherStateToString: { [key in TeacherState]: string } = {
+  created: 'Registriert',
+  applied: 'Beworben',
+  employed: 'Angestellt',
+  suspended: 'Suspendiert',
+  deleted: 'Gelöscht',
 }
