@@ -1,6 +1,8 @@
 import { GridLocaleText } from '@mui/x-data-grid'
+import { OptionsObject as SnackbarOptions } from 'notistack'
 
-import subject from './types/subject'
+import { TeacherState } from './types/enums'
+import { privateCustomerForm, teacherForm } from './types/form'
 
 export const dataGridLocaleText: Partial<GridLocaleText> = {
   filterPanelColumns: 'Spalte',
@@ -10,26 +12,25 @@ export const dataGridLocaleText: Partial<GridLocaleText> = {
   filterPanelInputPlaceholder: 'Eingabe',
 }
 
-export const defaultTeacherFormData = {
+export const defaultTeacherFormData: teacherForm = {
   firstName: '',
   lastName: '',
-  salutation: '',
   city: '',
   postalCode: '',
   street: '',
   email: '',
   phone: '',
-  subjects: [] as subject[],
+  subjects: [],
   fee: null,
   degree: '',
   schoolTypes: [],
   timesAvailable: [],
+  state: TeacherState.CREATED,
 }
 
-export const defaultPrivateCustomerFormData = {
+export const defaultPrivateCustomerFormData: privateCustomerForm = {
   firstName: '',
   lastName: '',
-  salutation: '',
   city: '',
   postalCode: '',
   street: '',
@@ -37,6 +38,26 @@ export const defaultPrivateCustomerFormData = {
   phone: '',
   grade: null,
   timesAvailable: [],
+}
+
+export const snackbarOptions: SnackbarOptions = {
+  anchorOrigin: {
+    vertical: 'bottom',
+    horizontal: 'left',
+  },
+}
+
+export const snackbarOptionsError: SnackbarOptions = {
+  ...snackbarOptions,
+  variant: 'error',
+}
+
+export const teacherStateToString: { [key in TeacherState]: string } = {
+  created: 'Registriert',
+  applied: 'Beworben',
+  employed: 'Angestellt',
+  suspended: 'Suspendiert',
+  deleted: 'Gelöscht',
 }
 
 export const defaultSchoolCustomerFormData = {
@@ -54,5 +75,5 @@ export const defaultClassCustomerFormData = {
   numberOfStudents: 0,
   grade: 0,
   timesAvailable: [],
-  schoolTypes: []
+  schoolTypes: [],
 }

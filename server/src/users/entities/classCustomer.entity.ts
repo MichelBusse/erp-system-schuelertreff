@@ -1,7 +1,5 @@
 import { ChildEntity, Column, ManyToOne } from 'typeorm'
 
-
-
 import { Role } from 'src/auth/role.enum'
 
 import { Customer } from './customer.entity'

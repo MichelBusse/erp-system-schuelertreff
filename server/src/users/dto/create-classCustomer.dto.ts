@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer'
 import { IsArray, IsInt, IsNotEmpty, ValidateNested } from 'class-validator'
+
 import { timeAvailable } from './timeAvailable'
 
 export class CreateClassCustomerDto {

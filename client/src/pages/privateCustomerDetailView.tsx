@@ -1,10 +1,10 @@
 import {
   Button,
-  FormControl,
-  FormHelperText,
-  InputLabel,
-  MenuItem,
-  Select,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Stack,
   TextField,
 } from '@mui/material'
@@ -18,11 +18,15 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
-import { formValidation } from '../components/FormValidation'
-import { defaultPrivateCustomerFormData } from '../consts'
+import {
+  defaultPrivateCustomerFormData,
+  snackbarOptions,
+  snackbarOptionsError,
+} from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { privateCustomerForm } from '../types/form'
 import { timesAvailableParsed } from '../types/user'
+import { formValidation } from '../utils/formValidation'
 
 dayjs.extend(customParseFormat)
 
@@ -31,6 +35,7 @@ const PrivateCustomerDetailView: React.FC = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
 
   const requestedId = id ? id : 'me'
 
@@ -58,7 +63,6 @@ const PrivateCustomerDetailView: React.FC = () => {
         ...data,
         firstName: res.data.firstName,
         lastName: res.data.lastName,
-        salutation: res.data.salutation,
         city: res.data.city,
         postalCode: res.data.postalCode,
         street: res.data.street,
@@ -82,14 +86,35 @@ const PrivateCustomerDetailView: React.FC = () => {
           end: time.end?.format('HH:mm'),
         })),
       }).then(() => {
-        enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gespeichert')
+        enqueueSnackbar(
+          data.firstName + ' ' + data.lastName + ' gespeichert',
+          snackbarOptions,
+        )
         if (id) navigate('/privateCustomers')
       })
     }
   }
 
   const deleteUser = () => {
-    console.log('deletePrivateCustomer')
+    setDialogOpen(false)
+
+    API.delete('users/privateCustomer/' + requestedId)
+      .then(() => {
+        enqueueSnackbar(
+          data.firstName + ' ' + data.lastName + ' gelöscht',
+          snackbarOptions,
+        )
+        navigate('/privateCustomers')
+      })
+      .catch(() => {
+        enqueueSnackbar(
+          data.firstName +
+            ' ' +
+            data.lastName +
+            ' kann nicht gelöscht werden, da noch laufende Verträge existieren.',
+          snackbarOptionsError,
+        )
+      })
   }
 
   return (
@@ -106,26 +131,6 @@ const PrivateCustomerDetailView: React.FC = () => {
         <Stack direction="column" alignItems={'stretch'}>
           <h3>Person:</h3>
           <Stack direction="row" columnGap={2}>
-            <FormControl fullWidth>
-              <InputLabel id="SalutationLable">Anrede *</InputLabel>
-              <Select
-                id="Salutation"
-                label="Anrede"
-                value={data.salutation}
-                onChange={(event) =>
-                  setData((data) => ({
-                    ...data,
-                    salutation: event.target.value,
-                  }))
-                }
-                disabled={requestedId === 'me'}
-              >
-                <MenuItem value="Herr">Herr</MenuItem>
-                <MenuItem value="Frau">Frau</MenuItem>
-                <MenuItem value="divers">divers</MenuItem>
-              </Select>
-              <FormHelperText>{errors.salutation}</FormHelperText>
-            </FormControl>
             <TextField
               helperText={errors.firstName}
               fullWidth={true}
@@ -281,7 +286,7 @@ const PrivateCustomerDetailView: React.FC = () => {
             {id && (
               <Button
                 variant="outlined"
-                onClick={deleteUser}
+                onClick={() => setDialogOpen(true)}
                 sx={{ marginLeft: 'auto' }}
                 color="error"
               >
@@ -291,6 +296,23 @@ const PrivateCustomerDetailView: React.FC = () => {
           </Stack>
         </Stack>
       </Box>
+      <Dialog
+        open={dialogOpen}
+        keepMounted
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle>{'Schüler:in wirklich löschen?'}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            Schüler:innen können nur gelöscht werden, wenn sie in keinen
+            laufenden oder zukünftigen Verträgen mehr eingeplant sind.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)}>Abbrechen</Button>
+          <Button onClick={deleteUser}>Löschen</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }

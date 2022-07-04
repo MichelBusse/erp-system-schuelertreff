@@ -36,13 +36,13 @@ const Subjects: React.FC = () => {
         </Grid>
         {subjects.map((subject) => (
           <Grid key={subject.id} item sm={12} md={6} lg={4} xl={3}>
-            <Paper className={styles.card}>
+            <Paper className={styles.card} sx={{ whiteSpace: 'nowrap' }}>
               {`${subject.name} (${subject.shortForm})`}
               <div
                 style={{
                   width: '100%',
                   height: 90,
-                  backgroundColor: subject.color,
+                  backgroundColor: subject.color + '95',
                   opacity: 0.5,
                   marginTop: 10,
                 }}

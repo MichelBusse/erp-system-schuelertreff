@@ -11,7 +11,7 @@ import { SketchPicker } from 'react-color'
 
 import { useAuth } from '../components/AuthProvider'
 import subject from '../types/subject'
-import { formValidation } from './FormValidation'
+import { formValidation } from '../utils/formValidation'
 
 type Props = {
   open: boolean

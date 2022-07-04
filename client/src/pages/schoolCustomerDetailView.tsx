@@ -14,8 +14,6 @@ import dayjs from 'dayjs'
 import { nanoid } from 'nanoid'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { SchoolType } from '../types/enums'
-
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
@@ -24,9 +22,10 @@ import {
   defaultSchoolCustomerFormData,
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
+import { SchoolType } from '../types/enums'
 import { classCustomerForm, schoolCustomerForm } from '../types/form'
-import { timesAvailableParsed } from '../types/user'
 import timeAvailable from '../types/timeAvailable'
+import { timesAvailableParsed } from '../types/user'
 
 const SchoolCustomerDetailView: React.FC = () => {
   const { API } = useAuth()
@@ -114,7 +113,7 @@ const SchoolCustomerDetailView: React.FC = () => {
 
   const updateClassCustomer = (newValue: timeAvailable[], index: number) => {
     setClassCustomers((classCustomers) => {
-      let newClassCustomers = [...classCustomers]
+      const newClassCustomers = [...classCustomers]
       newClassCustomers[index] = {
         ...classCustomers[index],
         timesAvailable: newValue,
@@ -134,7 +133,7 @@ const SchoolCustomerDetailView: React.FC = () => {
       newClassCustomer.numberOfStudents != 0 &&
       newClassCustomer.schoolTypes.length != 0
     ) {
-      setClassCustomers((ClassCustomers) => [
+      setClassCustomers((classCustomers) => [
         ...classCustomers,
         newClassCustomer,
       ])
@@ -225,7 +224,7 @@ const SchoolCustomerDetailView: React.FC = () => {
                     <Button
                       size="small"
                       variant="outlined"
-                      onClick={() => (setClassCustomers(classCustomers.filter((_, i) => i !== index)))}
+                      onClick={() => deleteClass(index)}
                       sx={{ marginLeft: 'auto' }}
                       color="error"
                     >
@@ -254,7 +253,9 @@ const SchoolCustomerDetailView: React.FC = () => {
                 borderRadius: '5px',
               }}
             >
-              <Typography sx={{fontWeight: "bold"}}>Klasse hinzufügen</Typography>
+              <Typography sx={{ fontWeight: 'bold' }}>
+                Klasse hinzufügen
+              </Typography>
               <Stack direction="row" columnGap={2}>
                 <TextField
                   size="small"

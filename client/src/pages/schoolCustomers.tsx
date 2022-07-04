@@ -9,8 +9,8 @@ import {
   GridToolbarContainer,
   GridToolbarFilterButton,
 } from '@mui/x-data-grid'
-import { useLocation, useNavigate } from 'react-router-dom'
 import { useCallback, useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../components/AuthProvider'
 import SchoolCustomerDialog from '../components/SchoolCustomerDialog'
@@ -99,7 +99,7 @@ const SchoolCustomers: React.FC = () => {
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} style={{ minHeight: '100vh' }}>
       <div style={{ flexGrow: 1 }}>
         <DataGrid
           headerHeight={0}
@@ -124,7 +124,7 @@ const SchoolCustomers: React.FC = () => {
           getRowSpacing={getRowSpacing}
         />
       </div>
-      
+
       <SchoolCustomerDialog
         open={open}
         setOpen={setOpen}

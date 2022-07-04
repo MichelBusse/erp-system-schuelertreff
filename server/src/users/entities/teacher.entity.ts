@@ -3,31 +3,29 @@ import { ChildEntity, Column, JoinTable, ManyToMany } from 'typeorm'
 import { Role } from 'src/auth/role.enum'
 import { Subject } from 'src/subjects/subject.entity'
 
-import { User } from './user.entity'
-import { ColumnCommonOptions } from 'typeorm/decorator/options/ColumnCommonOptions'
+import { SchoolType, User } from './user.entity'
 
 export enum TeacherState {
+  CREATED = 'created',
   APPLIED = 'applied',
   EMPLOYED = 'employed',
   SUSPENDED = 'suspended',
-  QUIT = 'quit',
+  DELETED = 'deleted',
 }
 
-export enum Degree
-{
+export enum Degree {
   NOINFO = 'noinfo',
   HIGHSCHOOL = 'highschool',
   BACHELOR = 'bachelor',
   MASTER = 'master',
 }
 
-
 @ChildEntity()
 export class Teacher extends User {
   role = Role.TEACHER
 
   //TODO: decimal value
-  @Column()
+  @Column({ nullable: true })
   fee: number
 
   @Column({
@@ -42,6 +40,14 @@ export class Teacher extends User {
     enum: Degree,
   })
   degree: Degree
+
+  @Column({
+    type: 'enum',
+    enum: SchoolType,
+    array: true,
+    default: '{}',
+  })
+  schoolTypes: SchoolType[]
 
   @ManyToMany(() => Subject)
   @JoinTable()

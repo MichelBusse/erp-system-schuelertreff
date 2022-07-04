@@ -5,5 +5,4 @@ import { CreateUserDto } from './create-user.dto'
 export class CreateSchoolCustomerDto extends CreateUserDto {
   @IsNotEmpty()
   schoolName: string
-
 }

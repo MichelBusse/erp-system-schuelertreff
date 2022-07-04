@@ -7,7 +7,8 @@ import { timeAvailable } from 'src/users/dto/timeAvailable'
 import { Customer, User } from 'src/users/entities'
 import { parseMultirange, UsersService } from 'src/users/users.service'
 
-import { Contract } from './contract.entity'
+import { Contract, ContractState } from './contract.entity'
+import { AcceptOrDeclineContractDto } from './dto/accept-or-decline-contract-dto'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
 
@@ -46,8 +47,82 @@ export class ContractsService {
     })
   }
 
-  async findOne(id: string): Promise<Contract> {
-    return this.contractsRepository.findOne(id)
+  async findAllPending(teacherId): Promise<Contract[]> {
+    const contracts = this.contractsRepository
+      .createQueryBuilder('c')
+      .select(['c', 's'])
+      .leftJoin('c.subject', 's')
+      .where('c.state = :contractState', {
+        contractState: ContractState.PENDING,
+      })
+      .andWhere('c.teacherId = :teacherId', { teacherId: teacherId })
+
+    return contracts.getMany()
+  }
+
+  async findOne(id: string, teacherId?: number): Promise<Contract> {
+    const contract = await this.contractsRepository.findOne(id, {
+      relations: ['subject', 'teacher', 'customers'],
+    })
+
+    if (!(teacherId && contract.teacher.id !== teacherId)) {
+      return contract
+    } else {
+      return null
+    }
+  }
+
+  async endOrDeleteContract(id: string): Promise<void> {
+    const contract = await this.contractsRepository.findOneOrFail(id)
+
+    if (dayjs().isBefore(contract.endDate)) {
+      // Cannot delete past contracts
+      if (dayjs().isBefore(contract.startDate)) {
+        // Delete Future contracts completely
+        this.contractsRepository.delete(id)
+      } else {
+        // End ongoing contracts
+        this.contractsRepository.update(id, {
+          endDate: dayjs().format('YYYY-MM-DD'),
+        })
+      }
+    } else {
+      throw new BadRequestException('Past contracts cannot be deleted')
+    }
+  }
+
+  async updateContract(id: string, dto: CreateContractDto): Promise<void> {
+    let contract: any = await this.contractsRepository.findOne(id)
+
+    contract = {
+      ...contract,
+      ...dto,
+      subject: { id: dto.subject },
+      teacher: await this.usersService
+        .findOneTeacher(dto.teacher)
+        .then((c) => ({ id: c.id })),
+      customers: await Promise.all(
+        dto.customers.map((id) =>
+          this.usersService.findOneCustomer(id).then((c) => ({ id: c.id })),
+        ),
+      ),
+    }
+
+    await this.contractsRepository.save(contract)
+  }
+
+  async acceptOrDeclineContract(
+    id: string,
+    dto: AcceptOrDeclineContractDto,
+  ): Promise<void> {
+    let contract: any = await this.contractsRepository.findOne(id)
+
+    contract = {
+      ...contract,
+      ...dto,
+    }
+
+    await this.contractsRepository.save(contract)
   }
 
   async suggestContracts(dto: SuggestContractsDto): Promise<any[]> {
@@ -70,7 +145,8 @@ export class ContractsService {
 
     const qb = this.connection.createQueryBuilder()
 
-    // subquery: when are all customers available?
+    /* CUSTOMER QUERY */
+
     const cTimes = qb
       .subQuery()
       .select('intersection(c."timesAvailable") * :filter::tstzmultirange')
@@ -79,19 +155,67 @@ export class ContractsService {
       .having('count(c) = :cc', { cc: dto.customers.length })
       .setParameter('filter', dowTimeFilter)
 
+    /* CONTRACT QUERY */
+
+    const contractQuery = qb
+      .subQuery()
+      .select(
+        `union_multirange((
+      '{[2001-01-0' || extract(dow from "con"."startDate") || ' ' || "con"."startTime" ||
+      ', 2001-01-0' || extract(dow from "con"."startDate") || ' ' || "con"."endTime" || ')}'
+    )::tstzmultirange)`,
+        'contractTimes',
+      )
+      .from(Contract, 'con')
+      .leftJoin('con.customers', 'customer')
+      .where(
+        new Brackets((contractQuery) => {
+          contractQuery
+            .where('t.id = con.teacherId')
+            .orWhere(`customer.id IN (:...cid)`, { cid: dto.customers })
+        }),
+      )
+      .andWhere('con.state = :contractState', {
+        contractState: ContractState.ACCEPTED,
+      })
+      .andWhere('con.endDate > :minDate', {
+        minDate: dto.minDate ?? dayjs().format('YYYY-MM-DD'),
+      })
+    if (typeof dto.maxDate !== 'undefined')
+      contractQuery.andWhere('con.startDate < :maxDate', {
+        maxDate: dto.maxDate,
+      })
+
+    if (dto.interval !== 1) contractQuery.andWhere('con.interval = 1')
+
+    /* MAIN QUERY */
+
     const mainQuery = qb
       .select('*')
       .from((subq) => {
-        return subq
+        const sq = subq
           .select('t.id', 'teacherId')
           .addSelect('t.firstName', 'firstName')
           .addSelect('t.lastName', 'lastName')
-          .addSelect('t.timesAvailable * ' + cTimes.getQuery(), 'possibleTimes')
-          .from(User, 't')
+          .addSelect(
+            `
+              t.timesAvailable
+              * ${cTimes.getQuery()}
+              - ${contractQuery.getQuery()}
+            `,
+            'possibleTimes',
+          )
+          .addFrom(User, 't')
           .leftJoin('t.subjects', 'subject')
           .where('t.type = :tt', { tt: 'Teacher' })
+          .andWhere(`t.state = 'applied'`)
           .andWhere('subject.id = :subjectId', { subjectId: dto.subjectId })
-          .setParameters(cTimes.getParameters())
+
+        sq.groupBy('t.id')
+
+        sq.setParameters(cTimes.getParameters())
+
+        return sq
       }, 's')
       .where(`s."possibleTimes" <> '{}'::tstzmultirange`)
 
@@ -149,6 +273,9 @@ export class ContractsService {
       .leftJoin('c.customers', 'customer')
       .leftJoin('c.teacher', 'teacher')
       .where('extract(dow from c.startDate) = :dow')
+      .andWhere('c.state = :contractState', {
+        contractState: ContractState.ACCEPTED,
+      })
       .andWhere('c.startTime < :end::time')
       .andWhere('c.endTime > :start::time')
       .andWhere(
@@ -160,18 +287,6 @@ export class ContractsService {
       .setParameters(range)
 
     return qb.getMany()
-  }
-
-  async remove(id: string): Promise<void> {
-    const contract = await this.contractsRepository.findOne(id)
-
-    console.log(contract.startDate)
-
-    if (dayjs().isBefore(contract.startDate)) {
-      this.contractsRepository.delete(id)
-    } else {
-      throw new BadRequestException('contract cannot be deleted')
-    }
   }
 
   async findByWeek(week: Dayjs, teacherId?: number): Promise<Contract[]> {
@@ -186,7 +301,7 @@ export class ContractsService {
         'customer.type',
         'customer.firstName',
         'customer.lastName',
-        'customer.schoolName',
+        'customer.className',
       ])
       .loadAllRelationIds({
         relations: ['teacher'],
@@ -196,6 +311,9 @@ export class ContractsService {
         { week: week.format() },
       )
       .andWhere(`c.endDate >= date_trunc('week', :week::date)`)
+      .andWhere('c.state = :contractState', {
+        contractState: ContractState.ACCEPTED,
+      })
       .andWhere(
         `extract( days from ( date_trunc('week', c.startDate) - date_trunc('week', :week::date) ) ) / 7 % c.interval = 0`,
       )

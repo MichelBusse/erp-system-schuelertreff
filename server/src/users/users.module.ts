@@ -5,14 +5,13 @@ import { AuthModule } from 'src/auth/auth.module'
 
 import {
   Admin,
+  ClassCustomer,
   Customer,
   PrivateCustomer,
   SchoolCustomer,
   Teacher,
   User,
-  ClassCustomer,
 } from './entities'
-
 import { UsersController } from './users.controller'
 import { UsersService } from './users.service'
 

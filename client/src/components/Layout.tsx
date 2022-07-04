@@ -6,9 +6,11 @@ import {
   School as SchoolIcon,
   TableChart as TableChartIcon,
 } from '@mui/icons-material'
-import { Box, CssBaseline, useTheme } from '@mui/material'
+import { Box, useTheme } from '@mui/material'
 import { Outlet } from 'react-router-dom'
 
+import { TeacherState } from '../types/enums'
+import { useAuth } from './AuthProvider'
 import MainMenu from './MainMenu'
 
 const menuItems = [
@@ -44,23 +46,31 @@ const menuItems = [
   {
     icon: ManageAccountsIcon,
     text: 'Profil',
-    href: '/profil',
+    href: '/profile',
+    roles: ['teacher'],
   },
 ]
 
 const Layout: React.FC = () => {
   const theme = useTheme()
+  const { isAuthed, decodeToken } = useAuth()
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <MainMenu items={menuItems} />
+      {
+        // hide menu for non-employed teachers
+        !(
+          isAuthed() &&
+          decodeToken().role === 'teacher' &&
+          decodeToken().state !== TeacherState.EMPLOYED
+        ) && <MainMenu items={menuItems} />
+      }
       <Box
         component="main"
         sx={{
           backgroundColor: theme.palette.grey[100],
           flexGrow: 1,
-          minHeight: '100vh',
+          height: '100vh',
           overflow: 'auto',
         }}
       >

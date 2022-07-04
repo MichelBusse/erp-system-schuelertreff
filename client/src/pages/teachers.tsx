@@ -28,15 +28,17 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../components/AuthProvider'
 import TeacherDialog from '../components/TeacherDialog'
-import { dataGridLocaleText } from '../consts'
-import { Degree } from '../types/enums'
+import { dataGridLocaleText, teacherStateToString } from '../consts'
+import { Degree, TeacherState } from '../types/enums'
 import subject from '../types/subject'
 import { teacher } from '../types/user'
 import styles from './gridList.module.scss'
 
 //definition of subject filter input
-function SubjectsFilterInputValue(props: GridFilterInputValueProps) {
-  const { item, applyValue } = props
+const SubjectsFilterInputValue: React.FC<GridFilterInputValueProps> = ({
+  item,
+  applyValue,
+}) => {
   const { API } = useAuth()
   const [subjects, setSubjects] = useState<subject[]>([])
 
@@ -75,33 +77,61 @@ function SubjectsFilterInputValue(props: GridFilterInputValueProps) {
   )
 }
 
-function DegreeFilterInputValue(props: GridFilterInputValueProps) {
-  const { item, applyValue } = props
+const DegreeFilterInputValue: React.FC<GridFilterInputValueProps> = ({
+  item,
+  applyValue,
+}) => (
+  <FormControl fullWidth>
+    <InputLabel variant="standard" htmlFor="degree-select">
+      Höchster Abschluss
+    </InputLabel>
+    <NativeSelect
+      inputProps={{
+        name: 'degree',
+        id: 'degree-select',
+      }}
+      defaultValue={Degree.NOINFO}
+      required
+      onChange={(event) => {
+        applyValue({ ...item, value: event.target.value })
+      }}
+    >
+      <option value={Degree.NOINFO}>Keine Angabe</option>
+      <option value={Degree.HIGHSCHOOL}>Abitur</option>
+      <option value={Degree.BACHELOR}>Bachelor</option>
+      <option value={Degree.MASTER}>Master</option>
+    </NativeSelect>
+  </FormControl>
+)
 
-  return (
-    <FormControl fullWidth>
-      <InputLabel variant="standard" htmlFor="degree-select">
-        Höchster Abschluss
-      </InputLabel>
-      <NativeSelect
-        inputProps={{
-          name: 'degree',
-          id: 'degree-select',
-        }}
-        defaultValue={Degree.NOINFO}
-        required
-        onChange={(event) => {
-          applyValue({ ...item, value: event.target.value })
-        }}
-      >
-        <option value={Degree.NOINFO}>Keine Angabe</option>
-        <option value={Degree.HIGHSCHOOL}>Abitur</option>
-        <option value={Degree.BACHELOR}>Bachelor</option>
-        <option value={Degree.MASTER}>Master</option>
-      </NativeSelect>
-    </FormControl>
-  )
-}
+const StateFilterInputValue: React.FC<GridFilterInputValueProps> = ({
+  item,
+  applyValue,
+}) => (
+  <FormControl fullWidth>
+    <InputLabel variant="standard" htmlFor="state-select">
+      Status
+    </InputLabel>
+    <NativeSelect
+      inputProps={{
+        name: 'state',
+        id: 'state-select',
+      }}
+      defaultValue={''}
+      required
+      onChange={(event) => {
+        applyValue({ ...item, value: event.target.value })
+      }}
+    >
+      <option value={''}></option>
+      {Object.values(TeacherState).map((state) => (
+        <option key={state} value={state}>
+          {teacherStateToString[state]}
+        </option>
+      ))}
+    </NativeSelect>
+  </FormControl>
+)
 
 //definition of filter operators
 const subjectOperator: GridFilterOperator = {
@@ -125,10 +155,11 @@ const subjectOperator: GridFilterOperator = {
   InputComponent: SubjectsFilterInputValue,
   InputComponentProps: { type: 'string' },
 }
+
 const degreeOperator: GridFilterOperator = {
   label: 'mindestens',
   value: 'mininum',
-  getApplyFilterFn: (filterItem: GridFilterItem ) => {
+  getApplyFilterFn: (filterItem: GridFilterItem) => {
     if (
       !filterItem.columnField ||
       !filterItem.value ||
@@ -159,6 +190,24 @@ const degreeOperator: GridFilterOperator = {
     }
   },
   InputComponent: DegreeFilterInputValue,
+  InputComponentProps: { type: 'string' },
+}
+
+const stateOperator: GridFilterOperator = {
+  label: 'ist',
+  value: 'is',
+  getApplyFilterFn: (filterItem: GridFilterItem) => {
+    if (
+      !filterItem.columnField ||
+      !filterItem.value ||
+      !filterItem.operatorValue
+    ) {
+      return null
+    }
+
+    return (params: GridCellParams) => params.value === filterItem.value
+  },
+  InputComponent: StateFilterInputValue,
   InputComponentProps: { type: 'string' },
 }
 
@@ -194,7 +243,7 @@ const cols: GridColumns = [
     filterOperators: [subjectOperator],
     renderCell: (params) => (
       <Stack direction="row" spacing={2}>
-        {params.value.map((subject: subject) => (
+        {params.value?.map((subject: subject) => (
           <Chip
             key={subject.id}
             label={subject.name}
@@ -212,17 +261,7 @@ const cols: GridColumns = [
     filterOperators: getGridStringOperators().filter(
       (operator) => operator.value === 'contains',
     ),
-    renderCell: (params) => (
-      <div
-        style={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          paddingLeft: 15,
-        }}
-      >
-        {params.value}
-      </div>
-    ),
+    renderCell: () => <></>,
   },
   {
     field: 'degree',
@@ -230,6 +269,14 @@ const cols: GridColumns = [
     headerName: 'Abschluss',
     hide: true,
     filterOperators: [degreeOperator],
+    renderCell: () => <></>,
+  },
+  {
+    field: 'state',
+    headerClassName: 'DataGridHead',
+    headerName: 'Status',
+    minWidth: 150,
+    filterOperators: [stateOperator],
     renderCell: (params) => (
       <div
         style={{
@@ -238,7 +285,7 @@ const cols: GridColumns = [
           paddingLeft: 15,
         }}
       >
-        {params.value}
+        {teacherStateToString[params.value as TeacherState]}
       </div>
     ),
   },
@@ -266,6 +313,7 @@ const Teachers: React.FC = () => {
     subjectName: teacher.subjects,
     city: teacher.city,
     degree: teacher.degree,
+    state: teacher.state,
   }))
 
   //space between rows
@@ -283,7 +331,7 @@ const Teachers: React.FC = () => {
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} style={{ minHeight: '100vh' }}>
       <div style={{ flexGrow: 1 }}>
         <DataGrid
           localeText={dataGridLocaleText}

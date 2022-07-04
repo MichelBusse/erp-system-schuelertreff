@@ -21,8 +21,8 @@ import dayjs, { Dayjs } from 'dayjs'
 import { nanoid } from 'nanoid'
 import { useState } from 'react'
 
-import BetterTimePicker from './BetterTimePicker'
 import timeAvailable from '../types/timeAvailable'
+import BetterTimePicker from './BetterTimePicker'
 
 type times = {
   dow: string

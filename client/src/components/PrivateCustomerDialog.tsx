@@ -5,22 +5,20 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
-  FormHelperText,
   FormLabel,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TextField,
 } from '@mui/material'
+import axios from 'axios'
+import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
-import { defaultPrivateCustomerFormData } from '../consts'
+import { defaultPrivateCustomerFormData, snackbarOptionsError } from '../consts'
 import { privateCustomerForm } from '../types/form'
 import { privateCustomer } from '../types/user'
-import { formValidation } from './FormValidation'
+import { formValidation } from '../utils/formValidation'
 
 type Props = {
   open: boolean
@@ -39,6 +37,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
   const [errors, setErrors] = useState(defaultPrivateCustomerFormData)
 
   const { API } = useAuth()
+  const { enqueueSnackbar } = useSnackbar()
 
   //TODO: validate filled fields
   const submitForm = () => {
@@ -48,7 +47,6 @@ const PrivateCustomerDialog: React.FC<Props> = ({
       API.post(`users/privateCustomer`, {
         firstName: data.firstName,
         lastName: data.lastName,
-        salutation: data.salutation,
         city: data.city,
         postalCode: data.postalCode,
         street: data.street,
@@ -59,11 +57,23 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           start: time.start?.format('HH:mm'),
           end: time.end?.format('HH:mm'),
         })),
-      }).then((res) => {
-        setCustomers((s) => [...s, res.data])
-        setOpen(false)
-        setData(defaultPrivateCustomerFormData)
       })
+        .then((res) => {
+          setCustomers((s) => [...s, res.data])
+          setOpen(false)
+          setData(defaultPrivateCustomerFormData)
+        })
+        .catch((error) => {
+          if (axios.isAxiosError(error) && error.response?.status === 400) {
+            enqueueSnackbar(
+              (error.response.data as { message: string }).message,
+              snackbarOptionsError,
+            )
+          } else {
+            console.error(error)
+            enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+          }
+        })
   }
 
   const closeForm = () => {
@@ -83,25 +93,6 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           sx={{ paddingTop: '15px' }}
         >
           <Stack direction={'row'} columnGap={2}>
-            <FormControl sx={{ width: '240px' }}>
-              <InputLabel id="SalutationLable">Anrede</InputLabel>
-              <Select
-                id="Salutation"
-                label="Anrede"
-                value={data.salutation}
-                onChange={(event) =>
-                  setData((data) => ({
-                    ...data,
-                    salutation: event.target.value,
-                  }))
-                }
-              >
-                <MenuItem value="Herr">Herr</MenuItem>
-                <MenuItem value="Frau">Frau</MenuItem>
-                <MenuItem value="divers">divers</MenuItem>
-              </Select>
-              <FormHelperText>{errors.salutation}</FormHelperText>
-            </FormControl>
             <TextField
               helperText={errors.firstName}
               id="firstName"

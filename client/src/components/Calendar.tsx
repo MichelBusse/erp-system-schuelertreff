@@ -1,41 +1,25 @@
 import AddIcon from '@mui/icons-material/Add'
-import { Fab, Paper, Stack, Typography } from '@mui/material'
+import { Fab, Paper } from '@mui/material'
 import { Box } from '@mui/system'
-import {
-  DataGrid,
-  GridCellParams,
-  GridColDef,
-  GridRowsProp,
-} from '@mui/x-data-grid'
+import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 
-import { SideMenu } from '../pages/timetable'
-import subject from '../types/subject'
-import { customer, teacher } from '../types/user'
+import { DrawerParameters } from '../pages/timetable'
+import { contract } from '../types/contract'
+import { lesson } from '../types/lesson'
+import { teacher } from '../types/user'
 import { useAuth } from './AuthProvider'
 import styles from './Calendar.module.scss'
 import CalendarControl from './CalendarControl'
 
 type Props = {
   date: Dayjs
-  setDrawer: (open: SideMenu) => void
+  setDrawer: (params: DrawerParameters) => void
   setDate: (date: Dayjs) => void
   openDialog: () => void
   refresh?: number
   teachers: teacher[]
-}
-
-type contract = {
-  id: number
-  startTime: string
-  endTime: string
-  startDate: string
-  endDate: string
-  interval: 1
-  subject: subject
-  customers: customer[]
-  teacher: number
 }
 
 const Calendar: React.FC<Props> = ({
@@ -49,6 +33,7 @@ const Calendar: React.FC<Props> = ({
   const { API } = useAuth()
 
   const [contracts, setContracts] = useState<Record<number, contract[]>>([])
+  const [lessons, setLessons] = useState<lesson[]>([])
 
   useEffect(() => {
     API.get('lessons/week', {
@@ -58,13 +43,22 @@ const Calendar: React.FC<Props> = ({
     }).then((res) => {
       const contractsByTeacher: Record<number, contract[]> = {}
 
-      res.data.map((c: contract) => {
-        contractsByTeacher[c.teacher] = (
-          contractsByTeacher[c.teacher] ?? []
-        ).concat(c)
-      })
+      res.data.contracts
+        .sort((a: contract, b: contract) => {
+          return dayjs(a.startTime, 'HH:mm').isAfter(
+            dayjs(b.startTime, 'HH:mm'),
+          )
+            ? 1
+            : -1
+        })
+        .map((c: contract) => {
+          contractsByTeacher[c.teacher] = (
+            contractsByTeacher[c.teacher] ?? []
+          ).concat(c)
+        })
 
       setContracts(contractsByTeacher)
+      setLessons(res.data.lessons)
     })
   }, [date, refresh])
 
@@ -83,20 +77,22 @@ const Calendar: React.FC<Props> = ({
         cursor: (params.value ?? []).length > 0 ? 'pointer' : 'normal',
       }}
     >
-      {(params.value as contract[])?.map((c) => (
-        <Box
-          key={c.id}
-          sx={{
-            backgroundColor: c.subject.color + '95',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            boxShadow: `0 0 2px ${c.subject.color} inset`,
-          }}
-        >
-          {c.subject.shortForm}
-        </Box>
-      ))}
+      {(params.value as contract[])?.map((c) => {
+        return (
+          <Box
+            key={c.id}
+            sx={{
+              backgroundColor: c.subject.color + '70',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              boxShadow: `0 0 2px ${c.subject.color} inset`,
+            }}
+          >
+            {c.subject.shortForm}
+          </Box>
+        )
+      })}
     </Box>
   )
 
@@ -141,7 +137,11 @@ const Calendar: React.FC<Props> = ({
             params.colDef.field !== 'teacher' &&
             (params.value ?? []).length > 0
           ) {
-            setDrawer({ open: true, content: drawerContent(params) })
+            setDrawer({
+              open: true,
+              params: params,
+              lessons: lessons,
+            })
           }
         }}
       />
@@ -161,42 +161,5 @@ const Calendar: React.FC<Props> = ({
     </Paper>
   )
 }
-
-const drawerContent = (params: GridCellParams) => (
-  <>
-    <span>{params.colDef.headerName?.replace('\n', ' / ')}</span>
-    <Typography variant="h5" mb={3}>
-      {params.row.teacher}
-    </Typography>
-    <Stack spacing={2}>
-      {(params.value as contract[])?.map((c) => (
-        <Stack
-          key={c.id}
-          spacing={0.5}
-          sx={{
-            backgroundColor: c.subject.color + 50,
-            p: 1,
-            borderRadius: 2,
-          }}
-        >
-          <span>
-            {c.startTime.substring(0, 5) + ' - ' + c.endTime.substring(0, 5)}
-          </span>
-          <span>{c.subject.name}</span>
-          <span>Kunden:</span>
-          <ul className={styles.list}>
-            {c.customers.map((s) => (
-              <li key={s.id}>
-                {s.role === 'schoolCustomer'
-                  ? s.schoolName
-                  : s.firstName + ' ' + s.lastName}
-              </li>
-            ))}
-          </ul>
-        </Stack>
-      ))}
-    </Stack>
-  </>
-)
 
 export default Calendar

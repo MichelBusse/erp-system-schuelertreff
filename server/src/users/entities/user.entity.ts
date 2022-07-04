@@ -8,18 +8,11 @@ import {
 
 import { Role } from 'src/auth/role.enum'
 
-export enum SchoolType
-{
+export enum SchoolType {
   GRUNDSCHULE = 'grundschule',
   OBERSCHULE = 'oberschule',
   GYMSEK1 = 'sek1',
   GYMSEK2 = 'sek2',
-}
-
-export enum Salutation {
-  FRAU = 'Frau',
-  HERR = 'Herr',
-  DIVERS = 'divers',
 }
 
 // the week of 2001-01-01 is used as dummy, DOW and time is important here
@@ -39,13 +32,6 @@ export abstract class User {
 
   @Column({ nullable: true })
   firstName: string
-
-  @Column({
-    type: 'enum',
-    enum: Salutation,
-    nullable: true,
-  })
-  salutation: Salutation
 
   @Column({ nullable: true })
   street: string
@@ -69,7 +55,10 @@ export abstract class User {
   @Column({ select: false })
   mayAuthenticate: boolean
 
-  @Column({ type: 'timestamptz', default: new Date(0) })
+  @Column({
+    type: 'timestamptz',
+    default: new Date(0),
+  })
   jwtValidAfter: Date
 
   @Column({
@@ -81,8 +70,9 @@ export abstract class User {
 
   @Column({
     type: 'enum',
-    enum: SchoolType, 
-    array: true, 
+    enum: SchoolType,
+    array: true,
+    default: '{}',
   })
   schoolTypes: SchoolType[]
 }

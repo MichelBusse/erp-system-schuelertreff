@@ -1,34 +1,40 @@
 import 'dayjs/locale/de'
 
-import { Box } from '@mui/material'
+import { Box, Button, Drawer, Stack, Typography } from '@mui/material'
+import { GridCellParams } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
-import { ReactElement, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
 import Calendar from '../components/Calendar'
 import ContractDialog from '../components/ContractDialog'
-import HiddenMenu from '../components/HiddenMenu'
+import LessonOverview from '../components/LessonOverview'
 import TeacherCalendar from '../components/TeacherCalendar'
-import { teacher } from '../types/user'
+import { contract } from '../types/contract'
+import { lesson } from '../types/lesson'
+import { Role, teacher } from '../types/user'
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)
 
-export type SideMenu = {
+export type DrawerParameters = {
   open: boolean
-  content: ReactElement
+  params: GridCellParams | null
+  lessons: lesson[]
 }
 
 const Timetable: React.FC = () => {
   const { API, hasRole } = useAuth()
 
-  const [drawer, setDrawer] = useState<SideMenu>({
+  const [drawer, setDrawer] = useState<DrawerParameters>({
     open: false,
-    content: <></>,
+    params: null,
+    lessons: [],
   })
   const [date, setDate] = useState(dayjs().day(1))
   const [open, setOpen] = useState(false)
+
   const [render, setRender] = useState(0)
 
   const [refreshCalendar, setRefreshCalendar] = useState(0)
@@ -53,7 +59,7 @@ const Timetable: React.FC = () => {
           alignItems: 'center',
         }}
       >
-        {hasRole('admin') ? (
+        {hasRole(Role.ADMIN) ? (
           <Calendar
             date={date}
             setDrawer={setDrawer}
@@ -69,7 +75,7 @@ const Timetable: React.FC = () => {
           />
         ) : null}
 
-        {hasRole('teacher') ? (
+        {hasRole(Role.TEACHER) ? (
           <TeacherCalendar
             date={date}
             setDrawer={setDrawer}
@@ -78,19 +84,80 @@ const Timetable: React.FC = () => {
         ) : null}
       </Box>
 
-      <HiddenMenu
-        state={drawer}
-        close={() => setDrawer((d) => ({ ...d, open: false }))}
-      />
+      <Drawer
+        open={drawer.open}
+        onClose={() => setDrawer((d) => ({ ...d, open: false }))}
+        anchor={'right'}
+        variant="persistent"
+      >
+        <Stack
+          direction={'column'}
+          minWidth={300}
+          sx={{ padding: '1em', height: '100%' }}
+        >
+          {drawer.params && (
+            <>
+              <span>
+                {drawer.params.colDef.headerName?.replace('\n', ' / ')}
+              </span>
+              <Typography variant="h5" mb={3}>
+                {drawer.params.row.teacher}
+              </Typography>
+              <Stack spacing={2}>
+                {(drawer.params.value as contract[])?.map((c) => {
+                  let existingLesson = null
+                  for (const lesson of drawer.lessons) {
+                    if (
+                      lesson.contract.id === c.id &&
+                      dayjs(lesson.date).format('DD/MM/YYYY') ===
+                        dayjs(
+                          drawer.params?.colDef.headerName,
+                          'dddd\nDD.MM.YYYY',
+                        ).format('DD/MM/YYYY')
+                    ) {
+                      existingLesson = lesson
+                      break
+                    }
+                  }
+                  return (
+                    <LessonOverview
+                      key={c.id}
+                      contract={c}
+                      existingLesson={existingLesson}
+                      date={dayjs(
+                        drawer.params?.colDef.headerName,
+                        'dddd\nDD.MM.YYYY',
+                      )}
+                    />
+                  )
+                })}
+              </Stack>
+            </>
+          )}
+
+          <Button
+            variant="text"
+            size="medium"
+            onClick={() =>
+              setDrawer({ open: false, params: null, lessons: [] })
+            }
+            sx={{ marginTop: 'auto' }}
+          >
+            schließen
+          </Button>
+        </Stack>
+      </Drawer>
 
       {!!render && (
-        <ContractDialog
-          key={render}
-          open={open}
-          setOpen={setOpen}
-          onSuccess={() => setRefreshCalendar((r) => r + 1)}
-          teachers={teachers}
-        />
+        <>
+          <ContractDialog
+            key={render}
+            open={open}
+            setOpen={setOpen}
+            onSuccess={() => setRefreshCalendar((r) => r + 1)}
+            teachers={teachers}
+          />
+        </>
       )}
     </Box>
   )

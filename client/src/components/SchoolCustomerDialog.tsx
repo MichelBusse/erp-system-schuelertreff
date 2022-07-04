@@ -11,27 +11,16 @@ import {
 import { useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
-import { schoolCustomer } from '../types/user'
-import { formValidation } from './FormValidation'
+import { defaultSchoolCustomerFormData } from '../consts'
 import { SchoolType } from '../types/enums'
 import { schoolCustomerForm } from '../types/form'
-import { defaultSchoolCustomerFormData } from '../consts'
+import { schoolCustomer } from '../types/user'
+import { formValidation } from '../utils/formValidation'
 
 type Props = {
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
   setCustomers: React.Dispatch<React.SetStateAction<schoolCustomer[]>>
-}
-
-const defaultFormData = {
-  schoolName: '',
-  schoolType: '',
-  city: '',
-  postalCode: '',
-  street: '',
-  email: '',
-  phone: '',
-  timesAvailable: [],
 }
 
 const SchoolCustomerDialog: React.FC<Props> = ({
@@ -65,7 +54,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({
 
   return (
     <Dialog open={open}>
-      <DialogTitle>Lehrkraft hinzufügen</DialogTitle>
+      <DialogTitle>Schule hinzufügen</DialogTitle>
       <DialogContent>
         <Stack
           direction={'column'}
@@ -95,7 +84,7 @@ const SchoolCustomerDialog: React.FC<Props> = ({
               options={[
                 SchoolType.GRUNDSCHULE,
                 SchoolType.OBERSCHULE,
-                SchoolType.GYMSEK1, 
+                SchoolType.GYMSEK1,
                 SchoolType.GYMSEK2,
               ]}
               getOptionLabel={(option) => {

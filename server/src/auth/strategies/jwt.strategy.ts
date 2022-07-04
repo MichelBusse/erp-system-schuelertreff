@@ -27,6 +27,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // reject if the JWT was issued before e.g. the last password reset
     if (payload.iat * 1000 < user.jwtValidAfter.getTime()) return
 
-    return { id: payload.sub, email: payload.username, role: payload.role }
+    return user
   }
 }

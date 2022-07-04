@@ -1,7 +1,7 @@
 import 'dayjs/locale/de'
 
 import ClearIcon from '@mui/icons-material/Clear'
-import { LoadingButton, loadingButtonClasses } from '@mui/lab'
+import { LoadingButton } from '@mui/lab'
 import {
   Autocomplete,
   Box,
@@ -25,9 +25,11 @@ import {
 import { DatePicker } from '@mui/x-date-pickers'
 import dayjs, { Dayjs } from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
-import { OptionsObject as SnackbarOptions, useSnackbar } from 'notistack'
+import { useSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 
+import { snackbarOptionsError } from '../consts'
+import { ContractState } from '../types/contract'
 import subject from '../types/subject'
 import { customer, schoolCustomer, teacher } from '../types/user'
 import { getNextDow } from '../utils/date'
@@ -72,14 +74,7 @@ type form1 = {
   maxTime: Dayjs | null
   teacher: string
   dow: number | null
-}
-
-const snackbarOptions: SnackbarOptions = {
-  variant: 'error',
-  anchorOrigin: {
-    vertical: 'bottom',
-    horizontal: 'right',
-  },
+  state: ContractState
 }
 
 type Props = {
@@ -102,7 +97,7 @@ const ContractDialog: React.FC<Props> = ({
 
   // step 9
   const [loading9, setLoading9] = useState(false)
-  const [form9, setForm9] = useState<string>("")
+  const [form9, setForm9] = useState<string>('')
 
   // step 0
   const [schoolCustomers, setSchoolCustomers] = useState<schoolCustomer[]>([])
@@ -112,13 +107,13 @@ const ContractDialog: React.FC<Props> = ({
   const [form0, setForm0] = useState<form0>({
     schoolCustomer: {
       id: 0,
-      schoolName: "",
+      schoolName: '',
     },
     customers: [],
     subject: null,
     interval: 1,
-    startDate: null,
-    endDate: null,
+    startDate: dayjs().add(1, 'day'),
+    endDate: dayjs().add(1, 'day').add(1, 'year'),
     startTime: null,
     endTime: null,
   })
@@ -136,79 +131,78 @@ const ContractDialog: React.FC<Props> = ({
     maxTime: null,
     teacher: '',
     dow: null,
+    state: ContractState.PENDING,
   })
 
-  const validForm9 = !!(
-    form9
-  )
+  const validForm9 = !!form9
 
   const handleChange9 = (event: SelectChangeEvent) => {
-    setForm9(event.target.value as string);
-  };
+    setForm9(event.target.value as string)
+  }
 
   const handleSubmit9 = () => {
     setLoading9(true)
-    
-    if(form9 === "privateCustomer"){
+
+    if (form9 === 'privateCustomer') {
       // get customers, subjects from DB
       API.get('users/privateCustomer')
-      .then((res) => setCustomers(res.data))
-      .catch((err) => {
-        console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
-      })
+        .then((res) => setCustomers(res.data))
+        .catch((err) => {
+          console.error(err)
+          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        })
 
       API.get('subjects')
-      .then((res) => {
-        setSubjects(res.data)
-        setActiveStep(1)
-      })
-      .catch((err) => {
-        console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
-      })
-      .finally(() => setLoading9(false))
+        .then((res) => {
+          setSubjects(res.data)
+          setActiveStep(1)
+        })
+        .catch((err) => {
+          console.error(err)
+          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        })
+        .finally(() => setLoading9(false))
     }
 
-    if(form9 === "schoolCustomer"){
-      console.log("drin2")
+    if (form9 === 'schoolCustomer') {
+      console.log('drin2')
       // get customers, subjects from DB
       API.get('users/schoolCustomer')
-      .then((res) => setSchoolCustomers(res.data))
-      .catch((err) => {
-        console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
-      })
+        .then((res) => setSchoolCustomers(res.data))
+        .catch((err) => {
+          console.error(err)
+          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        })
 
       API.get('subjects')
-      .then((res) => {
-        setSubjects(res.data)
-        setActiveStep(1)
-      })
-      .catch((err) => {
-        console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
-      })
-      .finally(() => setLoading9(false))
+        .then((res) => {
+          setSubjects(res.data)
+          setActiveStep(1)
+        })
+        .catch((err) => {
+          console.error(err)
+          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        })
+        .finally(() => setLoading9(false))
     }
   }
 
   const validForm0 = !!(
     form0.customers.length &&
     form0.subject &&
-    form0.interval
+    form0.interval &&
+    form0.startDate &&
+    form0.endDate
   )
 
-  const activateClassSelect = !!(
-    form0.schoolCustomer.id != 0
-  )
+  const activateClassSelect = !!(form0.schoolCustomer.id != 0)
 
   const loadClasses = (id: number) => {
     API.get('users/classCustomer/' + id)
       .then((res) => setCustomers(res.data))
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
       })
   }
 
@@ -230,10 +224,21 @@ const ContractDialog: React.FC<Props> = ({
         updateSelSuggestion('')
         setSuggestions(res.data)
         setActiveStep(2)
+        setForm1({
+          startDate: form0.startDate,
+          endDate: form0.endDate,
+          startTime: form0.startTime,
+          endTime: form0.endTime,
+          minTime: form0.startTime,
+          maxTime: form0.endTime,
+          teacher: '',
+          dow: null,
+          state: ContractState.PENDING,
+        })
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
       })
       .finally(() => setLoading0(false))
   }
@@ -247,34 +252,36 @@ const ContractDialog: React.FC<Props> = ({
       const teacher = suggestions[t]
       const suggestion = teacher.suggestions[s]
 
-      const startTime =
-        suggestion.start !== '00:00' ? dayjs(suggestion.start, 'HH:mm') : null
+      const startTime = dayjs(suggestion.start, 'HH:mm')
       const endTime =
-        suggestion.end !== '24:00' ? dayjs(suggestion.end, 'HH:mm') : null
+        suggestion.end !== '24:00'
+          ? dayjs(suggestion.end, 'HH:mm')
+          : dayjs(suggestion.end, 'HH:mm').subtract(5, 'minute')
 
       setForm1({
-        startDate: getNextDow(
-          suggestion.dow,
-          form0.startDate ?? dayjs('00:00', 'HH:mm').add(1, 'day'),
-        ),
-        endDate: null,
+        startDate: form0.startDate
+          ? getNextDow(suggestion.dow, form0.startDate)
+          : null,
+        endDate: form0.endDate,
         startTime: startTime,
         endTime: endTime,
         minTime: startTime,
         maxTime: endTime,
         teacher: teacher.teacherId.toString(),
         dow: suggestion.dow,
+        state: ContractState.PENDING,
       })
     } else {
       setForm1({
-        startDate: null,
-        endDate: null,
+        startDate: form0.startDate,
+        endDate: form0.endDate,
         startTime: null,
         endTime: null,
         minTime: null,
         maxTime: null,
         teacher: '',
         dow: null,
+        state: ContractState.PENDING,
       })
     }
   }
@@ -298,6 +305,7 @@ const ContractDialog: React.FC<Props> = ({
       endDate: form1.endDate?.format('YYYY-MM-DD'),
       startTime: form1.startTime?.format('HH:mm'),
       endTime: form1.endTime?.format('HH:mm'),
+      state: form1.state,
     })
       .then(() => {
         onSuccess()
@@ -305,21 +313,19 @@ const ContractDialog: React.FC<Props> = ({
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptions)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
       })
       .finally(() => setLoading1(false))
   }
 
   const privateCustomerSelect = () => {
-    return(
+    return (
       <Autocomplete
         fullWidth
         multiple
         size="small"
         options={customers}
-        getOptionLabel={(o) =>
-          o.firstName + ' ' + o.lastName
-        }
+        getOptionLabel={(o) => o.firstName + ' ' + o.lastName}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         value={form0.customers}
         onChange={(_, value) =>
@@ -339,65 +345,61 @@ const ContractDialog: React.FC<Props> = ({
   }
 
   const schoolCustomerSelect = () => {
-    return(
-    <>
-      <Autocomplete
-        fullWidth
-        size="small"
-        options={schoolCustomers}
-        getOptionLabel={(o) =>
-          o.schoolName
-        }
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-        value={form0.schoolCustomer}
-        onChange={(_, value) => {
-          setForm0((data) => ({ ...data, schoolCustomer: value }))
-          loadClasses(value.id)}
-        }
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            required
-            size="medium"
-            variant="standard"
-            label="Schule"
-          />
-        )}
-      />
-      <Autocomplete
-        disabled = {!activateClassSelect}
-        fullWidth
-        multiple
-        size="small"
-        options={customers}
-        getOptionLabel={(o) =>
-          o.className
-        }
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-        value={form0.customers}
-        onChange={(_, value) =>
-          setForm0((data) => ({ ...data, customers: value }))
-        }
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            required
-            size="medium"
-            variant="standard"
-            label="Klasse(n)"
-          />
-        )}
-      />
-    </>
+    return (
+      <>
+        <Autocomplete
+          fullWidth
+          size="small"
+          options={schoolCustomers}
+          getOptionLabel={(o) => o.schoolName}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          value={form0.schoolCustomer}
+          onChange={(_, value) => {
+            setForm0((data) => ({ ...data, schoolCustomer: value }))
+            loadClasses(value.id)
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              required
+              size="medium"
+              variant="standard"
+              label="Schule"
+            />
+          )}
+        />
+        <Autocomplete
+          disabled={!activateClassSelect}
+          fullWidth
+          multiple
+          size="small"
+          options={customers}
+          getOptionLabel={(o) => o.className}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          value={form0.customers}
+          onChange={(_, value) =>
+            setForm0((data) => ({ ...data, customers: value }))
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              required
+              size="medium"
+              variant="standard"
+              label="Klasse(n)"
+            />
+          )}
+        />
+      </>
     )
   }
 
   const chooseSelect = () => {
-    if(form9 === "privateCustomer"){
-      return(privateCustomerSelect())
+    if (form9 === 'privateCustomer') {
+      return privateCustomerSelect()
     }
-    if(form9 === "schoolCustomer"){
-      return(schoolCustomerSelect())
+    if (form9 === 'schoolCustomer') {
+      return schoolCustomerSelect()
     }
   }
 
@@ -411,7 +413,9 @@ const ContractDialog: React.FC<Props> = ({
       content: (
         <Stack spacing={2} marginTop={1}>
           <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">Vertragspartner</InputLabel>
+            <InputLabel id="demo-simple-select-label">
+              Vertragspartner
+            </InputLabel>
             <Select
               labelId="contractPartner"
               id="contractPartner"
@@ -419,11 +423,11 @@ const ContractDialog: React.FC<Props> = ({
               label="Vertragspartner"
               onChange={handleChange9}
             >
-              <MenuItem value={"privateCustomer"}>Privatkunde</MenuItem>
-              <MenuItem value={"schoolCustomer"}>Schule</MenuItem>
+              <MenuItem value={'privateCustomer'}>Privatkunde</MenuItem>
+              <MenuItem value={'schoolCustomer'}>Schule</MenuItem>
             </Select>
           </FormControl>
-        </Stack>  
+        </Stack>
       ),
       actions: (
         <>
@@ -439,9 +443,6 @@ const ContractDialog: React.FC<Props> = ({
         </>
       ),
     },
-
-
-
 
     {
       label: 'Filterkonditionen',
@@ -461,7 +462,7 @@ const ContractDialog: React.FC<Props> = ({
                 <TextField
                   {...params}
                   required
-                  variant="standard"
+                  variant="outlined"
                   label="Fach"
                 />
               )}
@@ -469,7 +470,7 @@ const ContractDialog: React.FC<Props> = ({
             <TextField
               required
               label="Wochenintervall"
-              variant="standard"
+              variant="outlined"
               type="number"
               value={form0.interval}
               onChange={(e) => {
@@ -500,12 +501,12 @@ const ContractDialog: React.FC<Props> = ({
                 setForm0((data) => ({
                   ...data,
                   startDate: value,
-                  endDate: null,
+                  endDate: value ? value.add(1, 'year') : null,
                 }))
               }}
               shouldDisableDate={(date) => [0, 6].includes(date.day())}
               renderInput={(params) => (
-                <TextField {...params} variant="standard" />
+                <TextField {...params} required variant="outlined" />
               )}
               InputAdornmentProps={{
                 position: 'start',
@@ -528,16 +529,15 @@ const ContractDialog: React.FC<Props> = ({
             <DatePicker
               label="Enddatum"
               mask="__.__.____"
-              minDate={form0.startDate ?? undefined}
+              minDate={form0.startDate?.add(7, 'day') ?? undefined}
               defaultCalendarMonth={form0.startDate ?? undefined}
               disabled={form0.startDate === null}
               value={form0.endDate}
               onChange={(value) => {
                 setForm0((data) => ({ ...data, endDate: value }))
               }}
-              shouldDisableDate={(date) => [0, 6].includes(date.day())}
               renderInput={(params) => (
-                <TextField {...params} variant="standard" />
+                <TextField {...params} required variant="outlined" />
               )}
               InputAdornmentProps={{
                 position: 'start',
@@ -552,32 +552,6 @@ const ContractDialog: React.FC<Props> = ({
                     }
                   />
                 ),
-              }}
-            />
-          </EqualStack>
-          <EqualStack direction="row" spacing={2}>
-            <BetterTimePicker
-              label="Startzeit"
-              minutesStep={5}
-              maxTime={form0.endTime?.subtract(45, 'm')}
-              value={form0.startTime}
-              onChange={(value) => {
-                setForm0((data) => ({ ...data, startTime: value }))
-              }}
-              clearValue={() => {
-                setForm0((data) => ({ ...data, startTime: null }))
-              }}
-            />
-            <BetterTimePicker
-              label="Endzeit"
-              minutesStep={5}
-              minTime={form0.startTime?.add(45, 'm')}
-              value={form0.endTime}
-              onChange={(value) => {
-                setForm0((data) => ({ ...data, endTime: value }))
-              }}
-              clearValue={() => {
-                setForm0((data) => ({ ...data, endTime: null }))
               }}
             />
           </EqualStack>
@@ -599,18 +573,17 @@ const ContractDialog: React.FC<Props> = ({
       ),
     },
 
-
-    
     {
       label: 'Termin auswählen',
       content: (
         <Stack spacing={2} marginTop={1}>
-          <FormControl variant="standard" fullWidth>
+          <FormControl variant="outlined" fullWidth>
             <InputLabel htmlFor="suggestion-select">
               {suggestions.length > 0 ? 'Vorschläge' : 'Keine Vorschläge'}
             </InputLabel>
             <Select
               id="suggestion-select"
+              label={suggestions.length > 0 ? 'Vorschläge' : 'Keine Vorschläge'}
               disabled={suggestions.length === 0}
               value={selSuggestion}
               onChange={(e) => updateSelSuggestion(e.target.value)}
@@ -637,10 +610,11 @@ const ContractDialog: React.FC<Props> = ({
             </Select>
           </FormControl>
 
-          <FormControl variant="standard" fullWidth required>
+          <FormControl variant="outlined" fullWidth required>
             <InputLabel htmlFor="teacher-select">Lehrkraft</InputLabel>
             <Select
               id="teacher-select"
+              label={'Lehrkraft'}
               disabled={selSuggestion !== ''}
               value={form1.teacher}
               onChange={(e) =>
@@ -660,82 +634,50 @@ const ContractDialog: React.FC<Props> = ({
                 ))}
             </Select>
           </FormControl>
-
           <EqualStack direction="row" spacing={2}>
-            <DatePicker
-              label="Startdatum"
-              mask="__.__.____"
-              minDate={form0.startDate ?? dayjs().add(1, 'd')}
-              maxDate={form0.endDate ?? undefined}
-              defaultCalendarMonth={form0.startDate ?? undefined}
-              value={form1.startDate}
-              onChange={(value) => {
-                setForm1((data) => ({
-                  ...data,
-                  startDate: value,
-                  endDate: null,
-                }))
-              }}
-              shouldDisableDate={(day) =>
-                [0, 6].includes(day.day()) ||
-                (selSuggestion !== '' && day.day() !== form1.dow)
-              }
-              renderInput={(params) => (
-                <TextField {...params} required variant="standard" />
-              )}
-              InputAdornmentProps={{
-                position: 'start',
-              }}
-              InputProps={{
-                endAdornment: (
-                  <IconButtonAdornment
-                    icon={ClearIcon}
-                    hidden={form1.startDate === null}
-                    onClick={() =>
-                      setForm1((data) => ({
-                        ...data,
-                        startDate: null,
-                      }))
-                    }
-                  />
-                ),
-              }}
-            />
-            <DatePicker
-              label="Enddatum"
-              mask="__.__.____"
-              minDate={form1.startDate ?? undefined}
-              maxDate={form0.endDate ?? undefined}
-              defaultCalendarMonth={form1.startDate ?? undefined}
-              disabled={form1.startDate === null}
-              value={form1.endDate}
-              onChange={(value) => {
-                setForm1((data) => ({ ...data, endDate: value }))
-              }}
-              shouldDisableDate={(day) =>
-                !!(
-                  form1.startDate &&
-                  day.diff(form1.startDate, 'd') % (7 * form0.interval)
-                )
-              }
-              renderInput={(params) => (
-                <TextField {...params} variant="standard" />
-              )}
-              InputAdornmentProps={{
-                position: 'start',
-              }}
-              InputProps={{
-                endAdornment: (
-                  <IconButtonAdornment
-                    icon={ClearIcon}
-                    hidden={form1.endDate === null}
-                    onClick={() =>
-                      setForm1((data) => ({ ...data, endDate: null }))
-                    }
-                  />
-                ),
-              }}
-            />
+            <FormControl variant="outlined" fullWidth required>
+              <InputLabel htmlFor="weekday-select">Wochentag</InputLabel>
+              <Select
+                id="weekday-select"
+                label={'Wochentag'}
+                value={(form1.startDate && form1.startDate.day()) || null}
+                disabled={selSuggestion !== ''}
+                onChange={(e) => {
+                  setForm1((data) => ({
+                    ...data,
+                    startDate: form0.startDate
+                      ? getNextDow(e.target.value as number, form0.startDate)
+                      : null,
+                  }))
+                }}
+              >
+                <MenuItem value={1}>{`Montag (Start: ${
+                  form0.startDate
+                    ? getNextDow(1, form0.startDate).format('DD.MM.YYYY')
+                    : ''
+                })`}</MenuItem>
+                <MenuItem value={2}>{`Dienstag (Start: ${
+                  form0.startDate
+                    ? getNextDow(2, form0.startDate).format('DD.MM.YYYY')
+                    : ''
+                })`}</MenuItem>
+                <MenuItem value={3}>{`Mittwoch (Start: ${
+                  form0.startDate
+                    ? getNextDow(3, form0.startDate).format('DD.MM.YYYY')
+                    : ''
+                })`}</MenuItem>
+                <MenuItem value={4}>{`Donnerstag (Start:${
+                  form0.startDate
+                    ? getNextDow(4, form0.startDate).format('DD.MM.YYYY')
+                    : ''
+                })`}</MenuItem>
+                <MenuItem value={5}>{`Freitag (Start: ${
+                  form0.startDate
+                    ? getNextDow(5, form0.startDate).format('DD.MM.YYYY')
+                    : ''
+                })`}</MenuItem>
+              </Select>
+            </FormControl>
           </EqualStack>
           <EqualStack direction="row" spacing={2}>
             <BetterTimePicker
@@ -767,6 +709,27 @@ const ContractDialog: React.FC<Props> = ({
               }}
             />
           </EqualStack>
+          <FormControl variant="outlined" fullWidth required>
+            <InputLabel htmlFor="contract-state-select">Annehmen</InputLabel>
+            <Select
+              id="contract-state-select"
+              label={'Annehmen'}
+              value={form1.state}
+              onChange={(e) =>
+                setForm1((data) => ({
+                  ...data,
+                  state: e.target.value as ContractState,
+                }))
+              }
+            >
+              <MenuItem key={1} value={ContractState.PENDING}>
+                Von Lehrkraft abfragen
+              </MenuItem>
+              <MenuItem key={2} value={ContractState.ACCEPTED}>
+                Automatisch annehmen
+              </MenuItem>
+            </Select>
+          </FormControl>
         </Stack>
       ),
       actions: (

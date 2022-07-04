@@ -1,37 +1,30 @@
-import { Paper, Stack, Typography } from '@mui/material'
+import { Paper } from '@mui/material'
 import { Box } from '@mui/system'
-import { DataGrid, GridCellParams, GridColDef } from '@mui/x-data-grid'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 
-import { SideMenu } from '../pages/timetable'
-import subject from '../types/subject'
-import { customer } from '../types/user'
+import { DrawerParameters } from '../pages/timetable'
+import { contract } from '../types/contract'
+import { lesson } from '../types/lesson'
+import AcceptContractsDialog from './AcceptContractsDialog'
 import { useAuth } from './AuthProvider'
 import CalendarControl from './CalendarControl'
 import styles from './TeacherCalendar.module.scss'
 
 type Props = {
   date: Dayjs
-  setDrawer: (open: SideMenu) => void
+  setDrawer: (params: DrawerParameters) => void
   setDate: (date: Dayjs) => void
-}
-
-type contract = {
-  id: number
-  startTime: string
-  endTime: string
-  startDate: string
-  endDate: string
-  interval: 1
-  subject: subject
-  customers: customer[]
-  teacher: number
 }
 
 const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
   const { API } = useAuth()
   const [contracts, setContracts] = useState<contract[]>([])
+  const [pendingContracts, setPendingContracts] = useState<contract[]>([])
+  const [lessons, setLessons] = useState<lesson[]>([])
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+  const [refresh, setRefresh] = useState<number>(0)
 
   const rowHeight = 777
   const startTimeAM = 7
@@ -39,12 +32,25 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
   const hourHeight = rowHeight / numberOfHours
 
   useEffect(() => {
-    API.get('contracts/myContracts', {
+    API.get('lessons/myLessons', {
       params: {
         of: date.format('YYYY-MM-DD'),
       },
-    }).then((res) => setContracts(res.data))
-  }, [date])
+    }).then((res) => {
+      setContracts(
+        res.data.contracts.sort((a: contract, b: contract) => {
+          return dayjs(a.startTime, 'HH:mm').isAfter(
+            dayjs(b.startTime, 'HH:mm'),
+          )
+            ? 1
+            : -1
+        }),
+      )
+      setPendingContracts(res.data.pendingContracts)
+      setDialogOpen(res.data.pendingContracts.length > 0)
+      setLessons(res.data.lessons)
+    })
+  }, [date, refresh])
 
   const getCellValue: GridColDef['valueGetter'] = ({ colDef: { field } }) =>
     contracts?.filter((c) => dayjs(c.startDate).day().toString() === field)
@@ -68,7 +74,7 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
           <Box
             key={c.id}
             sx={{
-              backgroundColor: c.subject.color + '95',
+              backgroundColor: c.subject.color + '70',
               height: hourHeight * hours,
               width: 180,
               position: 'absolute',
@@ -109,6 +115,8 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
                 width: '50px',
                 borderTopStyle: 'solid',
                 borderTopColor: '#7b878860',
+                textAlign: 'right',
+                padding: '3px',
               }}
             >
               {startTimeAM + i} Uhr
@@ -130,71 +138,44 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
   ]
 
   return (
-    <Paper
-      className={styles.wrapper}
-      sx={{ width: columns.reduce((p, c) => p + (c.width ?? 100), 0) }}
-    >
-      <CalendarControl date={date} setDate={setDate} />
+    <>
+      <Paper
+        className={styles.wrapper}
+        sx={{ width: columns.reduce((p, c) => p + (c.width ?? 100), 0) }}
+      >
+        <CalendarControl date={date} setDate={setDate} />
 
-      <DataGrid
-        getRowHeight={() => rowHeight}
-        hideFooter={true}
-        style={{
-          flexGrow: 1,
-          border: 'none',
+        <DataGrid
+          getRowHeight={() => rowHeight}
+          hideFooter={true}
+          style={{
+            flexGrow: 1,
+            border: 'none',
+          }}
+          rows={[{ id: 0 }]}
+          columns={columns}
+          disableColumnMenu={true}
+          disableSelectionOnClick={true}
+          onCellClick={(params) => {
+            if (
+              params.colDef.field !== 'teacher' &&
+              (params.value ?? []).length > 0
+            ) {
+              setDrawer({ open: true, params: params, lessons: lessons })
+            }
+          }}
+        />
+      </Paper>
+      <AcceptContractsDialog
+        contracts={pendingContracts}
+        open={dialogOpen}
+        setOpen={(open) => {
+          setDialogOpen(open)
         }}
-        rows={[{ id: 0 }]}
-        columns={columns}
-        disableColumnMenu={true}
-        disableSelectionOnClick={true}
-        onCellClick={(params) => {
-          if (
-            params.colDef.field !== 'teacher' &&
-            (params.value ?? []).length > 0
-          ) {
-            setDrawer({ open: true, content: drawerContent(params) })
-          }
-        }}
+        refresh={() => setRefresh((re) => ++re)}
       />
-    </Paper>
+    </>
   )
 }
-
-const drawerContent = (params: GridCellParams) => (
-  <>
-    <span>{params.colDef.headerName?.replace('\n', ' / ')}</span>
-    <Typography variant="h5" mb={3}>
-      {params.row.teacher}
-    </Typography>
-    <Stack spacing={2}>
-      {(params.value as contract[])?.map((c) => (
-        <Stack
-          key={c.id}
-          spacing={0.5}
-          sx={{
-            backgroundColor: c.subject.color + 50,
-            p: 1,
-            borderRadius: 2,
-          }}
-        >
-          <span>
-            {c.startTime.substring(0, 5) + ' - ' + c.endTime.substring(0, 5)}
-          </span>
-          <span>{c.subject.name}</span>
-          <span>Kunden:</span>
-          <ul className={styles.list}>
-            {c.customers.map((s) => (
-              <li key={s.id}>
-                {s.role === 'schoolCustomer'
-                  ? s.schoolName
-                  : s.firstName + ' ' + s.lastName}
-              </li>
-            ))}
-          </ul>
-        </Stack>
-      ))}
-    </Stack>
-  </>
-)
 
 export default TeacherCalendar

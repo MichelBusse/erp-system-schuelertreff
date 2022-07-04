@@ -1,11 +1,11 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 
 import { Contract } from 'src/contracts/contract.entity'
-import { Teacher } from 'src/users/entities/teacher.entity'
 
 export enum LessonState {
+  IDLE = 'idle',
   HELD = 'held',
-  POSTPONED = 'postponed',
+  CANCELLED = 'cancelled',
 }
 
 @Entity()
@@ -13,17 +13,15 @@ export class Lesson {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column({ type: 'timestamptz' })
-  date: Date
+  @Column({ type: 'date' })
+  date: string
 
   @Column({
     type: 'enum',
     enum: LessonState,
+    default: LessonState.IDLE,
   })
   state: LessonState
-
-  @ManyToOne(() => Teacher)
-  teacher: Teacher
 
   @ManyToOne(() => Contract)
   contract: Contract

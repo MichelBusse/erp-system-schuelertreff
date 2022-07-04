@@ -99,7 +99,7 @@ const PrivateCustomers: React.FC = () => {
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} style={{ minHeight: '100vh' }}>
       <div style={{ flexGrow: 1 }}>
         <DataGrid
           localeText={dataGridLocaleText}
