@@ -17,7 +17,7 @@ import { Role } from 'src/auth/role.enum'
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
-import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
+import { CreateSchoolDto } from './dto/create-school.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
 import { UpdatePrivateCustomerDto } from './dto/update-privateCustomer.dto'
 import { UpdateTeacherDto } from './dto/update-teacher.dto'
@@ -26,7 +26,7 @@ import {
   ClassCustomer,
   Customer,
   PrivateCustomer,
-  SchoolCustomer,
+  School,
   Teacher,
   User,
 } from './entities'
@@ -61,17 +61,17 @@ export class UsersController {
   }
 
   @Public()
-  @Get('classCustomer/:schoolCustomerId')
+  @Get('classCustomer/:schoolId')
   findAllClassesOfSchool(
-    @Param('schoolCustomerId') schoolCustomerId: number,
+    @Param('schoolId') schoolId: number,
   ): Promise<ClassCustomer[]> {
-    return this.usersService.findAllClassesOfSchool(schoolCustomerId)
+    return this.usersService.findAllClassesOfSchool(schoolId)
   }
 
-  @Get('schoolCustomer')
+  @Get('school')
   @Public()
-  findAllSchoolCustomers(): Promise<SchoolCustomer[]> {
-    return this.usersService.findAllSchoolCustomers()
+  findAllSchools(): Promise<School[]> {
+    return this.usersService.findAllSchools()
   }
 
   @Get('teacher')
@@ -79,11 +79,11 @@ export class UsersController {
     return this.usersService.findAppliedTeachers()
   }
 
-  @Get('schoolCustomer/:id')
+  @Get('school/:id')
   @Public()
   //@Roles(Role.ADMIN)
-  findOneSchoolCustomer(@Param('id') id: number): Promise<SchoolCustomer> {
-    return this.usersService.findOneSchoolCustomer(id)
+  findOneSchool(@Param('id') id: number): Promise<School> {
+    return this.usersService.findOneSchool(id)
   }
 
   @Get('privateCustomer/me')
@@ -133,15 +133,13 @@ export class UsersController {
     return this.usersService.createClassCustomer(dto)
   }
 
-  @Post('schoolCustomer')
+  @Post('school')
   @Roles(Role.ADMIN)
-  async createSchoolCustomer(
-    @Body() dto: CreateSchoolCustomerDto,
-  ): Promise<SchoolCustomer> {
+  async createSchool(@Body() dto: CreateSchoolDto): Promise<School> {
     if (await this.usersService.checkDuplicateEmail(dto.email))
       throw new BadRequestException('Email ist bereits im System registriert.')
 
-    return this.usersService.createSchoolCustomer(dto)
+    return this.usersService.createSchool(dto)
   }
 
   @Post('teacher')

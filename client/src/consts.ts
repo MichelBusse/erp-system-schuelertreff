@@ -60,7 +60,7 @@ export const teacherStateToString: { [key in TeacherState]: string } = {
   deleted: 'Gelöscht',
 }
 
-export const defaultSchoolCustomerFormData = {
+export const defaultSchoolFormData = {
   schoolName: '',
   city: '',
   postalCode: '',

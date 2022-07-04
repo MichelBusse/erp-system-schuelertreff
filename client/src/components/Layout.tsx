@@ -34,7 +34,7 @@ const menuItems = [
   {
     icon: AccountBalanceIcon,
     text: 'Schulen',
-    href: '/schoolCustomers',
+    href: '/schools',
     roles: ['admin'],
   },
   {

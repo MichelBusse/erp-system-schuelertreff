@@ -17,17 +17,14 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
-import {
-  defaultClassCustomerFormData,
-  defaultSchoolCustomerFormData,
-} from '../consts'
+import { defaultClassCustomerFormData, defaultSchoolFormData } from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { SchoolType } from '../types/enums'
-import { classCustomerForm, schoolCustomerForm } from '../types/form'
+import { classCustomerForm, schoolForm } from '../types/form'
 import timeAvailable from '../types/timeAvailable'
 import { timesAvailableParsed } from '../types/user'
 
-const SchoolCustomerDetailView: React.FC = () => {
+const SchoolDetailView: React.FC = () => {
   const { API } = useAuth()
   const { id } = useParams()
   const navigate = useNavigate()
@@ -35,16 +32,14 @@ const SchoolCustomerDetailView: React.FC = () => {
   const requestedId = id ? id : 'me'
 
   const [classCustomers, setClassCustomers] = useState<classCustomerForm[]>([])
-  const [schoolCustomer, setSchoolCustomer] = useState<schoolCustomerForm>(
-    defaultSchoolCustomerFormData,
-  )
+  const [school, setSchool] = useState<schoolForm>(defaultSchoolFormData)
   const [newClassCustomer, setNewClassCustomer] = useState<classCustomerForm>(
     defaultClassCustomerFormData,
   )
 
   useEffect(() => {
-    API.get('users/schoolCustomer/' + requestedId).then((res) => {
-      setSchoolCustomer((data) => ({
+    API.get('users/school/' + requestedId).then((res) => {
+      setSchool((data) => ({
         ...data,
         schoolName: res.data.schoolName,
         city: res.data.city,
@@ -159,15 +154,14 @@ const SchoolCustomerDetailView: React.FC = () => {
       >
         <Stack direction="column" alignItems={'stretch'}>
           <h1>
-            {schoolCustomer.schoolName} (
-            {schoolCustomer.schoolTypes.map((Type) => Type + ' ')})
+            {school.schoolName} ({school.schoolTypes.map((Type) => Type + ' ')})
           </h1>
           <h3>Adresse:</h3>
           <Stack direction="row" columnGap={2}>
             <TextField
               label="Straße"
               fullWidth={true}
-              value={schoolCustomer.street}
+              value={school.street}
               InputProps={{
                 readOnly: false,
               }}
@@ -175,7 +169,7 @@ const SchoolCustomerDetailView: React.FC = () => {
             <TextField
               label="Postleitzahl"
               fullWidth={true}
-              value={schoolCustomer.postalCode}
+              value={school.postalCode}
               InputProps={{
                 readOnly: false,
               }}
@@ -183,7 +177,7 @@ const SchoolCustomerDetailView: React.FC = () => {
             <TextField
               label="Stadt"
               fullWidth={true}
-              value={schoolCustomer.city}
+              value={school.city}
               InputProps={{
                 readOnly: false,
               }}
@@ -191,16 +185,12 @@ const SchoolCustomerDetailView: React.FC = () => {
           </Stack>
           <h3>Kontakt:</h3>
           <Stack direction="row" columnGap={2}>
-            <TextField
-              fullWidth={true}
-              label="Email"
-              value={schoolCustomer.email}
-            />
+            <TextField fullWidth={true} label="Email" value={school.email} />
 
             <TextField
               fullWidth={true}
               label="Telefonnummer"
-              value={schoolCustomer.phone}
+              value={school.phone}
             />
           </Stack>
           <h3>Klassen:</h3>
@@ -293,7 +283,7 @@ const SchoolCustomerDetailView: React.FC = () => {
                   size="small"
                   sx={{ width: '25%' }}
                   id="schoolTypes"
-                  options={schoolCustomer.schoolTypes}
+                  options={school.schoolTypes}
                   getOptionLabel={(option) => {
                     switch (option) {
                       case SchoolType.GRUNDSCHULE:
@@ -345,7 +335,7 @@ const SchoolCustomerDetailView: React.FC = () => {
             {id && (
               <Button
                 onClick={() => {
-                  navigate('/schoolCustomers')
+                  navigate('/schools')
                 }}
                 variant="outlined"
               >
@@ -372,4 +362,4 @@ const SchoolCustomerDetailView: React.FC = () => {
   )
 }
 
-export default SchoolCustomerDetailView
+export default SchoolDetailView

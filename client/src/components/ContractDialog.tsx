@@ -31,7 +31,7 @@ import React, { useEffect, useState } from 'react'
 import { snackbarOptionsError } from '../consts'
 import { ContractState } from '../types/contract'
 import subject from '../types/subject'
-import { customer, schoolCustomer, teacher } from '../types/user'
+import { customer, school, teacher } from '../types/user'
 import { getNextDow } from '../utils/date'
 import { useAuth } from './AuthProvider'
 import BetterTimePicker from './BetterTimePicker'
@@ -52,7 +52,7 @@ type suggestion = {
 }
 
 type form0 = {
-  schoolCustomer: {
+  school: {
     id: number
     schoolName: string
   } | null
@@ -100,12 +100,12 @@ const ContractDialog: React.FC<Props> = ({
   const [form9, setForm9] = useState<string>('')
 
   // step 0
-  const [schoolCustomers, setSchoolCustomers] = useState<schoolCustomer[]>([])
+  const [schools, setSchools] = useState<school[]>([])
   const [customers, setCustomers] = useState<customer[]>([])
   const [subjects, setSubjects] = useState<subject[]>([])
   const [loading0, setLoading0] = useState(false)
   const [form0, setForm0] = useState<form0>({
-    schoolCustomer: {
+    school: {
       id: 0,
       schoolName: '',
     },
@@ -164,11 +164,11 @@ const ContractDialog: React.FC<Props> = ({
         .finally(() => setLoading9(false))
     }
 
-    if (form9 === 'schoolCustomer') {
+    if (form9 === 'school') {
       console.log('drin2')
       // get customers, subjects from DB
-      API.get('users/schoolCustomer')
-        .then((res) => setSchoolCustomers(res.data))
+      API.get('users/school')
+        .then((res) => setSchools(res.data))
         .catch((err) => {
           console.error(err)
           enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
@@ -195,7 +195,7 @@ const ContractDialog: React.FC<Props> = ({
     form0.endDate
   )
 
-  const activateClassSelect = !!(form0.schoolCustomer.id != 0)
+  const activateClassSelect = !!(form0.school.id != 0)
 
   const loadClasses = (id: number) => {
     API.get('users/classCustomer/' + id)
@@ -344,18 +344,18 @@ const ContractDialog: React.FC<Props> = ({
     )
   }
 
-  const schoolCustomerSelect = () => {
+  const schoolSelect = () => {
     return (
       <>
         <Autocomplete
           fullWidth
           size="small"
-          options={schoolCustomers}
+          options={schools}
           getOptionLabel={(o) => o.schoolName}
           isOptionEqualToValue={(option, value) => option.id === value.id}
-          value={form0.schoolCustomer}
+          value={form0.school}
           onChange={(_, value) => {
-            setForm0((data) => ({ ...data, schoolCustomer: value }))
+            setForm0((data) => ({ ...data, school: value }))
             loadClasses(value.id)
           }}
           renderInput={(params) => (
@@ -398,8 +398,8 @@ const ContractDialog: React.FC<Props> = ({
     if (form9 === 'privateCustomer') {
       return privateCustomerSelect()
     }
-    if (form9 === 'schoolCustomer') {
-      return schoolCustomerSelect()
+    if (form9 === 'school') {
+      return schoolSelect()
     }
   }
 
@@ -424,7 +424,7 @@ const ContractDialog: React.FC<Props> = ({
               onChange={handleChange9}
             >
               <MenuItem value={'privateCustomer'}>Privatkunde</MenuItem>
-              <MenuItem value={'schoolCustomer'}>Schule</MenuItem>
+              <MenuItem value={'school'}>Schule</MenuItem>
             </Select>
           </FormControl>
         </Stack>

@@ -11,7 +11,7 @@ export class CreateClassCustomerDto {
   numberOfStudents: number
 
   @IsInt()
-  schoolCustomer: number
+  school: number
 
   @IsArray()
   @Type(() => timeAvailable)

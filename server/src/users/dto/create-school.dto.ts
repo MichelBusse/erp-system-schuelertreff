@@ -2,7 +2,7 @@ import { IsNotEmpty } from 'class-validator'
 
 import { CreateUserDto } from './create-user.dto'
 
-export class CreateSchoolCustomerDto extends CreateUserDto {
+export class CreateSchoolDto extends CreateUserDto {
   @IsNotEmpty()
   schoolName: string
 }

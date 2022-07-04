@@ -13,9 +13,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../components/AuthProvider'
-import SchoolCustomerDialog from '../components/SchoolCustomerDialog'
+import SchoolDialog from '../components/SchoolDialog'
 import { dataGridLocaleText } from '../consts'
-import { schoolCustomer } from '../types/user'
+import { school } from '../types/user'
 import styles from './gridList.module.scss'
 
 //definition of the columns
@@ -63,9 +63,9 @@ const cols: GridColumns = [
   },
 ]
 
-const SchoolCustomers: React.FC = () => {
+const Schools: React.FC = () => {
   const [open, setOpen] = useState(false)
-  const [customers, setCustomers] = useState<schoolCustomer[]>([])
+  const [customers, setCustomers] = useState<school[]>([])
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -73,7 +73,7 @@ const SchoolCustomers: React.FC = () => {
 
   //Get subjects, teachers from DB
   useEffect(() => {
-    API.get(`users/schoolCustomer`).then((res) => setCustomers(res.data))
+    API.get(`users/school`).then((res) => setCustomers(res.data))
   }, [location])
 
   //creating rows out of the teachers
@@ -125,13 +125,9 @@ const SchoolCustomers: React.FC = () => {
         />
       </div>
 
-      <SchoolCustomerDialog
-        open={open}
-        setOpen={setOpen}
-        setCustomers={setCustomers}
-      />
+      <SchoolDialog open={open} setOpen={setOpen} setCustomers={setCustomers} />
     </div>
   )
 }
 
-export default SchoolCustomers
+export default Schools

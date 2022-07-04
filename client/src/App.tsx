@@ -99,12 +99,12 @@ const App: React.FC = () => {
                   }
                 />
               </Route>
-              <Route path="schoolCustomers">
+              <Route path="schools">
                 <Route
                   path=""
                   element={
                     <ProtectedRoute>
-                      <Pages.SchoolCustomers />
+                      <Pages.Schools />
                     </ProtectedRoute>
                   }
                 />
@@ -112,7 +112,7 @@ const App: React.FC = () => {
                   path=":id"
                   element={
                     <ProtectedRoute>
-                      <Pages.SchoolCustomerDetailView />
+                      <Pages.SchoolDetailView />
                     </ProtectedRoute>
                   }
                 />

@@ -8,7 +8,7 @@ import {
   ClassCustomer,
   Customer,
   PrivateCustomer,
-  SchoolCustomer,
+  School,
   Teacher,
   User,
 } from './entities'
@@ -21,7 +21,7 @@ import { UsersService } from './users.service'
       User,
       Customer,
       PrivateCustomer,
-      SchoolCustomer,
+      School,
       Teacher,
       Admin,
       ClassCustomer,

@@ -10,37 +10,31 @@ import {
 } from '@mui/material'
 import { useState } from 'react'
 
-import { useAuth } from '../components/AuthProvider'
-import { defaultSchoolCustomerFormData } from '../consts'
+import { defaultSchoolFormData } from '../consts'
 import { SchoolType } from '../types/enums'
-import { schoolCustomerForm } from '../types/form'
-import { schoolCustomer } from '../types/user'
+import { schoolForm } from '../types/form'
+import { school } from '../types/user'
 import { formValidation } from '../utils/formValidation'
+import { useAuth } from './AuthProvider'
 
 type Props = {
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
-  setCustomers: React.Dispatch<React.SetStateAction<schoolCustomer[]>>
+  setCustomers: React.Dispatch<React.SetStateAction<school[]>>
 }
 
-const SchoolCustomerDialog: React.FC<Props> = ({
-  open,
-  setOpen,
-  setCustomers,
-}) => {
-  const [data, setData] = useState<schoolCustomerForm>(
-    defaultSchoolCustomerFormData,
-  )
-  const [errors, setErrors] = useState(defaultSchoolCustomerFormData)
+const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
+  const [data, setData] = useState<schoolForm>(defaultSchoolFormData)
+  const [errors, setErrors] = useState(defaultSchoolFormData)
 
   const { API } = useAuth()
 
   //TODO: validate filled fields
   const submitForm = () => {
-    setErrors(formValidation('schoolCustomer', data))
+    setErrors(formValidation('school', data))
 
-    if (formValidation('schoolCustomer', data).validation)
-      API.post(`users/schoolCustomer`, data).then((res) => {
+    if (formValidation('school', data).validation)
+      API.post(`users/school`, data).then((res) => {
         setCustomers((s) => [...s, res.data])
         setOpen(false)
       })
@@ -48,8 +42,8 @@ const SchoolCustomerDialog: React.FC<Props> = ({
 
   const closeForm = () => {
     setOpen(false)
-    setData(defaultSchoolCustomerFormData)
-    setErrors(defaultSchoolCustomerFormData)
+    setData(defaultSchoolFormData)
+    setErrors(defaultSchoolFormData)
   }
 
   return (
@@ -186,4 +180,4 @@ const SchoolCustomerDialog: React.FC<Props> = ({
   )
 }
 
-export default SchoolCustomerDialog
+export default SchoolDialog

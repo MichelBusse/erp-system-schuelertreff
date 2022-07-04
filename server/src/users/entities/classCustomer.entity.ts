@@ -3,11 +3,11 @@ import { ChildEntity, Column, ManyToOne } from 'typeorm'
 import { Role } from 'src/auth/role.enum'
 
 import { Customer } from './customer.entity'
-import { SchoolCustomer } from './schoolCustomer.entity'
+import { School } from './school.entity'
 
 @ChildEntity()
 export class ClassCustomer extends Customer {
-  role = Role.CLASS
+  role = Role.CLASSCUSTOMER
 
   @Column()
   className: string
@@ -15,6 +15,6 @@ export class ClassCustomer extends Customer {
   @Column()
   numberOfStudents: number
 
-  @ManyToOne(() => SchoolCustomer)
-  schoolCustomer: SchoolCustomer
+  @ManyToOne(() => School)
+  school: School
 }

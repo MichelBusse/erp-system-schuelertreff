@@ -5,8 +5,8 @@ import { Role } from 'src/auth/role.enum'
 import { User } from './user.entity'
 
 @ChildEntity()
-export class SchoolCustomer extends User {
-  role = Role.SCHOOLCUSTOMER
+export class School extends User {
+  role = Role.SCHOOL
 
   @Column()
   schoolName: string

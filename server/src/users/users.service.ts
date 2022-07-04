@@ -9,7 +9,7 @@ import { Contract } from 'src/contracts/contract.entity'
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
-import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
+import { CreateSchoolDto } from './dto/create-school.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
 import { timeAvailable } from './dto/timeAvailable'
 import { UpdatePrivateCustomerDto } from './dto/update-privateCustomer.dto'
@@ -20,7 +20,7 @@ import {
   ClassCustomer,
   Customer,
   PrivateCustomer,
-  SchoolCustomer,
+  School,
   Teacher,
   User,
 } from './entities'
@@ -91,8 +91,8 @@ export class UsersService {
     @InjectRepository(ClassCustomer)
     private readonly classCustomersRepository: Repository<ClassCustomer>,
 
-    @InjectRepository(SchoolCustomer)
-    private readonly schoolCustomersRepository: Repository<SchoolCustomer>,
+    @InjectRepository(School)
+    private readonly schoolsRepository: Repository<School>,
 
     @InjectRepository(Admin)
     private readonly adminsRepository: Repository<Admin>,
@@ -161,8 +161,8 @@ export class UsersService {
     return this.classCustomersRepository.find().then(transformUsers)
   }
 
-  async findAllSchoolCustomers(): Promise<SchoolCustomer[]> {
-    return this.schoolCustomersRepository.find().then(transformUsers)
+  async findAllSchools(): Promise<School[]> {
+    return this.schoolsRepository.find().then(transformUsers)
   }
 
   async findAppliedTeachers(): Promise<Teacher[]> {
@@ -186,8 +186,8 @@ export class UsersService {
     return this.privateCustomersRepository.findOneOrFail(id).then(transformUser)
   }
 
-  async findOneSchoolCustomer(id: number): Promise<SchoolCustomer> {
-    return this.schoolCustomersRepository.findOneOrFail(id).then(transformUser)
+  async findOneSchool(id: number): Promise<School> {
+    return this.schoolsRepository.findOneOrFail(id).then(transformUser)
   }
 
   async findOneTeacher(id: number): Promise<Teacher> {
@@ -198,26 +198,24 @@ export class UsersService {
       .then(transformUser)
   }
 
-  async findAllClassesOfSchool(
-    schoolCustomerId?: number,
-  ): Promise<ClassCustomer[]> {
+  async findAllClassesOfSchool(schoolId?: number): Promise<ClassCustomer[]> {
     const q = this.classCustomersRepository
       .createQueryBuilder('c')
-      .leftJoin('c.schoolCustomer', 'schoolCustomer')
+      .leftJoin('c.school', 'school')
       .select([
         'c',
-        'schoolCustomer.id',
-        'schoolCustomer.street',
-        'schoolCustomer.city',
-        'schoolCustomer.postalCode',
-        'schoolCustomer.schoolName',
-        'schoolCustomer.schoolTypes',
+        'school.id',
+        'school.street',
+        'school.city',
+        'school.postalCode',
+        'school.schoolName',
+        'school.schoolTypes',
       ])
       // .loadAllRelationIds({
       //   relations: ['teacher'],
       // })
-      .where('c.schoolCustomerId = :schoolCustomerId', {
-        schoolCustomerId: schoolCustomerId,
+      .where('c.schoolId = :schoolId', {
+        schoolId: schoolId,
       })
 
     return q.getMany().then(transformUsers)
@@ -259,21 +257,19 @@ export class UsersService {
       postalCode: null,
       email: null,
       phone: null,
-      schoolCustomer: { id: dto.schoolCustomer },
+      school: { id: dto.school },
     })
 
     return this.classCustomersRepository.save(classCustomer)
   }
 
-  async createSchoolCustomer(
-    dto: CreateSchoolCustomerDto,
-  ): Promise<SchoolCustomer> {
-    const schoolCustomer = this.schoolCustomersRepository.create({
+  async createSchool(dto: CreateSchoolDto): Promise<School> {
+    const school = this.schoolsRepository.create({
       ...dto,
       mayAuthenticate: false,
     })
 
-    return this.schoolCustomersRepository.save(schoolCustomer)
+    return this.schoolsRepository.save(school)
   }
 
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
