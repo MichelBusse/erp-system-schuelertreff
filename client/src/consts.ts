@@ -3,7 +3,6 @@ import { OptionsObject as SnackbarOptions } from 'notistack'
 
 import { TeacherState } from './types/enums'
 import { privateCustomerForm, teacherForm } from './types/form'
-import subject from './types/subject'
 
 export const dataGridLocaleText: Partial<GridLocaleText> = {
   filterPanelColumns: 'Spalte',
@@ -21,11 +20,12 @@ export const defaultTeacherFormData: teacherForm = {
   street: '',
   email: '',
   phone: '',
-  subjects: [] as subject[],
+  subjects: [],
   fee: null,
   degree: '',
   schoolTypes: [],
   timesAvailable: [],
+  state: TeacherState.CREATED
 }
 
 export const defaultPrivateCustomerFormData: privateCustomerForm = {

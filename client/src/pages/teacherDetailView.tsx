@@ -42,22 +42,24 @@ import { formValidation } from '../utils/formValidation'
 dayjs.extend(customParseFormat)
 
 const TeacherDetailView: React.FC = () => {
-  const { API } = useAuth()
+  const { API, decodeToken } = useAuth()
   const { id } = useParams()
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
 
   const [subjects, setSubjects] = useState<subject[]>([])
   const [dialogOpen, setDialogOpen] = useState<boolean>(false)
-
-  useEffect(() => {
-    API.get(`subjects`).then((res) => setSubjects(res.data))
-  }, [])
-
-  const requestedId = id ? id : 'me'
-
   const [data, setData] = useState<teacherForm>(defaultTeacherFormData)
   const [errors, setErrors] = useState(defaultTeacherFormData)
+
+  const requestedId = id ?? 'me'
+  const activeTeacherState = decodeToken().state
+
+  // refresh data if teacher state is updated (i.e. application accepted)
+  useEffect(() => {
+    API.get(`subjects`).then((res) => setSubjects(res.data))
+    API.get('users/teacher/' + requestedId).then((res) => updateData(res.data))
+  }, [activeTeacherState])
 
   const updateData = (newData: teacher) => {
     //Convert default value to "Immer verfügbar" in list
@@ -90,10 +92,6 @@ const TeacherDetailView: React.FC = () => {
       timesAvailable: newTimesAvailable,
     })
   }
-
-  useEffect(() => {
-    API.get('users/teacher/' + requestedId).then((res) => updateData(res.data))
-  }, [])
 
   const submitForm = (override: Partial<teacherForm> = {}) => {
     setErrors(formValidation('teacher', data))

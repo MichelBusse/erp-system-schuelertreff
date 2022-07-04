@@ -8,6 +8,8 @@ import {
 import { Box, useTheme } from '@mui/material'
 import { Outlet } from 'react-router-dom'
 
+import { TeacherState } from '../types/enums'
+import { useAuth } from './AuthProvider'
 import MainMenu from './MainMenu'
 
 const menuItems = [
@@ -50,10 +52,18 @@ const menuItems = [
 
 const Layout: React.FC = () => {
   const theme = useTheme()
+  const { isAuthed, decodeToken } = useAuth()
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <MainMenu items={menuItems} />
+      {
+        // hide menu for non-employed teachers
+        !(
+          isAuthed() &&
+          decodeToken().role === 'teacher' &&
+          decodeToken().state !== TeacherState.EMPLOYED
+        ) && <MainMenu items={menuItems} />
+      }
       <Box
         component="main"
         sx={{

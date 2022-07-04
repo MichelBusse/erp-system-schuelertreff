@@ -16,6 +16,7 @@ export type JwtType = {
   sub: number
   username: string
   role: string
+  state?: string
 }
 
 export type AuthContextValue = {
@@ -98,6 +99,9 @@ const AuthProvider: React.FC = ({ children }) => {
       })
       .catch((err) => {
         console.error('error while refreshing token:', err)
+
+        if (axios.isAxiosError(err) && err.response?.status === 500)
+          handleLogout()
       })
   }
 

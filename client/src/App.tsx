@@ -5,14 +5,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { SnackbarProvider } from 'notistack'
-import { useEffect } from 'react'
-import {
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
 import { useAuth } from './components/AuthProvider'
 import Layout from './components/Layout'
@@ -27,24 +20,18 @@ const ProtectedRoute: React.FC<{ roles?: Role[] }> = ({
   children,
   roles = [],
 }) => {
-  const { isAuthed, hasRole, decodeToken, API } = useAuth()
+  const { isAuthed, hasRole, decodeToken } = useAuth()
   const location = useLocation()
-  const navigate = useNavigate()
 
-  useEffect(() => {
-    // force non-employed teacher to /application
-    if (
-      location.pathname !== '/application' &&
-      isAuthed() &&
-      hasRole(Role.TEACHER)
-    ) {
-      API.get('users/teacher/me').then((res) => {
-        if ((res.data.state as TeacherState) !== TeacherState.EMPLOYED) {
-          navigate('/application', { replace: true })
-        }
-      })
-    }
-  }, [])
+  // force non-employed teacher to profile page
+  if (
+    location.pathname !== '/profile' &&
+    isAuthed() &&
+    hasRole(Role.TEACHER) &&
+    decodeToken().state !== TeacherState.EMPLOYED
+  ) {
+    return <Navigate to="/profile" replace />
+  }
 
   if (!isAuthed()) {
     return <Navigate to="/login" replace state={{ from: location }} />
@@ -155,15 +142,6 @@ const App: React.FC = () => {
                 }
               />
             </Route>
-
-            <Route
-              path="application"
-              element={
-                <ProtectedRoute roles={[Role.TEACHER]}>
-                  <Pages.TeacherDetailView />
-                </ProtectedRoute>
-              }
-            />
 
             <Route
               path="login"
