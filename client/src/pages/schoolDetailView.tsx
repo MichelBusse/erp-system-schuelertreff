@@ -1,5 +1,5 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from '@mui/icons-material/Delete'
 import {
   Accordion,
   AccordionDetails,
@@ -188,7 +188,7 @@ const SchoolDetailView: React.FC = () => {
           setNewClassCustomer(defaultClassCustomerFormData)
           enqueueSnackbar('Klasse erfolgreich hinzugefügt')
         })
-        .catch((res) => {
+        .catch(() => {
           enqueueSnackbar('Fehler beim Erstellen der Klasse')
         })
     } else {
@@ -299,9 +299,15 @@ const SchoolDetailView: React.FC = () => {
               value={school.phone}
             />
           </Stack>
-          <Stack direction={"row"} columnGap={2}><h3>Klassen:</h3><IconButton sx={{marginLeft: 'auto'}} onClick={() => setAddClassDialogOpen(true)}>
-                  <AddCircleIcon fontSize="large" color="primary" />
-                </IconButton></Stack>
+          <Stack direction={'row'} columnGap={2}>
+            <h3>Klassen:</h3>
+            <IconButton
+              sx={{ marginLeft: 'auto' }}
+              onClick={() => setAddClassDialogOpen(true)}
+            >
+              <AddCircleIcon fontSize="large" color="primary" />
+            </IconButton>
+          </Stack>
           {classCustomers.map((classCustomer, index) => (
             <Accordion
               key={classCustomer.className}
@@ -310,7 +316,7 @@ const SchoolDetailView: React.FC = () => {
                 boxShadow: 'none',
                 transition: 'none',
                 borderRadius: '4px',
-                margin: '4px 0'
+                margin: '4px 0',
               }}
             >
               <AccordionSummary
@@ -335,7 +341,7 @@ const SchoolDetailView: React.FC = () => {
                     sx={{ marginLeft: 'auto' }}
                     color="error"
                   >
-                    <DeleteIcon/>
+                    <DeleteIcon />
                   </IconButton>
                 </Stack>
               </AccordionSummary>

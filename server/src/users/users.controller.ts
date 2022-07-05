@@ -220,7 +220,7 @@ export class UsersController {
   async deletePrivateCustomer(@Param('id') id: number): Promise<void> {
     return this.usersService.deleteCustomer(id)
   }
-  
+
   @Delete('school/:id')
   @Roles(Role.ADMIN)
   async deletSchool(@Param('id') id: number): Promise<void> {

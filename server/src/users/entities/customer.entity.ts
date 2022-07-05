@@ -1,9 +1,6 @@
-import { ChildEntity, Column } from 'typeorm'
+import { ChildEntity } from 'typeorm'
 
 import { User } from './user.entity'
 
-
 @ChildEntity()
-export abstract class Customer extends User {
-
-}
+export abstract class Customer extends User {}

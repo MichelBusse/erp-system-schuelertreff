@@ -73,7 +73,6 @@ export abstract class User {
   })
   timesAvailable: string
 
-
   @Column({
     type: 'enum',
     enum: DeleteState,

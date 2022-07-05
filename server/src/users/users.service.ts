@@ -1,4 +1,4 @@
-import { BadRequestException, Delete, Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
 import * as argon2 from 'argon2'
 import dayjs from 'dayjs'
@@ -12,7 +12,9 @@ import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolDto } from './dto/create-school.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
 import { timeAvailable } from './dto/timeAvailable'
+import { UpdateClassCustomerDto } from './dto/update-classCustomer.dto'
 import { UpdatePrivateCustomerDto } from './dto/update-privateCustomer.dto'
+import { UpdateSchoolDto } from './dto/update-school.dto'
 import { UpdateTeacherDto } from './dto/update-teacher.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import {
@@ -26,8 +28,6 @@ import {
 } from './entities'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
-import { UpdateSchoolDto } from './dto/update-school.dto'
-import { UpdateClassCustomerDto } from './dto/update-classCustomer.dto'
 
 /**
  * Format Array of {@link timeAvailable} as Postgres `tstzmultirange`
@@ -321,7 +321,7 @@ export class UsersService {
     dto: UpdateClassCustomerDto,
   ): Promise<ClassCustomer> {
     const user = await this.findOne(id)
-    
+
     return this.classCustomersRepository.save({
       ...user,
       ...dto,
@@ -452,7 +452,7 @@ export class UsersService {
       .select('c')
       .from(ClassCustomer, 'c')
       .leftJoin('c.school', 's')
-      .where('s.id = :id', {id: id})
+      .where('s.id = :id', { id: id })
 
     const classCustomers = await classCustomerQuery.getMany()
     let allowedToRemove = true
