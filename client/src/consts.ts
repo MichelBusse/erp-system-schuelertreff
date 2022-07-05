@@ -71,6 +71,7 @@ export const defaultSchoolFormData = {
 }
 
 export const defaultClassCustomerFormData = {
+  id: -1,
   className: '',
   numberOfStudents: 0,
   grade: 0,

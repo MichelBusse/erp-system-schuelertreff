@@ -19,7 +19,9 @@ import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolDto } from './dto/create-school.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
+import { UpdateClassCustomerDto } from './dto/update-classCustomer.dto'
 import { UpdatePrivateCustomerDto } from './dto/update-privateCustomer.dto'
+import { UpdateSchoolDto } from './dto/update-school.dto'
 import { UpdateTeacherDto } from './dto/update-teacher.dto'
 import {
   Admin,
@@ -51,16 +53,14 @@ export class UsersController {
 
   @Get('privateCustomer')
   findAppliedPrivateCustomers(): Promise<PrivateCustomer[]> {
-    return this.usersService.findAppliedPrivateCustomers()
+    return this.usersService.findPrivateCustomers()
   }
 
-  @Public()
   @Get('classCustomer')
   findAllClassCustomers(): Promise<ClassCustomer[]> {
-    return this.usersService.findAllClassCustomers()
+    return this.usersService.findClassCustomers()
   }
 
-  @Public()
   @Get('classCustomer/:schoolId')
   findAllClassesOfSchool(
     @Param('schoolId') schoolId: number,
@@ -69,14 +69,13 @@ export class UsersController {
   }
 
   @Get('school')
-  @Public()
   findAllSchools(): Promise<School[]> {
-    return this.usersService.findAllSchools()
+    return this.usersService.findSchools()
   }
 
   @Get('teacher')
   findAppliedTeachers(): Promise<Teacher[]> {
-    return this.usersService.findAppliedTeachers()
+    return this.usersService.findTeachers()
   }
 
   @Get('school/:id')
@@ -108,12 +107,6 @@ export class UsersController {
     return this.usersService.findOneTeacher(id)
   }
 
-  @Delete(':id')
-  @Roles(Role.ADMIN)
-  remove(@Param('id') id: number): Promise<void> {
-    return this.usersService.remove(id)
-  }
-
   @Post('privateCustomer')
   @Roles(Role.ADMIN)
   async createPrivateCustomer(
@@ -140,6 +133,24 @@ export class UsersController {
       throw new BadRequestException('Email ist bereits im System registriert.')
 
     return this.usersService.createSchool(dto)
+  }
+
+  @Post('school/:id')
+  @Roles(Role.ADMIN)
+  async updateSchoolAdmin(
+    @Param('id') id: number,
+    @Body() dto: UpdateSchoolDto,
+  ): Promise<School> {
+    return this.usersService.updateSchoolAdmin(id, dto)
+  }
+
+  @Post('classCustomer/:id')
+  @Roles(Role.ADMIN)
+  async updateClassCustomer(
+    @Param('id') id: number,
+    @Body() dto: UpdateClassCustomerDto,
+  ): Promise<ClassCustomer> {
+    return this.usersService.updateClassCustomerAdmin(id, dto)
   }
 
   @Post('teacher')
@@ -207,7 +218,19 @@ export class UsersController {
   @Delete('privateCustomer/:id')
   @Roles(Role.ADMIN)
   async deletePrivateCustomer(@Param('id') id: number): Promise<void> {
-    return this.usersService.deletePrivateCustomer(id)
+    return this.usersService.deleteCustomer(id)
+  }
+  
+  @Delete('school/:id')
+  @Roles(Role.ADMIN)
+  async deletSchool(@Param('id') id: number): Promise<void> {
+    return this.usersService.deleteSchool(id)
+  }
+
+  @Delete('classCustomer/:id')
+  @Roles(Role.ADMIN)
+  async deletClassCustomer(@Param('id') id: number): Promise<void> {
+    return this.usersService.deleteCustomer(id)
   }
 
   @Post('admin')

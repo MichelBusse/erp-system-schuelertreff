@@ -2,7 +2,7 @@ import { ChildEntity, Column } from 'typeorm'
 
 import { Role } from 'src/auth/role.enum'
 
-import { User } from './user.entity'
+import { SchoolType, User } from './user.entity'
 
 @ChildEntity()
 export class School extends User {
@@ -10,4 +10,12 @@ export class School extends User {
 
   @Column()
   schoolName: string
+
+  @Column({
+    type: 'enum',
+    enum: SchoolType,
+    array: true,
+    default: '{}',
+  })
+  schoolTypes: SchoolType[]
 }

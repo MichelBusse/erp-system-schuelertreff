@@ -32,10 +32,9 @@ export interface schoolForm
 }
 
 export interface classCustomerForm {
+  id: number
   className: string
   numberOfStudents: number
-  grade: number
-  schoolTypes: string[]
   timesAvailable: timeAvailable[]
 }
 

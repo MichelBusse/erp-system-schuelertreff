@@ -12,22 +12,29 @@ import {
 import Box from '@mui/material/Box'
 import dayjs from 'dayjs'
 import { nanoid } from 'nanoid'
+import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
-import { defaultClassCustomerFormData, defaultSchoolFormData } from '../consts'
+import {
+  defaultClassCustomerFormData,
+  defaultSchoolFormData,
+  snackbarOptions,
+  snackbarOptionsError,
+} from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { SchoolType } from '../types/enums'
 import { classCustomerForm, schoolForm } from '../types/form'
 import timeAvailable from '../types/timeAvailable'
-import { timesAvailableParsed } from '../types/user'
+import { classCustomer, timesAvailableParsed } from '../types/user'
 
 const SchoolDetailView: React.FC = () => {
   const { API } = useAuth()
   const { id } = useParams()
   const navigate = useNavigate()
+  const { enqueueSnackbar } = useSnackbar()
 
   const requestedId = id ? id : 'me'
 
@@ -55,7 +62,7 @@ const SchoolDetailView: React.FC = () => {
   useEffect(() => {
     API.get('users/classCustomer/' + requestedId).then((res) => {
       setClassCustomers([])
-      res.data.map((classCustomer: any) => {
+      res.data.map((classCustomer: classCustomer) => {
         const newTimesAvailable =
           classCustomer.timesAvailableParsed.length === 1 &&
           classCustomer.timesAvailableParsed[0].dow === 1 &&
@@ -74,11 +81,10 @@ const SchoolDetailView: React.FC = () => {
         setClassCustomers((data: classCustomerForm[]) => [
           ...data,
           {
+            id: classCustomer.id,
             className: classCustomer.className,
             numberOfStudents: classCustomer.numberOfStudents,
-            grade: classCustomer.grade,
             timesAvailable: newTimesAvailable,
-            schoolTypes: classCustomer.schoolTypes,
           },
         ])
       })
@@ -86,54 +92,99 @@ const SchoolDetailView: React.FC = () => {
   }, [])
 
   const submitForm = () => {
-    //   setErrors(formValidation('privateCustomer', data))
-    //   if (formValidation('privateCustomer', data).validation) {
-    //     API.post('users/privateCustomer/' + requestedId, {
-    //       ...data,
-    //       timesAvailable: data.timesAvailable.map((time) => ({
-    //         dow: time.dow,
-    //         start: time.start?.format('HH:mm'),
-    //         end: time.end?.format('HH:mm'),
-    //       })),
-    //     }).then(() => {
-    //       enqueueSnackbar(data.firstName + ' ' + data.lastName + ' gespeichert')
-    //       if (id) navigate('/privateCustomers')
-    //     })
-    //   }
+    API.post('users/school/' + requestedId, school)
+      .then(() => {
+        enqueueSnackbar(school.schoolName + ' gespeichert')
+        if (id) navigate('/schools')
+      })
+      .catch(() => {
+        enqueueSnackbar('Fehler beim Speichern der Schuldaten')
+      })
   }
 
   const deleteUser = () => {
-    console.log('deletePrivateCustomer')
+    API.delete('users/school/' + requestedId)
+      .then(() => {
+        enqueueSnackbar(school.schoolName + ' gelöscht')
+        navigate('/schools')
+      })
+      .catch(() => {
+        enqueueSnackbar(
+          school.schoolName +
+            ' kann nicht gelöscht werden, da sie noch Klassen hat',
+        )
+      })
   }
 
   const updateClassCustomer = (newValue: timeAvailable[], index: number) => {
-    setClassCustomers((classCustomers) => {
-      const newClassCustomers = [...classCustomers]
-      newClassCustomers[index] = {
-        ...classCustomers[index],
-        timesAvailable: newValue,
-      }
+    const updatedClassCutomer: classCustomerForm = { ...classCustomers[index] }
+    updatedClassCutomer.timesAvailable = newValue
 
-      return newClassCustomers
+    API.post('users/classCustomer/' + updatedClassCutomer.id, {
+      ...updatedClassCutomer,
+      timesAvailable: updatedClassCutomer.timesAvailable.map((time) => ({
+        dow: time.dow,
+        start: time.start?.format('HH:mm'),
+        end: time.end?.format('HH:mm'),
+      })),
     })
+      .then(() => {
+        enqueueSnackbar(updatedClassCutomer.className + ' gespeichert')
+        setClassCustomers((classCustomers) => {
+          const newClassCustomers = [...classCustomers]
+          newClassCustomers[index] = updatedClassCutomer
+
+          return newClassCustomers
+        })
+      })
+      .catch((res) => {
+        console.log(res)
+        enqueueSnackbar('Fehler beim Speichern der Klasse')
+      })
   }
 
   const deleteClass = (index: number) => {
-    setClassCustomers(classCustomers.filter((_, i) => i !== index))
+    const classCustomer = classCustomers[index]
+
+    API.delete('users/classCustomer/' + classCustomer.id)
+      .then(() => {
+        enqueueSnackbar(classCustomer.className + ' gelöscht', snackbarOptions)
+        setClassCustomers(classCustomers.filter((_, i) => i !== index))
+      })
+      .catch(() => {
+        enqueueSnackbar(
+          classCustomer.className +
+            ' kann nicht gelöscht werden, da noch laufende Verträge existieren.',
+          snackbarOptionsError,
+        )
+      })
   }
 
   const addClass = () => {
-    if (
-      newClassCustomer.className &&
-      newClassCustomer.numberOfStudents != 0 &&
-      newClassCustomer.schoolTypes.length != 0
-    ) {
-      setClassCustomers((classCustomers) => [
-        ...classCustomers,
-        newClassCustomer,
-      ])
+    if (newClassCustomer.className && newClassCustomer.numberOfStudents != 0) {
+      API.post('users/classCustomer/', {
+        ...newClassCustomer,
+        school: requestedId,
+        timesAvailable: newClassCustomer.timesAvailable.map((time) => ({
+          dow: time.dow,
+          start: time.start?.format('HH:mm'),
+          end: time.end?.format('HH:mm'),
+        })),
+      })
+        .then(() => {
+          setClassCustomers((classCustomers) => [
+            ...classCustomers,
+            newClassCustomer,
+          ])
 
-      setNewClassCustomer(defaultClassCustomerFormData)
+          setNewClassCustomer(defaultClassCustomerFormData)
+          enqueueSnackbar('Klasse erfolgreich hinzugefügt')
+        })
+        .catch((res) => {
+          enqueueSnackbar('Fehler beim Erstellen der Klasse')
+        })
+    } else {
+      enqueueSnackbar('Eingabe unvollständig')
     }
   }
 
@@ -153,9 +204,55 @@ const SchoolDetailView: React.FC = () => {
         }}
       >
         <Stack direction="column" alignItems={'stretch'}>
-          <h1>
-            {school.schoolName} ({school.schoolTypes.map((Type) => Type + ' ')})
-          </h1>
+          <h3>Schule:</h3>
+          <Stack direction="row" columnGap={2}>
+            <TextField
+              fullWidth={true}
+              label="Schulname"
+              onChange={(event) =>
+                setSchool((data) => ({
+                  ...data,
+                  schoolName: event.target.value,
+                }))
+              }
+              value={school.schoolName}
+              InputProps={{
+                readOnly: requestedId === 'me',
+              }}
+            />
+            <Autocomplete
+              fullWidth
+              multiple
+              id="schoolTypes"
+              options={[
+                SchoolType.GRUNDSCHULE,
+                SchoolType.OBERSCHULE,
+                SchoolType.GYMSEK1,
+                SchoolType.GYMSEK2,
+              ]}
+              getOptionLabel={(option) => {
+                switch (option) {
+                  case SchoolType.GRUNDSCHULE:
+                    return 'Grundschule'
+                  case SchoolType.OBERSCHULE:
+                    return 'Oberschule'
+                  case SchoolType.GYMSEK1:
+                    return 'Gymnasium Sek. 1'
+                  case SchoolType.GYMSEK2:
+                    return 'Gymnasium Sek. 2'
+                  default:
+                    return ''
+                }
+              }}
+              renderInput={(params) => (
+                <TextField {...params} variant="outlined" label="Schularten" />
+              )}
+              value={school.schoolTypes}
+              onChange={(_, value) =>
+                setSchool((data) => ({ ...data, schoolTypes: value }))
+              }
+            />
+          </Stack>
           <h3>Adresse:</h3>
           <Stack direction="row" columnGap={2}>
             <TextField
@@ -193,144 +290,6 @@ const SchoolDetailView: React.FC = () => {
               value={school.phone}
             />
           </Stack>
-          <h3>Klassen:</h3>
-          <Stack direction="column" rowGap={2}>
-            <Box sx={{ bgcolor: 'background.default' }}>
-              {classCustomers.map((classCustomer, index) => (
-                <Accordion key={classCustomer.className}>
-                  <AccordionSummary
-                    aria-controls="panel1a-content"
-                    id="panel1a-header"
-                  >
-                    <Typography sx={{ width: '20%' }}>
-                      {classCustomer.className}
-                    </Typography>
-                    <Typography sx={{ width: '20%', color: 'text.secondary' }}>
-                      {classCustomer.numberOfStudents} Schüler
-                    </Typography>
-                    <Typography sx={{ width: '20%', color: 'text.secondary' }}>
-                      {classCustomer.schoolTypes}
-                    </Typography>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      onClick={() => deleteClass(index)}
-                      sx={{ marginLeft: 'auto' }}
-                      color="error"
-                    >
-                      Entfernen
-                    </Button>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Box>
-                      <AddTimes
-                        value={classCustomer.timesAvailable}
-                        setValue={(newValue) =>
-                          updateClassCustomer(newValue, index)
-                        }
-                      />
-                    </Box>
-                  </AccordionDetails>
-                </Accordion>
-              ))}
-            </Box>
-            <Stack
-              direction="column"
-              rowGap={2}
-              sx={{
-                padding: '15px',
-                backgroundColor: '#D9D9D9',
-                borderRadius: '5px',
-              }}
-            >
-              <Typography sx={{ fontWeight: 'bold' }}>
-                Klasse hinzufügen
-              </Typography>
-              <Stack direction="row" columnGap={2}>
-                <TextField
-                  size="small"
-                  id="className"
-                  label="Klassenname"
-                  variant="outlined"
-                  required={true}
-                  sx={{ width: '15%' }}
-                  value={newClassCustomer.className}
-                  onChange={(event) =>
-                    setNewClassCustomer((data) => ({
-                      ...data,
-                      className: event.target.value,
-                    }))
-                  }
-                />
-                <TextField
-                  size="small"
-                  type="number"
-                  id="numberOfStudents"
-                  label="Schüler"
-                  variant="outlined"
-                  sx={{ width: '7%' }}
-                  value={newClassCustomer.numberOfStudents}
-                  InputProps={{ inputProps: { min: 0, max: 50 } }}
-                  onChange={(event) =>
-                    setNewClassCustomer((data) => ({
-                      ...data,
-                      numberOfStudents: Number(event.target.value),
-                    }))
-                  }
-                />
-                <Autocomplete
-                  multiple
-                  size="small"
-                  sx={{ width: '25%' }}
-                  id="schoolTypes"
-                  options={school.schoolTypes}
-                  getOptionLabel={(option) => {
-                    switch (option) {
-                      case SchoolType.GRUNDSCHULE:
-                        return 'Grundschule'
-                      case SchoolType.OBERSCHULE:
-                        return 'Oberschule'
-                      case SchoolType.GYMSEK1:
-                        return 'Gymnasium Sek. 1'
-                      case SchoolType.GYMSEK2:
-                        return 'Gymnasium Sek. 2'
-                      default:
-                        return ''
-                    }
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      label="Schularten"
-                    />
-                  )}
-                  value={newClassCustomer.schoolTypes}
-                  onChange={(_, value) =>
-                    setNewClassCustomer((data) => ({
-                      ...data,
-                      schoolTypes: value,
-                    }))
-                  }
-                />
-              </Stack>
-              <Box>
-                <AddTimes
-                  value={newClassCustomer.timesAvailable}
-                  setValue={(newValue) =>
-                    setNewClassCustomer((classCustomer) => ({
-                      ...classCustomer,
-                      timesAvailable: newValue,
-                    }))
-                  }
-                />
-                <DialogActions>
-                  <Button onClick={cancelAddClass}>Abbrechen</Button>
-                  <Button onClick={addClass}>Hinzufügen</Button>
-                </DialogActions>
-              </Box>
-            </Stack>
-          </Stack>
           <Stack direction={'row'} columnGap={5} sx={{ marginTop: '15px' }}>
             {id && (
               <Button
@@ -352,9 +311,122 @@ const SchoolDetailView: React.FC = () => {
                 sx={{ marginLeft: 'auto' }}
                 color="error"
               >
-                Entfernen
+                Schule entfernen
               </Button>
             )}
+          </Stack>
+          <h3>Klassen:</h3>
+          <Stack direction="column" rowGap={2}>
+            <Box sx={{ bgcolor: 'background.default' }}>
+              {classCustomers.map((classCustomer, index) => (
+                <Accordion
+                  key={classCustomer.className}
+                  sx={{
+                    border: '1px solid rgba(0, 0, 0, 0.23)',
+                    boxShadow: 'none',
+                    transition: 'none',
+                  }}
+                >
+                  <AccordionSummary
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                    sx={{ alignItems: 'center' }}
+                  >
+                    <Stack
+                      direction={'row'}
+                      sx={{ width: '100%' }}
+                      columnGap={2}
+                      alignItems={'center'}
+                    >
+                      <Typography sx={{ width: '10em' }}>
+                        {classCustomer.className}
+                      </Typography>
+                      <Typography sx={{ color: 'text.secondary' }}>
+                        {classCustomer.numberOfStudents} Schüler
+                      </Typography>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => deleteClass(index)}
+                        sx={{ marginLeft: 'auto' }}
+                        color="error"
+                      >
+                        Entfernen
+                      </Button>
+                    </Stack>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Box>
+                      <AddTimes
+                        value={classCustomer.timesAvailable}
+                        setValue={(newValue) =>
+                          updateClassCustomer(newValue, index)
+                        }
+                      />
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
+              ))}
+            </Box>
+            <Stack
+              direction="column"
+              rowGap={2}
+              sx={{
+                padding: '15px',
+                borderRadius: '5px',
+                border: '1px solid rgba(0, 0, 0, 0.23)',
+              }}
+            >
+              <Typography sx={{ fontWeight: 'bold' }}>
+                Klasse hinzufügen
+              </Typography>
+              <Stack direction="row" columnGap={2}>
+                <TextField
+                  id="className"
+                  label="Klassenname"
+                  fullWidth
+                  variant="outlined"
+                  required={true}
+                  value={newClassCustomer.className}
+                  onChange={(event) =>
+                    setNewClassCustomer((data) => ({
+                      ...data,
+                      className: event.target.value,
+                    }))
+                  }
+                />
+                <TextField
+                  type="number"
+                  id="numberOfStudents"
+                  label="Schüler"
+                  variant="outlined"
+                  fullWidth
+                  value={newClassCustomer.numberOfStudents}
+                  InputProps={{ inputProps: { min: 0, max: 50 } }}
+                  onChange={(event) =>
+                    setNewClassCustomer((data) => ({
+                      ...data,
+                      numberOfStudents: Number(event.target.value),
+                    }))
+                  }
+                />
+              </Stack>
+              <AddTimes
+                value={newClassCustomer.timesAvailable}
+                setValue={(newValue) =>
+                  setNewClassCustomer((classCustomer) => ({
+                    ...classCustomer,
+                    timesAvailable: newValue,
+                  }))
+                }
+              />
+              <Stack direction="row" columnGap={2} justifyContent={'flex-end'}>
+                <Button onClick={cancelAddClass} variant={'outlined'}>Abbrechen</Button>
+                <Button onClick={addClass} variant={'contained'}>
+                  Hinzufügen
+                </Button>
+              </Stack>
+            </Stack>
           </Stack>
         </Stack>
       </Box>

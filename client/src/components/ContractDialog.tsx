@@ -31,7 +31,7 @@ import React, { useEffect, useState } from 'react'
 import { snackbarOptionsError } from '../consts'
 import { ContractState } from '../types/contract'
 import subject from '../types/subject'
-import { customer, school, teacher } from '../types/user'
+import { classCustomer, customer, privateCustomer, school, teacher } from '../types/user'
 import { getNextDow } from '../utils/date'
 import { useAuth } from './AuthProvider'
 import BetterTimePicker from './BetterTimePicker'
@@ -195,7 +195,7 @@ const ContractDialog: React.FC<Props> = ({
     form0.endDate
   )
 
-  const activateClassSelect = !!(form0.school.id != 0)
+  const activateClassSelect = !!(form0.school?.id != 0)
 
   const loadClasses = (id: number) => {
     API.get('users/classCustomer/' + id)
@@ -324,10 +324,10 @@ const ContractDialog: React.FC<Props> = ({
         fullWidth
         multiple
         size="small"
-        options={customers}
+        options={customers as privateCustomer[]}
         getOptionLabel={(o) => o.firstName + ' ' + o.lastName}
         isOptionEqualToValue={(option, value) => option.id === value.id}
-        value={form0.customers}
+        value={form0.customers as privateCustomer[]}
         onChange={(_, value) =>
           setForm0((data) => ({ ...data, customers: value }))
         }
@@ -356,7 +356,7 @@ const ContractDialog: React.FC<Props> = ({
           value={form0.school}
           onChange={(_, value) => {
             setForm0((data) => ({ ...data, school: value }))
-            loadClasses(value.id)
+            value && loadClasses(value.id)
           }}
           renderInput={(params) => (
             <TextField
@@ -373,10 +373,10 @@ const ContractDialog: React.FC<Props> = ({
           fullWidth
           multiple
           size="small"
-          options={customers}
+          options={customers as classCustomer[]}
           getOptionLabel={(o) => o.className}
           isOptionEqualToValue={(option, value) => option.id === value.id}
-          value={form0.customers}
+          value={form0.customers as classCustomer[]}
           onChange={(_, value) =>
             setForm0((data) => ({ ...data, customers: value }))
           }

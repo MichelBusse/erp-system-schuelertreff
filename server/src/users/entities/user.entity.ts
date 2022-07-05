@@ -15,6 +15,11 @@ export enum SchoolType {
   GYMSEK2 = 'sek2',
 }
 
+export enum DeleteState {
+  ACTIVE = 'active',
+  DELETED = 'deleted',
+}
+
 // the week of 2001-01-01 is used as dummy, DOW and time is important here
 export const maxTimeRange = '[2001-01-01 00:00, 2001-01-08 00:00)'
 
@@ -68,11 +73,11 @@ export abstract class User {
   })
   timesAvailable: string
 
+
   @Column({
     type: 'enum',
-    enum: SchoolType,
-    array: true,
-    default: '{}',
+    enum: DeleteState,
+    default: DeleteState.ACTIVE,
   })
-  schoolTypes: SchoolType[]
+  deleteState: DeleteState
 }

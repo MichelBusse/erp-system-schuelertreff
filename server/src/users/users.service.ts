@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Delete, Injectable } from '@nestjs/common'
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
 import * as argon2 from 'argon2'
 import dayjs from 'dayjs'
@@ -24,9 +24,10 @@ import {
   Teacher,
   User,
 } from './entities'
-import { CustomerState } from './entities/privateCustomer.entity'
 import { TeacherState } from './entities/teacher.entity'
-import { maxTimeRange } from './entities/user.entity'
+import { DeleteState, maxTimeRange } from './entities/user.entity'
+import { UpdateSchoolDto } from './dto/update-school.dto'
+import { UpdateClassCustomerDto } from './dto/update-classCustomer.dto'
 
 /**
  * Format Array of {@link timeAvailable} as Postgres `tstzmultirange`
@@ -151,25 +152,28 @@ export class UsersService {
     return this.customersRepository.find().then(transformUsers)
   }
 
-  async findAppliedPrivateCustomers(): Promise<PrivateCustomer[]> {
+  async findPrivateCustomers(): Promise<PrivateCustomer[]> {
     return this.privateCustomersRepository
-      .find({ where: { customerState: CustomerState.APPLIED } })
+      .find({ where: { deleteState: Not(DeleteState.DELETED) } })
       .then(transformUsers)
   }
 
-  async findAllClassCustomers(): Promise<ClassCustomer[]> {
-    return this.classCustomersRepository.find().then(transformUsers)
+  async findClassCustomers(): Promise<ClassCustomer[]> {
+    return this.classCustomersRepository
+      .find({ where: { deleteState: Not(DeleteState.DELETED) } })
+      .then(transformUsers)
+  }
+  async findSchools(): Promise<School[]> {
+    return this.schoolsRepository
+      .find({ where: { deleteState: Not(DeleteState.DELETED) } })
+      .then(transformUsers)
   }
 
-  async findAllSchools(): Promise<School[]> {
-    return this.schoolsRepository.find().then(transformUsers)
-  }
-
-  async findAppliedTeachers(): Promise<Teacher[]> {
+  async findTeachers(): Promise<Teacher[]> {
     return this.teachersRepository
       .find({
         relations: ['subjects'],
-        where: { state: Not(TeacherState.DELETED) },
+        where: { deleteState: Not(DeleteState.DELETED) },
       })
       .then(transformUsers)
   }
@@ -312,6 +316,29 @@ export class UsersService {
     })
   }
 
+  async updateClassCustomerAdmin(
+    id: number,
+    dto: UpdateClassCustomerDto,
+  ): Promise<ClassCustomer> {
+    const user = await this.findOne(id)
+    
+    return this.classCustomersRepository.save({
+      ...user,
+      ...dto,
+      timesAvailable: formatTimesAvailable(dto.timesAvailable),
+    })
+  }
+
+  async updateSchoolAdmin(id: number, dto: UpdateSchoolDto): Promise<School> {
+    const school = await this.findOne(id)
+
+    return this.schoolsRepository.save({
+      ...school,
+      ...dto,
+      timesAvailable: `{${maxTimeRange}}`,
+    })
+  }
+
   async updateUserAdmin(id: number, dto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id)
 
@@ -372,7 +399,7 @@ export class UsersService {
         }
       }
       if (allowedToRemove) {
-        this.teachersRepository.update(id, { state: TeacherState.DELETED })
+        this.teachersRepository.update(id, { deleteState: DeleteState.DELETED })
       } else {
         throw new BadRequestException(
           'Teacher cannot be deleted: there are ongoing or future contracts with this teacher',
@@ -383,7 +410,7 @@ export class UsersService {
     }
   }
 
-  async deletePrivateCustomer(id: number) {
+  async deleteCustomer(id: number) {
     const qb = this.connection.createQueryBuilder()
 
     const contractQuery = qb
@@ -406,7 +433,7 @@ export class UsersService {
       }
       if (allowedToRemove) {
         this.privateCustomersRepository.update(id, {
-          customerState: CustomerState.DELETED,
+          deleteState: DeleteState.DELETED,
         })
       } else {
         throw new BadRequestException(
@@ -414,7 +441,41 @@ export class UsersService {
         )
       }
     } else {
-      this.privateCustomersRepository.delete(id)
+      this.customersRepository.delete(id)
+    }
+  }
+
+  async deleteSchool(id: number) {
+    const qb = this.connection.createQueryBuilder()
+
+    const classCustomerQuery = qb
+      .select('c')
+      .from(ClassCustomer, 'c')
+      .leftJoin('c.school', 's')
+      .where('s.id = :id', {id: id})
+
+    const classCustomers = await classCustomerQuery.getMany()
+    let allowedToRemove = true
+
+    if (classCustomers.length > 0) {
+      for (const classCustomer of classCustomers) {
+        if (classCustomer.deleteState !== DeleteState.DELETED) {
+          allowedToRemove = false
+          break
+        }
+      }
+
+      if (allowedToRemove) {
+        this.schoolsRepository.update(id, {
+          deleteState: DeleteState.DELETED,
+        })
+      } else {
+        throw new BadRequestException(
+          'School cannot be deleted: first delete every class',
+        )
+      }
+    } else {
+      this.schoolsRepository.delete(id)
     }
   }
 

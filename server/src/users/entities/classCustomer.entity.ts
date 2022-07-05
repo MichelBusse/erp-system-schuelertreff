@@ -1,4 +1,4 @@
-import { ChildEntity, Column, ManyToOne } from 'typeorm'
+import { ChildEntity, Column, ManyToOne, OneToMany } from 'typeorm'
 
 import { Role } from 'src/auth/role.enum'
 

@@ -32,9 +32,9 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
   //TODO: validate filled fields
   const submitForm = () => {
     setErrors(formValidation('school', data))
-
+    console.log("He");
     if (formValidation('school', data).validation)
-      API.post(`users/school`, data).then((res) => {
+      API.post('users/school', data).then((res) => {
         setCustomers((s) => [...s, res.data])
         setOpen(false)
       })
