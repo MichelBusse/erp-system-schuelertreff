@@ -11,15 +11,18 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  FormControlLabel,
   InputLabel,
   ListSubheader,
   MenuItem,
+  Radio,
+  RadioGroup,
   Select,
-  SelectChangeEvent,
   Stack,
   Step,
   StepLabel,
   Stepper,
+  Switch,
   TextField,
 } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
@@ -31,7 +34,7 @@ import React, { useEffect, useState } from 'react'
 import { snackbarOptionsError } from '../consts'
 import { ContractState } from '../types/contract'
 import subject from '../types/subject'
-import { classCustomer, customer, privateCustomer, school, teacher } from '../types/user'
+import { classCustomer, privateCustomer, school, teacher } from '../types/user'
 import { getNextDow } from '../utils/date'
 import { useAuth } from './AuthProvider'
 import BetterTimePicker from './BetterTimePicker'
@@ -39,6 +42,11 @@ import EqualStack from './EqualStack'
 import IconButtonAdornment from './IconButtonAdornment'
 
 dayjs.extend(customParseFormat)
+
+enum CustomerType {
+  PRIVATE = 'privateCustomer',
+  SCHOOL = 'school',
+}
 
 type suggestion = {
   teacherId: number
@@ -56,7 +64,8 @@ type form0 = {
     id: number
     schoolName: string
   } | null
-  customers: customer[]
+  classCustomers: classCustomer[]
+  privateCustomers: privateCustomer[]
   subject: subject | null
   interval: number
   startDate: Dayjs | null
@@ -74,7 +83,7 @@ type form1 = {
   maxTime: Dayjs | null
   teacher: string
   dow: number | null
-  state: ContractState
+  teacherConfirmation: boolean
 }
 
 type Props = {
@@ -95,21 +104,19 @@ const ContractDialog: React.FC<Props> = ({
 
   const [activeStep, setActiveStep] = useState(0)
 
-  // step 9
-  const [loading9, setLoading9] = useState(false)
-  const [form9, setForm9] = useState<string>('')
-
   // step 0
+  const [customerType, setCustomerType] = useState(CustomerType.PRIVATE)
+  const [privateCustomers, setPrivateCustomers] = useState<privateCustomer[]>(
+    [],
+  )
   const [schools, setSchools] = useState<school[]>([])
-  const [customers, setCustomers] = useState<customer[]>([])
+  const [classCustomers, setClassCustomers] = useState<classCustomer[]>([])
   const [subjects, setSubjects] = useState<subject[]>([])
   const [loading0, setLoading0] = useState(false)
   const [form0, setForm0] = useState<form0>({
-    school: {
-      id: 0,
-      schoolName: '',
-    },
-    customers: [],
+    school: null,
+    classCustomers: [],
+    privateCustomers: [],
     subject: null,
     interval: 1,
     startDate: dayjs().add(1, 'day'),
@@ -131,75 +138,47 @@ const ContractDialog: React.FC<Props> = ({
     maxTime: null,
     teacher: '',
     dow: null,
-    state: ContractState.PENDING,
+    teacherConfirmation: true,
   })
 
-  const validForm9 = !!form9
+  useEffect(() => {
+    API.get('users/privateCustomer')
+      .then((res) => setPrivateCustomers(res.data))
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+      })
 
-  const handleChange9 = (event: SelectChangeEvent) => {
-    setForm9(event.target.value as string)
-  }
+    API.get('users/school')
+      .then((res) => setSchools(res.data))
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+      })
 
-  const handleSubmit9 = () => {
-    setLoading9(true)
-
-    if (form9 === 'privateCustomer') {
-      // get customers, subjects from DB
-      API.get('users/privateCustomer')
-        .then((res) => setCustomers(res.data))
-        .catch((err) => {
-          console.error(err)
-          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
-        })
-
-      API.get('subjects')
-        .then((res) => {
-          setSubjects(res.data)
-          setActiveStep(1)
-        })
-        .catch((err) => {
-          console.error(err)
-          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
-        })
-        .finally(() => setLoading9(false))
-    }
-
-    if (form9 === 'school') {
-      console.log('drin2')
-      // get customers, subjects from DB
-      API.get('users/school')
-        .then((res) => setSchools(res.data))
-        .catch((err) => {
-          console.error(err)
-          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
-        })
-
-      API.get('subjects')
-        .then((res) => {
-          setSubjects(res.data)
-          setActiveStep(1)
-        })
-        .catch((err) => {
-          console.error(err)
-          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
-        })
-        .finally(() => setLoading9(false))
-    }
-  }
+    API.get('subjects')
+      .then((res) => setSubjects(res.data))
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+      })
+  }, [])
 
   const validForm0 = !!(
-    form0.customers.length &&
     form0.subject &&
     form0.interval &&
     form0.startDate &&
-    form0.endDate
+    form0.endDate &&
+    ((customerType === CustomerType.PRIVATE &&
+      form0.privateCustomers.length > 0) ||
+      (customerType === CustomerType.SCHOOL &&
+        form0.school !== null &&
+        form0.classCustomers.length > 0))
   )
-
-  const activateClassSelect = !!(form0.school?.id != 0)
 
   const loadClasses = (id: number) => {
     API.get('users/classCustomer/' + id)
-      .then((res) => setCustomers(res.data))
+      .then((res) => setClassCustomers(res.data))
       .catch((err) => {
         console.error(err)
         enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
@@ -211,7 +190,7 @@ const ContractDialog: React.FC<Props> = ({
 
     API.get('contracts/suggest', {
       params: {
-        customers: form0.customers.map((c) => c.id).join(','),
+        customers: form0.privateCustomers.map((c) => c.id).join(','),
         subjectId: form0.subject?.id,
         interval: form0.interval,
         startDate: form0.startDate?.format('YYYY-MM-DD'),
@@ -223,7 +202,7 @@ const ContractDialog: React.FC<Props> = ({
       .then((res) => {
         updateSelSuggestion('')
         setSuggestions(res.data)
-        setActiveStep(2)
+        setActiveStep(1)
         setForm1({
           startDate: form0.startDate,
           endDate: form0.endDate,
@@ -233,7 +212,7 @@ const ContractDialog: React.FC<Props> = ({
           maxTime: form0.endTime,
           teacher: '',
           dow: null,
-          state: ContractState.PENDING,
+          teacherConfirmation: true,
         })
       })
       .catch((err) => {
@@ -269,7 +248,7 @@ const ContractDialog: React.FC<Props> = ({
         maxTime: endTime,
         teacher: teacher.teacherId.toString(),
         dow: suggestion.dow,
-        state: ContractState.PENDING,
+        teacherConfirmation: true,
       })
     } else {
       setForm1({
@@ -281,7 +260,7 @@ const ContractDialog: React.FC<Props> = ({
         maxTime: null,
         teacher: '',
         dow: null,
-        state: ContractState.PENDING,
+        teacherConfirmation: true,
       })
     }
   }
@@ -297,7 +276,10 @@ const ContractDialog: React.FC<Props> = ({
     setLoading1(true)
 
     API.post('contracts', {
-      customers: form0.customers.map((c) => c.id),
+      customers: (customerType === 'school'
+        ? form0.classCustomers
+        : form0.privateCustomers
+      ).map((c) => c.id),
       subject: form0.subject?.id,
       interval: form0.interval,
       teacher: form1.teacher,
@@ -305,7 +287,9 @@ const ContractDialog: React.FC<Props> = ({
       endDate: form1.endDate?.format('YYYY-MM-DD'),
       startTime: form1.startTime?.format('HH:mm'),
       endTime: form1.endTime?.format('HH:mm'),
-      state: form1.state,
+      state: form1.teacherConfirmation
+        ? ContractState.PENDING
+        : ContractState.ACCEPTED,
     })
       .then(() => {
         onSuccess()
@@ -318,18 +302,18 @@ const ContractDialog: React.FC<Props> = ({
       .finally(() => setLoading1(false))
   }
 
-  const privateCustomerSelect = () => {
+  const PrivateCustomerSelect = () => {
     return (
       <Autocomplete
         fullWidth
         multiple
         size="small"
-        options={customers as privateCustomer[]}
+        options={privateCustomers}
         getOptionLabel={(o) => o.firstName + ' ' + o.lastName}
         isOptionEqualToValue={(option, value) => option.id === value.id}
-        value={form0.customers as privateCustomer[]}
+        value={form0.privateCustomers}
         onChange={(_, value) =>
-          setForm0((data) => ({ ...data, customers: value }))
+          setForm0((data) => ({ ...data, privateCustomers: value }))
         }
         renderInput={(params) => (
           <TextField
@@ -344,7 +328,7 @@ const ContractDialog: React.FC<Props> = ({
     )
   }
 
-  const schoolSelect = () => {
+  const SchoolSelect = () => {
     return (
       <>
         <Autocomplete
@@ -356,7 +340,8 @@ const ContractDialog: React.FC<Props> = ({
           value={form0.school}
           onChange={(_, value) => {
             setForm0((data) => ({ ...data, school: value }))
-            value && loadClasses(value.id)
+
+            if (value !== null) loadClasses(value.id)
           }}
           renderInput={(params) => (
             <TextField
@@ -369,16 +354,16 @@ const ContractDialog: React.FC<Props> = ({
           )}
         />
         <Autocomplete
-          disabled={!activateClassSelect}
+          disabled={form0.school === null}
           fullWidth
           multiple
           size="small"
-          options={customers as classCustomer[]}
+          options={classCustomers}
           getOptionLabel={(o) => o.className}
           isOptionEqualToValue={(option, value) => option.id === value.id}
-          value={form0.customers as classCustomer[]}
+          value={form0.classCustomers}
           onChange={(_, value) =>
-            setForm0((data) => ({ ...data, customers: value }))
+            setForm0((data) => ({ ...data, classCustomers: value }))
           }
           renderInput={(params) => (
             <TextField
@@ -394,61 +379,42 @@ const ContractDialog: React.FC<Props> = ({
     )
   }
 
-  const chooseSelect = () => {
-    if (form9 === 'privateCustomer') {
-      return privateCustomerSelect()
-    }
-    if (form9 === 'school') {
-      return schoolSelect()
-    }
-  }
-
   const steps: {
     label: string
     content: React.ReactNode
     actions: React.ReactNode
   }[] = [
     {
-      label: 'Vertragspartner',
-      content: (
-        <Stack spacing={2} marginTop={1}>
-          <FormControl fullWidth>
-            <InputLabel id="demo-simple-select-label">
-              Vertragspartner
-            </InputLabel>
-            <Select
-              labelId="contractPartner"
-              id="contractPartner"
-              value={form9}
-              label="Vertragspartner"
-              onChange={handleChange9}
-            >
-              <MenuItem value={'privateCustomer'}>Privatkunde</MenuItem>
-              <MenuItem value={'school'}>Schule</MenuItem>
-            </Select>
-          </FormControl>
-        </Stack>
-      ),
-      actions: (
-        <>
-          <Button onClick={() => setOpen(false)}>Abbrechen</Button>
-          <LoadingButton
-            variant="contained"
-            onClick={handleSubmit9}
-            loading={loading9}
-            disabled={!validForm9}
-          >
-            Weiter
-          </LoadingButton>
-        </>
-      ),
-    },
-
-    {
       label: 'Filterkonditionen',
       content: (
         <Stack spacing={2} marginTop={1}>
-          {chooseSelect()}
+          <FormControl>
+            <RadioGroup
+              row
+              value={customerType}
+              onChange={(event) =>
+                setCustomerType(event.target.value as CustomerType)
+              }
+            >
+              <FormControlLabel
+                value={CustomerType.PRIVATE}
+                label="Privatkunde"
+                control={<Radio />}
+              />
+              <FormControlLabel
+                value={CustomerType.SCHOOL}
+                label="Schule"
+                control={<Radio />}
+              />
+            </RadioGroup>
+          </FormControl>
+
+          {customerType === 'privateCustomer' ? (
+            <PrivateCustomerSelect />
+          ) : (
+            <SchoolSelect />
+          )}
+
           <EqualStack direction="row" spacing={2}>
             <Autocomplete
               options={subjects}
@@ -560,7 +526,6 @@ const ContractDialog: React.FC<Props> = ({
       actions: (
         <>
           <Button onClick={() => setOpen(false)}>Abbrechen</Button>
-          <Button onClick={() => setActiveStep(0)}>Zurück</Button>
           <LoadingButton
             variant="contained"
             onClick={handleSubmit0}
@@ -709,33 +674,27 @@ const ContractDialog: React.FC<Props> = ({
               }}
             />
           </EqualStack>
-          <FormControl variant="outlined" fullWidth required>
-            <InputLabel htmlFor="contract-state-select">Annehmen</InputLabel>
-            <Select
-              id="contract-state-select"
-              label={'Annehmen'}
-              value={form1.state}
-              onChange={(e) =>
-                setForm1((data) => ({
-                  ...data,
-                  state: e.target.value as ContractState,
-                }))
-              }
-            >
-              <MenuItem key={1} value={ContractState.PENDING}>
-                Von Lehrkraft abfragen
-              </MenuItem>
-              <MenuItem key={2} value={ContractState.ACCEPTED}>
-                Automatisch annehmen
-              </MenuItem>
-            </Select>
-          </FormControl>
+
+          <FormControlLabel
+            label="Bestätigung der Lehrkraft anfordern"
+            control={
+              <Switch
+                checked={form1.teacherConfirmation}
+                onChange={(event) => {
+                  setForm1((data) => ({
+                    ...data,
+                    teacherConfirmation: event.target.checked,
+                  }))
+                }}
+              />
+            }
+          />
         </Stack>
       ),
       actions: (
         <>
           <Button onClick={() => setOpen(false)}>Abbrechen</Button>
-          <Button onClick={() => setActiveStep(1)}>Zurück</Button>
+          <Button onClick={() => setActiveStep(0)}>Zurück</Button>
           <LoadingButton
             variant="contained"
             onClick={handleSubmit1}
@@ -767,7 +726,7 @@ const ContractDialog: React.FC<Props> = ({
             </Step>
           ))}
         </Stepper>
-        <Box sx={{ overflow: 'auto', padding: 0.5, height: '320px' }}>
+        <Box sx={{ overflow: 'auto', padding: 0.5, height: '345px' }}>
           {steps[activeStep].content}
         </Box>
       </DialogContent>
