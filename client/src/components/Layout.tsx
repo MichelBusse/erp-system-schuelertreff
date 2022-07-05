@@ -1,4 +1,5 @@
 import {
+  AccountBalance as AccountBalanceIcon,
   Layers as LayersIcon,
   ManageAccounts as ManageAccountsIcon,
   People as PeopleIcon,
@@ -30,12 +31,12 @@ const menuItems = [
     href: '/privateCustomers',
     roles: ['admin'],
   },
-  /*{
+  {
     icon: AccountBalanceIcon,
     text: 'Schulen',
-    href: '/schoolCustomers',
+    href: '/schools',
     roles: ['admin'],
-  },*/
+  },
   {
     icon: LayersIcon,
     text: 'Fächer',

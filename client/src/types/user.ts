@@ -4,13 +4,14 @@ import timeAvailable from './timeAvailable'
 
 export enum Role {
   PRIVATECUSTOMER = 'privateCustomer',
-  SCHOOLCUSTOMER = 'schoolCustomer',
+  SCHOOL = 'school',
   TEACHER = 'teacher',
   ADMIN = 'admin',
+  CLASSCUSTOMER = 'classCustomer',
 }
 
 interface user {
-  role: 'admin' | 'teacher' | 'privateCustomer' | 'schoolCustomer'
+  role: 'admin' | 'teacher' | 'privateCustomer' | 'classCustomer' | 'school'
   id: number
   lastName: string
   firstName: string
@@ -46,11 +47,20 @@ export interface privateCustomer extends user {
   role: 'privateCustomer'
 }
 
-export interface schoolCustomer extends Omit<user, 'lastName' | 'firstName'> {
-  role: 'schoolCustomer'
+export interface school extends Omit<user, 'lastName' | 'firstName'> {
+  role: 'school'
   schoolName: string
 }
 
-export type customer = privateCustomer | schoolCustomer
+export interface classCustomer {
+  role: 'classCustomer'
+  id: number
+  className: string
+  numberOfStudents: number
+  timesAvailableParsed: timesAvailableParsed[]
+  timesAvailable: timeAvailable[]
+}
+
+export type customer = privateCustomer | classCustomer
 
 export default user

@@ -153,9 +153,9 @@ const ContractEditDialog: React.FC<Props> = ({
             size="small"
             options={customers}
             getOptionLabel={(o) =>
-              o.role === 'schoolCustomer'
-                ? o.schoolName
-                : o.firstName + ' ' + o.lastName
+              o.role === 'privateCustomer'
+                ? o.firstName + ' ' + o.lastName
+                : o.className
             }
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={data.customers}

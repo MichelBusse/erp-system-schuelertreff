@@ -362,7 +362,12 @@ const TeacherDetailView: React.FC = () => {
 
           <Typography variant="h6">Verfügbarkeit:</Typography>
           <Box>
-            <AddTimes data={data} setData={setData} />
+            <AddTimes
+              value={data.timesAvailable}
+              setValue={(newValue) =>
+                setData((data) => ({ ...data, timesAvailable: newValue }))
+              }
+            />
           </Box>
           <Stack direction={'row'} columnGap={5} sx={{ marginTop: '15px' }}>
             {id && (

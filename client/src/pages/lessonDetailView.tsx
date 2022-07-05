@@ -143,9 +143,9 @@ const LessonDetailView: React.FC = () => {
             value={
               contract.customers
                 .map((c) => {
-                  return c.role === 'schoolCustomer'
-                    ? c.schoolName
-                    : c.firstName + ' ' + c.lastName + ' '
+                  return c.role === 'privateCustomer'
+                    ? c.firstName + ' ' + c.lastName
+                    : c.className
                 })
                 .join(', ') ?? ''
             }

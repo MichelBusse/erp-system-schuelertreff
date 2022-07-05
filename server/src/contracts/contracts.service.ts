@@ -301,7 +301,7 @@ export class ContractsService {
         'customer.type',
         'customer.firstName',
         'customer.lastName',
-        'customer.schoolName',
+        'customer.className',
       ])
       .loadAllRelationIds({
         relations: ['teacher'],

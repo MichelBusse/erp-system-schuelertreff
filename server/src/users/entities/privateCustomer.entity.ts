@@ -13,13 +13,6 @@ export enum CustomerState {
 export class PrivateCustomer extends Customer {
   role = Role.PRIVATECUSTOMER
 
-  @Column({
-    type: 'enum',
-    enum: CustomerState,
-    default: CustomerState.APPLIED,
-  })
-  customerState: CustomerState
-
   @Column()
   grade: number
 }

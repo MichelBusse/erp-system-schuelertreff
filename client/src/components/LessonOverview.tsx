@@ -43,9 +43,9 @@ const LessonOverview: React.FC<Props> = ({
       <ul className={styles.list}>
         {contract.customers.map((s) => (
           <li key={s.id}>
-            {s.role === 'schoolCustomer'
-              ? s.schoolName
-              : s.firstName + ' ' + s.lastName}
+            {s.role === 'privateCustomer'
+              ? s.firstName + ' ' + s.lastName
+              : s.className}
           </li>
         ))}
       </ul>

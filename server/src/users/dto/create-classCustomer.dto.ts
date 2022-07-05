@@ -1,12 +1,17 @@
 import { Type } from 'class-transformer'
-import { IsArray, IsNotEmpty, ValidateNested } from 'class-validator'
+import { IsArray, IsInt, IsNotEmpty, ValidateNested } from 'class-validator'
 
-import { CreateUserDto } from './create-user.dto'
 import { timeAvailable } from './timeAvailable'
 
-export class CreateSchoolCustomerDto extends CreateUserDto {
+export class CreateClassCustomerDto {
   @IsNotEmpty()
-  schoolName: string
+  className: string
+
+  @IsInt()
+  numberOfStudents: number
+
+  @IsInt()
+  school: number
 
   @IsArray()
   @Type(() => timeAvailable)

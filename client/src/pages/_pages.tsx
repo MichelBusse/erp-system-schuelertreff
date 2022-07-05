@@ -3,7 +3,8 @@ import Login from './login'
 import PrivateCustomerDetailView from './privateCustomerDetailView'
 import PrivateCustomers from './privateCustomers'
 import Reset from './reset'
-import SchoolCustomers from './schoolCustomers'
+import SchoolDetailView from './schoolDetailView'
+import Schools from './schools'
 import Subjects from './subjects'
 import TeacherDetailView from './teacherDetailView'
 import Teachers from './teachers'
@@ -11,7 +12,7 @@ import Timetable from './timetable'
 
 export default {
   PrivateCustomers,
-  SchoolCustomers,
+  Schools,
   Login,
   Reset,
   Subjects,
@@ -19,5 +20,6 @@ export default {
   Timetable,
   TeacherDetailView,
   PrivateCustomerDetailView,
+  SchoolDetailView,
   LessonDetailView,
 }

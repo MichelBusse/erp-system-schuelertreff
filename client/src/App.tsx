@@ -99,14 +99,24 @@ const App: React.FC = () => {
                   }
                 />
               </Route>
-              <Route
-                path="schoolCustomers"
-                element={
-                  <ProtectedRoute>
-                    <Pages.SchoolCustomers />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="schools">
+                <Route
+                  path=""
+                  element={
+                    <ProtectedRoute>
+                      <Pages.Schools />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path=":id"
+                  element={
+                    <ProtectedRoute>
+                      <Pages.SchoolDetailView />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
               <Route path="teachers">
                 <Route
                   path=""

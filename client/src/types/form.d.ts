@@ -14,7 +14,7 @@ export interface userForm {
   street: string
   email: string
   phone: string
-  timesAvailable: (timeAvailable & { id: string })[]
+  timesAvailable: timeAvailable[]
 }
 
 export interface teacherForm extends userForm {
@@ -23,6 +23,19 @@ export interface teacherForm extends userForm {
   degree: string
   schoolTypes: string[]
   state: TeacherState
+}
+
+export interface schoolForm
+  extends Omit<userForm, 'lastName' | 'firstName' | 'timesAvailable'> {
+  schoolName: string
+  schoolTypes: string[]
+}
+
+export interface classCustomerForm {
+  id: number
+  className: string
+  numberOfStudents: number
+  timesAvailable: timeAvailable[]
 }
 
 export interface privateCustomerForm extends userForm {

@@ -7,24 +7,27 @@ import { Connection, Not, Repository } from 'typeorm'
 import { Contract } from 'src/contracts/contract.entity'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
+import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
-import { CreateSchoolCustomerDto } from './dto/create-schoolCustomer.dto'
+import { CreateSchoolDto } from './dto/create-school.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
 import { timeAvailable } from './dto/timeAvailable'
+import { UpdateClassCustomerDto } from './dto/update-classCustomer.dto'
 import { UpdatePrivateCustomerDto } from './dto/update-privateCustomer.dto'
+import { UpdateSchoolDto } from './dto/update-school.dto'
 import { UpdateTeacherDto } from './dto/update-teacher.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import {
   Admin,
+  ClassCustomer,
   Customer,
   PrivateCustomer,
-  SchoolCustomer,
+  School,
   Teacher,
   User,
 } from './entities'
-import { CustomerState } from './entities/privateCustomer.entity'
 import { TeacherState } from './entities/teacher.entity'
-import { maxTimeRange } from './entities/user.entity'
+import { DeleteState, maxTimeRange } from './entities/user.entity'
 
 /**
  * Format Array of {@link timeAvailable} as Postgres `tstzmultirange`
@@ -86,8 +89,11 @@ export class UsersService {
     @InjectRepository(PrivateCustomer)
     private readonly privateCustomersRepository: Repository<PrivateCustomer>,
 
-    @InjectRepository(SchoolCustomer)
-    private readonly schoolCustomersRepository: Repository<SchoolCustomer>,
+    @InjectRepository(ClassCustomer)
+    private readonly classCustomersRepository: Repository<ClassCustomer>,
+
+    @InjectRepository(School)
+    private readonly schoolsRepository: Repository<School>,
 
     @InjectRepository(Admin)
     private readonly adminsRepository: Repository<Admin>,
@@ -146,21 +152,28 @@ export class UsersService {
     return this.customersRepository.find().then(transformUsers)
   }
 
-  async findAppliedPrivateCustomers(): Promise<PrivateCustomer[]> {
+  async findPrivateCustomers(): Promise<PrivateCustomer[]> {
     return this.privateCustomersRepository
-      .find({ where: { customerState: CustomerState.APPLIED } })
+      .find({ where: { deleteState: Not(DeleteState.DELETED) } })
       .then(transformUsers)
   }
 
-  async findAllSchoolCustomers(): Promise<SchoolCustomer[]> {
-    return this.schoolCustomersRepository.find().then(transformUsers)
+  async findClassCustomers(): Promise<ClassCustomer[]> {
+    return this.classCustomersRepository
+      .find({ where: { deleteState: Not(DeleteState.DELETED) } })
+      .then(transformUsers)
+  }
+  async findSchools(): Promise<School[]> {
+    return this.schoolsRepository
+      .find({ where: { deleteState: Not(DeleteState.DELETED) } })
+      .then(transformUsers)
   }
 
-  async findAppliedTeachers(): Promise<Teacher[]> {
+  async findTeachers(): Promise<Teacher[]> {
     return this.teachersRepository
       .find({
         relations: ['subjects'],
-        where: { state: Not(TeacherState.DELETED) },
+        where: { deleteState: Not(DeleteState.DELETED) },
       })
       .then(transformUsers)
   }
@@ -177,8 +190,8 @@ export class UsersService {
     return this.privateCustomersRepository.findOneOrFail(id).then(transformUser)
   }
 
-  async findOneSchoolCustomer(id: number): Promise<SchoolCustomer> {
-    return this.schoolCustomersRepository.findOneOrFail(id).then(transformUser)
+  async findOneSchool(id: number): Promise<School> {
+    return this.schoolsRepository.findOneOrFail(id).then(transformUser)
   }
 
   async findOneTeacher(id: number): Promise<Teacher> {
@@ -187,6 +200,29 @@ export class UsersService {
         relations: ['subjects'],
       })
       .then(transformUser)
+  }
+
+  async findAllClassesOfSchool(schoolId?: number): Promise<ClassCustomer[]> {
+    const q = this.classCustomersRepository
+      .createQueryBuilder('c')
+      .leftJoin('c.school', 'school')
+      .select([
+        'c',
+        'school.id',
+        'school.street',
+        'school.city',
+        'school.postalCode',
+        'school.schoolName',
+        'school.schoolTypes',
+      ])
+      // .loadAllRelationIds({
+      //   relations: ['teacher'],
+      // })
+      .where('c.schoolId = :schoolId', {
+        schoolId: schoolId,
+      })
+
+    return q.getMany().then(transformUsers)
   }
 
   /**
@@ -213,16 +249,31 @@ export class UsersService {
     return this.privateCustomersRepository.save(privateCustomer)
   }
 
-  async createSchoolCustomer(
-    dto: CreateSchoolCustomerDto,
-  ): Promise<SchoolCustomer> {
-    const schoolCustomer = this.schoolCustomersRepository.create({
+  async createClassCustomer(
+    dto: CreateClassCustomerDto,
+  ): Promise<ClassCustomer> {
+    const classCustomer = this.classCustomersRepository.create({
       ...dto,
       timesAvailable: formatTimesAvailable(dto.timesAvailable),
       mayAuthenticate: false,
+      street: null,
+      city: null,
+      postalCode: null,
+      email: null,
+      phone: null,
+      school: { id: dto.school },
     })
 
-    return this.schoolCustomersRepository.save(schoolCustomer)
+    return this.classCustomersRepository.save(classCustomer)
+  }
+
+  async createSchool(dto: CreateSchoolDto): Promise<School> {
+    const school = this.schoolsRepository.create({
+      ...dto,
+      mayAuthenticate: false,
+    })
+
+    return this.schoolsRepository.save(school)
   }
 
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
@@ -262,6 +313,29 @@ export class UsersService {
       ...user,
       ...dto,
       timesAvailable: formatTimesAvailable(dto.timesAvailable),
+    })
+  }
+
+  async updateClassCustomerAdmin(
+    id: number,
+    dto: UpdateClassCustomerDto,
+  ): Promise<ClassCustomer> {
+    const user = await this.findOne(id)
+
+    return this.classCustomersRepository.save({
+      ...user,
+      ...dto,
+      timesAvailable: formatTimesAvailable(dto.timesAvailable),
+    })
+  }
+
+  async updateSchoolAdmin(id: number, dto: UpdateSchoolDto): Promise<School> {
+    const school = await this.findOne(id)
+
+    return this.schoolsRepository.save({
+      ...school,
+      ...dto,
+      timesAvailable: `{${maxTimeRange}}`,
     })
   }
 
@@ -325,7 +399,7 @@ export class UsersService {
         }
       }
       if (allowedToRemove) {
-        this.teachersRepository.update(id, { state: TeacherState.DELETED })
+        this.teachersRepository.update(id, { deleteState: DeleteState.DELETED })
       } else {
         throw new BadRequestException(
           'Teacher cannot be deleted: there are ongoing or future contracts with this teacher',
@@ -336,7 +410,7 @@ export class UsersService {
     }
   }
 
-  async deletePrivateCustomer(id: number) {
+  async deleteCustomer(id: number) {
     const qb = this.connection.createQueryBuilder()
 
     const contractQuery = qb
@@ -359,7 +433,7 @@ export class UsersService {
       }
       if (allowedToRemove) {
         this.privateCustomersRepository.update(id, {
-          customerState: CustomerState.DELETED,
+          deleteState: DeleteState.DELETED,
         })
       } else {
         throw new BadRequestException(
@@ -367,7 +441,41 @@ export class UsersService {
         )
       }
     } else {
-      this.privateCustomersRepository.delete(id)
+      this.customersRepository.delete(id)
+    }
+  }
+
+  async deleteSchool(id: number) {
+    const qb = this.connection.createQueryBuilder()
+
+    const classCustomerQuery = qb
+      .select('c')
+      .from(ClassCustomer, 'c')
+      .leftJoin('c.school', 's')
+      .where('s.id = :id', { id: id })
+
+    const classCustomers = await classCustomerQuery.getMany()
+    let allowedToRemove = true
+
+    if (classCustomers.length > 0) {
+      for (const classCustomer of classCustomers) {
+        if (classCustomer.deleteState !== DeleteState.DELETED) {
+          allowedToRemove = false
+          break
+        }
+      }
+
+      if (allowedToRemove) {
+        this.schoolsRepository.update(id, {
+          deleteState: DeleteState.DELETED,
+        })
+      } else {
+        throw new BadRequestException(
+          'School cannot be deleted: first delete every class',
+        )
+      }
+    } else {
+      this.schoolsRepository.delete(id)
     }
   }
 

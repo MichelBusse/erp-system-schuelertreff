@@ -204,7 +204,12 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           </Stack>
           <FormControl>
             <FormLabel>Verfügbarkeit</FormLabel>
-            <AddTimes data={data} setData={setData} />
+            <AddTimes
+              value={data.timesAvailable}
+              setValue={(newValue) =>
+                setData((data) => ({ ...data, timesAvailable: newValue }))
+              }
+            />
           </FormControl>{' '}
         </Stack>
       </DialogContent>

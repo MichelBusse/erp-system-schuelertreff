@@ -59,3 +59,22 @@ export const teacherStateToString: { [key in TeacherState]: string } = {
   suspended: 'Suspendiert',
   deleted: 'Gelöscht',
 }
+
+export const defaultSchoolFormData = {
+  schoolName: '',
+  city: '',
+  postalCode: '',
+  street: '',
+  email: '',
+  phone: '',
+  schoolTypes: [],
+}
+
+export const defaultClassCustomerFormData = {
+  id: -1,
+  className: '',
+  numberOfStudents: 0,
+  grade: 0,
+  timesAvailable: [],
+  schoolTypes: [],
+}

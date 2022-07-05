@@ -1,4 +1,6 @@
-import { IsNotEmpty } from 'class-validator'
+import { IsArray, IsNotEmpty, IsOptional } from 'class-validator'
+
+import { SchoolType } from '../entities/user.entity'
 
 export abstract class CreateUserDto {
   @IsNotEmpty()
@@ -15,4 +17,8 @@ export abstract class CreateUserDto {
 
   @IsNotEmpty()
   phone: string
+
+  @IsOptional()
+  @IsArray()
+  schoolTypes?: SchoolType[]
 }

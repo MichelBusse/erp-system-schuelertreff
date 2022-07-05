@@ -85,7 +85,7 @@ export function formValidation(form: string, data: any): any {
     return temp
   }
 
-  if (form === 'schoolCustomer') {
+  if (form === 'school') {
     const temp = {
       schoolName: '',
       city: '',

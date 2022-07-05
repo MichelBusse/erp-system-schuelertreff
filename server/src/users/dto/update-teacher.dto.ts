@@ -3,7 +3,8 @@ import { IsArray, IsOptional, ValidateNested } from 'class-validator'
 
 import { Subject } from 'src/subjects/subject.entity'
 
-import { SchoolType, TeacherState } from '../entities/teacher.entity'
+import { TeacherState } from '../entities/teacher.entity'
+import { SchoolType } from '../entities/user.entity'
 import { UpdateUserDto } from './update-user.dto'
 
 export class UpdateTeacherDto extends UpdateUserDto {
