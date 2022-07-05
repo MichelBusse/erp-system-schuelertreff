@@ -1,10 +1,16 @@
+import AddCircleIcon from '@mui/icons-material/AddCircle'
+import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
   Autocomplete,
   Button,
+  Dialog,
   DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
   Stack,
   TextField,
   Typography,
@@ -43,6 +49,7 @@ const SchoolDetailView: React.FC = () => {
   const [newClassCustomer, setNewClassCustomer] = useState<classCustomerForm>(
     defaultClassCustomerFormData,
   )
+  const [addClassDialogOpen, setAddClassDialogOpen] = useState<boolean>(false)
 
   useEffect(() => {
     API.get('users/school/' + requestedId).then((res) => {
@@ -161,6 +168,7 @@ const SchoolDetailView: React.FC = () => {
   }
 
   const addClass = () => {
+    setAddClassDialogOpen(false)
     if (newClassCustomer.className && newClassCustomer.numberOfStudents != 0) {
       API.post('users/classCustomer/', {
         ...newClassCustomer,
@@ -189,6 +197,7 @@ const SchoolDetailView: React.FC = () => {
   }
 
   const cancelAddClass = () => {
+    setAddClassDialogOpen(false)
     setNewClassCustomer(defaultClassCustomerFormData)
   }
 
@@ -290,6 +299,58 @@ const SchoolDetailView: React.FC = () => {
               value={school.phone}
             />
           </Stack>
+          <Stack direction={"row"} columnGap={2}><h3>Klassen:</h3><IconButton sx={{marginLeft: 'auto'}} onClick={() => setAddClassDialogOpen(true)}>
+                  <AddCircleIcon fontSize="large" color="primary" />
+                </IconButton></Stack>
+          {classCustomers.map((classCustomer, index) => (
+            <Accordion
+              key={classCustomer.className}
+              sx={{
+                border: '1px solid rgba(0, 0, 0, 0.23)',
+                boxShadow: 'none',
+                transition: 'none',
+                borderRadius: '4px',
+                margin: '4px 0'
+              }}
+            >
+              <AccordionSummary
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+                sx={{ alignItems: 'center' }}
+              >
+                <Stack
+                  direction={'row'}
+                  sx={{ width: '100%' }}
+                  columnGap={2}
+                  alignItems={'center'}
+                >
+                  <Typography sx={{ width: '10em' }}>
+                    {classCustomer.className}
+                  </Typography>
+                  <Typography sx={{ color: 'text.secondary' }}>
+                    {classCustomer.numberOfStudents} Schüler
+                  </Typography>
+                  <IconButton
+                    onClick={() => deleteClass(index)}
+                    sx={{ marginLeft: 'auto' }}
+                    color="error"
+                  >
+                    <DeleteIcon/>
+                  </IconButton>
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Box>
+                  <AddTimes
+                    value={classCustomer.timesAvailable}
+                    setValue={(newValue) =>
+                      updateClassCustomer(newValue, index)
+                    }
+                  />
+                </Box>
+              </AccordionDetails>
+            </Accordion>
+          ))}
           <Stack direction={'row'} columnGap={5} sx={{ marginTop: '15px' }}>
             {id && (
               <Button
@@ -315,121 +376,63 @@ const SchoolDetailView: React.FC = () => {
               </Button>
             )}
           </Stack>
-          <h3>Klassen:</h3>
-          <Stack direction="column" rowGap={2}>
-            <Box sx={{ bgcolor: 'background.default' }}>
-              {classCustomers.map((classCustomer, index) => (
-                <Accordion
-                  key={classCustomer.className}
-                  sx={{
-                    border: '1px solid rgba(0, 0, 0, 0.23)',
-                    boxShadow: 'none',
-                    transition: 'none',
-                  }}
-                >
-                  <AccordionSummary
-                    aria-controls="panel1a-content"
-                    id="panel1a-header"
-                    sx={{ alignItems: 'center' }}
-                  >
-                    <Stack
-                      direction={'row'}
-                      sx={{ width: '100%' }}
-                      columnGap={2}
-                      alignItems={'center'}
-                    >
-                      <Typography sx={{ width: '10em' }}>
-                        {classCustomer.className}
-                      </Typography>
-                      <Typography sx={{ color: 'text.secondary' }}>
-                        {classCustomer.numberOfStudents} Schüler
-                      </Typography>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() => deleteClass(index)}
-                        sx={{ marginLeft: 'auto' }}
-                        color="error"
-                      >
-                        Entfernen
-                      </Button>
-                    </Stack>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Box>
-                      <AddTimes
-                        value={classCustomer.timesAvailable}
-                        setValue={(newValue) =>
-                          updateClassCustomer(newValue, index)
-                        }
-                      />
-                    </Box>
-                  </AccordionDetails>
-                </Accordion>
-              ))}
-            </Box>
-            <Stack
-              direction="column"
-              rowGap={2}
-              sx={{
-                padding: '15px',
-                borderRadius: '5px',
-                border: '1px solid rgba(0, 0, 0, 0.23)',
-              }}
-            >
-              <Typography sx={{ fontWeight: 'bold' }}>
-                Klasse hinzufügen
-              </Typography>
-              <Stack direction="row" columnGap={2}>
-                <TextField
-                  id="className"
-                  label="Klassenname"
-                  fullWidth
-                  variant="outlined"
-                  required={true}
-                  value={newClassCustomer.className}
-                  onChange={(event) =>
-                    setNewClassCustomer((data) => ({
-                      ...data,
-                      className: event.target.value,
-                    }))
-                  }
-                />
-                <TextField
-                  type="number"
-                  id="numberOfStudents"
-                  label="Schüler"
-                  variant="outlined"
-                  fullWidth
-                  value={newClassCustomer.numberOfStudents}
-                  InputProps={{ inputProps: { min: 0, max: 50 } }}
-                  onChange={(event) =>
-                    setNewClassCustomer((data) => ({
-                      ...data,
-                      numberOfStudents: Number(event.target.value),
-                    }))
-                  }
-                />
-              </Stack>
-              <AddTimes
-                value={newClassCustomer.timesAvailable}
-                setValue={(newValue) =>
-                  setNewClassCustomer((classCustomer) => ({
-                    ...classCustomer,
-                    timesAvailable: newValue,
+        </Stack>
+      </Box>
+      <Dialog open={addClassDialogOpen}>
+        <DialogTitle>Klasse hinzufügen</DialogTitle>
+        <DialogContent>
+          <Stack direction={'column'} rowGap={2} pt={2}>
+            <Stack direction="row" columnGap={2}>
+              <TextField
+                id="className"
+                label="Klassenname"
+                fullWidth
+                variant="outlined"
+                required={true}
+                value={newClassCustomer.className}
+                onChange={(event) =>
+                  setNewClassCustomer((data) => ({
+                    ...data,
+                    className: event.target.value,
                   }))
                 }
               />
-              <Stack direction="row" columnGap={2} justifyContent={'flex-end'}>
-                <Button onClick={cancelAddClass} variant={'outlined'}>Abbrechen</Button>
-                <Button onClick={addClass} variant={'contained'}>
-                  Hinzufügen
-                </Button>
-              </Stack>
+              <TextField
+                type="number"
+                id="numberOfStudents"
+                label="Schüler"
+                variant="outlined"
+                fullWidth
+                value={newClassCustomer.numberOfStudents}
+                InputProps={{ inputProps: { min: 0, max: 50 } }}
+                onChange={(event) =>
+                  setNewClassCustomer((data) => ({
+                    ...data,
+                    numberOfStudents: Number(event.target.value),
+                  }))
+                }
+              />
             </Stack>
+            <AddTimes
+              value={newClassCustomer.timesAvailable}
+              setValue={(newValue) =>
+                setNewClassCustomer((classCustomer) => ({
+                  ...classCustomer,
+                  timesAvailable: newValue,
+                }))
+              }
+            />
           </Stack>
-        </Stack>
-      </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={cancelAddClass} variant={'outlined'}>
+            Abbrechen
+          </Button>
+          <Button onClick={addClass} variant={'contained'}>
+            Hinzufügen
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }
