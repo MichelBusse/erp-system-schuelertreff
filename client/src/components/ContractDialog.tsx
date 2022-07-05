@@ -190,7 +190,12 @@ const ContractDialog: React.FC<Props> = ({
 
     API.get('contracts/suggest', {
       params: {
-        customers: form0.privateCustomers.map((c) => c.id).join(','),
+        customers: (customerType === 'school'
+          ? form0.classCustomers
+          : form0.privateCustomers
+        )
+          .map((c) => c.id)
+          .join(','),
         subjectId: form0.subject?.id,
         interval: form0.interval,
         startDate: form0.startDate?.format('YYYY-MM-DD'),
