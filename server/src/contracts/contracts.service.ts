@@ -208,7 +208,7 @@ export class ContractsService {
           .addFrom(User, 't')
           .leftJoin('t.subjects', 'subject')
           .where('t.type = :tt', { tt: 'Teacher' })
-          .andWhere(`t.state = 'applied'`)
+          .andWhere(`t.state = 'employed'`)
           .andWhere('subject.id = :subjectId', { subjectId: dto.subjectId })
 
         sq.groupBy('t.id')
