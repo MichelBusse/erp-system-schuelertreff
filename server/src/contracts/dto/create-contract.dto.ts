@@ -1,4 +1,4 @@
-import { ArrayNotEmpty, IsInt, Max, Min } from 'class-validator'
+import { ArrayNotEmpty, IsInt, IsOptional, Max, Min } from 'class-validator'
 
 export class CreateContractDto {
   @ArrayNotEmpty()
@@ -23,4 +23,8 @@ export class CreateContractDto {
   @Max(4)
   @IsInt()
   interval: number
+
+  @IsOptional()
+  @IsInt()
+  parentContract: number
 }

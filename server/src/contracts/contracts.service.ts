@@ -36,6 +36,7 @@ export class ContractsService {
           this.usersService.findOneCustomer(id).then((c) => ({ id: c.id })),
         ),
       ),
+      parentContract: dto.parentContract ? { id: dto.parentContract } : null,
     })
 
     return this.contractsRepository.save(contract)

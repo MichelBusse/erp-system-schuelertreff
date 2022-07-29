@@ -53,4 +53,7 @@ export class Contract {
 
   @Column()
   interval: number
+
+  @ManyToOne(() => Contract, { nullable: true })
+  parentContract: Contract
 }

@@ -2,11 +2,14 @@ import {
   Check,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   TableInheritance,
 } from 'typeorm'
 
 import { Role } from 'src/auth/role.enum'
+
+import { Leave } from './leave.entity'
 
 export enum SchoolType {
   GRUNDSCHULE = 'grundschule',
@@ -79,4 +82,7 @@ export abstract class User {
     default: DeleteState.ACTIVE,
   })
   deleteState: DeleteState
+
+  @OneToMany(() => Leave, (leave) => leave.user, { cascade: true, eager: true })
+  leave: Leave[]
 }

@@ -12,6 +12,7 @@ import {
   Teacher,
   User,
 } from './entities'
+import { Leave } from './entities/leave.entity'
 import { UsersController } from './users.controller'
 import { UsersService } from './users.service'
 
@@ -25,6 +26,7 @@ import { UsersService } from './users.service'
       Teacher,
       Admin,
       ClassCustomer,
+      Leave,
     ]),
     forwardRef(() => AuthModule),
   ],
