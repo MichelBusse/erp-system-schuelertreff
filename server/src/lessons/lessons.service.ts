@@ -7,7 +7,7 @@ import { ContractState } from 'src/contracts/contract.entity'
 import { ContractsService } from 'src/contracts/contracts.service'
 
 import { CreateLessonDto } from './dto/create-lesson.dto'
-import { Lesson } from './lesson.entity'
+import { Lesson, LessonState } from './lesson.entity'
 
 @Injectable()
 export class LessonsService {
@@ -122,5 +122,82 @@ export class LessonsService {
       contracts: contractsOfWeek,
       pendingContracts: pendingContracts,
     }
+  }
+
+  async findInvoiceReadyByMonthAndCustomer(invoiceMonth: Dayjs, customerId: number) {
+    const q = this.lessonsRepository
+      .createQueryBuilder('l')
+      .select(['l', 'c', 'subject', 'school', 'teacher'])
+      .leftJoin('l.contract', 'c')
+      .leftJoin('c.customers', 'customer')
+      .leftJoin('c.subject', 'subject')
+      .leftJoin('customer.school', 'school')
+      .leftJoin('c.teacher', 'teacher')
+      .where(`l.date >= date_trunc('month', :invoiceMonthLower::date)`, {
+        invoiceMonthLower: dayjs(invoiceMonth).format(),
+      })
+      .andWhere(`l.date < date_trunc('month', :invoiceMonthHigher::date)`, {
+        invoiceMonthHigher: dayjs(invoiceMonth).add(1,'month').format(),
+      })
+      .andWhere('l.state = :lessonState', {
+        lessonState: LessonState.HELD
+      })
+      q.andWhere('customer.id = :customerId', { customerId: customerId })
+
+    return q.getMany()
+  }
+
+  async findInvoiceReadyByMonthAndSchool(invoiceMonth: Dayjs, schoolId: number) {
+    const q = this.lessonsRepository
+      .createQueryBuilder('l')
+      .select(['l', 'c', 'subject', 'school', 'teacher'])
+      .leftJoin('l.contract', 'c')
+      .leftJoin('c.customers', 'customer')
+      .leftJoin('c.subject', 'subject')
+      .leftJoin('customer.school', 'school')
+      .leftJoin('c.teacher', 'teacher')
+      .where(`l.date >= date_trunc('month', :invoiceMonthLower::date)`, {
+        invoiceMonthLower: dayjs(invoiceMonth).format(),
+      })
+      .andWhere(`l.date < date_trunc('month', :invoiceMonthHigher::date)`, {
+        invoiceMonthHigher: dayjs(invoiceMonth).add(1,'month').format(),
+      })
+      .andWhere('l.state = :lessonState', {
+        lessonState: LessonState.HELD
+      })
+      q.andWhere('school.id = :schoolId', { schoolId: schoolId })
+
+    return q.getMany()
+  }
+
+  async findInvoiceReadyByMonth({invoiceMonth, customerId, schoolId, teacherId} : {invoiceMonth: Dayjs, customerId?: number, schoolId?: number, teacherId?: number}) {
+    const q = this.lessonsRepository
+      .createQueryBuilder('l')
+      .select(['l', 'c', 'subject', 'school', 'teacher'])
+      .leftJoin('l.contract', 'c')
+      .leftJoin('c.customers', 'customer')
+      .leftJoin('c.subject', 'subject')
+      .leftJoin('customer.school', 'school')
+      .leftJoin('c.teacher', 'teacher')
+      .where(`l.date >= date_trunc('month', :invoiceMonthLower::date)`, {
+        invoiceMonthLower: dayjs(invoiceMonth).format(),
+      })
+      .andWhere(`l.date < date_trunc('month', :invoiceMonthHigher::date)`, {
+        invoiceMonthHigher: dayjs(invoiceMonth).add(1,'month').format(),
+      })
+      .andWhere('l.state = :lessonState', {
+        lessonState: LessonState.HELD
+      })
+
+      if(customerId)
+        q.andWhere('customer.id = :customerId', { customerId: customerId })
+
+      if(schoolId)
+        q.andWhere('school.id = :schoolId', { schoolId: schoolId })
+
+      if(teacherId)
+        q.andWhere('teacher.id = :teacherId', { teacherId: teacherId })
+
+    return q.getMany()
   }
 }

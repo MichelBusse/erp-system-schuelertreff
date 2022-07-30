@@ -127,7 +127,14 @@ const PrivateCustomerDetailView: React.FC = () => {
   }
 
   const generateInvoice = () => {
-    API.get('lessons/invoice/' + invoiceData.year + '/' + invoiceData.month).then().catch(() => {
+    API.get('lessons/invoice/customer', {
+      params: {
+        of: dayjs().year(invoiceData.year).month(invoiceData.month).format('YYYY-MM-DD'),
+        customerId: id
+      },
+    }).then((res) => {
+      console.log(res.data)
+    }).catch(() => {
       enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
     })
   }

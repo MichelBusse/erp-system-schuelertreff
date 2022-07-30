@@ -40,11 +40,32 @@ export class LessonsController {
     return this.lessonsService.findByWeek(dayjs(date))
   }
 
-  @Get('invoice/:year/:month')
-  getInvoiceLessons(
-    @Param('year') year: number,
-    @Param('month') month: number,
-  ) {}
+  @Get('invoice/customer')
+  @Roles(Role.ADMIN)
+  getInvoiceLessonsCustomer(
+    @Query('of') month: string,
+    @Query('customerId') customerId: string,
+  ) {
+    return this.lessonsService.findInvoiceReadyByMonth({invoiceMonth: dayjs(month, 'YYYY-MM-DD'), customerId: Number(customerId)})
+  }
+
+  @Get('invoice/school')
+  @Roles(Role.ADMIN)
+  getInvoiceLessonsSchool(
+    @Query('of') month: string,
+    @Query('schoolId') schoolId: string,
+  ) {
+    return this.lessonsService.findInvoiceReadyByMonth({invoiceMonth: dayjs(month, 'YYYY-MM-DD'), schoolId: Number(schoolId)})
+  }
+
+  @Get('invoice/teacher')
+  @Roles(Role.ADMIN)
+  getInvoiceLessonsTeacher(
+    @Query('of') month: string,
+    @Query('teacherId') teacherId: string,
+  ) {
+    return this.lessonsService.findInvoiceReadyByMonth({invoiceMonth: dayjs(month, 'YYYY-MM-DD'), teacherId: Number(teacherId)})
+  }
 
   @Post('')
   create(
