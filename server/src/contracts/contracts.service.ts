@@ -47,7 +47,22 @@ export class ContractsService {
     })
   }
 
-  async findAllPending(teacherId): Promise<Contract[]> {
+  async findAllPending(): Promise<Contract[]> {
+    const contracts = this.contractsRepository
+      .createQueryBuilder('c')
+      .select(['c', 's','t', 'customers', 'school'])
+      .leftJoin('c.subject', 's')
+      .leftJoin('c.teacher', 't')
+      .leftJoin('c.customers', 'customers')
+      .leftJoin('customers.school', 'school')
+      .where('c.state != :contractState', {
+        contractState: ContractState.ACCEPTED,
+      })
+
+    return contracts.getMany()
+  }
+
+  async findAllPendingForTeacher(teacherId): Promise<Contract[]> {
     const contracts = this.contractsRepository
       .createQueryBuilder('c')
       .select(['c', 's'])
@@ -74,20 +89,25 @@ export class ContractsService {
 
   async endOrDeleteContract(id: string): Promise<void> {
     const contract = await this.contractsRepository.findOneOrFail(id)
-
-    if (dayjs().isBefore(contract.endDate)) {
-      // Cannot delete past contracts
-      if (dayjs().isBefore(contract.startDate)) {
-        // Delete Future contracts completely
-        this.contractsRepository.delete(id)
+    
+    if(contract.state === ContractState.ACCEPTED){
+      if (dayjs().isBefore(contract.endDate)) {
+        // Cannot delete past contracts
+        if (dayjs().isBefore(contract.startDate)) {
+          // Delete Future contracts completely
+          this.contractsRepository.delete(id)
+        } else {
+          // End ongoing contracts
+          this.contractsRepository.update(id, {
+            endDate: dayjs().format('YYYY-MM-DD'),
+          })
+        }
       } else {
-        // End ongoing contracts
-        this.contractsRepository.update(id, {
-          endDate: dayjs().format('YYYY-MM-DD'),
-        })
+        throw new BadRequestException('Past contracts cannot be deleted')
       }
-    } else {
-      throw new BadRequestException('Past contracts cannot be deleted')
+    }else{
+      // Delete unaccepted contracts completely
+      this.contractsRepository.delete(id)
     }
   }
 
@@ -187,6 +207,7 @@ export class ContractsService {
       })
 
     if (dto.interval !== 1) contractQuery.andWhere('con.interval = 1')
+
 
     /* MAIN QUERY */
 

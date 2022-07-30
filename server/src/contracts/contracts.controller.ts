@@ -74,6 +74,12 @@ export class ContractsController {
     return this.contractsService.findAll()
   }
 
+  @Get('pending')
+  @Roles(Role.ADMIN)
+  findAllPending(): Promise<Contract[]> {
+    return this.contractsService.findAllPending()
+  }
+
   @Get(':id')
   @Roles(Role.ADMIN)
   findOne(@Param('id') id: string): Promise<Contract> {

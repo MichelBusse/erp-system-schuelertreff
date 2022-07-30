@@ -155,7 +155,6 @@ const Timetable: React.FC = () => {
             open={open}
             setOpen={setOpen}
             onSuccess={() => setRefreshCalendar((r) => r + 1)}
-            teachers={teachers}
           />
         </>
       )}

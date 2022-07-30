@@ -1,5 +1,5 @@
 import subject from './subject'
-import { customer } from './user'
+import { customer, teacher } from './user'
 
 export enum ContractState {
   PENDING = 'pending',
@@ -17,5 +17,17 @@ export type contract = {
   subject: subject
   customers: customer[]
   teacher: number
+  state: ContractState
+}
+export type contractWithTeacher = {
+  id: number
+  startTime: string
+  endTime: string
+  startDate: string
+  endDate: string
+  interval: 1
+  subject: subject
+  customers: customer[]
+  teacher: teacher
   state: ContractState
 }

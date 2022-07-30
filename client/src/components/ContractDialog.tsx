@@ -32,7 +32,7 @@ import { useSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 
 import { snackbarOptionsError } from '../consts'
-import { ContractState } from '../types/contract'
+import { ContractState, contractWithTeacher } from '../types/contract'
 import subject from '../types/subject'
 import { classCustomer, privateCustomer, school, teacher } from '../types/user'
 import { getNextDow } from '../utils/date'
@@ -70,8 +70,6 @@ type form0 = {
   interval: number
   startDate: Dayjs | null
   endDate: Dayjs | null
-  startTime: Dayjs | null
-  endTime: Dayjs | null
 }
 
 type form1 = {
@@ -82,22 +80,22 @@ type form1 = {
   minTime: Dayjs | null
   maxTime: Dayjs | null
   teacher: string
-  dow: number | null
   teacherConfirmation: boolean
+  dow: number
 }
 
 type Props = {
   open: boolean
   setOpen: (open: boolean) => void
   onSuccess?: () => void
-  teachers: teacher[]
+  initialContract?: contractWithTeacher | null
 }
 
 const ContractDialog: React.FC<Props> = ({
   open,
   setOpen,
   onSuccess = () => {},
-  teachers,
+  initialContract,
 }) => {
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
@@ -109,6 +107,7 @@ const ContractDialog: React.FC<Props> = ({
   const [privateCustomers, setPrivateCustomers] = useState<privateCustomer[]>(
     [],
   )
+  const [teachers, setTeachers] = useState<teacher[]>([])
   const [schools, setSchools] = useState<school[]>([])
   const [classCustomers, setClassCustomers] = useState<classCustomer[]>([])
   const [subjects, setSubjects] = useState<subject[]>([])
@@ -121,8 +120,6 @@ const ContractDialog: React.FC<Props> = ({
     interval: 1,
     startDate: dayjs().add(1, 'day'),
     endDate: dayjs().add(1, 'day').add(1, 'year'),
-    startTime: null,
-    endTime: null,
   })
 
   // step 1
@@ -137,13 +134,55 @@ const ContractDialog: React.FC<Props> = ({
     minTime: null,
     maxTime: null,
     teacher: '',
-    dow: null,
     teacherConfirmation: true,
+    dow: 1,
   })
+
+  useEffect(() => {
+    if (!initialContract) return
+
+    if (initialContract.customers[0].role === CustomerType.PRIVATE) {
+      setCustomerType(CustomerType.PRIVATE)
+      console.log(initialContract.customers[0])
+    } else {
+      setCustomerType(CustomerType.SCHOOL)
+
+      console.log(initialContract.customers[0])
+    }
+
+    setForm0((form0) => {
+      const initialForm0Entry: form0 = {
+        ...form0,
+        startDate: dayjs(initialContract.startDate, 'YYYY-MM-DD'),
+        endDate: dayjs(initialContract.endDate, 'YYYY-MM-DD'),
+        subject: initialContract.subject,
+        interval: initialContract.interval,
+      }
+      if (initialContract.customers[0].role === CustomerType.PRIVATE) {
+        initialForm0Entry.privateCustomers =
+          initialContract.customers as privateCustomer[]
+      } else {
+        initialForm0Entry.school = (
+          initialContract.customers[0] as classCustomer
+        ).school
+        initialForm0Entry.classCustomers =
+          initialContract.customers as classCustomer[]
+      }
+
+      return initialForm0Entry
+    })
+  }, [initialContract])
 
   useEffect(() => {
     API.get('users/privateCustomer')
       .then((res) => setPrivateCustomers(res.data))
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+      })
+
+    API.get('users/teacher')
+      .then((res) => setTeachers(res.data))
       .catch((err) => {
         console.error(err)
         enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
@@ -200,25 +239,66 @@ const ContractDialog: React.FC<Props> = ({
         interval: form0.interval,
         startDate: form0.startDate?.format('YYYY-MM-DD'),
         endDate: form0.endDate?.format('YYYY-MM-DD'),
-        startTime: form0.startTime?.format('HH:mm'),
-        endTime: form0.endTime?.format('HH:mm'),
       },
     })
       .then((res) => {
-        updateSelSuggestion('')
         setSuggestions(res.data)
         setActiveStep(1)
+
+        updateSelSuggestion('')
         setForm1({
           startDate: form0.startDate,
           endDate: form0.endDate,
-          startTime: form0.startTime,
-          endTime: form0.endTime,
-          minTime: form0.startTime,
-          maxTime: form0.endTime,
+          startTime: null,
+          endTime: null,
+          minTime: null,
+          maxTime: null,
           teacher: '',
-          dow: null,
           teacherConfirmation: true,
+          dow: form0.startDate?.day() ?? 1,
         })
+
+        if (initialContract) {
+          const initialStartDate = dayjs(
+            initialContract.startDate,
+            'YYYY-MM-DD',
+          )
+          const initialStartTime = dayjs(initialContract.startTime, 'hh:mm')
+          const initialEndTime = dayjs(initialContract.endTime, 'hh:mm')
+
+          const resSuggestions = res.data as suggestion[]
+
+          resSuggestions.forEach((teacherSuggestion, teacherIndex) => {
+            if (teacherSuggestion.teacherId === initialContract.teacher.id) {
+              teacherSuggestion.suggestions.forEach(
+                (timeSuggestion, timeIndex) => {
+                  if (
+                    timeSuggestion.dow === initialStartDate.day() &&
+                    !dayjs(timeSuggestion.start, 'hh:mm').isAfter(
+                      initialStartTime,
+                    ) &&
+                    !dayjs(timeSuggestion.end, 'hh:mm').isBefore(initialEndTime)
+                  ) {
+                    setSelSuggestion(teacherIndex + ',' + timeIndex)
+                    setForm1((form1) => {
+                      const initialForm1Entry: form1 = {
+                        ...form1,
+                        startDate: initialStartDate,
+                        endDate: dayjs(initialContract.endDate, 'YYYY-MM-DD'),
+                        startTime: initialStartTime,
+                        endTime: initialEndTime,
+                        teacher: initialContract.teacher.id.toString(),
+                        dow: initialStartDate.day(),
+                      }
+
+                      return initialForm1Entry
+                    })
+                  }
+                },
+              )
+            }
+          })
+        }
       })
       .catch((err) => {
         console.error(err)
@@ -252,8 +332,8 @@ const ContractDialog: React.FC<Props> = ({
         minTime: startTime,
         maxTime: endTime,
         teacher: teacher.teacherId.toString(),
-        dow: suggestion.dow,
         teacherConfirmation: true,
+        dow: suggestion.dow,
       })
     } else {
       setForm1({
@@ -264,8 +344,8 @@ const ContractDialog: React.FC<Props> = ({
         minTime: null,
         maxTime: null,
         teacher: '',
-        dow: null,
         teacherConfirmation: true,
+        dow: form0.startDate?.day() ?? 1,
       })
     }
   }
@@ -298,6 +378,11 @@ const ContractDialog: React.FC<Props> = ({
     })
       .then(() => {
         onSuccess()
+
+        if (initialContract) {
+          API.delete('contracts/' + initialContract.id)
+        }
+
         setOpen(false)
       })
       .catch((err) => {
@@ -610,14 +695,15 @@ const ContractDialog: React.FC<Props> = ({
               <Select
                 id="weekday-select"
                 label={'Wochentag'}
-                value={(form1.startDate && form1.startDate.day()) || null}
+                value={form1.dow}
                 disabled={selSuggestion !== ''}
                 onChange={(e) => {
                   setForm1((data) => ({
                     ...data,
-                    startDate: form0.startDate
-                      ? getNextDow(e.target.value as number, form0.startDate)
-                      : null,
+                    dow: e.target.value as number,
+                    startDate:
+                      form0.startDate &&
+                      getNextDow(e.target.value as number, form0.startDate),
                   }))
                 }}
               >
@@ -636,7 +722,7 @@ const ContractDialog: React.FC<Props> = ({
                     ? getNextDow(3, form0.startDate).format('DD.MM.YYYY')
                     : ''
                 })`}</MenuItem>
-                <MenuItem value={4}>{`Donnerstag (Start:${
+                <MenuItem value={4}>{`Donnerstag (Start: ${
                   form0.startDate
                     ? getNextDow(4, form0.startDate).format('DD.MM.YYYY')
                     : ''
@@ -654,8 +740,8 @@ const ContractDialog: React.FC<Props> = ({
               label="Startzeit"
               required
               minutesStep={5}
-              minTime={form1.minTime ?? form0.startTime ?? undefined}
-              maxTime={(form1.endTime ?? form0.endTime)?.subtract(45, 'm')}
+              minTime={form1.minTime ?? undefined}
+              maxTime={form1.endTime?.subtract(45, 'm')}
               value={form1.startTime}
               onChange={(value) => {
                 setForm1((data) => ({ ...data, startTime: value }))
@@ -668,8 +754,8 @@ const ContractDialog: React.FC<Props> = ({
               label="Endzeit"
               required
               minutesStep={5}
-              minTime={(form1.startTime ?? form0.startTime)?.add(45, 'm')}
-              maxTime={form1.maxTime ?? form0.endTime ?? undefined}
+              minTime={form1.startTime?.add(45, 'm')}
+              maxTime={form1.maxTime ?? undefined}
               value={form1.endTime}
               onChange={(value) => {
                 setForm1((data) => ({ ...data, endTime: value }))

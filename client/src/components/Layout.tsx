@@ -6,6 +6,7 @@ import {
   School as SchoolIcon,
   TableChart as TableChartIcon,
 } from '@mui/icons-material'
+import ExploreIcon from '@mui/icons-material/Explore'
 import { Box, useTheme } from '@mui/material'
 import { Outlet } from 'react-router-dom'
 
@@ -14,6 +15,11 @@ import { useAuth } from './AuthProvider'
 import MainMenu from './MainMenu'
 
 const menuItems = [
+  {
+    icon: ExploreIcon,
+    text: 'Cockpit',
+    href: '/cockpit',
+  },
   {
     icon: TableChartIcon,
     text: 'Stundenplan',

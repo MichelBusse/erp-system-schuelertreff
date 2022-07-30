@@ -12,6 +12,15 @@ export class SubjectsController {
   constructor(private readonly subjectsService: SubjectsService) {}
 
   @Roles(Role.ADMIN)
+  @Post(':id')
+  update(
+    @Param('id') id: number,
+    @Body() updateSubjectDto: CreateSubjectDto,
+  ): Promise<Subject> {
+    return this.subjectsService.update(id, updateSubjectDto)
+  }
+
+  @Roles(Role.ADMIN)
   @Post()
   create(@Body() createSubjectDto: CreateSubjectDto): Promise<Subject> {
     return this.subjectsService.create(createSubjectDto)
@@ -27,6 +36,7 @@ export class SubjectsController {
     return this.subjectsService.findOne(id)
   }
 
+  @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: number): Promise<void> {
     return this.subjectsService.remove(id)
