@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { Contract } from 'src/contracts/contract.entity'
 import { Teacher } from 'src/users/entities'
-import { Connection, Repository } from 'typeorm'
+import { DataSource, Repository } from 'typeorm'
 
 import { CreateSubjectDto } from './dto/create-subject.dto'
 import { Subject } from './subject.entity'
@@ -12,8 +12,8 @@ export class SubjectsService {
   constructor(
     @InjectRepository(Subject)
     private readonly subjectsRepository: Repository<Subject>,
-    @InjectConnection()
-    private connection: Connection,
+    @InjectDataSource()
+    private connection: DataSource,
   ) {}
 
   create(createUserDto: CreateSubjectDto): Promise<Subject> {
@@ -26,7 +26,7 @@ export class SubjectsService {
   }
 
   async update(id: number, createUserDto: CreateSubjectDto): Promise<Subject> {
-    const subject = await this.subjectsRepository.findOneOrFail(id)
+    const subject = await this.subjectsRepository.findOneByOrFail({ id })
 
     subject.name = createUserDto.name
     subject.color = createUserDto.color
@@ -40,7 +40,7 @@ export class SubjectsService {
   }
 
   findOne(id: number): Promise<Subject> {
-    return this.subjectsRepository.findOne(id)
+    return this.subjectsRepository.findOneBy({ id })
   }
 
   async remove(id: number): Promise<void> {
@@ -63,11 +63,11 @@ export class SubjectsService {
 
     const teachers = await teacherQuery.getMany()
 
-    if(teachers.length > 0 || contracts.length > 0){
+    if (teachers.length > 0 || contracts.length > 0) {
       throw new BadRequestException(
         'Subject cannot be deleted: the subject is already used by teachers or in contracts',
       )
-    }else{
+    } else {
       await this.subjectsRepository.delete(id)
     }
   }

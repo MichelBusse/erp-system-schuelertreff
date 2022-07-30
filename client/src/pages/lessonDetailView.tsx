@@ -77,7 +77,7 @@ const LessonDetailView: React.FC = () => {
   const submitForm = () => {
     API.post('lessons/' + (id ?? ''), {
       date: dayjs(date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
-      contractId: contractId,
+      contractId: parseInt(contractId ?? ''),
       ...data,
     }).then(() => {
       enqueueSnackbar('Stunde gespeichert', snackbarOptions)

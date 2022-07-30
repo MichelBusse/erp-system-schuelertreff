@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import dayjs, { Dayjs } from 'dayjs'
-import { Brackets, Connection, Repository } from 'typeorm'
+import { Brackets, DataSource, Repository } from 'typeorm'
 
 import { timeAvailable } from 'src/users/dto/timeAvailable'
 import { Customer, User } from 'src/users/entities'
@@ -18,8 +18,8 @@ export class ContractsService {
     @InjectRepository(Contract)
     private readonly contractsRepository: Repository<Contract>,
 
-    @InjectConnection()
-    private connection: Connection,
+    @InjectDataSource()
+    private connection: DataSource,
 
     private readonly usersService: UsersService,
   ) {}
@@ -50,7 +50,7 @@ export class ContractsService {
   async findAllPending(): Promise<Contract[]> {
     const contracts = this.contractsRepository
       .createQueryBuilder('c')
-      .select(['c', 's','t', 'customers', 'school'])
+      .select(['c', 's', 't', 'customers', 'school'])
       .leftJoin('c.subject', 's')
       .leftJoin('c.teacher', 't')
       .leftJoin('c.customers', 'customers')
@@ -75,8 +75,9 @@ export class ContractsService {
     return contracts.getMany()
   }
 
-  async findOne(id: string, teacherId?: number): Promise<Contract> {
-    const contract = await this.contractsRepository.findOne(id, {
+  async findOne(id: number, teacherId?: number): Promise<Contract> {
+    const contract = await this.contractsRepository.findOne({
+      where: { id },
       relations: ['subject', 'teacher', 'customers'],
     })
 
@@ -87,10 +88,10 @@ export class ContractsService {
     }
   }
 
-  async endOrDeleteContract(id: string): Promise<void> {
-    const contract = await this.contractsRepository.findOneOrFail(id)
-    
-    if(contract.state === ContractState.ACCEPTED){
+  async endOrDeleteContract(id: number): Promise<void> {
+    const contract = await this.contractsRepository.findOneByOrFail({ id })
+
+    if (contract.state === ContractState.ACCEPTED) {
       if (dayjs().isBefore(contract.endDate)) {
         // Cannot delete past contracts
         if (dayjs().isBefore(contract.startDate)) {
@@ -105,14 +106,14 @@ export class ContractsService {
       } else {
         throw new BadRequestException('Past contracts cannot be deleted')
       }
-    }else{
+    } else {
       // Delete unaccepted contracts completely
       this.contractsRepository.delete(id)
     }
   }
 
-  async updateContract(id: string, dto: CreateContractDto): Promise<void> {
-    let contract: any = await this.contractsRepository.findOne(id)
+  async updateContract(id: number, dto: CreateContractDto): Promise<void> {
+    let contract: any = await this.contractsRepository.findOneBy({ id })
 
     contract = {
       ...contract,
@@ -132,10 +133,10 @@ export class ContractsService {
   }
 
   async acceptOrDeclineContract(
-    id: string,
+    id: number,
     dto: AcceptOrDeclineContractDto,
   ): Promise<void> {
-    let contract: any = await this.contractsRepository.findOne(id)
+    let contract: any = await this.contractsRepository.findOneBy({ id })
 
     contract = {
       ...contract,
@@ -208,7 +209,6 @@ export class ContractsService {
 
     if (dto.interval !== 1) contractQuery.andWhere('con.interval = 1')
 
-
     /* MAIN QUERY */
 
     const mainQuery = qb
@@ -220,7 +220,7 @@ export class ContractsService {
           .addSelect('t.lastName', 'lastName')
           .addSelect(
             `
-              t.timesAvailable
+              t."timesAvailable"
               * ${cTimes.getQuery()}
               - ${contractQuery.getQuery()}
             `,

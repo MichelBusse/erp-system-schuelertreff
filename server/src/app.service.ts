@@ -1,16 +1,16 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { InjectConnection } from '@nestjs/typeorm'
+import { InjectDataSource } from '@nestjs/typeorm'
 import { nanoid } from 'nanoid'
-import { Connection } from 'typeorm'
+import { DataSource } from 'typeorm'
 
 import { UsersService } from './users/users.service'
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
   constructor(
-    @InjectConnection()
-    private connection: Connection,
+    @InjectDataSource()
+    private connection: DataSource,
 
     private config: ConfigService,
 

@@ -52,7 +52,8 @@ export class LessonsService {
     createLessonDto: CreateLessonDto,
     teacherId?: number,
   ): Promise<Lesson> {
-    const lesson = await this.lessonsRepository.findOne(id, {
+    const lesson = await this.lessonsRepository.findOne({
+      where: { id },
       relations: ['contract', 'contract.teacher'],
     })
 
@@ -76,7 +77,7 @@ export class LessonsService {
     })
   }
 
-  async findOne(contractId: string, date: string, teacherId?: number) {
+  async findOne(contractId: number, date: string, teacherId?: number) {
     const lessonQuery = this.lessonsRepository
       .createQueryBuilder('l')
       .leftJoin('l.contract', 'c')
@@ -91,7 +92,7 @@ export class LessonsService {
     return { contract: contract, lesson: lesson }
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     await this.lessonsRepository.delete(id)
   }
 
@@ -113,9 +114,8 @@ export class LessonsService {
       dayjs(week),
       teacherId,
     )
-    const pendingContracts = await this.contractsService.findAllPendingForTeacher(
-      teacherId,
-    )
+    const pendingContracts =
+      await this.contractsService.findAllPendingForTeacher(teacherId)
 
     return {
       lessons: lessonsOfWeek,

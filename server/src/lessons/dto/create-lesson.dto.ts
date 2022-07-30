@@ -5,5 +5,5 @@ export class CreateLessonDto {
 
   state: LessonState
 
-  contractId: string
+  contractId: number
 }

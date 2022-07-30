@@ -75,8 +75,8 @@ const PendingContracts: React.FC = () => {
                   <span>{contract.subject.name}</span>
                   <span>{dayjs(contract.startDate).format('dddd')}s</span>
                   <div>
-                    <IconButton>
-                      <EditIcon onClick={() => editContract(contract)} />
+                    <IconButton onClick={() => editContract(contract)}>
+                      <EditIcon />
                     </IconButton>
                     <IconButton onClick={() => deleteContract(contract.id)}>
                       <DeleteIcon />

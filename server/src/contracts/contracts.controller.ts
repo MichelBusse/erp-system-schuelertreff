@@ -82,13 +82,13 @@ export class ContractsController {
 
   @Get(':id')
   @Roles(Role.ADMIN)
-  findOne(@Param('id') id: string): Promise<Contract> {
+  findOne(@Param('id') id: number): Promise<Contract> {
     return this.contractsService.findOne(id)
   }
 
   @Post('acceptOrDecline/:id')
   acceptOrDecline(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() dto: AcceptOrDeclineContractDto,
   ): void {
     this.contractsService.acceptOrDeclineContract(id, dto)
@@ -96,7 +96,7 @@ export class ContractsController {
 
   @Post(':id')
   @Roles(Role.ADMIN)
-  update(@Param('id') id: string, @Body() dto: CreateContractDto): void {
+  update(@Param('id') id: number, @Body() dto: CreateContractDto): void {
     this.validateDto(dto)
 
     if (dayjs(dto.startDate).isAfter(dayjs())) {
@@ -122,7 +122,7 @@ export class ContractsController {
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  endOrDelete(@Param('id') id: string): Promise<void> {
+  endOrDelete(@Param('id') id: number): Promise<void> {
     return this.contractsService.endOrDeleteContract(id)
   }
 }

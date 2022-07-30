@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import * as argon2 from 'argon2'
 import dayjs from 'dayjs'
-import { Connection, Not, Repository } from 'typeorm'
+import { DataSource, Not, Repository } from 'typeorm'
 
 import { Contract } from 'src/contracts/contract.entity'
 
@@ -98,8 +98,8 @@ export class UsersService {
     @InjectRepository(Admin)
     private readonly adminsRepository: Repository<Admin>,
 
-    @InjectConnection()
-    private connection: Connection,
+    @InjectDataSource()
+    private connection: DataSource,
   ) {}
 
   /**
@@ -179,24 +179,27 @@ export class UsersService {
   }
 
   async findOne(id: number): Promise<User> {
-    return this.usersRepository.findOneOrFail(id).then(transformUser)
+    return this.usersRepository.findOneByOrFail({ id }).then(transformUser)
   }
 
   async findOneCustomer(id: number): Promise<Customer> {
-    return this.customersRepository.findOneOrFail(id).then(transformUser)
+    return this.customersRepository.findOneByOrFail({ id }).then(transformUser)
   }
 
   async findOnePrivateCustomer(id: number): Promise<PrivateCustomer> {
-    return this.privateCustomersRepository.findOneOrFail(id).then(transformUser)
+    return this.privateCustomersRepository
+      .findOneByOrFail({ id })
+      .then(transformUser)
   }
 
   async findOneSchool(id: number): Promise<School> {
-    return this.schoolsRepository.findOneOrFail(id).then(transformUser)
+    return this.schoolsRepository.findOneByOrFail({ id }).then(transformUser)
   }
 
   async findOneTeacher(id: number): Promise<Teacher> {
     return this.teachersRepository
-      .findOneOrFail(id, {
+      .findOneOrFail({
+        where: { id },
         relations: ['subjects'],
       })
       .then(transformUser)
@@ -494,7 +497,7 @@ export class UsersService {
    * Password reset
    */
   async setPassword(id: number, password: string): Promise<User> {
-    const user = await this.usersRepository.findOne(id)
+    const user = await this.usersRepository.findOneBy({ id })
 
     user.passwordHash = await this.hash(password)
     user.jwtValidAfter = new Date()

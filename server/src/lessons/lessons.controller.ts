@@ -74,7 +74,7 @@ export class LessonsController {
   @Get(':contractId/:date')
   findOne(
     @Request() req,
-    @Param('contractId') id: string,
+    @Param('contractId') id: number,
     @Param('date') date: string,
   ): Promise<{ contract: Contract; lesson: Lesson }> {
     if (req.user.role === Role.ADMIN) {
@@ -86,7 +86,7 @@ export class LessonsController {
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  remove(@Param('id') id: string): Promise<void> {
+  remove(@Param('id') id: number): Promise<void> {
     return this.lessonsService.remove(id)
   }
 }
