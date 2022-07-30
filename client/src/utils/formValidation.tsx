@@ -124,7 +124,7 @@ export function formValidation(form: string, data: any): any {
     }
 
     temp.name = data.name ? '' : errorText.subjectName
-    temp.shortForm = data.schortForm ? '' : errorText.shortForm
+    temp.shortForm = data.shortForm ? '' : errorText.shortForm
 
     if (data.name && data.shortForm) temp.validation = true
 

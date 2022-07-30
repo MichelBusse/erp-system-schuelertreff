@@ -63,6 +63,14 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="cockpit"
+                element={
+                  <ProtectedRoute>
+                    <Pages.Cockpit />
+                  </ProtectedRoute>
+                }
+              ></Route>
               <Route path="timetable">
                 <Route
                   path=""

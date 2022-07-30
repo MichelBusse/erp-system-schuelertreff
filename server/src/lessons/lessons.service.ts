@@ -113,7 +113,7 @@ export class LessonsService {
       dayjs(week),
       teacherId,
     )
-    const pendingContracts = await this.contractsService.findAllPending(
+    const pendingContracts = await this.contractsService.findAllPendingForTeacher(
       teacherId,
     )
 

@@ -1,3 +1,4 @@
+import Cockpit from './cockpit'
 import LessonDetailView from './lessonDetailView'
 import Login from './login'
 import PrivateCustomerDetailView from './privateCustomerDetailView'
@@ -11,6 +12,7 @@ import Teachers from './teachers'
 import Timetable from './timetable'
 
 export default {
+  Cockpit,
   PrivateCustomers,
   Schools,
   Login,

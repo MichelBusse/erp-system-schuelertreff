@@ -11,6 +11,7 @@ const Subjects: React.FC = () => {
   const [error, setError] = useState('')
   const [open, setOpen] = useState(false)
   const [subjects, setSubjects] = useState<subject[]>([])
+  const [initialSubject, setInitialSubject] = useState<subject | null>(null)
   const { API } = useAuth()
 
   //Get subjects from DB
@@ -26,17 +27,33 @@ const Subjects: React.FC = () => {
     return <h1>{error}</h1>
   }
 
+  const openSubjectDialog = (subject?: subject) => {
+    if (subject) {
+      setInitialSubject(subject)
+    } else {
+      setInitialSubject(null)
+    }
+    setOpen(true)
+  }
+
   return (
     <Box sx={{ p: 4 }} className={styles.wrapper}>
       <Grid container spacing={4} columns={24}>
         <Grid item sm={12} md={6} lg={4} xl={3}>
-          <IconButton className={styles.card} onClick={() => setOpen(true)}>
+          <IconButton
+            className={styles.card}
+            onClick={() => openSubjectDialog()}
+          >
             <BsPlusLg />
           </IconButton>
         </Grid>
         {subjects.map((subject) => (
           <Grid key={subject.id} item sm={12} md={6} lg={4} xl={3}>
-            <Paper className={styles.card} sx={{ whiteSpace: 'nowrap' }}>
+            <Paper
+              className={styles.card}
+              sx={{ whiteSpace: 'nowrap', cursor: 'pointer' }}
+              onClick={() => openSubjectDialog(subject)}
+            >
               {`${subject.name} (${subject.shortForm})`}
               <div
                 style={{
@@ -51,7 +68,12 @@ const Subjects: React.FC = () => {
           </Grid>
         ))}
       </Grid>
-      <SubjectDialog open={open} setOpen={setOpen} setSubjects={setSubjects} />
+      <SubjectDialog
+        open={open}
+        setOpen={setOpen}
+        setSubjects={setSubjects}
+        initialSubject={initialSubject}
+      />
     </Box>
   )
 }
