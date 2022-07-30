@@ -62,6 +62,7 @@ const SchoolDetailView: React.FC = () => {
         email: res.data.email,
         phone: res.data.phone,
         schoolTypes: res.data.schoolTypes,
+        fee: res.data.fee
       }))
     })
   }, [])
@@ -287,6 +288,24 @@ const SchoolDetailView: React.FC = () => {
               InputProps={{
                 readOnly: false,
               }}
+            />
+          </Stack>
+
+          <h3>Weitere Infos</h3>
+          <Stack direction="row" columnGap={2}>
+            <TextField
+              type="number"
+              id="fee"
+              label="Stundensatz"
+              variant="outlined"
+              disabled={requestedId === 'me'}
+              value={school.fee ?? ''}
+              onChange={(event) =>
+                setSchool((data) => ({
+                  ...data,
+                  fee: Number(event.target.value),
+                }))
+              }
             />
           </Stack>
           <h3>Kontakt:</h3>

@@ -341,7 +341,7 @@ const TeacherDetailView: React.FC = () => {
               <TextField
                 type="number"
                 id="fee"
-                label="Lohn"
+                label="Stundensatz"
                 variant="outlined"
                 disabled={requestedId === 'me'}
                 value={data.fee ?? ''}

@@ -18,4 +18,7 @@ export class School extends User {
     default: '{}',
   })
   schoolTypes: SchoolType[]
+
+  @Column({type: "decimal", precision: 5, scale: 2, default: 0})
+  fee: number
 }

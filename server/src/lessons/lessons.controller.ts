@@ -40,6 +40,12 @@ export class LessonsController {
     return this.lessonsService.findByWeek(dayjs(date))
   }
 
+  @Get('invoice/:year/:month')
+  getInvoiceLessons(
+    @Param('year') year: number,
+    @Param('month') month: number,
+  ) {}
+
   @Post('')
   create(
     @Request() req,

@@ -45,11 +45,13 @@ export interface admin extends user {
 
 export interface privateCustomer extends user {
   role: 'privateCustomer'
+  fee: number
 }
 
 export interface school extends Omit<user, 'lastName' | 'firstName'> {
   role: 'school'
   schoolName: string
+  fee: number
 }
 
 export interface classCustomer {

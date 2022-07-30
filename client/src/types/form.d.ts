@@ -29,6 +29,7 @@ export interface schoolForm
   extends Omit<userForm, 'lastName' | 'firstName' | 'timesAvailable'> {
   schoolName: string
   schoolTypes: string[]
+  fee: number
 }
 
 export interface classCustomerForm {
@@ -39,7 +40,8 @@ export interface classCustomerForm {
 }
 
 export interface privateCustomerForm extends userForm {
-  grade: number | null
+  grade: number
+  fee: number
 }
 
 export interface lessonForm {

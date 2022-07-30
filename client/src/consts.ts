@@ -36,8 +36,9 @@ export const defaultPrivateCustomerFormData: privateCustomerForm = {
   street: '',
   email: '',
   phone: '',
-  grade: null,
+  grade: 0,
   timesAvailable: [],
+  fee: 0
 }
 
 export const snackbarOptions: SnackbarOptions = {
@@ -68,6 +69,7 @@ export const defaultSchoolFormData = {
   email: '',
   phone: '',
   schoolTypes: [],
+  fee: 0
 }
 
 export const defaultClassCustomerFormData = {
