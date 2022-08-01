@@ -38,7 +38,7 @@ import {
   Teacher,
   User,
 } from './entities'
-import { Leave } from './entities/leave.entity'
+import { Leave, LeaveState } from './entities/leave.entity'
 import { UsersService } from './users.service'
 
 @Controller('users')
@@ -281,7 +281,7 @@ export class UsersController {
 
   @Post('me/leave')
   async createOwnLeave(@Request() req, @Body() dto: LeaveDto): Promise<Leave> {
-    return this.createLeave(req.user.id, dto)
+    return this.createLeave(req.user.id, { ...dto, state: LeaveState.PENDING })
   }
 
   @Roles(Role.ADMIN)

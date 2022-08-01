@@ -26,7 +26,7 @@ import { useState } from 'react'
 
 import { snackbarOptionsError } from '../consts'
 import { LeaveState, LeaveType } from '../types/enums'
-import { leave } from '../types/user'
+import { leave, Role } from '../types/user'
 import { useAuth } from './AuthProvider'
 import EqualStack from './EqualStack'
 import IconButtonAdornment from './IconButtonAdornment'
@@ -61,9 +61,10 @@ const LeaveDialog: React.FC<Props> = ({
   const [uploadFile, setUploadFile] = useState<File | null>(null)
   const [renderUpload, setRenderUpload] = useState(0)
   const [deleteConfirmation, setDeleteConfirmation] = useState(false)
+  const [initialState] = useState(value.state)
 
   const { enqueueSnackbar } = useSnackbar()
-  const { API } = useAuth()
+  const { API, hasRole } = useAuth()
 
   const clearUpload = () => {
     setRenderUpload((r) => r + 1)
@@ -73,7 +74,9 @@ const LeaveDialog: React.FC<Props> = ({
   const formValid = !!(value.startDate && value.endDate && value.type)
 
   // user is not supposed to edit it (would cause lots of issues)
-  const editDisabled = typeof value.id !== 'undefined' && userId === 'me'
+  const editDisabled =
+    (typeof value.id !== 'undefined' && userId === 'me') ||
+    initialState !== LeaveState.PENDING
 
   const handleUpload = (id: number, data?: leave) => {
     if (uploadFile === null) return
@@ -284,6 +287,7 @@ const LeaveDialog: React.FC<Props> = ({
                     color={value.hasAttachment ? 'primary' : 'default'}
                     aria-label="Nachweis hochladen"
                     component="label"
+                    disabled={initialState !== LeaveState.PENDING}
                   >
                     <input
                       key={renderUpload}
@@ -328,6 +332,32 @@ const LeaveDialog: React.FC<Props> = ({
                 </IconButton>
               </Box>
             )}
+
+            {hasRole(Role.ADMIN) && (
+              <FormControl disabled={editDisabled}>
+                <RadioGroup
+                  row
+                  value={value.state}
+                  onChange={(event) =>
+                    setValue((form) => ({
+                      ...form,
+                      state: event.target.value as LeaveState,
+                    }))
+                  }
+                >
+                  <FormControlLabel
+                    value={LeaveState.ACCEPTED}
+                    label="Bestätigt"
+                    control={<Radio />}
+                  />
+                  <FormControlLabel
+                    value={LeaveState.DECLINED}
+                    label="Abgelehnt"
+                    control={<Radio />}
+                  />
+                </RadioGroup>
+              </FormControl>
+            )}
           </Stack>
         </Box>
       </DialogContent>
@@ -338,14 +368,16 @@ const LeaveDialog: React.FC<Props> = ({
           </Button>
         )}
         <Button onClick={close}>Abbrechen</Button>
-        <LoadingButton
-          variant="contained"
-          onClick={handleSubmit}
-          loading={loading}
-          disabled={!formValid || loading}
-        >
-          {value.id ? 'Speichern' : 'Hinzufügen'}
-        </LoadingButton>
+        {initialState === LeaveState.PENDING && (
+          <LoadingButton
+            variant="contained"
+            onClick={handleSubmit}
+            loading={loading}
+            disabled={!formValid || loading}
+          >
+            {value.id ? 'Speichern' : 'Hinzufügen'}
+          </LoadingButton>
+        )}
       </DialogActions>
     </Dialog>
   )

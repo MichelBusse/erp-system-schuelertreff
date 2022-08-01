@@ -31,7 +31,7 @@ import {
   Teacher,
   User,
 } from './entities'
-import { Leave } from './entities/leave.entity'
+import { Leave, LeaveState } from './entities/leave.entity'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
 
@@ -164,6 +164,7 @@ export class UsersService {
       type: dto.type,
       startDate: dto.startDate,
       endDate: dto.endDate,
+      state: dto.state,
     })
 
     return repo.save(leave)
@@ -177,6 +178,9 @@ export class UsersService {
       .where('"userId" = :userId', { userId })
       .andWhere('id = :id', { id })
       .getOneOrFail()
+
+    // leave cannot be edited after it was accepted/declined
+    if (leave.state !== LeaveState.PENDING) throw new BadRequestException()
 
     return repo.save({
       ...leave,
