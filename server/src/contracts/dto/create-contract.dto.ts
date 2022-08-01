@@ -26,5 +26,5 @@ export class CreateContractDto {
 
   @IsOptional()
   @IsInt()
-  parentContract: number
+  parentContract?: number
 }

@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
+import { DataSource, Repository } from 'typeorm'
+
 import { Contract } from 'src/contracts/contract.entity'
 import { Teacher } from 'src/users/entities'
-import { DataSource, Repository } from 'typeorm'
 
 import { CreateSubjectDto } from './dto/create-subject.dto'
 import { Subject } from './subject.entity'

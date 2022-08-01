@@ -36,4 +36,13 @@ export class Leave {
 
   @ManyToOne(() => User, (user) => user.leave)
   user?: User
+
+  @Column({ type: 'bytea', nullable: true, select: false })
+  attachment?: Buffer
+
+  @Column({
+    generatedType: 'STORED',
+    asExpression: `attachment IS NOT NULL`,
+  })
+  hasAttachment?: boolean
 }
