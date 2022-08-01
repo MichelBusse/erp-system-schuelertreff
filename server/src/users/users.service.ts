@@ -162,7 +162,8 @@ export class UsersService {
     const leave = repo.create({
       user: { id: userId },
       type: dto.type,
-      dateRange: `[${dto.startDate}, ${dto.endDate})`,
+      startDate: dto.startDate,
+      endDate: dto.endDate,
     })
 
     return repo.save(leave)
@@ -180,10 +181,6 @@ export class UsersService {
     return repo.save({
       ...leave,
       ...dto,
-      dateRange:
-        dto.startDate && dto.endDate
-          ? `[${dto.startDate}, ${dto.endDate})`
-          : leave.dateRange,
     })
   }
 

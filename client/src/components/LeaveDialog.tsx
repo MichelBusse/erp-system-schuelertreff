@@ -1,4 +1,8 @@
-import { Clear as ClearIcon, Upload as UploadIcon } from '@mui/icons-material'
+import {
+  Clear as ClearIcon,
+  Download as DownloadIcon,
+  Upload as UploadIcon,
+} from '@mui/icons-material'
 import { LoadingButton } from '@mui/lab'
 import {
   Box,
@@ -42,7 +46,7 @@ type Props = {
   close: () => void
   value: LeaveForm
   setValue: React.Dispatch<React.SetStateAction<LeaveForm>>
-  onSuccess: (id: number, value: Partial<leave> | null) => void
+  onSuccess: (id: number, value: leave | null) => void
 }
 
 const LeaveDialog: React.FC<Props> = ({
@@ -71,7 +75,7 @@ const LeaveDialog: React.FC<Props> = ({
   // user is not supposed to edit it (would cause lots of issues)
   const editDisabled = typeof value.id !== 'undefined' && userId === 'me'
 
-  const handleUpload = (id: number) => {
+  const handleUpload = (id: number, data?: leave) => {
     if (uploadFile === null) return
 
     setLoading(true)
@@ -84,8 +88,8 @@ const LeaveDialog: React.FC<Props> = ({
         'Content-Type': 'multipart/form-data',
       },
     })
-      .then(() => {
-        onSuccess(id, { hasAttachment: true })
+      .then((res) => {
+        onSuccess(id, { ...(data ?? res.data), hasAttachment: true })
         close()
       })
       .catch((err) => {
@@ -113,7 +117,7 @@ const LeaveDialog: React.FC<Props> = ({
           console.log(res.data)
           // after leave is saved, upload attachment (if selected)
           if (uploadFile !== null) {
-            handleUpload(res.data.id)
+            handleUpload(res.data.id, res.data)
           } else {
             onSuccess(res.data.id, res.data)
             close()
@@ -141,6 +145,24 @@ const LeaveDialog: React.FC<Props> = ({
           enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
         })
     }
+  }
+
+  const getAttachment = () => {
+    if (typeof value.id === 'undefined') return
+
+    API.get(`users/${userId}/leave/${value.id}`, {
+      responseType: 'blob',
+      timeout: 30000,
+    })
+      .then((res) => {
+        console.log(res.data)
+        const url = URL.createObjectURL(res.data)
+        window.open(url, '_blank', 'noopener,noreferrer')
+      })
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+      })
   }
 
   return (
@@ -248,46 +270,64 @@ const LeaveDialog: React.FC<Props> = ({
                 }}
               />
             </EqualStack>
-            <Box>
-              <Typography>
-                Nachweis hochladen: {value.hasAttachment && '(vorhanden)'}
-              </Typography>
-              <Stack direction="row" spacing={1} sx={{ placeItems: 'center' }}>
-                <IconButton
-                  color={value.hasAttachment ? 'primary' : 'default'}
-                  aria-label="Nachweis hochladen"
-                  component="label"
+            {userId === 'me' || !value.id ? (
+              <Box>
+                <Typography>
+                  Nachweis hochladen: {value.hasAttachment && '(vorhanden)'}
+                </Typography>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{ placeItems: 'center' }}
                 >
-                  <input
-                    key={renderUpload}
-                    hidden
-                    accept="image/*"
-                    type="file"
-                    onChange={(e) =>
-                      setUploadFile(
-                        e.target.files !== null ? e.target.files[0] : null,
-                      )
-                    }
-                  />
-                  <UploadIcon />
+                  <IconButton
+                    color={value.hasAttachment ? 'primary' : 'default'}
+                    aria-label="Nachweis hochladen"
+                    component="label"
+                  >
+                    <input
+                      key={renderUpload}
+                      hidden
+                      accept="image/*"
+                      type="file"
+                      onChange={(e) =>
+                        setUploadFile(
+                          e.target.files !== null ? e.target.files[0] : null,
+                        )
+                      }
+                    />
+                    <UploadIcon />
+                  </IconButton>
+                  {uploadFile !== null && (
+                    <>
+                      <Typography sx={{ opacity: 0.75 }}>
+                        {uploadFile.name}
+                      </Typography>
+                      <IconButton
+                        size="small"
+                        color="default"
+                        aria-label="Feld leeren"
+                        onClick={clearUpload}
+                      >
+                        <ClearIcon fontSize="small" />
+                      </IconButton>
+                    </>
+                  )}
+                </Stack>
+              </Box>
+            ) : (
+              <Box>
+                <Typography>Nachweis:</Typography>
+                <IconButton
+                  color="primary"
+                  disabled={!value.hasAttachment}
+                  aria-label="Nachweis"
+                  onClick={getAttachment}
+                >
+                  <DownloadIcon />
                 </IconButton>
-                {uploadFile !== null && (
-                  <>
-                    <Typography sx={{ opacity: 0.75 }}>
-                      {uploadFile.name}
-                    </Typography>
-                    <IconButton
-                      size="small"
-                      color="default"
-                      aria-label="Feld leeren"
-                      onClick={clearUpload}
-                    >
-                      <ClearIcon fontSize="small" />
-                    </IconButton>
-                  </>
-                )}
-              </Stack>
-            </Box>
+              </Box>
+            )}
           </Stack>
         </Box>
       </DialogContent>

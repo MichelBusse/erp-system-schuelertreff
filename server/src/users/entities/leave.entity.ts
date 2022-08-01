@@ -31,10 +31,15 @@ export class Leave {
   })
   state?: LeaveState
 
-  @Column({ type: 'daterange' })
-  dateRange: string
+  @Column({ type: 'date' })
+  startDate: string
 
-  @ManyToOne(() => User, (user) => user.leave)
+  @Column({ type: 'date' })
+  endDate: string
+
+  @ManyToOne(() => User, (user) => user.leave, {
+    onDelete: 'CASCADE',
+  })
   user?: User
 
   @Column({ type: 'bytea', nullable: true, select: false })

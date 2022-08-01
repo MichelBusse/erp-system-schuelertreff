@@ -20,7 +20,8 @@ export type leave = {
   id: number
   type: LeaveType
   state: LeaveState
-  dateRange: string
+  startDate: string
+  endDate: string
   hasAttachment: boolean
 }
 

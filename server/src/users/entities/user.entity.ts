@@ -83,6 +83,9 @@ export abstract class User {
   })
   deleteState: DeleteState
 
-  @OneToMany(() => Leave, (leave) => leave.user, { cascade: true, eager: true })
+  @OneToMany(() => Leave, (leave) => leave.user, {
+    cascade: true,
+    eager: true,
+  })
   leave: Leave[]
 }

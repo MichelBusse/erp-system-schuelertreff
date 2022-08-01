@@ -33,7 +33,7 @@ const Leave: React.FC<Props> = ({ value, setValue, userId }) => {
     setOpen(true)
   }
 
-  const onSuccess = (id: number, newValue: Partial<leave> | null) => {
+  const onSuccess = (id: number, newValue: leave | null) => {
     // update entries on success
     if (newValue === null) {
       // delete entry
@@ -44,7 +44,7 @@ const Leave: React.FC<Props> = ({ value, setValue, userId }) => {
 
         if (index === -1) {
           // add entry
-          return [...v, newValue as leave]
+          return [...v, newValue]
         } else {
           // update entry
           v[index] = { ...v[index], ...newValue }
@@ -83,43 +83,38 @@ const Leave: React.FC<Props> = ({ value, setValue, userId }) => {
             Hinzufügen
           </Button>
         </ListItem>
-        {value.map((l) => {
-          const match = l.dateRange.match(/\[([\d-]*), ?([\d-]*)\)/)
 
-          if (match === null)
-            return console.error('Error parsing daterange: ' + l.dateRange)
-
-          const [, start, end] = match
-
-          return (
-            <ListItem
-              key={l.id}
-              secondaryAction={
-                <IconButton
-                  edge="end"
-                  aria-label="bearbeiten"
-                  onClick={() =>
-                    openDialog({
-                      id: l.id,
-                      type: l.type,
-                      state: l.state,
-                      startDate: dayjs(start),
-                      endDate: dayjs(end),
-                      hasAttachment: l.hasAttachment,
-                    })
-                  }
-                >
-                  <EditIcon />
-                </IconButton>
+        {value.map((l) => (
+          <ListItem
+            key={l.id}
+            secondaryAction={
+              <IconButton
+                edge="end"
+                aria-label="bearbeiten"
+                onClick={() =>
+                  openDialog({
+                    id: l.id,
+                    type: l.type,
+                    state: l.state,
+                    startDate: dayjs(l.startDate),
+                    endDate: dayjs(l.endDate),
+                    hasAttachment: l.hasAttachment,
+                  })
+                }
+              >
+                <EditIcon />
+              </IconButton>
+            }
+          >
+            <ListItemText
+              primary={
+                `${leaveTypeToString[l.type]}: ` +
+                `${l.startDate} - ${l.endDate}`
               }
-            >
-              <ListItemText
-                primary={`${leaveTypeToString[l.type]}: ${start} - ${end}`}
-                secondary={leaveStateToString[l.state]}
-              />
-            </ListItem>
-          )
-        })}
+              secondary={leaveStateToString[l.state]}
+            />
+          </ListItem>
+        ))}
       </List>
     </>
   )
