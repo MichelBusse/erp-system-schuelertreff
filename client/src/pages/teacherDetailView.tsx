@@ -26,6 +26,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
+import Leave from '../components/Leave'
 import {
   defaultTeacherFormData,
   snackbarOptions,
@@ -36,7 +37,7 @@ import styles from '../pages/gridList.module.scss'
 import { Degree, SchoolType, TeacherState } from '../types/enums'
 import { teacherForm } from '../types/form'
 import subject from '../types/subject'
-import { teacher, timesAvailableParsed } from '../types/user'
+import { leave, teacher, timesAvailableParsed } from '../types/user'
 import { formValidation } from '../utils/formValidation'
 
 dayjs.extend(customParseFormat)
@@ -50,6 +51,7 @@ const TeacherDetailView: React.FC = () => {
   const [subjects, setSubjects] = useState<subject[]>([])
   const [dialogOpen, setDialogOpen] = useState<boolean>(false)
   const [data, setData] = useState<teacherForm>(defaultTeacherFormData)
+  const [leaveData, setLeaveData] = useState<leave[]>([])
   const [errors, setErrors] = useState(defaultTeacherFormData)
 
   const requestedId = id ?? 'me'
@@ -91,6 +93,8 @@ const TeacherDetailView: React.FC = () => {
       fee: newData.fee,
       timesAvailable: newTimesAvailable,
     })
+
+    setLeaveData(newData.leave)
   }
 
   const submitForm = (override: Partial<teacherForm> = {}) => {
@@ -369,6 +373,14 @@ const TeacherDetailView: React.FC = () => {
               }
             />
           </Box>
+
+          <Typography variant="h6">Urlaub/Krankmeldung:</Typography>
+          <Leave
+            userId={requestedId}
+            value={leaveData}
+            setValue={setLeaveData}
+          />
+
           <Stack direction={'row'} columnGap={5} sx={{ marginTop: '15px' }}>
             {id && (
               <Button
