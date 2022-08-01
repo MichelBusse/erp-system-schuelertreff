@@ -24,7 +24,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 
-import { snackbarOptionsError } from '../consts'
+import { snackbarOptions, snackbarOptionsError } from '../consts'
 import { LeaveState, LeaveType } from '../types/enums'
 import { leave, Role } from '../types/user'
 import { useAuth } from './AuthProvider'
@@ -92,6 +92,7 @@ const LeaveDialog: React.FC<Props> = ({
       },
     })
       .then((res) => {
+        enqueueSnackbar('Erfolgreich gespeichert', snackbarOptions)
         onSuccess(id, { ...(data ?? res.data), hasAttachment: true })
         close()
       })
@@ -122,6 +123,7 @@ const LeaveDialog: React.FC<Props> = ({
           if (uploadFile !== null) {
             handleUpload(res.data.id, res.data)
           } else {
+            enqueueSnackbar('Erfolgreich gespeichert', snackbarOptions)
             onSuccess(res.data.id, res.data)
             close()
           }
@@ -140,6 +142,7 @@ const LeaveDialog: React.FC<Props> = ({
     } else {
       API.delete(`users/${userId}/leave/${value.id}`)
         .then(() => {
+          enqueueSnackbar('Erfolgreich gelöscht', snackbarOptions)
           onSuccess(value.id ?? 0, null)
           close()
         })

@@ -353,4 +353,10 @@ export class UsersController {
   async deleteLeave(@Param('userId') userId: number, @Param('id') id: number) {
     return this.usersService.deleteLeave(id, userId)
   }
+
+  @Roles(Role.ADMIN)
+  @Get('leaves/pending')
+  async getPendingLeaves() {
+    return this.usersService.getPendingLeaves()
+  }
 }

@@ -23,6 +23,11 @@ export type leave = {
   startDate: string
   endDate: string
   hasAttachment: boolean
+  user: {
+    id: number
+    firstName: string
+    lastName: string
+  }
 }
 
 interface user {

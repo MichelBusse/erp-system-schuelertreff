@@ -216,6 +216,21 @@ export class UsersService {
     return leave.attachment
   }
 
+  async getPendingLeaves(): Promise<Leave[]> {
+    const q = this.connection
+      .createQueryBuilder()
+      .select('l')
+      .from(Leave, 'l')
+      .leftJoin('l.user', 'u')
+      .addSelect('u.id')
+      .addSelect('u.firstName')
+      .addSelect('u.lastName')
+      .where('l."userId" IS NOT NULL')
+      .andWhere('l."state" = :state', { state: LeaveState.PENDING })
+
+    return q.getMany()
+  }
+
   /**
    * Find methods
    */
