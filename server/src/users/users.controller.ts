@@ -38,6 +38,7 @@ import {
   Teacher,
   User,
 } from './entities'
+import { Leave } from './entities/leave.entity'
 import { UsersService } from './users.service'
 
 @Controller('users')
@@ -279,30 +280,33 @@ export class UsersController {
   }
 
   @Post('me/leave')
-  async createOwnLeave(@Request() req, @Body() dto: LeaveDto) {
+  async createOwnLeave(@Request() req, @Body() dto: LeaveDto): Promise<Leave> {
     return this.createLeave(req.user.id, dto)
   }
 
   @Roles(Role.ADMIN)
   @Post(':userId/leave')
-  async createLeave(@Param('userId') userId: number, @Body() dto: LeaveDto) {
+  async createLeave(
+    @Param('userId') userId: number,
+    @Body() dto: LeaveDto,
+  ): Promise<Leave> {
     return this.usersService.createLeave(userId, dto)
   }
 
-  @Post('me/leave/:id')
-  async updateOwnLeave(
-    @Request() req,
-    @Param('id') id: number,
-    @Body() dto: LeaveDto,
-  ) {
-    const cleanDto: LeaveDto = {
-      startDate: dto.startDate,
-      endDate: dto.endDate,
-      type: dto.type,
-    }
+  // @Post('me/leave/:id')
+  // async updateOwnLeave(
+  //   @Request() req,
+  //   @Param('id') id: number,
+  //   @Body() dto: LeaveDto,
+  // ): Promise<Leave> {
+  //   const cleanDto: LeaveDto = {
+  //     startDate: dto.startDate,
+  //     endDate: dto.endDate,
+  //     type: dto.type,
+  //   }
 
-    return this.updateLeave(req.user.id, id, cleanDto)
-  }
+  //   return this.updateLeave(req.user.id, id, cleanDto)
+  // }
 
   @Roles(Role.ADMIN)
   @Post(':userId/leave/:id')
@@ -310,7 +314,7 @@ export class UsersController {
     @Param('userId') userId: number,
     @Param('id') id: number,
     @Body() dto: LeaveDto,
-  ) {
+  ): Promise<Leave> {
     return this.usersService.updateLeave(id, userId, dto)
   }
 

@@ -168,7 +168,7 @@ export class UsersService {
     return repo.save(leave)
   }
 
-  async updateLeave(id: number, userId: number, dto: LeaveDto) {
+  async updateLeave(id: number, userId: number, dto: LeaveDto): Promise<Leave> {
     const repo = this.connection.getRepository(Leave)
 
     const leave = await repo
@@ -177,9 +177,13 @@ export class UsersService {
       .andWhere('id = :id', { id })
       .getOneOrFail()
 
-    repo.save({
+    return repo.save({
       ...leave,
       ...dto,
+      dateRange:
+        dto.startDate && dto.endDate
+          ? `[${dto.startDate}, ${dto.endDate})`
+          : leave.dateRange,
     })
   }
 

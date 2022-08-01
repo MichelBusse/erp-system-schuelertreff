@@ -3,13 +3,14 @@ import { Button, IconButton, List, ListItem, ListItemText } from '@mui/material'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 
+import { leaveStateToString, leaveTypeToString } from '../consts'
 import { LeaveState, LeaveType } from '../types/enums'
 import { leave } from '../types/user'
 import LeaveDialog, { LeaveForm } from './LeaveDialog'
 
 type Props = {
   value: leave[]
-  setValue: (newValue: leave[]) => void
+  setValue: React.Dispatch<React.SetStateAction<leave[]>>
   userId: string
 }
 
@@ -21,23 +22,48 @@ const defaultFormData: LeaveForm = {
   hasAttachment: false,
 }
 
-const typeToString = {
-  regular: 'Urlaub',
-  sick: 'Krankmeldung',
-}
-
 const Leave: React.FC<Props> = ({ value, setValue, userId }) => {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState(defaultFormData)
+  const [render, setRender] = useState(0)
+
+  const openDialog = (form: LeaveForm) => {
+    setRender((r) => r + 1)
+    setForm(form)
+    setOpen(true)
+  }
+
+  const onSuccess = (id: number, newValue: Partial<leave> | null) => {
+    // update entries on success
+    if (newValue === null) {
+      // delete entry
+      setValue((v) => v.filter((leave) => leave.id !== id))
+    } else {
+      setValue((v) => {
+        const index = v.findIndex((leave) => leave.id === id)
+
+        if (index === -1) {
+          // add entry
+          return [...v, newValue as leave]
+        } else {
+          // update entry
+          v[index] = { ...v[index], ...newValue }
+          return v
+        }
+      })
+    }
+  }
 
   return (
     <>
       <LeaveDialog
+        key={render}
         userId={userId}
         open={open}
         close={() => setOpen(false)}
         value={form}
         setValue={setForm}
+        onSuccess={onSuccess}
       />
 
       <List
@@ -52,16 +78,13 @@ const Leave: React.FC<Props> = ({ value, setValue, userId }) => {
           <Button
             variant="text"
             endIcon={<AddIcon />}
-            onClick={() => {
-              setForm(defaultFormData)
-              setOpen(true)
-            }}
+            onClick={() => openDialog(defaultFormData)}
           >
             Hinzufügen
           </Button>
         </ListItem>
         {value.map((l) => {
-          const match = l.dateRange.match(/[[(]([\d-]*),([\d-]*)[\])]/)
+          const match = l.dateRange.match(/\[([\d-]*), ?([\d-]*)\)/)
 
           if (match === null)
             return console.error('Error parsing daterange: ' + l.dateRange)
@@ -75,8 +98,8 @@ const Leave: React.FC<Props> = ({ value, setValue, userId }) => {
                 <IconButton
                   edge="end"
                   aria-label="bearbeiten"
-                  onClick={() => {
-                    setForm({
+                  onClick={() =>
+                    openDialog({
                       id: l.id,
                       type: l.type,
                       state: l.state,
@@ -84,16 +107,15 @@ const Leave: React.FC<Props> = ({ value, setValue, userId }) => {
                       endDate: dayjs(end),
                       hasAttachment: l.hasAttachment,
                     })
-                    setOpen(true)
-                  }}
+                  }
                 >
                   <EditIcon />
                 </IconButton>
               }
             >
               <ListItemText
-                primary={`${typeToString[l.type]}: ${start} - ${end}`}
-                secondary={l.state}
+                primary={`${leaveTypeToString[l.type]}: ${start} - ${end}`}
+                secondary={leaveStateToString[l.state]}
               />
             </ListItem>
           )

@@ -1,7 +1,7 @@
 import { GridLocaleText } from '@mui/x-data-grid'
 import { OptionsObject as SnackbarOptions } from 'notistack'
 
-import { TeacherState } from './types/enums'
+import { LeaveState, LeaveType, TeacherState } from './types/enums'
 import { privateCustomerForm, teacherForm } from './types/form'
 
 export const dataGridLocaleText: Partial<GridLocaleText> = {
@@ -58,6 +58,17 @@ export const teacherStateToString: { [key in TeacherState]: string } = {
   employed: 'Angestellt',
   suspended: 'Suspendiert',
   deleted: 'Gelöscht',
+}
+
+export const leaveTypeToString: { [key in LeaveType]: string } = {
+  regular: 'Urlaub',
+  sick: 'Krankmeldung',
+}
+
+export const leaveStateToString: { [key in LeaveState]: string } = {
+  pending: 'ausstehend',
+  accepted: 'bestätigt',
+  declined: 'abgelehnt',
 }
 
 export const defaultSchoolFormData = {

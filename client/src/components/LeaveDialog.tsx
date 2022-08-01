@@ -22,6 +22,7 @@ import { useState } from 'react'
 
 import { snackbarOptionsError } from '../consts'
 import { LeaveState, LeaveType } from '../types/enums'
+import { leave } from '../types/user'
 import { useAuth } from './AuthProvider'
 import EqualStack from './EqualStack'
 import IconButtonAdornment from './IconButtonAdornment'
@@ -41,6 +42,7 @@ type Props = {
   close: () => void
   value: LeaveForm
   setValue: React.Dispatch<React.SetStateAction<LeaveForm>>
+  onSuccess: (id: number, value: Partial<leave> | null) => void
 }
 
 const LeaveDialog: React.FC<Props> = ({
@@ -49,10 +51,12 @@ const LeaveDialog: React.FC<Props> = ({
   close,
   value,
   setValue,
+  onSuccess,
 }) => {
   const [loading, setLoading] = useState(false)
   const [uploadFile, setUploadFile] = useState<File | null>(null)
   const [renderUpload, setRenderUpload] = useState(0)
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false)
 
   const { enqueueSnackbar } = useSnackbar()
   const { API } = useAuth()
@@ -64,45 +68,79 @@ const LeaveDialog: React.FC<Props> = ({
 
   const formValid = !!(value.startDate && value.endDate && value.type)
 
-  const handleSubmit = () => {
+  // user is not supposed to edit it (would cause lots of issues)
+  const editDisabled = typeof value.id !== 'undefined' && userId === 'me'
+
+  const handleUpload = (id: number) => {
+    if (uploadFile === null) return
+
     setLoading(true)
 
-    // if id is not set, create new leave
-    API.post(`users/${userId}/leave/${value.id ?? ''}`, {
-      type: value.type,
-      state: value.state,
-      startDate: value.startDate?.format('YYYY-MM-DD'),
-      endDate: value.endDate?.format('YYYY-MM-DD'),
-    })
-      .then((res) => {
-        // after leave is saved, upload attachment (if selected)
-        if (uploadFile !== null) {
-          const formData = new FormData()
-          formData.append('file', uploadFile)
+    const formData = new FormData()
+    formData.append('file', uploadFile)
 
-          API.post(`users/${userId}/leave/${res.data.id}/upload`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          })
-            .then(() => setLoading(false))
-            .catch((err) => {
-              console.error(err)
-              enqueueSnackbar(
-                'Ein Fehler ist aufgetreten.',
-                snackbarOptionsError,
-              )
-              setLoading(false)
-            })
-        } else {
-          setLoading(false)
-        }
+    API.post(`users/${userId}/leave/${id}/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(() => {
+        onSuccess(id, { hasAttachment: true })
+        close()
       })
       .catch((err) => {
         console.error(err)
         enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
         setLoading(false)
       })
+  }
+
+  const handleSubmit = () => {
+    setLoading(true)
+
+    if (editDisabled && value.id) {
+      handleUpload(value.id)
+    } else {
+      // if id is not set, create new leave
+      // userId can be 'me' or a numeric id
+      API.post(`users/${userId}/leave/${value.id ?? ''}`, {
+        type: value.type,
+        state: value.state,
+        startDate: value.startDate?.format('YYYY-MM-DD'),
+        endDate: value.endDate?.format('YYYY-MM-DD'),
+      })
+        .then((res) => {
+          console.log(res.data)
+          // after leave is saved, upload attachment (if selected)
+          if (uploadFile !== null) {
+            handleUpload(res.data.id)
+          } else {
+            onSuccess(res.data.id, res.data)
+            close()
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+          setLoading(false)
+        })
+    }
+  }
+
+  const handleDelete = () => {
+    if (!deleteConfirmation) {
+      setDeleteConfirmation(true)
+    } else {
+      API.delete(`users/${userId}/leave/${value.id}`)
+        .then(() => {
+          onSuccess(value.id ?? 0, null)
+          close()
+        })
+        .catch((err) => {
+          console.error(err)
+          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        })
+    }
   }
 
   return (
@@ -117,7 +155,7 @@ const LeaveDialog: React.FC<Props> = ({
       >
         <Box sx={{ overflow: 'auto', padding: 0.5 }}>
           <Stack spacing={2}>
-            <FormControl>
+            <FormControl disabled={editDisabled}>
               <RadioGroup
                 row
                 value={value.type}
@@ -144,7 +182,8 @@ const LeaveDialog: React.FC<Props> = ({
               <DatePicker
                 label="Startdatum"
                 mask="__.__.____"
-                minDate={dayjs().add(7, 'd')}
+                minDate={!editDisabled ? dayjs().add(7, 'd') : undefined}
+                disabled={editDisabled}
                 value={value.startDate}
                 onChange={(value) => {
                   setValue((data) => ({
@@ -166,7 +205,7 @@ const LeaveDialog: React.FC<Props> = ({
                   endAdornment: (
                     <IconButtonAdornment
                       icon={ClearIcon}
-                      hidden={value.startDate === null}
+                      hidden={value.startDate === null || editDisabled}
                       onClick={() =>
                         setValue((data) => ({
                           ...data,
@@ -181,9 +220,11 @@ const LeaveDialog: React.FC<Props> = ({
               <DatePicker
                 label="Enddatum"
                 mask="__.__.____"
-                minDate={value.startDate ?? undefined}
+                minDate={
+                  !editDisabled ? value.startDate ?? undefined : undefined
+                }
                 defaultCalendarMonth={value.startDate ?? undefined}
-                disabled={value.startDate === null}
+                disabled={value.startDate === null || editDisabled}
                 value={value.endDate}
                 onChange={(value) => {
                   setValue((data) => ({ ...data, endDate: value }))
@@ -198,7 +239,7 @@ const LeaveDialog: React.FC<Props> = ({
                   endAdornment: (
                     <IconButtonAdornment
                       icon={ClearIcon}
-                      hidden={value.endDate === null}
+                      hidden={value.endDate === null || editDisabled}
                       onClick={() =>
                         setValue((data) => ({ ...data, endDate: null }))
                       }
@@ -208,7 +249,9 @@ const LeaveDialog: React.FC<Props> = ({
               />
             </EqualStack>
             <Box>
-              <Typography>Nachweis hochladen:</Typography>
+              <Typography>
+                Nachweis hochladen: {value.hasAttachment && '(vorhanden)'}
+              </Typography>
               <Stack direction="row" spacing={1} sx={{ placeItems: 'center' }}>
                 <IconButton
                   color={value.hasAttachment ? 'primary' : 'default'}
@@ -249,21 +292,19 @@ const LeaveDialog: React.FC<Props> = ({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button
-          onClick={() => {
-            close()
-            clearUpload()
-          }}
-        >
-          Abbrechen
-        </Button>
+        {value.id && (
+          <Button color="error" onClick={handleDelete}>
+            {deleteConfirmation ? 'Bestätigen' : 'Löschen'}
+          </Button>
+        )}
+        <Button onClick={close}>Abbrechen</Button>
         <LoadingButton
           variant="contained"
           onClick={handleSubmit}
           loading={loading}
           disabled={!formValid || loading}
         >
-          Hinzufügen
+          {value.id ? 'Speichern' : 'Hinzufügen'}
         </LoadingButton>
       </DialogActions>
     </Dialog>
