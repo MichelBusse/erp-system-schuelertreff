@@ -2,7 +2,7 @@ import { GridLocaleText } from '@mui/x-data-grid'
 import { OptionsObject as SnackbarOptions } from 'notistack'
 
 import { TeacherState } from './types/enums'
-import { privateCustomerForm, teacherForm } from './types/form'
+import { classCustomerForm, privateCustomerForm, schoolForm, teacherForm } from './types/form'
 
 export const dataGridLocaleText: Partial<GridLocaleText> = {
   filterPanelColumns: 'Spalte',
@@ -61,7 +61,9 @@ export const teacherStateToString: { [key in TeacherState]: string } = {
   deleted: 'Gelöscht',
 }
 
-export const defaultSchoolFormData = {
+export const defaultSchoolFormData : schoolForm = {
+  firstName: '',
+  lastName: '',
   schoolName: '',
   city: '',
   postalCode: '',
@@ -72,11 +74,9 @@ export const defaultSchoolFormData = {
   fee: 0
 }
 
-export const defaultClassCustomerFormData = {
+export const defaultClassCustomerFormData : classCustomerForm = {
   id: -1,
   className: '',
   numberOfStudents: 0,
-  grade: 0,
   timesAvailable: [],
-  schoolTypes: [],
 }

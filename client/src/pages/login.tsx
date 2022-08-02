@@ -28,16 +28,17 @@ const Login: React.FC = () => {
   }
 
   const resetPassword = () => {
-    if(email === ''){
+    if (email === '') {
       setEmailErrorText('Bitte E-Mail angeben')
-      return;
+      return
     }
-    API.post('auth/reset/mail', {mail: email}).then(() => {
-      enqueueSnackbar('Der Passwort-Reset wurde an die E-Mail gesendet')
-    }).catch(() => {
-      enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
-    })
-
+    API.post('auth/reset/mail', { mail: email })
+      .then(() => {
+        enqueueSnackbar('Der Passwort-Reset wurde an die E-Mail gesendet')
+      })
+      .catch(() => {
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+      })
   }
 
   return (
@@ -47,7 +48,7 @@ const Login: React.FC = () => {
         direction="column"
         justifyContent="center"
         alignItems="center"
-        style={{ height: '90vh' }}
+        style={{ height: '100vh' }}
         rowGap={1}
         component={'form'}
       >
@@ -56,35 +57,44 @@ const Login: React.FC = () => {
           variant="outlined"
           autoComplete="username"
           size="small"
-          style={{ width: 200 }}
           value={email}
+          style={{ width: '300px', maxWidth: '100%' }}
           onChange={(e) => setEmail(e.target.value)}
           error={error !== '' || emailErrorText !== ''}
           helperText={emailErrorText}
+          fullWidth
         />
         <TextField
           label="Password"
           type="password"
           autoComplete="current-password"
           size="small"
-          style={{ width: 200 }}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           error={error !== ''}
           helperText={error}
+          style={{ width: '300px', maxWidth: '100%' }}
+          fullWidth
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleSubmit()
           }}
         />
         <Button
           variant="contained"
-          size="medium"
-          style={{ margin: '5px' }}
+          style={{  width: '300px', maxWidth: '100%' }}
           onClick={handleSubmit}
+          fullWidth
         >
           Login
         </Button>
-        <Button variant="text" onClick={() => resetPassword()}>Passwort zurücksetzen</Button>
+        <Button
+          variant="text"
+          fullWidth
+          onClick={() => resetPassword()}
+          style={{ width: '300px', maxWidth: '100%' }}
+        >
+          Passwort zurücksetzen
+        </Button>
       </Grid>
     </>
   )

@@ -126,7 +126,7 @@
         <tr>
           <td class="address">
             <p><%= address.schoolName %></p>
-            <p><%= address.firstName %> <%= address.lastName %></p>
+            <p><% if(address.schoolName != '') { %>z.Hd. <% } %><%= address.firstName %> <%= address.lastName %></p>
             <p><%= address.street %></p>
             <p><%= address.zip %> <%= address.city %></p>
           </td>

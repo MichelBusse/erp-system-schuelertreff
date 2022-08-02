@@ -26,7 +26,7 @@ export interface teacherForm extends userForm {
 }
 
 export interface schoolForm
-  extends Omit<userForm, 'lastName' | 'firstName' | 'timesAvailable'> {
+  extends Omit<userForm, 'timesAvailable'> {
   schoolName: string
   schoolTypes: string[]
   fee: number

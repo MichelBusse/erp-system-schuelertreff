@@ -60,6 +60,8 @@ const SchoolDetailView: React.FC = () => {
     API.get('users/school/' + requestedId).then((res) => {
       setSchool((data) => ({
         ...data,
+        firstName: res.data.firstName,
+        lastName: res.data.lastName,
         schoolName: res.data.schoolName,
         city: res.data.city,
         postalCode: res.data.postalCode,
@@ -67,7 +69,7 @@ const SchoolDetailView: React.FC = () => {
         email: res.data.email,
         phone: res.data.phone,
         schoolTypes: res.data.schoolTypes,
-        fee: res.data.fee
+        fee: res.data.fee,
       }))
     })
   }, [])
@@ -284,6 +286,37 @@ const SchoolDetailView: React.FC = () => {
               }
             />
           </Stack>
+          <h3>Ansprechpartner</h3>
+          <Stack direction="row" columnGap={2}>
+            <TextField
+              fullWidth={true}
+              label="Vorname"
+              onChange={(event) =>
+                setSchool((data) => ({
+                  ...data,
+                  firstName: event.target.value,
+                }))
+              }
+              value={school.firstName}
+              InputProps={{
+                readOnly: requestedId === 'me',
+              }}
+            />
+            <TextField
+              fullWidth={true}
+              label="Nachname"
+              onChange={(event) =>
+                setSchool((data) => ({
+                  ...data,
+                  lastName: event.target.value,
+                }))
+              }
+              value={school.lastName}
+              InputProps={{
+                readOnly: requestedId === 'me',
+              }}
+            />
+          </Stack>
           <h3>Adresse:</h3>
           <Stack direction="row" columnGap={2}>
             <TextField
@@ -423,7 +456,7 @@ const SchoolDetailView: React.FC = () => {
             )}
           </Stack>
           <h3>Rechnung generieren:</h3>
-          <InvoiceDataSelect generateInvoice={generateInvoice}/>
+          <InvoiceDataSelect generateInvoice={generateInvoice} />
         </Stack>
       </Box>
       <Dialog open={addClassDialogOpen}>
