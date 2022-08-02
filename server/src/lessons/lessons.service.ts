@@ -1,13 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import dayjs, { Dayjs } from 'dayjs'
-import { Repository } from 'typeorm'
+import { DataSource, DeepPartial, Repository } from 'typeorm'
 
-import { ContractState } from 'src/contracts/contract.entity'
+import { Contract, ContractState } from 'src/contracts/contract.entity'
 import { ContractsService } from 'src/contracts/contracts.service'
+import { getNextDow, maxDate, minDate } from 'src/date'
+import { Leave } from 'src/users/entities/leave.entity'
 
 import { CreateLessonDto } from './dto/create-lesson.dto'
-import { Lesson } from './lesson.entity'
+import { Lesson, LessonState } from './lesson.entity'
 
 @Injectable()
 export class LessonsService {
@@ -16,6 +18,9 @@ export class LessonsService {
     private readonly lessonsRepository: Repository<Lesson>,
 
     private readonly contractsService: ContractsService,
+
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(
@@ -122,5 +127,56 @@ export class LessonsService {
       contracts: contractsOfWeek,
       pendingContracts: pendingContracts,
     }
+  }
+
+  async cancelByLeave(leave: Leave) {
+    const qb = this.dataSource.createQueryBuilder()
+
+    qb.select('c')
+      .from(Contract, 'c')
+      .where(`c."teacherId" = :userId`, { userId: leave.user.id })
+      .andWhere(`c.state = :state`, { state: ContractState.ACCEPTED })
+      .andWhere(`c."startDate" <= :end::date`, { end: leave.endDate })
+      .andWhere(`c."endDate" >= :start::date`, { start: leave.startDate })
+      .leftJoinAndSelect('c.lessons', 'lesson')
+
+    const contracts: Contract[] = await qb.getMany()
+
+    const lessons: DeepPartial<Lesson>[] = contracts.flatMap((c) => {
+      const dow = dayjs(c.startDate).day()
+      const start = maxDate(dayjs(c.startDate), dayjs(leave.startDate))
+      const end = minDate(dayjs(c.endDate), dayjs(leave.endDate))
+
+      const dates: string[] = []
+
+      for (
+        let i = getNextDow(dow, start);
+        !i.isAfter(end);
+        i = i.add(7, 'day')
+      ) {
+        dates.push(i.format('YYYY-MM-DD'))
+      }
+
+      return dates.map((d) => {
+        const existingLesson = c.lessons.find((l) => l.date === d)
+
+        if (typeof existingLesson === 'undefined') {
+          // lesson does not exist yet
+          return {
+            contract: { id: c.id },
+            date: d,
+            state: LessonState.CANCELLED,
+          }
+        } else {
+          // lesson already exists, set it to cancelled
+          return {
+            ...existingLesson,
+            state: LessonState.CANCELLED,
+          }
+        }
+      })
+    })
+
+    return this.lessonsRepository.save(lessons)
   }
 }

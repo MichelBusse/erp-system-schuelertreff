@@ -9,6 +9,7 @@ import dayjs from 'dayjs'
 import { DataSource, Not, Repository } from 'typeorm'
 
 import { Contract } from 'src/contracts/contract.entity'
+import { LessonsService } from 'src/lessons/lessons.service'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
@@ -106,6 +107,8 @@ export class UsersService {
 
     @InjectDataSource()
     private connection: DataSource,
+
+    private readonly lessonsService: LessonsService,
   ) {}
 
   /**
@@ -174,18 +177,27 @@ export class UsersService {
     const repo = this.connection.getRepository(Leave)
 
     const leave = await repo
-      .createQueryBuilder()
-      .where('"userId" = :userId', { userId })
-      .andWhere('id = :id', { id })
+      .createQueryBuilder('l')
+      .where('l."userId" = :userId', { userId })
+      .andWhere('l.id = :id', { id })
+      .leftJoin('l.user', 'u')
+      .addSelect('u.id')
       .getOneOrFail()
 
     // leave cannot be edited after it was accepted/declined
     if (leave.state !== LeaveState.PENDING) throw new BadRequestException()
 
-    return repo.save({
+    const newLeave = {
       ...leave,
       ...dto,
-    })
+    }
+
+    // cancel lessons of intersecting contracts
+    if (dto.state === LeaveState.ACCEPTED) {
+      await this.lessonsService.cancelByLeave(newLeave)
+    }
+
+    return repo.save(newLeave)
   }
 
   async deleteLeave(id: number, userId: number) {

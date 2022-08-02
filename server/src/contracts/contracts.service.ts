@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import dayjs, { Dayjs } from 'dayjs'
 import { Brackets, DataSource, Repository } from 'typeorm'
@@ -21,6 +26,7 @@ export class ContractsService {
     @InjectDataSource()
     private connection: DataSource,
 
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
   ) {}
 
