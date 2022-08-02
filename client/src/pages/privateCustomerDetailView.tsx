@@ -123,8 +123,8 @@ const PrivateCustomerDetailView: React.FC = () => {
       })
   }
 
-  const generateInvoice = (year: number, month: number) => {
-    API.get('lessons/invoice/customer', {
+  const generateInvoice = (year: number, month: number, invoiceData?: {invoiceNumber: number, invoiceType: string}) => {
+    API.post('lessons/invoice/customer', invoiceData,  {
       params: {
         of: dayjs().year(year).month(month).format('YYYY-MM-DD'),
         customerId: id,
@@ -331,7 +331,7 @@ const PrivateCustomerDetailView: React.FC = () => {
             )}
           </Stack>
           <h3>Rechnung generieren:</h3>
-          <InvoiceDataSelect generateInvoice={generateInvoice} />
+          <InvoiceDataSelect generateInvoice={generateInvoice} invoiceDialog={true}/>
         </Stack>
       </Box>
       <Dialog

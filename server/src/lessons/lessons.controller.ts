@@ -74,10 +74,11 @@ export class LessonsController {
     }
   }
 
-  @Get('invoice/customer')
+  @Post('invoice/customer')
   @Roles(Role.ADMIN)
   async getInvoiceCustomer(
     @Res() res: Response,
+    @Body() invoiceData: {invoiceNumber: number, invoiceType: string},
     @Query('of') month: string,
     @Query('customerId') customerId: string,
     @Query('schoolId') schoolId: string,
@@ -86,6 +87,7 @@ export class LessonsController {
       invoiceMonth: dayjs(month, 'YYYY-MM-DD'),
       customerId: customerId ? Number(customerId) : null,
       schoolId: schoolId ? Number(schoolId) : null,
+      invoiceData
     })
 
     res.set({

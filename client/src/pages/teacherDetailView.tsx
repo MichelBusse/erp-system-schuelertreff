@@ -435,7 +435,7 @@ const TeacherDetailView: React.FC = () => {
             </Stack>
           )}
           <h3>Abrechnung generieren:</h3>
-          <InvoiceDataSelect generateInvoice={generateInvoice} />
+          <InvoiceDataSelect generateInvoice={generateInvoice} invoiceDialog={false}/>
         </Stack>
       </Box>
       <Dialog

@@ -247,10 +247,12 @@ export class LessonsService {
     invoiceMonth,
     customerId,
     schoolId,
+    invoiceData
   }: {
     invoiceMonth: Dayjs
     customerId?: number
-    schoolId?: number
+    schoolId?: number,
+    invoiceData: {invoiceNumber: number, invoiceType: string}
   }): Promise<Buffer> {
 
     let customer = null
@@ -305,8 +307,8 @@ export class LessonsService {
     const invoiceInfo = {
       date: dayjs().format('DD.MM.YYYY'),
       month: invoiceMonth.locale('de').format('MMMM / YYYY'),
-      number: 1,
-      type: 'Nachhilfe',
+      number: invoiceData.invoiceNumber,
+      type: invoiceData.invoiceType,
       totalPrice: totalPrice.toFixed(2).replace(".", ","),
     }
 
