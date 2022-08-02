@@ -568,7 +568,6 @@ const ContractDialog: React.FC<Props> = ({
                 setForm0((data) => ({
                   ...data,
                   interval: value,
-                  endDate: null,
                 }))
               }}
               InputProps={{

@@ -1,6 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
+import { LessonsModule } from 'src/lessons/lessons.module'
 import { UsersModule } from 'src/users/users.module'
 
 import { Contract } from './contract.entity'
@@ -11,6 +12,7 @@ import { ContractsService } from './contracts.service'
   imports: [
     TypeOrmModule.forFeature([Contract]),
     forwardRef(() => UsersModule),
+    forwardRef(() => LessonsModule),
   ],
   providers: [ContractsService],
   controllers: [ContractsController],

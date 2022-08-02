@@ -6,7 +6,7 @@ import { DataSource, DeepPartial, Repository } from 'typeorm'
 import { Contract, ContractState } from 'src/contracts/contract.entity'
 import { ContractsService } from 'src/contracts/contracts.service'
 import { getNextDow, maxDate, minDate } from 'src/date'
-import { Leave } from 'src/users/entities/leave.entity'
+import { Leave, LeaveState } from 'src/users/entities/leave.entity'
 
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Lesson, LessonState } from './lesson.entity'
@@ -129,6 +129,28 @@ export class LessonsService {
     }
   }
 
+  getLessonDates(
+    contract: Contract,
+    startDate: Dayjs,
+    endDate: Dayjs,
+  ): Dayjs[] {
+    const dow = dayjs(contract.startDate).day()
+    const start = maxDate(dayjs(contract.startDate), startDate)
+    const end = minDate(dayjs(contract.endDate), endDate)
+
+    const dates: Dayjs[] = []
+
+    for (
+      let i = getNextDow(dow, start);
+      !i.isAfter(end);
+      i = i.add(contract.interval, 'week')
+    ) {
+      dates.push(i)
+    }
+
+    return dates
+  }
+
   async cancelByLeave(leave: Leave) {
     const qb = this.dataSource.createQueryBuilder()
 
@@ -143,19 +165,11 @@ export class LessonsService {
     const contracts: Contract[] = await qb.getMany()
 
     const lessons: DeepPartial<Lesson>[] = contracts.flatMap((c) => {
-      const dow = dayjs(c.startDate).day()
-      const start = maxDate(dayjs(c.startDate), dayjs(leave.startDate))
-      const end = minDate(dayjs(c.endDate), dayjs(leave.endDate))
-
-      const dates: string[] = []
-
-      for (
-        let i = getNextDow(dow, start);
-        !i.isAfter(end);
-        i = i.add(7, 'day')
-      ) {
-        dates.push(i.format('YYYY-MM-DD'))
-      }
+      const dates = this.getLessonDates(
+        c,
+        dayjs(leave.startDate),
+        dayjs(leave.endDate),
+      ).map((d) => d.format('YYYY-MM-DD'))
 
       return dates.map((d) => {
         const existingLesson = c.lessons.find((l) => l.date === d)
@@ -165,6 +179,57 @@ export class LessonsService {
           return {
             contract: { id: c.id },
             date: d,
+            state: LessonState.CANCELLED,
+          }
+        } else {
+          // lesson already exists, set it to cancelled
+          return {
+            ...existingLesson,
+            state: LessonState.CANCELLED,
+          }
+        }
+      })
+    })
+
+    return this.lessonsRepository.save(lessons)
+  }
+
+  async cancelByContract(contract: Contract) {
+    const qb = this.dataSource.createQueryBuilder()
+
+    qb.select('l')
+      .from(Leave, 'l')
+      .where(`l."userId" = :userId`, { userId: contract.teacher.id })
+      .andWhere(`l.state = :state`, { state: LeaveState.ACCEPTED })
+      .andWhere(`l."startDate" <= :end::date`, { end: contract.endDate })
+      .andWhere(`l."endDate" >= :start::date`, { start: contract.startDate })
+
+    const leaves: Leave[] = await qb.getMany()
+
+    const contractLessons = await this.lessonsRepository
+      .createQueryBuilder('l')
+      .where(`l.contractId = :contractId`, { contractId: contract.id })
+      .getMany()
+
+    const lessons: DeepPartial<Lesson>[] = leaves.flatMap((l) => {
+      const dates = this.getLessonDates(
+        contract,
+        dayjs(l.startDate),
+        dayjs(l.endDate),
+      )
+
+      return dates.map((d) => {
+        const dateString = d.format('YYYY-MM-DD')
+
+        const existingLesson = contractLessons.find(
+          (l) => l.date === dateString,
+        )
+
+        if (typeof existingLesson === 'undefined') {
+          // lesson does not exist yet
+          return {
+            contract: { id: contract.id },
+            date: dateString,
             state: LessonState.CANCELLED,
           }
         } else {

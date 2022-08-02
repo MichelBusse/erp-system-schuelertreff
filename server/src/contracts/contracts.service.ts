@@ -8,6 +8,7 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import dayjs, { Dayjs } from 'dayjs'
 import { Brackets, DataSource, Repository } from 'typeorm'
 
+import { LessonsService } from 'src/lessons/lessons.service'
 import { timeAvailable } from 'src/users/dto/timeAvailable'
 import { Customer, User } from 'src/users/entities'
 import { parseMultirange, UsersService } from 'src/users/users.service'
@@ -28,6 +29,9 @@ export class ContractsService {
 
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
+
+    @Inject(forwardRef(() => LessonsService))
+    private readonly lessonsService: LessonsService,
   ) {}
 
   async create(dto: CreateContractDto): Promise<Contract> {
@@ -45,7 +49,12 @@ export class ContractsService {
       parentContract: dto.parentContract ? { id: dto.parentContract } : null,
     })
 
-    return this.contractsRepository.save(contract)
+    const savedContract = await this.contractsRepository.save(contract)
+
+    if (savedContract.state === ContractState.ACCEPTED)
+      await this.lessonsService.cancelByContract(savedContract)
+
+    return savedContract
   }
 
   async findAll(): Promise<Contract[]> {
@@ -143,14 +152,24 @@ export class ContractsService {
     id: number,
     dto: AcceptOrDeclineContractDto,
   ): Promise<void> {
-    let contract: any = await this.contractsRepository.findOneBy({ id })
+    const contract = await this.contractsRepository
+      .createQueryBuilder('c')
+      .select('c')
+      .where('c.id = :id', { id })
+      .leftJoin('c.teacher', 't')
+      .addSelect('t.id')
+      .getOne()
 
-    contract = {
+    const newContract = {
       ...contract,
       ...dto,
     }
 
-    await this.contractsRepository.save(contract)
+    // cancel blocked lessons
+    if (dto.state === ContractState.ACCEPTED)
+      await this.lessonsService.cancelByContract(newContract)
+
+    await this.contractsRepository.save(newContract)
   }
 
   async suggestContracts(dto: SuggestContractsDto): Promise<any[]> {
