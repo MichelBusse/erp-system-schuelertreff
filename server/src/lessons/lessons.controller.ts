@@ -128,23 +128,23 @@ export class LessonsController {
     }
   }
 
-  @Get()
-  @Roles(Role.ADMIN)
-  findAll(): Promise<Lesson[]> {
-    return this.lessonsService.findAll()
-  }
-
   @Get(':contractId/:date')
   findOne(
     @Request() req,
     @Param('contractId') id: number,
     @Param('date') date: string,
-  ): Promise<Lesson> {
+  ): Promise<{lesson: Lesson, contract: Contract}> {
     if (req.user.role === Role.ADMIN) {
       return this.lessonsService.findOne(id, date)
     } else {
       return this.lessonsService.findOne(id, date, req.user.id)
     }
+  }
+
+  @Get()
+  @Roles(Role.ADMIN)
+  findAll(): Promise<Lesson[]> {
+    return this.lessonsService.findAll()
   }
 
   @Delete(':id')

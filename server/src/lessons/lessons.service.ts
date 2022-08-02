@@ -102,9 +102,13 @@ export class LessonsService {
     if (teacherId)
       lessonQuery.andWhere('c.teacherId = :teacherId', { teacherId: teacherId })
 
-    const lesson = await lessonQuery.getOne()
-    return lesson
+    let lesson = await lessonQuery.getOne()
+
+    const contract = await this.contractsService.findOne(contractId)
+    
+    return {lesson, contract}
   }
+
 
   async remove(id: number): Promise<void> {
     await this.lessonsRepository.delete(id)

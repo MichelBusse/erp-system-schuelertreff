@@ -81,10 +81,26 @@ const App: React.FC = () => {
                   }
                 />
                 <Route
+                  path=":initialDate/:contractId/:date"
+                  element={
+                    <ProtectedRoute>
+                      <Pages.LessonDetailView />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path=":contractId/:date"
                   element={
                     <ProtectedRoute>
                       <Pages.LessonDetailView />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path=":initialDate"
+                  element={
+                    <ProtectedRoute>
+                      <Pages.Timetable />
                     </ProtectedRoute>
                   }
                 />

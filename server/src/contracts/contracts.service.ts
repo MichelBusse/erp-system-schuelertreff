@@ -78,7 +78,7 @@ export class ContractsService {
   async findOne(id: number, teacherId?: number): Promise<Contract> {
     const contract = await this.contractsRepository.findOne({
       where: { id },
-      relations: ['subject', 'teacher', 'customers'],
+      relations: ['subject', 'teacher', 'customers', 'customers.school'],
     })
 
     if (!(teacherId && contract.teacher.id !== teacherId)) {

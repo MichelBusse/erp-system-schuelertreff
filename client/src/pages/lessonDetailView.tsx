@@ -23,7 +23,7 @@ import { LessonState } from '../types/lesson'
 const LessonDetailView: React.FC = () => {
   const { API } = useAuth()
   const navigate = useNavigate()
-  const { contractId, date } = useParams()
+  const { initialDate, contractId, date } = useParams()
   const [id, setId] = useState<number | null>(null)
   const { decodeToken } = useAuth()
   const [refresh, setRefresh] = useState(0)
@@ -52,7 +52,6 @@ const LessonDetailView: React.FC = () => {
 
   useEffect(() => {
     API.get('lessons/' + contractId + '/' + date).then((res) => {
-      console.log(res.data)
       const contract = {
         startDate: dayjs(res.data.contract.startDate),
         endDate: dayjs(res.data.contract.endDate),
@@ -69,9 +68,8 @@ const LessonDetailView: React.FC = () => {
 
 
       const lesson = {
-        state: res.data ? res.data.state : LessonState.IDLE,
-        attendance: [],
-        notes: res.data.notes
+        state: res.data.lesson ? res.data.lesson.state : LessonState.IDLE,
+        notes: res.data.lesson.notes
       }
       setId(res.data?.id)
       setData(lesson)
@@ -85,7 +83,7 @@ const LessonDetailView: React.FC = () => {
       ...data,
     }).then(() => {
       enqueueSnackbar('Stunde gespeichert', snackbarOptions)
-      navigate('/timetable')
+      navigate('/timetable/' + (initialDate ?? ''))
     })
   }
 
@@ -189,7 +187,7 @@ const LessonDetailView: React.FC = () => {
           <Stack direction={'row'} columnGap={2}>
             <Button
               onClick={() => {
-                navigate('/timetable')
+                navigate('/timetable/' + (initialDate ?? ''))
               }}
               variant="outlined"
             >

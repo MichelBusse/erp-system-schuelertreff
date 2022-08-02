@@ -4,6 +4,7 @@ import { Box } from '@mui/system'
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 
 import { DrawerParameters } from '../pages/timetable'
 import { contract } from '../types/contract'
@@ -34,6 +35,7 @@ const Calendar: React.FC<Props> = ({
 
   const [contracts, setContracts] = useState<Record<number, contract[]>>([])
   const [lessons, setLessons] = useState<lesson[]>([])
+
 
   useEffect(() => {
     API.get('lessons/week', {

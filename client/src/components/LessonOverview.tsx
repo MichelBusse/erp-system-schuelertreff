@@ -10,12 +10,14 @@ type Props = {
   contract: contract
   existingLesson: lesson | null
   date: Dayjs
+  calendarDate: Dayjs
 }
 
 const LessonOverview: React.FC<Props> = ({
   contract,
   existingLesson,
   date,
+  calendarDate
 }) => {
   const navigate = useNavigate()
 
@@ -61,7 +63,7 @@ const LessonOverview: React.FC<Props> = ({
           label="Gehalten"
         />
       </FormGroup>
-      <Button onClick={() => navigate(contract.id + '/' + date.format('YYYY-MM-DD'))}>Mehr anzeigen</Button>
+      <Button onClick={() => navigate('/timetable/' + calendarDate.format('YYYY-MM-DD') + '/' + contract.id + '/' + date.format('YYYY-MM-DD'))}>Mehr anzeigen</Button>
     </Stack>
   )
 }

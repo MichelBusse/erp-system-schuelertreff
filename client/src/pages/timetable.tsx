@@ -14,6 +14,8 @@ import TeacherCalendar from '../components/TeacherCalendar'
 import { contract } from '../types/contract'
 import { lesson } from '../types/lesson'
 import { Role, teacher } from '../types/user'
+import { useParams } from 'react-router-dom'
+import { isNumberObject } from 'util/types'
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)
@@ -32,7 +34,9 @@ const Timetable: React.FC = () => {
     params: null,
     lessons: [],
   })
-  const [date, setDate] = useState(dayjs().day(1))
+  const { initialDate } = useParams()
+  const [date, setDate] = useState((initialDate && dayjs(initialDate, 'YYYY-MM-DD').isValid()) ? dayjs(initialDate, 'YYYY-MM-DD').day(1) : dayjs().day(1))
+
   const [open, setOpen] = useState(false)
 
   const [render, setRender] = useState(0)
@@ -124,6 +128,7 @@ const Timetable: React.FC = () => {
                       key={c.id}
                       contract={c}
                       existingLesson={existingLesson}
+                      calendarDate={date}
                       date={dayjs(
                         drawer.params?.colDef.headerName,
                         'dddd\nDD.MM.YYYY',
