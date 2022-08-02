@@ -6,6 +6,7 @@ import {
   Select,
   Stack,
   TextField,
+  Typography,
 } from '@mui/material'
 import { Box } from '@mui/system'
 import dayjs from 'dayjs'
@@ -15,7 +16,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAuth } from '../components/AuthProvider'
 import ContractEditDialog from '../components/ContractEditDialog'
-import { snackbarOptions } from '../consts'
+import { snackbarOptions, snackbarOptionsError } from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { contractForm, lessonForm } from '../types/form'
 import { LessonState } from '../types/lesson'
@@ -48,6 +49,7 @@ const LessonDetailView: React.FC = () => {
   const [data, setData] = useState<lessonForm>({
     state: LessonState.IDLE,
   })
+  const [blocked, setBlocked] = useState(false)
 
   useEffect(() => {
     API.get('lessons/' + contractId + '/' + date).then((res) => {
@@ -65,6 +67,8 @@ const LessonDetailView: React.FC = () => {
 
       setContract(contract)
 
+      setBlocked(res.data.blocked)
+
       const lesson = {
         state: res.data.lesson ? res.data.lesson.state : LessonState.IDLE,
         attendance: [],
@@ -79,10 +83,15 @@ const LessonDetailView: React.FC = () => {
       date: dayjs(date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
       contractId: parseInt(contractId ?? ''),
       ...data,
-    }).then(() => {
-      enqueueSnackbar('Stunde gespeichert', snackbarOptions)
-      navigate('/timetable')
     })
+      .then(() => {
+        enqueueSnackbar('Stunde gespeichert', snackbarOptions)
+        navigate('/timetable')
+      })
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+      })
   }
 
   return (
@@ -154,7 +163,7 @@ const LessonDetailView: React.FC = () => {
             }}
           />
           <Stack direction={'row'} columnGap={2}>
-            <FormControl fullWidth>
+            <FormControl fullWidth disabled={blocked}>
               <InputLabel>Status</InputLabel>
               <Select
                 label="Satus"
@@ -172,6 +181,11 @@ const LessonDetailView: React.FC = () => {
               </Select>
             </FormControl>
           </Stack>
+          {blocked && (
+            <Typography>
+              Stunde ist durch Krankmeldung oder Urlaub blockiert.
+            </Typography>
+          )}
           <Stack direction={'row'} columnGap={2}>
             <Button
               onClick={() => {
@@ -181,7 +195,7 @@ const LessonDetailView: React.FC = () => {
             >
               Abbrechen
             </Button>
-            <Button onClick={submitForm} variant="contained">
+            <Button onClick={submitForm} variant="contained" disabled={blocked}>
               Speichern
             </Button>
           </Stack>

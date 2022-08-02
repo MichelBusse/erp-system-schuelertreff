@@ -23,16 +23,17 @@ export class LessonsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create(
-    createLessonDto: CreateLessonDto,
-    teacherId?: number,
-  ): Promise<Lesson> {
+  async create(dto: CreateLessonDto, teacherId?: number): Promise<Lesson> {
     const lesson = new Lesson()
 
     const contract = await this.contractsService.findOne(
-      createLessonDto.contractId,
+      dto.contractId,
       teacherId,
     )
+
+    // check for intersecting leaves
+    if ((await this.checkLeave(dto.date, contract.teacher.id)) > 0)
+      throw new BadRequestException('Lesson is blocked')
 
     if (contract) {
       if (contract.state !== ContractState.ACCEPTED)
@@ -40,8 +41,8 @@ export class LessonsService {
           'You cannot create lessons of unaccepted contracts',
         )
 
-      lesson.date = createLessonDto.date
-      lesson.state = createLessonDto.state
+      lesson.date = dto.date
+      lesson.state = dto.state
       lesson.contract = contract
 
       return this.lessonsRepository.save(lesson)
@@ -54,7 +55,7 @@ export class LessonsService {
 
   async update(
     id: number,
-    createLessonDto: CreateLessonDto,
+    dto: CreateLessonDto,
     teacherId?: number,
   ): Promise<Lesson> {
     const lesson = await this.lessonsRepository.findOne({
@@ -62,11 +63,15 @@ export class LessonsService {
       relations: ['contract', 'contract.teacher'],
     })
 
+    // check for intersecting leaves
+    if ((await this.checkLeave(dto.date, lesson.contract.teacher.id)) > 0)
+      throw new BadRequestException('Lesson is blocked')
+
     if (
       lesson.contract.state === ContractState.ACCEPTED &&
       (!teacherId || (teacherId && lesson.contract.teacher.id === teacherId))
     ) {
-      lesson.state = createLessonDto.state
+      lesson.state = dto.state
 
       return this.lessonsRepository.save(lesson)
     } else {
@@ -86,7 +91,6 @@ export class LessonsService {
     const lessonQuery = this.lessonsRepository
       .createQueryBuilder('l')
       .leftJoin('l.contract', 'c')
-      .select(['l'])
       .where('c.id = :contractId', { contractId: contractId })
       .andWhere('l.date::date = :lessonDate::date', { lessonDate: date })
     if (teacherId)
@@ -94,7 +98,8 @@ export class LessonsService {
 
     const lesson = await lessonQuery.getOne()
     const contract = await this.contractsService.findOne(contractId, teacherId)
-    return { contract: contract, lesson: lesson }
+    const blocked = (await this.checkLeave(date, contract.teacher.id)) > 0
+    return { contract, lesson, blocked }
   }
 
   async remove(id: number): Promise<void> {
@@ -243,5 +248,18 @@ export class LessonsService {
     })
 
     return this.lessonsRepository.save(lessons)
+  }
+
+  async checkLeave(date: string, userId: number) {
+    const q = this.dataSource
+      .createQueryBuilder()
+      .select('l')
+      .from(Leave, 'l')
+      .where(`l."userId" = :userId`, { userId })
+      .andWhere(`l."startDate" <= :lessonDate::date`, { lessonDate: date })
+      .andWhere(`l."endDate" >= :lessonDate::date`)
+      .andWhere(`l.state = :state`, { state: LeaveState.ACCEPTED })
+
+    return q.getCount()
   }
 }
