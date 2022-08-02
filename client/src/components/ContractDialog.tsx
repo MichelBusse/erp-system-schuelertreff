@@ -1,5 +1,6 @@
 import 'dayjs/locale/de'
 
+import { InfoOutlined } from '@mui/icons-material'
 import ClearIcon from '@mui/icons-material/Clear'
 import { LoadingButton } from '@mui/lab'
 import {
@@ -31,10 +32,16 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useSnackbar } from 'notistack'
 import React, { useEffect, useState } from 'react'
 
-import { snackbarOptionsError } from '../consts'
+import { leaveTypeToString, snackbarOptionsError } from '../consts'
 import { ContractState, contractWithTeacher } from '../types/contract'
 import subject from '../types/subject'
-import { classCustomer, privateCustomer, school, teacher } from '../types/user'
+import {
+  classCustomer,
+  leave,
+  privateCustomer,
+  school,
+  teacher,
+} from '../types/user'
 import { getNextDow } from '../utils/date'
 import { useAuth } from './AuthProvider'
 import BetterTimePicker from './BetterTimePicker'
@@ -57,6 +64,7 @@ type suggestion = {
     end: string
     overlap: number[]
   }[]
+  leave: leave[]
 }
 
 type form0 = {
@@ -124,8 +132,9 @@ const ContractDialog: React.FC<Props> = ({
 
   // step 1
   const [suggestions, setSuggestions] = useState<suggestion[]>([])
-  const [loading1, setLoading1] = useState(false)
   const [selSuggestion, setSelSuggestion] = useState<string>('')
+  const [leaves, setLeaves] = useState<Record<number, leave[]>>([])
+  const [loading1, setLoading1] = useState(false)
   const [form1, setForm1] = useState<form1>({
     startDate: null,
     endDate: null,
@@ -226,6 +235,29 @@ const ContractDialog: React.FC<Props> = ({
 
   const handleSubmit0 = () => {
     setLoading0(true)
+
+    API.get('users/leaves/intersecting', {
+      params: {
+        start: form0.startDate?.format('YYYY-MM-DD'),
+        end: form0.endDate?.format('YYYY-MM-DD'),
+      },
+    })
+      .then((res) => {
+        const leavesByTeacher: Record<number, leave[]> = {}
+
+        ;(res.data as leave[]).map((l) => {
+          leavesByTeacher[l.user.id] = [
+            ...(leavesByTeacher[l.user.id] ?? []),
+            l,
+          ]
+        })
+
+        setLeaves(leavesByTeacher)
+      })
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+      })
 
     API.get('contracts/suggest', {
       params: {
@@ -674,6 +706,30 @@ const ContractDialog: React.FC<Props> = ({
               value={form1.teacher}
               onChange={(e) =>
                 setForm1((data) => ({ ...data, teacher: e.target.value }))
+              }
+              endAdornment={
+                <IconButtonAdornment
+                  margin="16px"
+                  icon={InfoOutlined}
+                  hidden={!leaves[parseInt(form1.teacher)]}
+                  tooltip={
+                    !leaves[parseInt(form1.teacher)] ? (
+                      ''
+                    ) : (
+                      <>
+                        {leaves[parseInt(form1.teacher)]?.map((l) => (
+                          <p key={l.id}>
+                            {leaveTypeToString[l.type] +
+                              ': ' +
+                              l.startDate +
+                              ' - ' +
+                              l.endDate}
+                          </p>
+                        ))}
+                      </>
+                    )
+                  }
+                />
               }
             >
               {teachers

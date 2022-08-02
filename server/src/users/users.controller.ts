@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
   Res,
   UploadedFile,
@@ -15,7 +16,6 @@ import { FileInterceptor } from '@nestjs/platform-express'
 import { Response } from 'express'
 
 import { AuthService } from 'src/auth/auth.service'
-import { Public } from 'src/auth/decorators/public.decorator'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 
@@ -86,8 +86,7 @@ export class UsersController {
   }
 
   @Get('school/:id')
-  @Public()
-  //@Roles(Role.ADMIN)
+  @Roles(Role.ADMIN)
   findOneSchool(@Param('id') id: number): Promise<School> {
     return this.usersService.findOneSchool(id)
   }
@@ -358,5 +357,14 @@ export class UsersController {
   @Get('leaves/pending')
   async getPendingLeaves() {
     return this.usersService.getPendingLeaves()
+  }
+
+  @Roles(Role.ADMIN)
+  @Get('leaves/intersecting')
+  async getIntersectingLeaves(
+    @Query('start') start: string,
+    @Query('end') end: string,
+  ): Promise<Leave[]> {
+    return this.usersService.getIntersectingLeaves(start, end)
   }
 }

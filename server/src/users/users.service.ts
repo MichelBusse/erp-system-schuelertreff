@@ -231,6 +231,23 @@ export class UsersService {
     return q.getMany()
   }
 
+  async getIntersectingLeaves(start: string, end: string): Promise<Leave[]> {
+    const qb = this.connection.createQueryBuilder()
+
+    qb.select('l')
+      .from(Leave, 'l')
+      .leftJoin('l.user', 'u')
+      .addSelect('u.id')
+      .addSelect('u.firstName')
+      .addSelect('u.lastName')
+      .where('l."userId" IS NOT NULL')
+      .andWhere(`l.state = :state`, { state: LeaveState.ACCEPTED })
+      .andWhere(`l.startDate < :end::date`, { end })
+      .andWhere(`l.endDate > :start::date`, { start })
+
+    return qb.getMany()
+  }
+
   /**
    * Find methods
    */

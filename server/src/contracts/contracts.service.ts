@@ -183,9 +183,9 @@ export class ContractsService {
       .subQuery()
       .select(
         `union_multirange((
-      '{[2001-01-0' || extract(dow from "con"."startDate") || ' ' || "con"."startTime" ||
-      ', 2001-01-0' || extract(dow from "con"."startDate") || ' ' || "con"."endTime" || ')}'
-    )::tstzmultirange)`,
+          '{[2001-01-0' || extract(dow from "con"."startDate") || ' ' || "con"."startTime" ||
+          ', 2001-01-0' || extract(dow from "con"."startDate") || ' ' || "con"."endTime" || ')}'
+        )::tstzmultirange)`,
         'contractTimes',
       )
       .from(Contract, 'con')
@@ -200,12 +200,12 @@ export class ContractsService {
       .andWhere('con.state = :contractState', {
         contractState: ContractState.ACCEPTED,
       })
-      .andWhere('con.endDate > :minDate', {
-        minDate: dto.minDate ?? dayjs().format('YYYY-MM-DD'),
+      .andWhere('con.endDate > :startDate', {
+        startDate: dto.startDate ?? dayjs().format('YYYY-MM-DD'),
       })
-    if (typeof dto.maxDate !== 'undefined')
-      contractQuery.andWhere('con.startDate < :maxDate', {
-        maxDate: dto.maxDate,
+    if (typeof dto.endDate !== 'undefined')
+      contractQuery.andWhere('con.startDate < :endDate', {
+        endDate: dto.endDate,
       })
 
     if (dto.interval !== 1) contractQuery.andWhere('con.interval = 1')

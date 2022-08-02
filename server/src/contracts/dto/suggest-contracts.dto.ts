@@ -36,9 +36,9 @@ export class SuggestContractsDto {
 
   @IsOptional()
   @IsValidDate()
-  minDate?: string
+  startDate?: string
 
   @IsOptional()
   @IsValidDate()
-  maxDate?: string
+  endDate?: string
 }

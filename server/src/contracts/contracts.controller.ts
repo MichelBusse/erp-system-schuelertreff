@@ -12,7 +12,6 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { EntityNotFoundError } from 'typeorm'
 
-import { Public } from 'src/auth/decorators/public.decorator'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 
@@ -68,8 +67,7 @@ export class ContractsController {
   }
 
   @Get()
-  @Public()
-  //@Roles(Role.ADMIN)
+  @Roles(Role.ADMIN)
   findAll(): Promise<Contract[]> {
     return this.contractsService.findAll()
   }
