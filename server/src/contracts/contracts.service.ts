@@ -270,18 +270,27 @@ export class ContractsService {
         teacherName: a.firstName + ' ' + a.lastName,
         suggestions: await Promise.all(
           [1, 2, 3, 4, 5].flatMap((n) =>
-            parseMultirange(a[n]).map(async (r) => ({
-              ...r,
-              overlap: (
-                await this.checkOverlap(a.teacherId, dto.customers, r)
-              ).map((c) => c.id),
-            })),
+            parseMultirange(a[n])
+              .filter((r) => this.durationMinutes(r) >= 45)
+              .map(async (r) => ({
+                ...r,
+                overlap: (
+                  await this.checkOverlap(a.teacherId, dto.customers, r)
+                ).map((c) => c.id),
+              })),
           ),
         ),
       })),
     )
 
     return suggestions
+  }
+
+  durationMinutes(range: timeAvailable): number {
+    return dayjs('2001-01-01 ' + range.end).diff(
+      '2001-01-01 ' + range.start,
+      'minute',
+    )
   }
 
   async checkOverlap(
