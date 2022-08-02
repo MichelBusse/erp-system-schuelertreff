@@ -35,7 +35,7 @@ export class LessonsService {
     const lesson = new Lesson()
 
     const contract = await this.contractsService.findOne(
-      createLessonDto.contractId,
+      Number(createLessonDto.contractId),
       teacherId,
     )
 

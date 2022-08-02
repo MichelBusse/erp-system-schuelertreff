@@ -1,14 +1,18 @@
 import { Button, Grid, TextField } from '@mui/material'
 import axios from 'axios'
+import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
+import { snackbarOptionsError } from '../consts'
 
 const Login: React.FC = () => {
   const [error, setError] = useState('')
   const [email, setEmail] = useState('')
+  const [emailErrorText, setEmailErrorText] = useState('')
   const [password, setPassword] = useState('')
-  const { handleLogin } = useAuth()
+  const { API, handleLogin } = useAuth()
+  const { enqueueSnackbar } = useSnackbar()
 
   const handleSubmit = async () => {
     try {
@@ -21,6 +25,19 @@ const Login: React.FC = () => {
         setError('Ein Fehler ist aufgetreten, bitte erneut versuchen')
       }
     }
+  }
+
+  const resetPassword = () => {
+    if(email === ''){
+      setEmailErrorText('Bitte E-Mail angeben')
+      return;
+    }
+    API.post('auth/reset/mail', {mail: email}).then(() => {
+      enqueueSnackbar('Der Passwort-Reset wurde an die E-Mail gesendet')
+    }).catch(() => {
+      enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+    })
+
   }
 
   return (
@@ -42,7 +59,8 @@ const Login: React.FC = () => {
           style={{ width: 200 }}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          error={error !== ''}
+          error={error !== '' || emailErrorText !== ''}
+          helperText={emailErrorText}
         />
         <TextField
           label="Password"
@@ -59,13 +77,14 @@ const Login: React.FC = () => {
           }}
         />
         <Button
-          variant="outlined"
+          variant="contained"
           size="medium"
           style={{ margin: '5px' }}
           onClick={handleSubmit}
         >
           Login
         </Button>
+        <Button variant="text" onClick={() => resetPassword()}>Passwort zurücksetzen</Button>
       </Grid>
     </>
   )

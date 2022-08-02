@@ -36,10 +36,10 @@ export class AuthController {
     return this.authService.login(req.user)
   }
 
-  @Roles(Role.ADMIN)
-  @Post('reset/:id')
-  async adminReset(@Param('id') id: number) {
-    const user = await this.usersService.findOne(id)
+  @Public()
+  @Post('reset/mail')
+  async adminReset(@Body() body: {mail: string}) {
+    const user = await this.usersService.findByEmailAuth(body.mail)
 
     return this.authService.initReset(user)
   }
