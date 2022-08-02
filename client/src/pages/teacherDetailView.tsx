@@ -144,15 +144,13 @@ const TeacherDetailView: React.FC = () => {
   const generateInvoice = (year: number, month: number) => {
     API.get('lessons/invoice/teacher', {
       params: {
-        of: dayjs()
-          .year(year)
-          .month(month)
-          .format('YYYY-MM-DD'),
+        of: dayjs().year(year).month(month).format('YYYY-MM-DD'),
         teacherId: id,
       },
+      responseType: 'blob',
     })
       .then((res) => {
-        console.log(res.data)
+        window.open(URL.createObjectURL(res.data))
       })
       .catch(() => {
         enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
@@ -388,9 +386,6 @@ const TeacherDetailView: React.FC = () => {
               }
             />
           </Box>
-
-          <h3>Überweisung generieren:</h3>
-          <InvoiceDataSelect generateInvoice={generateInvoice}/>
           <Stack direction={'row'} columnGap={5} sx={{ marginTop: '15px' }}>
             {id && (
               <Button
@@ -431,7 +426,6 @@ const TeacherDetailView: React.FC = () => {
               </Button>
             )}
           </Stack>
-
           {requestedId === 'me' && data.state === TeacherState.APPLIED && (
             <Stack direction="row" alignItems="center" gap={1}>
               <CheckIcon color="success" />
@@ -440,6 +434,8 @@ const TeacherDetailView: React.FC = () => {
               </Typography>
             </Stack>
           )}
+          <h3>Abrechnung generieren:</h3>
+          <InvoiceDataSelect generateInvoice={generateInvoice} />
         </Stack>
       </Box>
       <Dialog

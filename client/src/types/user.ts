@@ -61,6 +61,7 @@ export interface classCustomer {
   numberOfStudents: number
   timesAvailableParsed: timesAvailableParsed[]
   timesAvailable: timeAvailable[]
+  school: school
 }
 
 export type customer = privateCustomer | classCustomer

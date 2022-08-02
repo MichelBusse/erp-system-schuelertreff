@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -7,8 +8,10 @@ import {
   Post,
   Query,
   Request,
+  Res,
 } from '@nestjs/common'
 import dayjs from 'dayjs'
+import { Response } from 'express'
 
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
@@ -40,31 +43,64 @@ export class LessonsController {
     return this.lessonsService.findByWeek(dayjs(date))
   }
 
-  @Get('invoice/customer')
-  @Roles(Role.ADMIN)
-  getInvoiceLessonsCustomer(
-    @Query('of') month: string,
-    @Query('customerId') customerId: string,
-  ) {
-    return this.lessonsService.findInvoiceReadyByMonth({invoiceMonth: dayjs(month, 'YYYY-MM-DD'), customerId: Number(customerId)})
-  }
-
-  @Get('invoice/school')
-  @Roles(Role.ADMIN)
-  getInvoiceLessonsSchool(
-    @Query('of') month: string,
-    @Query('schoolId') schoolId: string,
-  ) {
-    return this.lessonsService.findInvoiceReadyByMonth({invoiceMonth: dayjs(month, 'YYYY-MM-DD'), schoolId: Number(schoolId)})
-  }
-
   @Get('invoice/teacher')
-  @Roles(Role.ADMIN)
-  getInvoiceLessonsTeacher(
+  async getInvoiceTeacher(
+    @Request() req,
+    @Res() res: Response,
     @Query('of') month: string,
     @Query('teacherId') teacherId: string,
-  ) {
-    return this.lessonsService.findInvoiceReadyByMonth({invoiceMonth: dayjs(month, 'YYYY-MM-DD'), teacherId: Number(teacherId)})
+  ): Promise<void> {
+    if (req.user.id === teacherId || req.user.role === Role.ADMIN) {
+      const buffer = await this.lessonsService.generateInvoiceTeacher({
+        invoiceMonth: dayjs(month, 'YYYY-MM-DD'),
+        teacherId: Number(teacherId),
+      })
+
+      res.set({
+        // pdf
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename=invoice.pdf',
+        'Content-Length': buffer.length,
+
+        // prevent cache
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        Pragma: 'no-cache',
+        Expires: 0,
+      })
+
+      res.end(buffer)
+    }else{
+      throw new BadRequestException("You don't have permission to generate the invoice of this teacher")
+    }
+  }
+
+  @Get('invoice/customer')
+  @Roles(Role.ADMIN)
+  async getInvoiceCustomer(
+    @Res() res: Response,
+    @Query('of') month: string,
+    @Query('customerId') customerId: string,
+    @Query('schoolId') schoolId: string,
+  ): Promise<void> {
+    const buffer = await this.lessonsService.generateInvoice({
+      invoiceMonth: dayjs(month, 'YYYY-MM-DD'),
+      customerId: customerId ? Number(customerId) : null,
+      schoolId: schoolId ? Number(schoolId) : null,
+    })
+
+    res.set({
+      // pdf
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename=invoice.pdf',
+      'Content-Length': buffer.length,
+
+      // prevent cache
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: 0,
+    })
+
+    res.end(buffer)
   }
 
   @Post('')
@@ -103,7 +139,7 @@ export class LessonsController {
     @Request() req,
     @Param('contractId') id: string,
     @Param('date') date: string,
-  ): Promise<{ contract: Contract; lesson: Lesson }> {
+  ): Promise<Lesson> {
     if (req.user.role === Role.ADMIN) {
       return this.lessonsService.findOne(id, date)
     } else {

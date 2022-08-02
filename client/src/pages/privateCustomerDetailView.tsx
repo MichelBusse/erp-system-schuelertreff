@@ -47,7 +47,11 @@ const PrivateCustomerDetailView: React.FC = () => {
   const [data, setData] = useState<privateCustomerForm>(
     defaultPrivateCustomerFormData,
   )
-  const [errors, setErrors] = useState({...defaultPrivateCustomerFormData, grade: '', fee: ''})
+  const [errors, setErrors] = useState({
+    ...defaultPrivateCustomerFormData,
+    grade: '',
+    fee: '',
+  })
 
   useEffect(() => {
     API.get('users/privateCustomer/' + requestedId).then((res) => {
@@ -123,17 +127,20 @@ const PrivateCustomerDetailView: React.FC = () => {
       })
   }
 
-  const generateInvoice = (year : number, month : number) => {
+  const generateInvoice = (year: number, month: number) => {
     API.get('lessons/invoice/customer', {
       params: {
         of: dayjs().year(year).month(month).format('YYYY-MM-DD'),
-        customerId: id
+        customerId: id,
       },
-    }).then((res) => {
-      console.log(res.data)
-    }).catch(() => {
-      enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+      responseType: 'blob',
     })
+      .then((res) => {
+        window.open(URL.createObjectURL(res.data))
+      })
+      .catch(() => {
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+      })
   }
 
   return (
@@ -302,8 +309,6 @@ const PrivateCustomerDetailView: React.FC = () => {
               }
             />
           </Box>
-          <h3>Rechnung generieren:</h3>
-          <InvoiceDataSelect generateInvoice={generateInvoice}/>
           <Stack direction={'row'} columnGap={5} sx={{ marginTop: '15px' }}>
             {id && (
               <Button
@@ -329,6 +334,8 @@ const PrivateCustomerDetailView: React.FC = () => {
               </Button>
             )}
           </Stack>
+          <h3>Rechnung generieren:</h3>
+          <InvoiceDataSelect generateInvoice={generateInvoice} />
         </Stack>
       </Box>
       <Dialog

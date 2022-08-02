@@ -46,6 +46,7 @@ export interface privateCustomerForm extends userForm {
 
 export interface lessonForm {
   state: LessonState
+  notes: string
 }
 
 export type contractForm = {

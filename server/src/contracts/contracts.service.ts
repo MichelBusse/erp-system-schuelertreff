@@ -294,14 +294,12 @@ export class ContractsService {
       .createQueryBuilder('c')
       .leftJoin('c.subject', 'subject')
       .leftJoin('c.customers', 'customer')
+      .leftJoin('customer.school', 'school')
       .select([
         'c',
         'subject',
-        'customer.id',
-        'customer.type',
-        'customer.firstName',
-        'customer.lastName',
-        'customer.className',
+        'customer',
+        'school'
       ])
       .loadAllRelationIds({
         relations: ['teacher'],

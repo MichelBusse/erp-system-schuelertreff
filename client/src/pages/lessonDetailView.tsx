@@ -47,10 +47,12 @@ const LessonDetailView: React.FC = () => {
   })
   const [data, setData] = useState<lessonForm>({
     state: LessonState.IDLE,
+    notes: ''
   })
 
   useEffect(() => {
     API.get('lessons/' + contractId + '/' + date).then((res) => {
+      console.log(res.data)
       const contract = {
         startDate: dayjs(res.data.contract.startDate),
         endDate: dayjs(res.data.contract.endDate),
@@ -65,11 +67,13 @@ const LessonDetailView: React.FC = () => {
 
       setContract(contract)
 
+
       const lesson = {
-        state: res.data.lesson ? res.data.lesson.state : LessonState.IDLE,
+        state: res.data ? res.data.state : LessonState.IDLE,
         attendance: [],
+        notes: res.data.notes
       }
-      setId(res.data.lesson?.id)
+      setId(res.data?.id)
       setData(lesson)
     })
   }, [refresh])
@@ -145,7 +149,7 @@ const LessonDetailView: React.FC = () => {
                 .map((c) => {
                   return c.role === 'privateCustomer'
                     ? c.firstName + ' ' + c.lastName
-                    : c.className
+                    : c.school.schoolName + ': ' + c.className
                 })
                 .join(', ') ?? ''
             }
@@ -172,6 +176,16 @@ const LessonDetailView: React.FC = () => {
               </Select>
             </FormControl>
           </Stack>
+          <TextField 
+            label="Notizen"
+            value={data.notes}
+            variant={"outlined"}
+            multiline
+            rows={(3)}
+            onChange={(e) => {
+              setData((prevData) => ({...prevData, notes: e.target.value}));
+            }}
+          />
           <Stack direction={'row'} columnGap={2}>
             <Button
               onClick={() => {
