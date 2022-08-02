@@ -26,6 +26,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
+import InvoiceDataSelect from '../components/InvoiceDateSelect'
 import {
   defaultTeacherFormData,
   snackbarOptions,
@@ -51,13 +52,6 @@ const TeacherDetailView: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false)
   const [data, setData] = useState<teacherForm>(defaultTeacherFormData)
   const [errors, setErrors] = useState(defaultTeacherFormData)
-  const [invoiceData, setInvoiceData] = useState<{
-    month: number
-    year: number
-  }>({
-    month: dayjs().subtract(1, 'month').month(),
-    year: dayjs().subtract(1, 'month').year(),
-  })
 
   const requestedId = id ?? 'me'
   const activeTeacherState = decodeToken().state
@@ -147,12 +141,12 @@ const TeacherDetailView: React.FC = () => {
       })
   }
 
-  const generateInvoice = () => {
+  const generateInvoice = (year: number, month: number) => {
     API.get('lessons/invoice/teacher', {
       params: {
         of: dayjs()
-          .year(invoiceData.year)
-          .month(invoiceData.month)
+          .year(year)
+          .month(month)
           .format('YYYY-MM-DD'),
         teacherId: id,
       },
@@ -396,81 +390,7 @@ const TeacherDetailView: React.FC = () => {
           </Box>
 
           <h3>Überweisung generieren:</h3>
-          <Stack direction={'row'} columnGap={2}>
-            <FormControl fullWidth>
-              <InputLabel id="invoiceYearLabel">Jahr</InputLabel>
-              <Select
-                id="invoiceYear"
-                label="Jahr"
-                value={invoiceData.year}
-                onChange={(event) => {
-                  if (
-                    !(event.target.value < dayjs().year()) ||
-                    !(invoiceData.month < dayjs().month())
-                  ) {
-                    setInvoiceData((data) => ({
-                      ...data,
-                      year: dayjs().subtract(1, 'month').year(),
-                      month: dayjs().subtract(1, 'month').month(),
-                    }))
-                  } else {
-                    setInvoiceData((data) => ({
-                      ...data,
-                      year: event.target.value as number,
-                    }))
-                  }
-                }}
-              >
-                {[
-                  dayjs().year(),
-                  dayjs().year() - 1,
-                  dayjs().year() - 2,
-                  dayjs().year() - 3,
-                ].map((e) => (
-                  <MenuItem value={e} key={e}>
-                    {e}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl fullWidth>
-              <InputLabel id="invoiceMonthLabel">Monat</InputLabel>
-              <Select
-                id="invoiceMonth"
-                label="Monat"
-                value={invoiceData.month}
-                onChange={(event) =>
-                  setInvoiceData((data) => ({
-                    ...data,
-                    month: event.target.value as number,
-                  }))
-                }
-              >
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-                  .filter((e) => {
-                    if (
-                      invoiceData.year < dayjs().year() ||
-                      e < dayjs().month()
-                    ) {
-                      return true
-                    }
-                    return false
-                  })
-                  .map((e) => (
-                    <MenuItem value={e} key={e}>
-                      {dayjs().month(e).format('MMMM')}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
-            <Button
-              variant={'outlined'}
-              fullWidth
-              onClick={() => generateInvoice()}
-            >
-              Rechnung generieren
-            </Button>
-          </Stack>
+          <InvoiceDataSelect generateInvoice={generateInvoice}/>
           <Stack direction={'row'} columnGap={5} sx={{ marginTop: '15px' }}>
             {id && (
               <Button

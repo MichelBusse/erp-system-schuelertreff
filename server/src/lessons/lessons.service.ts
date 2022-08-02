@@ -9,6 +9,10 @@ import { ContractsService } from 'src/contracts/contracts.service'
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Lesson, LessonState } from './lesson.entity'
 
+import ejs from 'ejs'
+import path from 'path'
+import * as puppeteer from 'puppeteer'
+
 @Injectable()
 export class LessonsService {
   constructor(
@@ -124,56 +128,10 @@ export class LessonsService {
     }
   }
 
-  async findInvoiceReadyByMonthAndCustomer(invoiceMonth: Dayjs, customerId: number) {
-    const q = this.lessonsRepository
-      .createQueryBuilder('l')
-      .select(['l', 'c', 'subject', 'school', 'teacher'])
-      .leftJoin('l.contract', 'c')
-      .leftJoin('c.customers', 'customer')
-      .leftJoin('c.subject', 'subject')
-      .leftJoin('customer.school', 'school')
-      .leftJoin('c.teacher', 'teacher')
-      .where(`l.date >= date_trunc('month', :invoiceMonthLower::date)`, {
-        invoiceMonthLower: dayjs(invoiceMonth).format(),
-      })
-      .andWhere(`l.date < date_trunc('month', :invoiceMonthHigher::date)`, {
-        invoiceMonthHigher: dayjs(invoiceMonth).add(1,'month').format(),
-      })
-      .andWhere('l.state = :lessonState', {
-        lessonState: LessonState.HELD
-      })
-      q.andWhere('customer.id = :customerId', { customerId: customerId })
-
-    return q.getMany()
-  }
-
-  async findInvoiceReadyByMonthAndSchool(invoiceMonth: Dayjs, schoolId: number) {
-    const q = this.lessonsRepository
-      .createQueryBuilder('l')
-      .select(['l', 'c', 'subject', 'school', 'teacher'])
-      .leftJoin('l.contract', 'c')
-      .leftJoin('c.customers', 'customer')
-      .leftJoin('c.subject', 'subject')
-      .leftJoin('customer.school', 'school')
-      .leftJoin('c.teacher', 'teacher')
-      .where(`l.date >= date_trunc('month', :invoiceMonthLower::date)`, {
-        invoiceMonthLower: dayjs(invoiceMonth).format(),
-      })
-      .andWhere(`l.date < date_trunc('month', :invoiceMonthHigher::date)`, {
-        invoiceMonthHigher: dayjs(invoiceMonth).add(1,'month').format(),
-      })
-      .andWhere('l.state = :lessonState', {
-        lessonState: LessonState.HELD
-      })
-      q.andWhere('school.id = :schoolId', { schoolId: schoolId })
-
-    return q.getMany()
-  }
-
   async findInvoiceReadyByMonth({invoiceMonth, customerId, schoolId, teacherId} : {invoiceMonth: Dayjs, customerId?: number, schoolId?: number, teacherId?: number}) {
     const q = this.lessonsRepository
       .createQueryBuilder('l')
-      .select(['l', 'c', 'subject', 'school', 'teacher'])
+      .select(['l', 'c', 'subject', 'school', 'customer', 'teacher'])
       .leftJoin('l.contract', 'c')
       .leftJoin('c.customers', 'customer')
       .leftJoin('c.subject', 'subject')
@@ -199,5 +157,49 @@ export class LessonsService {
         q.andWhere('teacher.id = :teacherId', { teacherId: teacherId })
 
     return q.getMany()
+  }
+
+
+  async generatePDF(): Promise<Buffer> {
+    const passengers = [
+      {
+        name: 'Joyce',
+        flightNumber: 7859,
+        time: '18:00',
+      },
+      {
+        name: 'Brock',
+        flightNumber: 7859,
+        time: '18:00',
+      },
+      {
+        name: 'Eve',
+        flightNumber: 7859,
+        time: '18:00',
+      },
+    ]
+
+    const filePath = path.join(__dirname, 'templates/test.ejs')
+
+    const content = await ejs.renderFile(filePath, { passengers })
+
+    const browser = await puppeteer.launch({ headless: true })
+    const page = await browser.newPage()
+    await page.setContent(content)
+
+    const buffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        left: '20px',
+        top: '20px',
+        right: '20px',
+        bottom: '20px',
+      },
+    })
+
+    await browser.close()
+
+    return buffer
   }
 }

@@ -1,12 +1,8 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { InjectDataSource } from '@nestjs/typeorm'
-import ejs from 'ejs'
-import { readFileSync } from 'fs'
+import { InjectConnection } from '@nestjs/typeorm'
 import { nanoid } from 'nanoid'
-import path from 'path'
-import * as puppeteer from 'puppeteer'
-import { DataSource } from 'typeorm'
+import { Connection } from 'typeorm'
 
 import { UsersService } from './users/users.service'
 
@@ -81,48 +77,5 @@ export class AppService implements OnApplicationBootstrap {
 
   getHello(): string {
     return 'Hello World!'
-  }
-
-  async generatePDF(): Promise<Buffer> {
-    const passengers = [
-      {
-        name: 'Joyce',
-        flightNumber: 7859,
-        time: '18:00',
-      },
-      {
-        name: 'Brock',
-        flightNumber: 7859,
-        time: '18:00',
-      },
-      {
-        name: 'Eve',
-        flightNumber: 7859,
-        time: '18:00',
-      },
-    ]
-
-    const filePath = path.join(__dirname, 'templates/test.ejs')
-
-    const content = await ejs.renderFile(filePath, { passengers })
-
-    const browser = await puppeteer.launch({ headless: true })
-    const page = await browser.newPage()
-    await page.setContent(content)
-
-    const buffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        left: '20px',
-        top: '20px',
-        right: '20px',
-        bottom: '20px',
-      },
-    })
-
-    await browser.close()
-
-    return buffer
   }
 }
