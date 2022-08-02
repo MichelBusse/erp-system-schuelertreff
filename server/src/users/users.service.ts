@@ -170,6 +170,11 @@ export class UsersService {
       state: dto.state,
     })
 
+    // cancel lessons of intersecting contracts
+    if (dto.state === LeaveState.ACCEPTED) {
+      await this.lessonsService.cancelByLeave(leave)
+    }
+
     return repo.save(leave)
   }
 

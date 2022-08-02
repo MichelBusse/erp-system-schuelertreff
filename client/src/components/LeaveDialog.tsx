@@ -118,7 +118,6 @@ const LeaveDialog: React.FC<Props> = ({
         endDate: value.endDate?.format('YYYY-MM-DD'),
       })
         .then((res) => {
-          console.log(res.data)
           // after leave is saved, upload attachment (if selected)
           if (uploadFile !== null) {
             handleUpload(res.data.id, res.data)
@@ -161,7 +160,6 @@ const LeaveDialog: React.FC<Props> = ({
       timeout: 30000,
     })
       .then((res) => {
-        console.log(res.data)
         const url = URL.createObjectURL(res.data)
         window.open(url, '_blank', 'noopener,noreferrer')
       })
