@@ -10,7 +10,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   TextField,
   Typography,
@@ -24,6 +28,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
+import InvoiceDataSelect from '../components/InvoiceDateSelect'
 import {
   defaultClassCustomerFormData,
   defaultSchoolFormData,
@@ -62,6 +67,7 @@ const SchoolDetailView: React.FC = () => {
         email: res.data.email,
         phone: res.data.phone,
         schoolTypes: res.data.schoolTypes,
+        fee: res.data.fee
       }))
     })
   }, [])
@@ -201,6 +207,22 @@ const SchoolDetailView: React.FC = () => {
     setNewClassCustomer(defaultClassCustomerFormData)
   }
 
+  const generateInvoice = (year: number, month: number) => {
+    API.get('lessons/invoice/customer', {
+      params: {
+        of: dayjs().year(year).month(month).format('YYYY-MM-DD'),
+        schoolId: id,
+      },
+      responseType: 'blob',
+    })
+      .then((res) => {
+        window.open(URL.createObjectURL(res.data))
+      })
+      .catch(() => {
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+      })
+  }
+
   return (
     <div className={styles.wrapper}>
       <Box
@@ -287,6 +309,24 @@ const SchoolDetailView: React.FC = () => {
               InputProps={{
                 readOnly: false,
               }}
+            />
+          </Stack>
+
+          <h3>Weitere Infos</h3>
+          <Stack direction="row" columnGap={2}>
+            <TextField
+              type="number"
+              id="fee"
+              label="Stundensatz"
+              variant="outlined"
+              disabled={requestedId === 'me'}
+              value={school.fee ?? ''}
+              onChange={(event) =>
+                setSchool((data) => ({
+                  ...data,
+                  fee: Number(event.target.value),
+                }))
+              }
             />
           </Stack>
           <h3>Kontakt:</h3>
@@ -382,6 +422,8 @@ const SchoolDetailView: React.FC = () => {
               </Button>
             )}
           </Stack>
+          <h3>Rechnung generieren:</h3>
+          <InvoiceDataSelect generateInvoice={generateInvoice}/>
         </Stack>
       </Box>
       <Dialog open={addClassDialogOpen}>

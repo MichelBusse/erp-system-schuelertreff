@@ -23,8 +23,7 @@ export enum Degree {
 export class Teacher extends User {
   role = Role.TEACHER
 
-  //TODO: decimal value
-  @Column({ nullable: true })
+  @Column({type: "decimal", precision: 5, scale: 2, default: 0})
   fee: number
 
   @Column({

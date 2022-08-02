@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        position: relative;
+        color: #706555;
+      }
+      .greenLine {
+        width: 100%;
+        height: 30px;
+        background: #a3dc8c;
+      }
+      header {
+        width: 100%;
+      }
+      header h1 {
+        margin-left: 40px;
+        margin-bottom: 10px;
+        font-size: 50px;
+        font-weight: bolder;
+        text-transform: uppercase;
+        color: #a3dc8c;
+      }
+      .headerData {
+        width: 100%;
+        font-size: 14px;
+      }
+      .headerData .invoiceInfo, .headerData .address {
+        vertical-align: top;
+        width: 50%;
+        box-sizing: border-box;
+        padding: 30px 40px;
+      }
+      .headerData .address p{
+        margin: 0;
+      }
+      .headerData .invoiceInfo td{
+        padding-bottom: 10px;
+      }
+      .headerData .invoiceInfo .data {
+        color: #a3dc8c;
+        font-weight: bolder;
+      }
+      .tableSection {
+        background: #a3dc8c;
+        padding: 30px 40px;
+        color: white;
+      }
+      .tableSection table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .tableSection table tbody {
+        border: none;
+        border-top: solid 3px #93c67e;
+        border-bottom: solid 3px #93c67e;
+      }
+      .tableSection th {
+        text-align: left;
+        width: 25%;
+        padding: 10px 0;
+        text-transform: uppercase;
+      }
+      .tableSection table td {
+        padding: 10px 0;
+      }
+      .tableSection tfoot {
+        text-transform: uppercase;
+        font-weight: bolder;
+      }
+      .tableSection .total{
+        font-size: 25px;
+      }
+      .companyDataSection {
+        position: relative;
+        font-size: 14px;
+        margin-top: auto;
+        margin-bottom: 0;
+        width: 100%;
+      }
+      .companyDataSection p{
+        margin: 0;
+      }
+      .companyDataSection table {
+        width: 100%;
+        margin-top: 0;
+      }
+      .companyDataSection td {
+        vertical-align: top;
+        width: 50%;
+        box-sizing: border-box;
+        padding: 20px 40px;
+        position: relative;
+      }
+      .companyDataSection .slogan {
+        text-align: left;
+        font-size: 25px;
+        font-weight: bolder;
+        color: #a3dc8c;
+        margin-top: 30px;
+      }
+      .companyDataSection .disclaimer {
+        margin-left: 40px;
+        margin-bottom: 0;
+        margin-top: 40px;
+      }
+      .greenLine:nth-of-type(2) {
+        position: absolute;
+        bottom: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="greenLine"></div>
+    <header>
+      <h1>Schülertreff</h1>
+      <table class="headerData">
+        <tr>
+          <td class="address">
+            <p><%= address.schoolName %></p>
+            <p><%= address.firstName %> <%= address.lastName %></p>
+            <p><%= address.street %></p>
+            <p><%= address.zip %> <%= address.city %></p>
+          </td>
+          <td class="invoiceInfo">
+            <table>
+            <tr><td>RECHNUNGSDATUM:</td> <td class="data"><%= invoiceInfo.date %></td></tr>
+            <tr><td>RECHNUNGSZEITRAUM:</td> <td class="data"><%= invoiceInfo.month %></td></tr>
+            <tr><td>RECHNUNGSNUMMER:</td> <td class="data"><%= invoiceInfo.number %></td></tr>
+            <tr><td>ART:</td> <td class="data"><%= invoiceInfo.type %></td></tr>
+          </table>
+          </td>
+        </tr>
+      </table>
+    </header>
+    <section class="tableSection">
+      <table>
+        <thead>
+          <tr>
+            <th>Beschreibung</th>
+            <th>Einzelpreis</th>
+            <th>St.</th>
+            <th>Gesamt</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (rows.length > 0) { %> <% rows.forEach(row => { %>
+          <tr>
+            <td><%= row.subject %></td>
+            <td><%= row.unitPrice %> €</td>
+            <td><%= row.count %></td>
+            <td><%= row.totalPrice %> €</td>
+          </tr>
+          <% }); %> <% } %>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td></td>
+            <td></td>
+            <td>Gesamt</td>
+            <td class="total"><%= invoiceInfo.totalPrice %> €</td>
+          </tr>
+        </tfoot>
+      </table>
+    </section>
+    <section class="companyDataSection">
+      <p class="disclaimer">
+        <b>STEUERBEFREIUNG NACH §4 NR. 21 B) AA) USTG</b>
+      </p>
+      <table>
+        <tr>
+          <td>
+            <p>Schülertreff GbR</p>
+            <p>August-Bebel-Str. 22</p>
+            <p>09217 Burgstädt</p>
+            <br/>
+            <p>info@schuelertreff-nachhilfe.de</p>
+            <p>+49 176 60912238 (M.Pijala)</p>
+            <p>+49 176 22079244 (N. Soldatov)</p>
+            <br/>
+            <br/>
+            <p>STEUERNUMMER: <b>225-554-8978</b></p>
+          </td>
+          <td>
+            <p>Kontodaten</p>
+            <p>Bank: FINOM-Bank</p>
+            <p>Kontoinhaber: Schuelertreff GbR</p>
+            <p>IBAN: DE 80 1101 0101 5205 6241 39</p>
+            <p>BIC: SOBKDEB2XXX</p>
+            <div class="slogan">
+              <span
+                >DANKE FÜR IHR <br />
+                VERTRAUEN!</span
+              >
+            </div>
+          </td>
+        </tr>
+      </table>
+    </section>
+    <div class="greenLine"></div>
+  </body>
+</html>

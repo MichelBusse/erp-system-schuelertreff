@@ -26,6 +26,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
+import InvoiceDataSelect from '../components/InvoiceDateSelect'
 import {
   defaultTeacherFormData,
   snackbarOptions,
@@ -137,6 +138,22 @@ const TeacherDetailView: React.FC = () => {
             ' kann nicht gelöscht werden, da noch laufende Verträge existieren.',
           snackbarOptionsError,
         )
+      })
+  }
+
+  const generateInvoice = (year: number, month: number) => {
+    API.get('lessons/invoice/teacher', {
+      params: {
+        of: dayjs().year(year).month(month).format('YYYY-MM-DD'),
+        teacherId: id,
+      },
+      responseType: 'blob',
+    })
+      .then((res) => {
+        window.open(URL.createObjectURL(res.data))
+      })
+      .catch(() => {
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
       })
   }
 
@@ -341,7 +358,7 @@ const TeacherDetailView: React.FC = () => {
               <TextField
                 type="number"
                 id="fee"
-                label="Lohn"
+                label="Stundensatz"
                 variant="outlined"
                 disabled={requestedId === 'me'}
                 value={data.fee ?? ''}
@@ -409,7 +426,6 @@ const TeacherDetailView: React.FC = () => {
               </Button>
             )}
           </Stack>
-
           {requestedId === 'me' && data.state === TeacherState.APPLIED && (
             <Stack direction="row" alignItems="center" gap={1}>
               <CheckIcon color="success" />
@@ -418,6 +434,8 @@ const TeacherDetailView: React.FC = () => {
               </Typography>
             </Stack>
           )}
+          <h3>Abrechnung generieren:</h3>
+          <InvoiceDataSelect generateInvoice={generateInvoice} />
         </Stack>
       </Box>
       <Dialog

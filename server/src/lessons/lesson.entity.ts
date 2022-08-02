@@ -25,4 +25,7 @@ export class Lesson {
 
   @ManyToOne(() => Contract)
   contract: Contract
+
+  @Column({type: 'text', default: ''})
+  notes: string
 }

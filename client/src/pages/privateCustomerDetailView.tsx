@@ -5,6 +5,10 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   TextField,
 } from '@mui/material'
@@ -18,6 +22,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
+import InvoiceDataSelect from '../components/InvoiceDateSelect'
 import {
   defaultPrivateCustomerFormData,
   snackbarOptions,
@@ -42,7 +47,11 @@ const PrivateCustomerDetailView: React.FC = () => {
   const [data, setData] = useState<privateCustomerForm>(
     defaultPrivateCustomerFormData,
   )
-  const [errors, setErrors] = useState(defaultPrivateCustomerFormData)
+  const [errors, setErrors] = useState({
+    ...defaultPrivateCustomerFormData,
+    grade: '',
+    fee: '',
+  })
 
   useEffect(() => {
     API.get('users/privateCustomer/' + requestedId).then((res) => {
@@ -70,6 +79,7 @@ const PrivateCustomerDetailView: React.FC = () => {
         phone: res.data.phone,
         timesAvailable: newTimesAvailable,
         grade: res.data.grade,
+        fee: res.data.fee,
       }))
     })
   }, [])
@@ -114,6 +124,22 @@ const PrivateCustomerDetailView: React.FC = () => {
             ' kann nicht gelöscht werden, da noch laufende Verträge existieren.',
           snackbarOptionsError,
         )
+      })
+  }
+
+  const generateInvoice = (year: number, month: number) => {
+    API.get('lessons/invoice/customer', {
+      params: {
+        of: dayjs().year(year).month(month).format('YYYY-MM-DD'),
+        customerId: id,
+      },
+      responseType: 'blob',
+    })
+      .then((res) => {
+        window.open(URL.createObjectURL(res.data))
+      })
+      .catch(() => {
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
       })
   }
 
@@ -241,7 +267,7 @@ const PrivateCustomerDetailView: React.FC = () => {
               value={data.phone}
             />
           </Stack>
-          <h3>Schüler</h3>
+          <h3>Weitere Infos</h3>
           <Stack direction="row" columnGap={2}>
             <TextField
               type="number"
@@ -256,6 +282,20 @@ const PrivateCustomerDetailView: React.FC = () => {
                 setData((data) => ({
                   ...data,
                   grade: Number(event.target.value),
+                }))
+              }
+            />
+            <TextField
+              type="number"
+              id="fee"
+              label="Stundensatz"
+              variant="outlined"
+              disabled={requestedId === 'me'}
+              value={data.fee ?? ''}
+              onChange={(event) =>
+                setData((data) => ({
+                  ...data,
+                  fee: Number(event.target.value),
                 }))
               }
             />
@@ -294,6 +334,8 @@ const PrivateCustomerDetailView: React.FC = () => {
               </Button>
             )}
           </Stack>
+          <h3>Rechnung generieren:</h3>
+          <InvoiceDataSelect generateInvoice={generateInvoice} />
         </Stack>
       </Box>
       <Dialog
