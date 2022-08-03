@@ -1,8 +1,9 @@
 import { Box, Grid } from '@mui/material'
 
 import { useAuth } from '../components/AuthProvider'
+import CockpitLeaves from '../components/cockpit/CockpitLeaves'
 import PendingContracts from '../components/cockpit/PendingContracts'
-import PendingLeaves from '../components/cockpit/PendingLeaves'
+import { LeaveState } from '../types/enums'
 import { Role } from '../types/user'
 
 const Cockpit: React.FC = () => {
@@ -14,9 +15,16 @@ const Cockpit: React.FC = () => {
         <Grid item xs={6}>
           <PendingContracts />
         </Grid>
-        <Grid item xs={6}>
-          {hasRole(Role.ADMIN) && <PendingLeaves />}
-        </Grid>
+        {hasRole(Role.ADMIN) && (
+          <Grid item xs={6}>
+            <CockpitLeaves state={LeaveState.PENDING} />
+          </Grid>
+        )}
+        {hasRole(Role.ADMIN) && (
+          <Grid item xs={6}>
+            <CockpitLeaves state={LeaveState.ACCEPTED} />
+          </Grid>
+        )}
       </Grid>
     </Box>
   )

@@ -12,13 +12,26 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 
 import { leaveStateToString, leaveTypeToString } from '../../consts'
+import { LeaveState } from '../../types/enums'
 import { leave } from '../../types/user'
 import { useAuth } from '../AuthProvider'
 import LeaveDialog, { LeaveForm } from '../LeaveDialog'
 
-const PendingLeaves: React.FC = () => {
+type Props = {
+  state: LeaveState
+}
+
+const leaveStateToHeading: { [key in LeaveState]: string } = {
+  pending: 'Ausstehende Urlaube/Krankmeldungen',
+  accepted: 'Bestätigte Urlaube/Krankmeldungen',
+  declined: 'Abgelehnte Urlaube/Krankmeldungen',
+}
+
+const formatDate = (date: string) => dayjs(date).format('DD.MM.YYYY')
+
+const CockpitLeaves: React.FC<Props> = ({ state }) => {
   const { API } = useAuth()
-  const [pendingLeaves, setPendingLeaves] = useState<leave[]>([])
+  const [leaves, setLeaves] = useState<leave[]>([])
   const [open, setOpen] = useState(false)
   const [refresh, setRefresh] = useState(0)
   const [render, setRender] = useState(0)
@@ -33,10 +46,7 @@ const PendingLeaves: React.FC = () => {
   }
 
   useEffect(() => {
-    API.get('users/leaves/pending').then((res) => {
-      setPendingLeaves(res.data)
-      console.log(res.data)
-    })
+    API.get('users/leaves/' + state).then((res) => setLeaves(res.data))
   }, [refresh])
 
   return (
@@ -52,9 +62,7 @@ const PendingLeaves: React.FC = () => {
       />
       <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px' }}>
         <Stack direction="column" spacing={2}>
-          <Typography variant="h6">
-            Ausstehende Urlaube/Krankmeldungen
-          </Typography>
+          <Typography variant="h6">{leaveStateToHeading[state]}</Typography>
           <List
             dense={true}
             sx={{
@@ -63,12 +71,12 @@ const PendingLeaves: React.FC = () => {
               margin: '5px 0',
             }}
           >
-            {pendingLeaves.length === 0 && (
+            {leaves.length === 0 && (
               <ListItem>
                 <ListItemText primary="keine Einträge" />
               </ListItem>
             )}
-            {pendingLeaves.map((l) => (
+            {leaves.map((l) => (
               <ListItem
                 key={l.id}
                 secondaryAction={
@@ -94,11 +102,14 @@ const PendingLeaves: React.FC = () => {
                   primary={
                     <span style={{ whiteSpace: 'pre-wrap' }}>
                       {`${l.user.firstName} ${l.user.lastName}\n` +
-                        `${leaveTypeToString[l.type]}: ` +
-                        `${l.startDate} - ${l.endDate}`}
+                        `${formatDate(l.startDate)} - ${formatDate(l.endDate)}`}
                     </span>
                   }
-                  secondary={leaveStateToString[l.state]}
+                  secondary={
+                    leaveTypeToString[l.type] +
+                    ' - ' +
+                    leaveStateToString[l.state]
+                  }
                 />
               </ListItem>
             ))}
@@ -109,4 +120,4 @@ const PendingLeaves: React.FC = () => {
   )
 }
 
-export default PendingLeaves
+export default CockpitLeaves

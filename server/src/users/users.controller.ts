@@ -354,17 +354,17 @@ export class UsersController {
   }
 
   @Roles(Role.ADMIN)
-  @Get('leaves/pending')
-  async getPendingLeaves() {
-    return this.usersService.getPendingLeaves()
-  }
-
-  @Roles(Role.ADMIN)
   @Get('leaves/intersecting')
   async getIntersectingLeaves(
     @Query('start') start: string,
     @Query('end') end: string,
   ): Promise<Leave[]> {
     return this.usersService.getIntersectingLeaves(start, end)
+  }
+
+  @Roles(Role.ADMIN)
+  @Get('leaves/:state')
+  async getLeaves(@Param('state') state: LeaveState) {
+    return this.usersService.getLeaves(state)
   }
 }
