@@ -14,6 +14,7 @@ type Props = {
   hidden?: boolean
   disabled?: boolean
   tooltip?: TooltipProps['title']
+  color?: React.ComponentProps<typeof IconButton>['color']
 }
 
 const IconButtonAdornment: React.FC<Props> = ({
@@ -24,15 +25,17 @@ const IconButtonAdornment: React.FC<Props> = ({
   hidden = false,
   disabled = false,
   tooltip = '',
+  color,
 }) => (
-  <InputAdornment position={position}>
+  <InputAdornment position={position} sx={{ margin: margin }}>
     <Tooltip title={tooltip}>
       <div>
         <IconButton
           disabled={hidden || disabled}
           onClick={onClick}
-          sx={{ margin: margin, opacity: hidden ? 0 : 1 }}
+          sx={{ opacity: hidden ? 0 : 1 }}
           size="small"
+          color={color}
         >
           <Icon fontSize="small" />
         </IconButton>

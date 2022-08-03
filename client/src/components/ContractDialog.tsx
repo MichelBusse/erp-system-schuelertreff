@@ -709,6 +709,7 @@ const ContractDialog: React.FC<Props> = ({
               endAdornment={
                 <IconButtonAdornment
                   margin="16px"
+                  color="warning"
                   icon={InfoOutlined}
                   hidden={!leaves[parseInt(form1.teacher)]}
                   tooltip={
