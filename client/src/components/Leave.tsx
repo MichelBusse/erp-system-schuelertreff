@@ -22,6 +22,8 @@ const defaultFormData: LeaveForm = {
   hasAttachment: false,
 }
 
+const formatDate = (date: string) => dayjs(date).format('DD.MM.YYYY')
+
 const Leave: React.FC<Props> = ({ value, setValue, userId }) => {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState(defaultFormData)
@@ -109,7 +111,7 @@ const Leave: React.FC<Props> = ({ value, setValue, userId }) => {
             <ListItemText
               primary={
                 `${leaveTypeToString[l.type]}: ` +
-                `${l.startDate} - ${l.endDate}`
+                `${formatDate(l.startDate)} - ${formatDate(l.endDate)}`
               }
               secondary={leaveStateToString[l.state]}
             />

@@ -244,6 +244,7 @@ export class UsersService {
       .addSelect('u.lastName')
       .where('l."userId" IS NOT NULL')
       .andWhere('l."state" = :state', { state })
+      .andWhere(`l."endDate" > now() - interval '1 day'`)
 
     return q.getMany()
   }
