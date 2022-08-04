@@ -11,6 +11,28 @@ import { Leave, LeaveState } from 'src/users/entities/leave.entity'
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Lesson, LessonState } from './lesson.entity'
 
+export function getLessonDates(
+  contract: Contract,
+  startDate: Dayjs,
+  endDate: Dayjs,
+): Dayjs[] {
+  const dow = dayjs(contract.startDate).day()
+  const start = maxDate(dayjs(contract.startDate), startDate)
+  const end = minDate(dayjs(contract.endDate), endDate)
+
+  const dates: Dayjs[] = []
+
+  for (
+    let i = getNextDow(dow, start);
+    !i.isAfter(end);
+    i = i.add(contract.interval, 'week')
+  ) {
+    dates.push(i)
+  }
+
+  return dates
+}
+
 @Injectable()
 export class LessonsService {
   constructor(
@@ -134,28 +156,6 @@ export class LessonsService {
     }
   }
 
-  getLessonDates(
-    contract: Contract,
-    startDate: Dayjs,
-    endDate: Dayjs,
-  ): Dayjs[] {
-    const dow = dayjs(contract.startDate).day()
-    const start = maxDate(dayjs(contract.startDate), startDate)
-    const end = minDate(dayjs(contract.endDate), endDate)
-
-    const dates: Dayjs[] = []
-
-    for (
-      let i = getNextDow(dow, start);
-      !i.isAfter(end);
-      i = i.add(contract.interval, 'week')
-    ) {
-      dates.push(i)
-    }
-
-    return dates
-  }
-
   async cancelByLeave(leave: Leave) {
     const qb = this.dataSource.createQueryBuilder()
 
@@ -170,7 +170,7 @@ export class LessonsService {
     const contracts: Contract[] = await qb.getMany()
 
     const lessons: DeepPartial<Lesson>[] = contracts.flatMap((c) => {
-      const dates = this.getLessonDates(
+      const dates = getLessonDates(
         c,
         dayjs(leave.startDate),
         dayjs(leave.endDate),
@@ -217,7 +217,7 @@ export class LessonsService {
       .getMany()
 
     const lessons: DeepPartial<Lesson>[] = leaves.flatMap((l) => {
-      const dates = this.getLessonDates(
+      const dates = getLessonDates(
         contract,
         dayjs(l.startDate),
         dayjs(l.endDate),

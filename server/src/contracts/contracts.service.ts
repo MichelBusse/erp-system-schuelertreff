@@ -379,4 +379,31 @@ export class ContractsService {
 
     return q.getMany()
   }
+
+  /**
+   * find blocked contracts of teacher between dates
+   */
+  async findBlocked(
+    startDate: string,
+    endDate: string,
+    teacherId: number,
+  ): Promise<Contract[]> {
+    const qb = this.connection.createQueryBuilder()
+
+    qb.select('c')
+      .from(Contract, 'c')
+      .where(`c."teacherId" = :teacherId`, { teacherId })
+      .andWhere(`c.state = :state`, { state: ContractState.ACCEPTED })
+      .andWhere(`c."startDate" <= :end::date`, { end: endDate })
+      .andWhere(`c."endDate" >= :start::date`, { start: startDate })
+      .leftJoinAndSelect('c.lessons', 'lesson')
+      .andWhere(`lesson.date >= :start::date`)
+      .andWhere(`lesson.date <= :end::date`)
+      .leftJoinAndSelect('c.childContracts', 'childContract')
+
+    const contracts: Contract[] = await qb.getMany()
+
+    // if no lessons (between given dates) are found, contract is not affected
+    return contracts.filter((c) => c.lessons.length > 0)
+  }
 }

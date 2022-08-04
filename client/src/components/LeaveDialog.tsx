@@ -24,12 +24,18 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 
-import { snackbarOptions, snackbarOptionsError } from '../consts'
+import {
+  leaveStateToString,
+  leaveTypeToString,
+  snackbarOptions,
+  snackbarOptionsError,
+} from '../consts'
 import { LeaveState, LeaveType } from '../types/enums'
 import { leave, Role } from '../types/user'
 import { useAuth } from './AuthProvider'
 import EqualStack from './EqualStack'
 import IconButtonAdornment from './IconButtonAdornment'
+import LeaveDialogSubstitute from './LeaveDialogSubstitute'
 
 export type LeaveForm = {
   id?: number
@@ -181,99 +187,116 @@ const LeaveDialog: React.FC<Props> = ({
       >
         <Box sx={{ overflow: 'auto', padding: 0.5 }}>
           <Stack spacing={2}>
-            <FormControl disabled={editDisabled}>
-              <RadioGroup
-                row
-                value={value.type}
-                onChange={(event) =>
-                  setValue((form) => ({
-                    ...form,
-                    type: event.target.value as LeaveType,
-                  }))
-                }
-              >
-                <FormControlLabel
-                  value={LeaveType.REGULAR}
-                  label="Urlaub"
-                  control={<Radio />}
-                />
-                <FormControlLabel
-                  value={LeaveType.SICK}
-                  label="Krankmeldung"
-                  control={<Radio />}
-                />
-              </RadioGroup>
-            </FormControl>
-            <EqualStack direction="row" spacing={2}>
-              <DatePicker
-                label="Startdatum"
-                mask="__.__.____"
-                minDate={!editDisabled ? dayjs().add(7, 'd') : undefined}
-                disabled={editDisabled}
-                value={value.startDate}
-                onChange={(value) => {
-                  setValue((data) => ({
-                    ...data,
-                    startDate: value,
-                    endDate: data.endDate?.isBefore(value)
-                      ? null
-                      : data.endDate,
-                  }))
-                }}
-                shouldDisableDate={(date) => [0, 6].includes(date.day())}
-                renderInput={(params) => (
-                  <TextField {...params} required variant="outlined" />
-                )}
-                InputAdornmentProps={{
-                  position: 'start',
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <IconButtonAdornment
-                      icon={ClearIcon}
-                      hidden={value.startDate === null || editDisabled}
-                      onClick={() =>
-                        setValue((data) => ({
-                          ...data,
-                          startDate: null,
-                          endDate: null,
-                        }))
-                      }
+            {!editDisabled ? (
+              <>
+                <FormControl disabled={editDisabled}>
+                  <RadioGroup
+                    row
+                    value={value.type}
+                    onChange={(event) =>
+                      setValue((form) => ({
+                        ...form,
+                        type: event.target.value as LeaveType,
+                      }))
+                    }
+                  >
+                    <FormControlLabel
+                      value={LeaveType.REGULAR}
+                      label="Urlaub"
+                      control={<Radio />}
                     />
-                  ),
-                }}
-              />
-              <DatePicker
-                label="Enddatum"
-                mask="__.__.____"
-                minDate={
-                  !editDisabled ? value.startDate ?? undefined : undefined
-                }
-                defaultCalendarMonth={value.startDate ?? undefined}
-                disabled={value.startDate === null || editDisabled}
-                value={value.endDate}
-                onChange={(value) => {
-                  setValue((data) => ({ ...data, endDate: value }))
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} required variant="outlined" />
-                )}
-                InputAdornmentProps={{
-                  position: 'start',
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <IconButtonAdornment
-                      icon={ClearIcon}
-                      hidden={value.endDate === null || editDisabled}
-                      onClick={() =>
-                        setValue((data) => ({ ...data, endDate: null }))
-                      }
+                    <FormControlLabel
+                      value={LeaveType.SICK}
+                      label="Krankmeldung"
+                      control={<Radio />}
                     />
-                  ),
-                }}
-              />
-            </EqualStack>
+                  </RadioGroup>
+                </FormControl>
+                <EqualStack direction="row" spacing={2}>
+                  <DatePicker
+                    label="Startdatum"
+                    mask="__.__.____"
+                    minDate={!editDisabled ? dayjs().add(7, 'd') : undefined}
+                    disabled={editDisabled}
+                    value={value.startDate}
+                    onChange={(value) => {
+                      setValue((data) => ({
+                        ...data,
+                        startDate: value,
+                        endDate: data.endDate?.isBefore(value)
+                          ? null
+                          : data.endDate,
+                      }))
+                    }}
+                    shouldDisableDate={(date) => [0, 6].includes(date.day())}
+                    renderInput={(params) => (
+                      <TextField {...params} required variant="outlined" />
+                    )}
+                    InputAdornmentProps={{
+                      position: 'start',
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <IconButtonAdornment
+                          icon={ClearIcon}
+                          hidden={value.startDate === null || editDisabled}
+                          onClick={() =>
+                            setValue((data) => ({
+                              ...data,
+                              startDate: null,
+                              endDate: null,
+                            }))
+                          }
+                        />
+                      ),
+                    }}
+                  />
+                  <DatePicker
+                    label="Enddatum"
+                    mask="__.__.____"
+                    minDate={
+                      !editDisabled ? value.startDate ?? undefined : undefined
+                    }
+                    defaultCalendarMonth={value.startDate ?? undefined}
+                    disabled={value.startDate === null || editDisabled}
+                    value={value.endDate}
+                    onChange={(value) => {
+                      setValue((data) => ({ ...data, endDate: value }))
+                    }}
+                    renderInput={(params) => (
+                      <TextField {...params} required variant="outlined" />
+                    )}
+                    InputAdornmentProps={{
+                      position: 'start',
+                    }}
+                    InputProps={{
+                      endAdornment: (
+                        <IconButtonAdornment
+                          icon={ClearIcon}
+                          hidden={value.endDate === null || editDisabled}
+                          onClick={() =>
+                            setValue((data) => ({ ...data, endDate: null }))
+                          }
+                        />
+                      ),
+                    }}
+                  />
+                </EqualStack>
+              </>
+            ) : (
+              <>
+                <Typography variant="h5">
+                  {`${leaveTypeToString[value.type]} (${
+                    leaveStateToString[value.state]
+                  })`}
+                </Typography>
+                <Typography>
+                  {value.startDate?.format('DD.MM.YYYY') +
+                    ' - ' +
+                    value.endDate?.format('DD.MM.YYYY')}
+                </Typography>
+              </>
+            )}
             {userId === 'me' || !value.id ? (
               <Box>
                 <Typography>
@@ -334,30 +357,40 @@ const LeaveDialog: React.FC<Props> = ({
               </Box>
             )}
 
-            {hasRole(Role.ADMIN) && (
-              <FormControl disabled={editDisabled}>
-                <RadioGroup
-                  row
-                  value={value.state}
-                  onChange={(event) =>
-                    setValue((form) => ({
-                      ...form,
-                      state: event.target.value as LeaveState,
-                    }))
-                  }
-                >
-                  <FormControlLabel
-                    value={LeaveState.ACCEPTED}
-                    label="Bestätigt"
-                    control={<Radio />}
-                  />
-                  <FormControlLabel
-                    value={LeaveState.DECLINED}
-                    label="Abgelehnt"
-                    control={<Radio />}
-                  />
-                </RadioGroup>
-              </FormControl>
+            {hasRole(Role.ADMIN) && !editDisabled && (
+              <>
+                <FormControl disabled={editDisabled}>
+                  <RadioGroup
+                    row
+                    value={value.state}
+                    onChange={(event) =>
+                      setValue((form) => ({
+                        ...form,
+                        state: event.target.value as LeaveState,
+                      }))
+                    }
+                  >
+                    <FormControlLabel
+                      value={LeaveState.ACCEPTED}
+                      label="Bestätigt"
+                      control={<Radio />}
+                    />
+                    <FormControlLabel
+                      value={LeaveState.DECLINED}
+                      label="Abgelehnt"
+                      control={<Radio />}
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </>
+            )}
+
+            {userId !== 'me' && initialState === LeaveState.ACCEPTED && (
+              <LeaveDialogSubstitute
+                startDate={value.startDate?.format('YYYY-MM-DD') ?? ''}
+                endDate={value.endDate?.format('YYYY-MM-DD') ?? ''}
+                teacher={parseInt(userId)}
+              />
             )}
           </Stack>
         </Box>
@@ -368,16 +401,22 @@ const LeaveDialog: React.FC<Props> = ({
             {deleteConfirmation ? 'Bestätigen' : 'Löschen'}
           </Button>
         )}
-        <Button onClick={close}>Abbrechen</Button>
-        {initialState === LeaveState.PENDING && (
-          <LoadingButton
-            variant="contained"
-            onClick={handleSubmit}
-            loading={loading}
-            disabled={!formValid || loading}
-          >
-            {value.id ? 'Speichern' : 'Hinzufügen'}
-          </LoadingButton>
+        {initialState === LeaveState.PENDING ? (
+          <>
+            <Button onClick={close}>Abbrechen</Button>
+            <LoadingButton
+              variant="contained"
+              onClick={handleSubmit}
+              loading={loading}
+              disabled={!formValid || loading}
+            >
+              {value.id ? 'Speichern' : 'Hinzufügen'}
+            </LoadingButton>
+          </>
+        ) : (
+          <Button variant="contained" onClick={close}>
+            Schließen
+          </Button>
         )}
       </DialogActions>
     </Dialog>

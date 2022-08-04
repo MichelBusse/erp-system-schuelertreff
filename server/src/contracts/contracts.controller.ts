@@ -66,6 +66,19 @@ export class ContractsController {
     return this.contractsService.suggestContracts(dto)
   }
 
+  @Get('findBlocked')
+  @Roles(Role.ADMIN)
+  async findBlocked(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+    @Query('teacher') teacherId: number,
+  ) {
+    if (!dayjs(startDate).isValid() || !dayjs(endDate).isValid())
+      throw new BadRequestException()
+
+    return this.contractsService.findBlocked(startDate, endDate, teacherId)
+  }
+
   @Get()
   @Roles(Role.ADMIN)
   findAll(): Promise<Contract[]> {

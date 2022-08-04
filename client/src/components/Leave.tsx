@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { leaveStateToString, leaveTypeToString } from '../consts'
 import { LeaveState, LeaveType } from '../types/enums'
 import { leave } from '../types/user'
+import { formatDate } from '../utils/date'
 import LeaveDialog, { LeaveForm } from './LeaveDialog'
 
 type Props = {
@@ -21,8 +22,6 @@ const defaultFormData: LeaveForm = {
   endDate: null,
   hasAttachment: false,
 }
-
-const formatDate = (date: string) => dayjs(date).format('DD.MM.YYYY')
 
 const Leave: React.FC<Props> = ({ value, setValue, userId }) => {
   const [open, setOpen] = useState(false)

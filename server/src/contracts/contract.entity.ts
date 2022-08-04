@@ -56,8 +56,13 @@ export class Contract {
   @Column()
   interval: number
 
-  @ManyToOne(() => Contract, { nullable: true })
+  @ManyToOne(() => Contract, (contract) => contract.childContracts, {
+    nullable: true,
+  })
   parentContract: Contract
+
+  @OneToMany(() => Contract, (contract) => contract.parentContract)
+  childContracts: Contract[]
 
   @OneToMany(() => Lesson, (lesson) => lesson.contract)
   lessons: Lesson[]

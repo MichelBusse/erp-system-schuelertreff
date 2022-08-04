@@ -18,6 +18,8 @@ export type contract = {
   customers: customer[]
   teacher: number
   state: ContractState
+  parentContract?: contract
+  childContracts: contract[]
 }
 export type contractWithTeacher = {
   id: number
