@@ -1,10 +1,11 @@
 import { Dayjs } from 'dayjs'
 
+import { CustomerType } from '../components/ContractDialog'
 import { TeacherState } from './enums'
 import { LessonState } from './lesson'
 import subject from './subject'
 import timeAvailable from './timeAvailable'
-import { customer, teacher } from './user'
+import { classCustomer, customer, privateCustomer, teacher } from './user'
 
 export interface userForm {
   firstName: string
@@ -56,4 +57,31 @@ export type contractForm = {
   interval: number
   customers: customer[]
   subject: subject | null
+}
+
+export type ContractFilterForm = {
+  school: {
+    id: number
+    schoolName: string
+  } | null
+  classCustomers: classCustomer[]
+  privateCustomers: privateCustomer[]
+  subject: subject | null
+  interval: number
+  startDate: Dayjs | null
+  endDate: Dayjs | null
+  customerType: CustomerType
+}
+
+export type ContractCreationForm = {
+  startDate: Dayjs | null
+  endDate: Dayjs | null
+  startTime: Dayjs | null
+  endTime: Dayjs | null
+  minTime: Dayjs | null
+  maxTime: Dayjs | null
+  teacher: string
+  teacherConfirmation: boolean
+  dow: number
+  selsuggestion: string
 }
