@@ -39,20 +39,20 @@ type Props = {
   form: ContractCreationForm
   setForm: React.Dispatch<React.SetStateAction<ContractCreationForm>>
   suggestions: suggestion[]
-  updateSelSuggestion: (newSuggestion: string) => void
   leaves: Record<number, leave[]>
   subject: subject | null
-  startDate: Dayjs | null
+  minStartDate: Dayjs | null
+  maxEndDate: Dayjs | null
 }
 
 const ContractCreation: React.FC<Props> = ({
   form,
-  setForm: setForm1,
+  setForm,
   suggestions,
-  updateSelSuggestion,
   leaves,
   subject,
-  startDate,
+  minStartDate,
+  maxEndDate,
 }) => {
   const [teachers, setTeachers] = useState<teacher[]>([])
 
@@ -68,6 +68,49 @@ const ContractCreation: React.FC<Props> = ({
       })
   }, [])
 
+  useEffect(() => {
+    if (form.selsuggestion !== '') {
+      const [t, s] = form.selsuggestion.split(',').map((n) => parseInt(n))
+
+      const teacher = suggestions[t]
+      const suggestion = teacher.suggestions[s]
+
+      const startTime = dayjs(suggestion.start, 'HH:mm')
+      const endTime =
+        suggestion.end !== '24:00'
+          ? dayjs(suggestion.end, 'HH:mm')
+          : dayjs(suggestion.end, 'HH:mm').subtract(5, 'minute')
+
+      setForm({
+        startDate: minStartDate
+          ? getNextDow(suggestion.dow, minStartDate)
+          : null,
+        endDate: maxEndDate,
+        startTime: startTime,
+        endTime: endTime,
+        minTime: startTime,
+        maxTime: endTime,
+        teacher: teacher.teacherId.toString(),
+        teacherConfirmation: true,
+        dow: suggestion.dow,
+        selsuggestion: form.selsuggestion,
+      })
+    } else {
+      setForm({
+        startDate: minStartDate,
+        endDate: maxEndDate,
+        startTime: null,
+        endTime: null,
+        minTime: null,
+        maxTime: null,
+        teacher: '',
+        teacherConfirmation: true,
+        dow: minStartDate?.day() ?? 1,
+        selsuggestion: form.selsuggestion,
+      })
+    }
+  }, [form.selsuggestion])
+
   return (
     <Stack spacing={2} marginTop={1}>
       <FormControl variant="outlined" fullWidth>
@@ -79,7 +122,9 @@ const ContractCreation: React.FC<Props> = ({
           label={suggestions.length > 0 ? 'Vorschläge' : 'Keine Vorschläge'}
           disabled={suggestions.length === 0}
           value={form.selsuggestion}
-          onChange={(e) => updateSelSuggestion(e.target.value)}
+          onChange={(e) =>
+            setForm((f) => ({ ...f, selsuggestion: e.target.value }))
+          }
         >
           <MenuItem value="">freie Wahl</MenuItem>
           {suggestions.flatMap((t, i) => [
@@ -108,7 +153,7 @@ const ContractCreation: React.FC<Props> = ({
           disabled={form.selsuggestion !== ''}
           value={form.teacher}
           onChange={(e) =>
-            setForm1((data) => ({ ...data, teacher: e.target.value }))
+            setForm((data) => ({ ...data, teacher: e.target.value }))
           }
           endAdornment={
             <IconButtonAdornment
@@ -154,28 +199,39 @@ const ContractCreation: React.FC<Props> = ({
             value={form.dow}
             disabled={form.selsuggestion !== ''}
             onChange={(e) => {
-              setForm1((data) => ({
+              setForm((data) => ({
                 ...data,
                 dow: e.target.value as number,
                 startDate:
-                  startDate && getNextDow(e.target.value as number, startDate),
+                  minStartDate &&
+                  getNextDow(e.target.value as number, minStartDate),
               }))
             }}
           >
             <MenuItem value={1}>{`Montag (Start: ${
-              startDate ? getNextDow(1, startDate).format('DD.MM.YYYY') : ''
+              minStartDate
+                ? getNextDow(1, minStartDate).format('DD.MM.YYYY')
+                : ''
             })`}</MenuItem>
             <MenuItem value={2}>{`Dienstag (Start: ${
-              startDate ? getNextDow(2, startDate).format('DD.MM.YYYY') : ''
+              minStartDate
+                ? getNextDow(2, minStartDate).format('DD.MM.YYYY')
+                : ''
             })`}</MenuItem>
             <MenuItem value={3}>{`Mittwoch (Start: ${
-              startDate ? getNextDow(3, startDate).format('DD.MM.YYYY') : ''
+              minStartDate
+                ? getNextDow(3, minStartDate).format('DD.MM.YYYY')
+                : ''
             })`}</MenuItem>
             <MenuItem value={4}>{`Donnerstag (Start: ${
-              startDate ? getNextDow(4, startDate).format('DD.MM.YYYY') : ''
+              minStartDate
+                ? getNextDow(4, minStartDate).format('DD.MM.YYYY')
+                : ''
             })`}</MenuItem>
             <MenuItem value={5}>{`Freitag (Start: ${
-              startDate ? getNextDow(5, startDate).format('DD.MM.YYYY') : ''
+              minStartDate
+                ? getNextDow(5, minStartDate).format('DD.MM.YYYY')
+                : ''
             })`}</MenuItem>
           </Select>
         </FormControl>
@@ -189,10 +245,10 @@ const ContractCreation: React.FC<Props> = ({
           maxTime={form.endTime?.subtract(45, 'm')}
           value={form.startTime}
           onChange={(value) => {
-            setForm1((data) => ({ ...data, startTime: value }))
+            setForm((data) => ({ ...data, startTime: value }))
           }}
           clearValue={() => {
-            setForm1((data) => ({ ...data, startTime: null }))
+            setForm((data) => ({ ...data, startTime: null }))
           }}
         />
         <BetterTimePicker
@@ -203,10 +259,10 @@ const ContractCreation: React.FC<Props> = ({
           maxTime={form.maxTime ?? undefined}
           value={form.endTime}
           onChange={(value) => {
-            setForm1((data) => ({ ...data, endTime: value }))
+            setForm((data) => ({ ...data, endTime: value }))
           }}
           clearValue={() => {
-            setForm1((data) => ({ ...data, endTime: null }))
+            setForm((data) => ({ ...data, endTime: null }))
           }}
         />
       </EqualStack>
@@ -217,7 +273,7 @@ const ContractCreation: React.FC<Props> = ({
           <Switch
             checked={form.teacherConfirmation}
             onChange={(event) => {
-              setForm1((data) => ({
+              setForm((data) => ({
                 ...data,
                 teacherConfirmation: event.target.checked,
               }))

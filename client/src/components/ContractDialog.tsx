@@ -21,7 +21,6 @@ import { snackbarOptionsError } from '../consts'
 import { ContractState, contractWithTeacher } from '../types/contract'
 import { ContractCreationForm, ContractFilterForm } from '../types/form'
 import { leave } from '../types/user'
-import { getNextDow } from '../utils/date'
 import { useAuth } from './AuthProvider'
 import ContractCreation, { suggestion } from './contractDialog/ContractCreation'
 import Filter from './contractDialog/Filter'
@@ -52,7 +51,6 @@ const ContractDialog: React.FC<Props> = ({
   const [activeStep, setActiveStep] = useState(0)
 
   // step 0
-
   const [loading0, setLoading0] = useState(false)
   const [form0, setForm0] = useState<ContractFilterForm>({
     school: null,
@@ -67,7 +65,6 @@ const ContractDialog: React.FC<Props> = ({
 
   // step 1
   const [suggestions, setSuggestions] = useState<suggestion[]>([])
-
   const [leaves, setLeaves] = useState<Record<number, leave[]>>([])
   const [loading1, setLoading1] = useState(false)
   const [form1, setForm1] = useState<ContractCreationForm>({
@@ -143,7 +140,7 @@ const ContractDialog: React.FC<Props> = ({
         setSuggestions(res.data)
         setActiveStep(1)
 
-        updateSelSuggestion('')
+        setSelSuggestion('')
         setForm1({
           startDate: form0.startDate,
           endDate: form0.endDate,
@@ -204,51 +201,6 @@ const ContractDialog: React.FC<Props> = ({
         enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
       })
       .finally(() => setLoading0(false))
-  }
-
-  const updateSelSuggestion = (newSuggestion: string) => {
-    setSelSuggestion(newSuggestion)
-
-    if (newSuggestion !== '') {
-      const [t, s] = newSuggestion.split(',').map((n) => parseInt(n))
-
-      const teacher = suggestions[t]
-      const suggestion = teacher.suggestions[s]
-
-      const startTime = dayjs(suggestion.start, 'HH:mm')
-      const endTime =
-        suggestion.end !== '24:00'
-          ? dayjs(suggestion.end, 'HH:mm')
-          : dayjs(suggestion.end, 'HH:mm').subtract(5, 'minute')
-
-      setForm1({
-        startDate: form0.startDate
-          ? getNextDow(suggestion.dow, form0.startDate)
-          : null,
-        endDate: form0.endDate,
-        startTime: startTime,
-        endTime: endTime,
-        minTime: startTime,
-        maxTime: endTime,
-        teacher: teacher.teacherId.toString(),
-        teacherConfirmation: true,
-        dow: suggestion.dow,
-        selsuggestion: newSuggestion,
-      })
-    } else {
-      setForm1({
-        startDate: form0.startDate,
-        endDate: form0.endDate,
-        startTime: null,
-        endTime: null,
-        minTime: null,
-        maxTime: null,
-        teacher: '',
-        teacherConfirmation: true,
-        dow: form0.startDate?.day() ?? 1,
-        selsuggestion: newSuggestion,
-      })
-    }
   }
 
   const validForm1 = !!(
@@ -328,10 +280,10 @@ const ContractDialog: React.FC<Props> = ({
           form={form1}
           setForm={setForm1}
           suggestions={suggestions}
-          updateSelSuggestion={updateSelSuggestion}
           leaves={leaves}
           subject={form0.subject}
-          startDate={form0.startDate}
+          minStartDate={form0.startDate}
+          maxEndDate={form0.endDate}
         />
       ),
       actions: (
