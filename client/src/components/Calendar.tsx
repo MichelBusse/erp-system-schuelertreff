@@ -54,8 +54,8 @@ const Calendar: React.FC<Props> = ({
             : -1
         })
         .map((c: contract) => {
-          contractsByTeacher[c.teacher] = (
-            contractsByTeacher[c.teacher] ?? []
+          contractsByTeacher[c.teacher.id] = (
+            contractsByTeacher[c.teacher.id] ?? []
           ).concat(c)
         })
 

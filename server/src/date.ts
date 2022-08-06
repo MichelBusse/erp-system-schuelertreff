@@ -16,5 +16,3 @@ export function getNextDow(dow: number, date: Dayjs = dayjs()) {
   if (dow < date.day()) dow += 7
   return date.day(dow)
 }
-
-export const formatDate = (date: string) => dayjs(date).format('DD.MM.YYYY')

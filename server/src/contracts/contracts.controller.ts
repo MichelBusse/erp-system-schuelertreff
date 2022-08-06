@@ -12,7 +12,6 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { EntityNotFoundError } from 'typeorm'
 
-import { Public } from 'src/auth/decorators/public.decorator'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 
@@ -67,9 +66,21 @@ export class ContractsController {
     return this.contractsService.suggestContracts(dto)
   }
 
+  @Get('findBlocked')
+  @Roles(Role.ADMIN)
+  async findBlocked(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+    @Query('teacher') teacherId: number,
+  ) {
+    if (!dayjs(startDate).isValid() || !dayjs(endDate).isValid())
+      throw new BadRequestException()
+
+    return this.contractsService.findBlocked(startDate, endDate, teacherId)
+  }
+
   @Get()
-  @Public()
-  //@Roles(Role.ADMIN)
+  @Roles(Role.ADMIN)
   findAll(): Promise<Contract[]> {
     return this.contractsService.findAll()
   }

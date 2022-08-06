@@ -6,11 +6,16 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
+  Res,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { Response } from 'express'
 
 import { AuthService } from 'src/auth/auth.service'
-import { Public } from 'src/auth/decorators/public.decorator'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 
@@ -19,6 +24,7 @@ import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolDto } from './dto/create-school.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
+import { LeaveDto } from './dto/leave.dto'
 import { UpdateClassCustomerDto } from './dto/update-classCustomer.dto'
 import { UpdatePrivateCustomerDto } from './dto/update-privateCustomer.dto'
 import { UpdateSchoolDto } from './dto/update-school.dto'
@@ -32,6 +38,7 @@ import {
   Teacher,
   User,
 } from './entities'
+import { Leave, LeaveState } from './entities/leave.entity'
 import { UsersService } from './users.service'
 
 @Controller('users')
@@ -79,8 +86,7 @@ export class UsersController {
   }
 
   @Get('school/:id')
-  @Public()
-  //@Roles(Role.ADMIN)
+  @Roles(Role.ADMIN)
   findOneSchool(@Param('id') id: number): Promise<School> {
     return this.usersService.findOneSchool(id)
   }
@@ -241,5 +247,124 @@ export class UsersController {
     this.authService.initReset(user)
 
     return user
+  }
+
+  @Get('me/leave/:id')
+  async getOwnLeaveAttachment(
+    @Request() req,
+    @Res() res: Response,
+    @Param('id') id: number,
+  ) {
+    this.getLeaveAttachment(res, req.user.id, id)
+  }
+
+  @Roles(Role.ADMIN)
+  @Get(':userId/leave/:id')
+  async getLeaveAttachment(
+    @Res() res: Response,
+    @Param('userId') userId: number,
+    @Param('id') id: number,
+  ) {
+    const buffer = await this.usersService.getLeaveAttachment(id, userId)
+
+    const fileType = await this.usersService.fileTypeFromBuffer(buffer)
+
+    res.set({
+      'Content-Type': fileType.mime,
+      // 'Content-Disposition': 'attachment; filename=test.' + fileType.ext,
+      'Content-Length': buffer.length,
+    })
+
+    res.end(buffer)
+  }
+
+  @Post('me/leave')
+  async createOwnLeave(@Request() req, @Body() dto: LeaveDto): Promise<Leave> {
+    return this.createLeave(req.user.id, { ...dto, state: LeaveState.PENDING })
+  }
+
+  @Roles(Role.ADMIN)
+  @Post(':userId/leave')
+  async createLeave(
+    @Param('userId') userId: number,
+    @Body() dto: LeaveDto,
+  ): Promise<Leave> {
+    return this.usersService.createLeave(userId, dto)
+  }
+
+  // @Post('me/leave/:id')
+  // async updateOwnLeave(
+  //   @Request() req,
+  //   @Param('id') id: number,
+  //   @Body() dto: LeaveDto,
+  // ): Promise<Leave> {
+  //   const cleanDto: LeaveDto = {
+  //     startDate: dto.startDate,
+  //     endDate: dto.endDate,
+  //     type: dto.type,
+  //   }
+
+  //   return this.updateLeave(req.user.id, id, cleanDto)
+  // }
+
+  @Roles(Role.ADMIN)
+  @Post(':userId/leave/:id')
+  async updateLeave(
+    @Param('userId') userId: number,
+    @Param('id') id: number,
+    @Body() dto: LeaveDto,
+  ): Promise<Leave> {
+    return this.usersService.updateLeave(id, userId, dto)
+  }
+
+  @Post('me/leave/:id/upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadOwnLeaveAttachment(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id') id: number,
+    @Request() req,
+  ) {
+    return this.uploadLeaveAttachment(file, id, req.user.id)
+  }
+
+  @Roles(Role.ADMIN)
+  @Post(':userId/leave/:id/upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadLeaveAttachment(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id') id: number,
+    @Param('userId') userId: number,
+  ) {
+    const dto: LeaveDto = {
+      attachment: file.buffer,
+    }
+
+    return this.usersService.updateLeave(id, userId, dto)
+  }
+
+  @Delete('me/leave/:id')
+  async deleteOwnLeave(@Request() req, @Param('id') id: number) {
+    return this.deleteLeave(req.user.id, id)
+  }
+
+  @Roles(Role.ADMIN)
+  @Delete(':userId/leave/:id')
+  async deleteLeave(@Param('userId') userId: number, @Param('id') id: number) {
+    return this.usersService.deleteLeave(id, userId)
+  }
+
+  @Roles(Role.ADMIN)
+  @Get('leaves/intersecting')
+  async getIntersectingLeaves(
+    @Query('start') start: string,
+    @Query('end') end: string,
+  ): Promise<Leave[]> {
+    return this.usersService.getIntersectingLeaves(start, end)
+  }
+
+  @Roles(Role.ADMIN)
+  @Get('leaves/:state')
+  async getLeaves(@Param('state') state: LeaveState) {
+    return this.usersService.getLeaves(state)
   }
 }

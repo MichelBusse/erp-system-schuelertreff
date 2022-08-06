@@ -10,6 +10,5 @@ export type lesson = {
   id: number
   date: string
   state: LessonState
-  teacher: number[]
   contract: contract
 }

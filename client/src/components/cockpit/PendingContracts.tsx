@@ -23,7 +23,6 @@ const PendingContracts: React.FC = () => {
 
   useEffect(() => {
     API.get('contracts/pending').then((res) => {
-      console.log(res.data)
       setPendingContracts(res.data)
     })
   }, [refresh])

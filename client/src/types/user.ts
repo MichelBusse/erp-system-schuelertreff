@@ -1,4 +1,10 @@
-import { Degree, SchoolType, TeacherState } from './enums'
+import {
+  Degree,
+  LeaveState,
+  LeaveType,
+  SchoolType,
+  TeacherState,
+} from './enums'
 import subject from './subject'
 import timeAvailable from './timeAvailable'
 
@@ -8,6 +14,20 @@ export enum Role {
   TEACHER = 'teacher',
   ADMIN = 'admin',
   CLASSCUSTOMER = 'classCustomer',
+}
+
+export type leave = {
+  id: number
+  type: LeaveType
+  state: LeaveState
+  startDate: string
+  endDate: string
+  hasAttachment: boolean
+  user: {
+    id: number
+    firstName: string
+    lastName: string
+  }
 }
 
 interface user {
@@ -22,6 +42,7 @@ interface user {
   phone: string
   timesAvailableParsed: timesAvailableParsed[]
   timesAvailable: (timeAvailable & { id: string })[]
+  leave: leave[]
 }
 
 export type timesAvailableParsed = {

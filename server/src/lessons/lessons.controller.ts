@@ -135,7 +135,7 @@ export class LessonsController {
     @Request() req,
     @Param('contractId') id: number,
     @Param('date') date: string,
-  ): Promise<{lesson: Lesson, contract: Contract}> {
+  ): Promise<{ contract: Contract; lesson: Lesson; blocked: boolean }> {
     if (req.user.role === Role.ADMIN) {
       return this.lessonsService.findOne(id, date)
     } else {
