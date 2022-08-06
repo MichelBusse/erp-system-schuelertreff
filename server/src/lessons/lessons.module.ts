@@ -12,7 +12,7 @@ import { LessonsService } from './lessons.service'
   imports: [
     TypeOrmModule.forFeature([Lesson]),
     forwardRef(() => ContractsModule),
-    UsersModule,
+    forwardRef(() => UsersModule),
   ],
   providers: [LessonsService],
   controllers: [LessonsController],

@@ -10,11 +10,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TextField,
   Typography,
@@ -209,8 +205,12 @@ const SchoolDetailView: React.FC = () => {
     setNewClassCustomer(defaultClassCustomerFormData)
   }
 
-  const generateInvoice = (year: number, month: number, invoiceData?: {invoiceNumber: number, invoiceType: string}) => {
-    API.post('lessons/invoice/customer', invoiceData,  {
+  const generateInvoice = (
+    year: number,
+    month: number,
+    invoiceData?: { invoiceNumber: number; invoiceType: string },
+  ) => {
+    API.post('lessons/invoice/customer', invoiceData, {
       params: {
         of: dayjs().year(year).month(month).format('YYYY-MM-DD'),
         schoolId: id,
@@ -248,7 +248,7 @@ const SchoolDetailView: React.FC = () => {
                   schoolName: event.target.value,
                 }))
               }
-              value={school.schoolName}
+              value={school.schoolName ?? ''}
               InputProps={{
                 readOnly: requestedId === 'me',
               }}
@@ -297,7 +297,7 @@ const SchoolDetailView: React.FC = () => {
                   firstName: event.target.value,
                 }))
               }
-              value={school.firstName}
+              value={school.firstName ?? ''}
               InputProps={{
                 readOnly: requestedId === 'me',
               }}
@@ -311,7 +311,7 @@ const SchoolDetailView: React.FC = () => {
                   lastName: event.target.value,
                 }))
               }
-              value={school.lastName}
+              value={school.lastName ?? ''}
               InputProps={{
                 readOnly: requestedId === 'me',
               }}
@@ -456,7 +456,10 @@ const SchoolDetailView: React.FC = () => {
             )}
           </Stack>
           <h3>Rechnung generieren:</h3>
-          <InvoiceDataSelect generateInvoice={generateInvoice} invoiceDialog={true}/>
+          <InvoiceDataSelect
+            generateInvoice={generateInvoice}
+            invoiceDialog={true}
+          />
         </Stack>
       </Box>
       <Dialog open={addClassDialogOpen}>

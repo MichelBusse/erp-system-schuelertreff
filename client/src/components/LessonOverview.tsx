@@ -1,4 +1,10 @@
-import { Button, Checkbox, FormControlLabel, FormGroup, Stack, TextField, Typography } from '@mui/material'
+import {
+  Button,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Stack,
+} from '@mui/material'
 import { Dayjs } from 'dayjs'
 import { useNavigate } from 'react-router-dom'
 
@@ -17,7 +23,7 @@ const LessonOverview: React.FC<Props> = ({
   contract,
   existingLesson,
   date,
-  calendarDate
+  calendarDate,
 }) => {
   const navigate = useNavigate()
 
@@ -44,7 +50,7 @@ const LessonOverview: React.FC<Props> = ({
           <li key={s.id}>
             {s.role === 'privateCustomer'
               ? s.firstName + ' ' + s.lastName
-              : s.school.schoolName + ' ' + s.className }
+              : s.school.schoolName + ' ' + s.className}
           </li>
         ))}
       </ul>
@@ -63,7 +69,20 @@ const LessonOverview: React.FC<Props> = ({
           label="Gehalten"
         />
       </FormGroup>
-      <Button onClick={() => navigate('/timetable/' + calendarDate.format('YYYY-MM-DD') + '/' + contract.id + '/' + date.format('YYYY-MM-DD'))}>Mehr anzeigen</Button>
+      <Button
+        onClick={() =>
+          navigate(
+            '/timetable/' +
+              calendarDate.format('YYYY-MM-DD') +
+              '/' +
+              contract.id +
+              '/' +
+              date.format('YYYY-MM-DD'),
+          )
+        }
+      >
+        Mehr anzeigen
+      </Button>
     </Stack>
   )
 }

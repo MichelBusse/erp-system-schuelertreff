@@ -23,7 +23,7 @@ export enum Degree {
 export class Teacher extends User {
   role = Role.TEACHER
 
-  @Column({type: "decimal", precision: 5, scale: 2, default: 0})
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
   fee: number
 
   @Column({

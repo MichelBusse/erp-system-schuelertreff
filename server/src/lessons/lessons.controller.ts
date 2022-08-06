@@ -69,8 +69,10 @@ export class LessonsController {
       })
 
       res.end(buffer)
-    }else{
-      throw new BadRequestException("You don't have permission to generate the invoice of this teacher")
+    } else {
+      throw new BadRequestException(
+        "You don't have permission to generate the invoice of this teacher",
+      )
     }
   }
 
@@ -78,7 +80,7 @@ export class LessonsController {
   @Roles(Role.ADMIN)
   async getInvoiceCustomer(
     @Res() res: Response,
-    @Body() invoiceData: {invoiceNumber: number, invoiceType: string},
+    @Body() invoiceData: { invoiceNumber: number; invoiceType: string },
     @Query('of') month: string,
     @Query('customerId') customerId: string,
     @Query('schoolId') schoolId: string,
@@ -87,7 +89,7 @@ export class LessonsController {
       invoiceMonth: dayjs(month, 'YYYY-MM-DD'),
       customerId: customerId ? Number(customerId) : null,
       schoolId: schoolId ? Number(schoolId) : null,
-      invoiceData
+      invoiceData,
     })
 
     res.set({

@@ -1,21 +1,25 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import dayjs, { Dayjs } from 'dayjs'
+import ejs from 'ejs'
+import path from 'path'
+import * as puppeteer from 'puppeteer'
 import { DataSource, DeepPartial, Repository } from 'typeorm'
 
+import { Role } from 'src/auth/role.enum'
 import { Contract, ContractState } from 'src/contracts/contract.entity'
 import { ContractsService } from 'src/contracts/contracts.service'
 import { getNextDow, maxDate, minDate } from 'src/date'
 import { Leave, LeaveState } from 'src/users/entities/leave.entity'
+import { UsersService } from 'src/users/users.service'
 
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Lesson, LessonState } from './lesson.entity'
-
-import ejs from 'ejs'
-import path from 'path'
-import * as puppeteer from 'puppeteer'
-import { UsersService } from 'src/users/users.service'
-import { Role } from 'src/auth/role.enum'
 
 require('dayjs/locale/de')
 
@@ -49,6 +53,7 @@ export class LessonsService {
 
     private readonly contractsService: ContractsService,
 
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
 
     @InjectDataSource()
@@ -140,7 +145,6 @@ export class LessonsService {
     return { contract, lesson, blocked }
   }
 
-
   async remove(id: number): Promise<void> {
     await this.lessonsRepository.delete(id)
   }
@@ -210,7 +214,7 @@ export class LessonsService {
     if (teacherId)
       q.andWhere('teacher.id = :teacherId', { teacherId: teacherId })
 
-    q.orderBy('l.date');
+    q.orderBy('l.date')
 
     return q.getMany()
   }
@@ -222,22 +226,30 @@ export class LessonsService {
     invoiceMonth: Dayjs
     teacherId: number
   }): Promise<Buffer> {
-
     const teacher = await this.usersService.findOneTeacher(teacherId)
 
-    const lessons = await this.findInvoiceReadyByMonth({invoiceMonth, teacherId})
+    const lessons = await this.findInvoiceReadyByMonth({
+      invoiceMonth,
+      teacherId,
+    })
 
     if (!teacher) throw new BadRequestException('The customer does not exist')
-
 
     const rows = []
 
     lessons.forEach((lesson) => {
       rows.push({
         subject: lesson.contract.subject.name,
-        duration: (dayjs(lesson.contract.endTime, 'HH:mm').diff(dayjs(lesson.contract.startTime, 'HH:mm'), 'minute') / 60).toFixed(2).replace('.', ','),
+        duration: (
+          dayjs(lesson.contract.endTime, 'HH:mm').diff(
+            dayjs(lesson.contract.startTime, 'HH:mm'),
+            'minute',
+          ) / 60
+        )
+          .toFixed(2)
+          .replace('.', ','),
         date: dayjs(lesson.date).format('DD.MM.YYYY'),
-        notes: lesson.notes
+        notes: lesson.notes,
       })
     })
 
@@ -278,14 +290,13 @@ export class LessonsService {
     invoiceMonth,
     customerId,
     schoolId,
-    invoiceData
+    invoiceData,
   }: {
     invoiceMonth: Dayjs
     customerId?: number
-    schoolId?: number,
-    invoiceData: {invoiceNumber: number, invoiceType: string}
+    schoolId?: number
+    invoiceData: { invoiceNumber: number; invoiceType: string }
   }): Promise<Buffer> {
-
     let customer = null
 
     if (customerId) {
@@ -294,7 +305,11 @@ export class LessonsService {
       customer = await this.usersService.findOneSchool(customerId)
     }
 
-    const lessons = await this.findInvoiceReadyByMonth({invoiceMonth, customerId, schoolId})
+    const lessons = await this.findInvoiceReadyByMonth({
+      invoiceMonth,
+      customerId,
+      schoolId,
+    })
 
     if (!customer) throw new BadRequestException('The customer does not exist')
 
@@ -313,12 +328,16 @@ export class LessonsService {
 
     const subjectCounts = new Map()
 
-    for (let lesson of lessons) {
+    for (const lesson of lessons) {
       const name = lesson.contract.subject.name
-      const duration = dayjs(lesson.contract.endTime, 'HH:mm').diff(dayjs(lesson.contract.startTime, 'HH:mm'), 'minute') / 60
+      const duration =
+        dayjs(lesson.contract.endTime, 'HH:mm').diff(
+          dayjs(lesson.contract.startTime, 'HH:mm'),
+          'minute',
+        ) / 60
       subjectCounts.set(
         name,
-        subjectCounts.get(name) ? subjectCounts.get(name) + duration : duration
+        subjectCounts.get(name) ? subjectCounts.get(name) + duration : duration,
       )
     }
 
@@ -328,9 +347,11 @@ export class LessonsService {
     subjectCounts.forEach((count, subject) => {
       rows.push({
         subject,
-        unitPrice: Number(customer.fee).toFixed(2).replace(".", ","),
-        count: count.toFixed(2).replace(".", ","),
-        totalPrice: Number(customer.fee * count).toFixed(2).replace(".", ","),
+        unitPrice: Number(customer.fee).toFixed(2).replace('.', ','),
+        count: count.toFixed(2).replace('.', ','),
+        totalPrice: Number(customer.fee * count)
+          .toFixed(2)
+          .replace('.', ','),
       })
       totalPrice += Number(customer.fee * count)
     })
@@ -340,7 +361,7 @@ export class LessonsService {
       month: invoiceMonth.locale('de').format('MMMM / YYYY'),
       number: invoiceData.invoiceNumber,
       type: invoiceData.invoiceType,
-      totalPrice: totalPrice.toFixed(2).replace(".", ","),
+      totalPrice: totalPrice.toFixed(2).replace('.', ','),
     }
 
     const filePath = path.join(__dirname, '../templates/customerInvoice.ejs')

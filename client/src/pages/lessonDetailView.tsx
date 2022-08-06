@@ -48,7 +48,7 @@ const LessonDetailView: React.FC = () => {
   })
   const [data, setData] = useState<lessonForm>({
     state: LessonState.IDLE,
-    notes: ''
+    notes: '',
   })
   const [blocked, setBlocked] = useState(false)
 
@@ -72,7 +72,7 @@ const LessonDetailView: React.FC = () => {
 
       const lesson = {
         state: res.data.lesson ? res.data.lesson.state : LessonState.IDLE,
-        notes: res.data.lesson.notes
+        notes: res.data.lesson.notes,
       }
       setId(res.data?.id)
       setData(lesson)
@@ -182,14 +182,14 @@ const LessonDetailView: React.FC = () => {
               </Select>
             </FormControl>
           </Stack>
-          <TextField 
+          <TextField
             label="Notizen"
             value={data.notes}
-            variant={"outlined"}
+            variant={'outlined'}
             multiline
-            rows={(3)}
+            rows={3}
             onChange={(e) => {
-              setData((prevData) => ({...prevData, notes: e.target.value}));
+              setData((prevData) => ({ ...prevData, notes: e.target.value }))
             }}
           />
           {blocked && (
