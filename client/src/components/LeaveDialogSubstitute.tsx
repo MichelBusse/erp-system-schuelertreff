@@ -1,4 +1,9 @@
-import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material'
+import 'dayjs/locale/de'
+
+import {
+  Edit as EditIcon,
+  ExpandMore as ExpandMoreIcon,
+} from '@mui/icons-material'
 import { LoadingButton } from '@mui/lab'
 import {
   Accordion,
@@ -11,18 +16,23 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
   Typography,
 } from '@mui/material'
 import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
-import { snackbarOptionsError } from '../consts'
+import { contractStateToString, snackbarOptionsError } from '../consts'
 import { contract, ContractState } from '../types/contract'
 import { ContractCreationForm } from '../types/form'
 import { leave } from '../types/user'
 import { useAuth } from './AuthProvider'
 import ContractCreation, { suggestion } from './contractDialog/ContractCreation'
+import ContractEditDialog from './ContractEditDialog'
 
 dayjs.locale('de')
 
@@ -68,6 +78,8 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
     dow: 1,
     selsuggestion: '',
   })
+
+  const [editDialog, setEditDialog] = useState({ open: false, id: -1 })
 
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
@@ -243,12 +255,49 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              {c.childContracts.length === 0 && (
-                <Typography>noch nicht vorhanden</Typography>
-              )}
-              {c.childContracts.map((child) => (
-                <Typography key={child.id}>{child.id}</Typography>
-              ))}
+              <List
+                dense={true}
+                sx={{
+                  backgroundColor: '#f5f5f5',
+                  borderRadius: '4px',
+                  margin: '5px 0',
+                }}
+              >
+                {c.childContracts.length === 0 && (
+                  <ListItem>
+                    <ListItemText primary="noch nicht vorhanden" />
+                  </ListItem>
+                )}
+                {c.childContracts.map((child) => (
+                  <ListItem
+                    key={child.id}
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        aria-label="bearbeiten"
+                        onClick={() =>
+                          setEditDialog({
+                            open: true,
+                            id: child.id,
+                          })
+                        }
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    }
+                  >
+                    <ListItemText
+                      primary={
+                        dayjs(child.startDate).format('dddd') +
+                        ` ${formatTime(child.startTime)} -` +
+                        ` ${formatTime(child.endTime)} ` +
+                        `(${contractStateToString[child.state]})`
+                      }
+                      secondary={`${child.teacher.firstName} ${child.teacher.lastName}`}
+                    />
+                  </ListItem>
+                ))}
+              </List>
             </AccordionDetails>
             <AccordionActions>
               <Button onClick={() => openDialog(c)}>hinzufügen</Button>
@@ -294,6 +343,16 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
           </LoadingButton>
         </DialogActions>
       </Dialog>
+
+      <ContractEditDialog
+        dialogInfo={editDialog}
+        setDialogInfo={(open: boolean, id: number) =>
+          setEditDialog({ open, id })
+        }
+        onSuccess={() => {
+          setRefresh((r) => r + 1)
+        }}
+      />
     </Box>
   )
 }

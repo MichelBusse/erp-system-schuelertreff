@@ -1,6 +1,7 @@
 import { GridLocaleText } from '@mui/x-data-grid'
 import { OptionsObject as SnackbarOptions } from 'notistack'
 
+import { ContractState } from './types/contract'
 import { LeaveState, LeaveType, TeacherState } from './types/enums'
 import { privateCustomerForm, teacherForm } from './types/form'
 
@@ -66,6 +67,12 @@ export const leaveTypeToString: { [key in LeaveType]: string } = {
 }
 
 export const leaveStateToString: { [key in LeaveState]: string } = {
+  pending: 'ausstehend',
+  accepted: 'bestätigt',
+  declined: 'abgelehnt',
+}
+
+export const contractStateToString: { [key in ContractState]: string } = {
   pending: 'ausstehend',
   accepted: 'bestätigt',
   declined: 'abgelehnt',

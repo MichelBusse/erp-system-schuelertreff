@@ -415,6 +415,7 @@ export class ContractsService {
         'cc',
         `cc."startDate" <= :end::date AND cc."endDate" >= :start::date`,
       )
+      .leftJoinAndSelect('cc.teacher', 'cc_teacher')
       .leftJoin('c.customers', 'customer')
       .addSelect('customer.id')
       .leftJoinAndSelect('c.subject', 'subject')
