@@ -34,7 +34,7 @@ import {
   teacherStateToString,
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
-import { Degree, SchoolType, TeacherState } from '../types/enums'
+import { Degree, TeacherSchoolType, TeacherState } from '../types/enums'
 import { teacherForm } from '../types/form'
 import subject from '../types/subject'
 import { teacher, timesAvailableParsed } from '../types/user'
@@ -292,20 +292,20 @@ const TeacherDetailView: React.FC = () => {
               multiple
               id="schoolTypes"
               options={[
-                SchoolType.GRUNDSCHULE,
-                SchoolType.OBERSCHULE,
-                SchoolType.GYMSEK1,
-                SchoolType.GYMSEK2,
+                TeacherSchoolType.GRUNDSCHULE,
+                TeacherSchoolType.OBERSCHULE,
+                TeacherSchoolType.GYMSEK1,
+                TeacherSchoolType.GYMSEK2,
               ]}
               getOptionLabel={(option) => {
                 switch (option) {
-                  case SchoolType.GRUNDSCHULE:
+                  case TeacherSchoolType.GRUNDSCHULE:
                     return 'Grundschule'
-                  case SchoolType.OBERSCHULE:
+                  case TeacherSchoolType.OBERSCHULE:
                     return 'Oberschule'
-                  case SchoolType.GYMSEK1:
+                  case TeacherSchoolType.GYMSEK1:
                     return 'Gymnasium Sek. 1'
-                  case SchoolType.GYMSEK2:
+                  case TeacherSchoolType.GYMSEK2:
                     return 'Gymnasium Sek. 2'
                   default:
                     return ''

@@ -6,6 +6,9 @@ import {
   DialogTitle,
   FormControl,
   FormLabel,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   TextField,
 } from '@mui/material'
@@ -16,6 +19,7 @@ import { useState } from 'react'
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
 import { defaultPrivateCustomerFormData, snackbarOptionsError } from '../consts'
+import { SchoolType } from '../types/enums'
 import { privateCustomerForm } from '../types/form'
 import { privateCustomer } from '../types/user'
 import { formValidation } from '../utils/formValidation'
@@ -185,14 +189,33 @@ const PrivateCustomerDialog: React.FC<Props> = ({
             />
           </Stack>
           <Stack direction={'row'} columnGap={2}>
+            <FormControl fullWidth>
+              <InputLabel id="invoiceMonthLabel">Schulart</InputLabel>
+              <Select
+                label={'Schulart'}
+                fullWidth
+                value={data.schoolType ?? ''}
+                onChange={(e) => {
+                  setData((c) => ({
+                    ...c,
+                    schoolType: e.target.value as SchoolType,
+                  }))
+                }}
+              >
+                <MenuItem value={SchoolType.GRUNDSCHULE}>Grundschule</MenuItem>
+                <MenuItem value={SchoolType.OBERSCHULE}>Oberschule</MenuItem>
+                <MenuItem value={SchoolType.GYMNASIUM}>Gymnasium</MenuItem>
+                <MenuItem value={SchoolType.ANDERE}>Andere</MenuItem>
+              </Select>
+            </FormControl>
             <TextField
               type="number"
               id="grade"
               label="Klasse"
               variant="outlined"
               helperText={errors.grade}
-              sx={{ width: '100px' }}
-              value={data.grade}
+              value={data.grade ?? ''}
+              fullWidth
               InputProps={{ inputProps: { min: 0, max: 13 } }}
               onChange={(event) =>
                 setData((data) => ({

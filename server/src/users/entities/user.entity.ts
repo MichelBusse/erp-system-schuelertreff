@@ -8,11 +8,18 @@ import {
 
 import { Role } from 'src/auth/role.enum'
 
-export enum SchoolType {
+export enum TeacherSchoolType {
   GRUNDSCHULE = 'grundschule',
   OBERSCHULE = 'oberschule',
   GYMSEK1 = 'sek1',
   GYMSEK2 = 'sek2',
+}
+
+export enum SchoolType {
+  GRUNDSCHULE = 'grundschule',
+  OBERSCHULE = 'oberschule',
+  GYMNASIUM = 'gymnasium',
+  ANDERE = 'other',
 }
 
 export enum DeleteState {

@@ -36,7 +36,8 @@ export const defaultPrivateCustomerFormData: privateCustomerForm = {
   street: '',
   email: '',
   phone: '',
-  grade: 0,
+  grade: null,
+  schoolType: null,
   timesAvailable: [],
   fee: 0
 }
@@ -77,6 +78,7 @@ export const defaultSchoolFormData : schoolForm = {
 export const defaultClassCustomerFormData : classCustomerForm = {
   id: -1,
   className: '',
-  numberOfStudents: 0,
   timesAvailable: [],
+  schoolType: null,
+  grade: null,
 }

@@ -1,7 +1,5 @@
-import { UpdateUserDto } from './update-user.dto'
+import { UpdateCustomerDto } from './update-customer.dto'
 
-export class UpdateClassCustomerDto extends UpdateUserDto {
+export class UpdateClassCustomerDto extends UpdateCustomerDto {
   className: string
-
-  numberOfStudents: number
 }

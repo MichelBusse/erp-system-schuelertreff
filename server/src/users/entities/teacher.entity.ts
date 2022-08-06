@@ -3,7 +3,7 @@ import { ChildEntity, Column, JoinTable, ManyToMany } from 'typeorm'
 import { Role } from 'src/auth/role.enum'
 import { Subject } from 'src/subjects/subject.entity'
 
-import { SchoolType, User } from './user.entity'
+import { TeacherSchoolType, User } from './user.entity'
 
 export enum TeacherState {
   CREATED = 'created',
@@ -41,11 +41,11 @@ export class Teacher extends User {
 
   @Column({
     type: 'enum',
-    enum: SchoolType,
+    enum: TeacherSchoolType,
     array: true,
     default: '{}',
   })
-  schoolTypes: SchoolType[]
+  schoolTypes: TeacherSchoolType[]
 
   @ManyToMany(() => Subject)
   @JoinTable()

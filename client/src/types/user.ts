@@ -45,7 +45,9 @@ export interface admin extends user {
 
 export interface privateCustomer extends user {
   role: 'privateCustomer'
-  fee: number
+  fee: number,
+  schoolType: SchoolType,
+  grade: number
 }
 
 export interface school extends Omit<user, 'lastName' | 'firstName'> {
@@ -58,10 +60,11 @@ export interface classCustomer {
   role: 'classCustomer'
   id: number
   className: string
-  numberOfStudents: number
   timesAvailableParsed: timesAvailableParsed[]
   timesAvailable: timeAvailable[]
-  school: school
+  school: school,
+  schoolType: SchoolType,
+  grade: number
 }
 
 export type customer = privateCustomer | classCustomer

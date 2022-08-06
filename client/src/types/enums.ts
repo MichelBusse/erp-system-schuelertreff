@@ -16,6 +16,13 @@ export enum Degree {
 export enum SchoolType {
   GRUNDSCHULE = 'grundschule',
   OBERSCHULE = 'oberschule',
+  GYMNASIUM = 'gymnasium',
+  ANDERE = 'other',
+}
+
+export enum TeacherSchoolType {
+  GRUNDSCHULE = 'grundschule',
+  OBERSCHULE = 'oberschule',
   GYMSEK1 = 'sek1',
   GYMSEK2 = 'sek2',
 }

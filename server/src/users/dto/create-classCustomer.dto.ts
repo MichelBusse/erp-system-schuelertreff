@@ -8,9 +8,6 @@ export class CreateClassCustomerDto {
   className: string
 
   @IsInt()
-  numberOfStudents: number
-
-  @IsInt()
   school: number
 
   @IsArray()

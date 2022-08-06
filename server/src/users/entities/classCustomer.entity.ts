@@ -4,6 +4,7 @@ import { Role } from 'src/auth/role.enum'
 
 import { Customer } from './customer.entity'
 import { School } from './school.entity'
+import { SchoolType } from './user.entity'
 
 @ChildEntity()
 export class ClassCustomer extends Customer {
@@ -12,9 +13,7 @@ export class ClassCustomer extends Customer {
   @Column()
   className: string
 
-  @Column()
-  numberOfStudents: number
-
   @ManyToOne(() => School)
   school: School
+
 }

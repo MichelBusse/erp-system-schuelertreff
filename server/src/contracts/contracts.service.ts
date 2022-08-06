@@ -4,13 +4,14 @@ import dayjs, { Dayjs } from 'dayjs'
 import { Brackets, DataSource, Repository } from 'typeorm'
 
 import { timeAvailable } from 'src/users/dto/timeAvailable'
-import { Customer, User } from 'src/users/entities'
+import { Customer, Teacher, User } from 'src/users/entities'
 import { parseMultirange, UsersService } from 'src/users/users.service'
 
 import { Contract, ContractState } from './contract.entity'
 import { AcceptOrDeclineContractDto } from './dto/accept-or-decline-contract-dto'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
+import { SchoolType, TeacherSchoolType } from 'src/users/entities/user.entity'
 
 @Injectable()
 export class ContractsService {
@@ -162,6 +163,32 @@ export class ContractsService {
 
     const dowTimeFilter = `{${dowTime.join(', ')}}`
 
+    // get schoolTypes from customers
+    
+    const customers = await this.connection.createQueryBuilder().select('c').from(Customer, 'c').where('c.id IN (:...cid)', { cid: dto.customers }).getMany()
+
+    const requestedSchoolTypes : TeacherSchoolType[] = []
+
+    customers.forEach((customer) => {
+      if(customer.schoolType && customer.schoolType !== SchoolType.ANDERE && customer.grade){
+        switch(customer.schoolType){
+          case SchoolType.GRUNDSCHULE:
+            requestedSchoolTypes.push(TeacherSchoolType.GRUNDSCHULE)
+            break;
+          case SchoolType.OBERSCHULE:
+            requestedSchoolTypes.push(TeacherSchoolType.OBERSCHULE)
+            break;
+          case SchoolType.GYMNASIUM:
+            if(customer.grade < 11) {
+              requestedSchoolTypes.push(TeacherSchoolType.GYMSEK1)
+            }else{
+              requestedSchoolTypes.push(TeacherSchoolType.GYMSEK2)
+            }
+            break;
+        }
+      }
+    })
+
     // begin actual query
 
     const qb = this.connection.createQueryBuilder()
@@ -231,6 +258,12 @@ export class ContractsService {
           .where('t.type = :tt', { tt: 'Teacher' })
           .andWhere(`t.state = 'employed'`)
           .andWhere('subject.id = :subjectId', { subjectId: dto.subjectId })
+          .andWhere(
+            new Brackets((qb) => {
+              qb.where('cardinality(t.schoolTypes) = 0')
+                .orWhere('t.schoolTypes @> :requestedSchoolTypes', {requestedSchoolTypes})
+            }),
+          )
 
         sq.groupBy('t.id')
 

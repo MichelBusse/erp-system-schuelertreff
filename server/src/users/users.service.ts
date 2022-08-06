@@ -149,23 +149,33 @@ export class UsersService {
   }
 
   async findAllCustomers(): Promise<Customer[]> {
-    return this.customersRepository.find().then(transformUsers)
+    return await this.customersRepository
+      .find({
+        order: { firstName: 'ASC', lastName: 'ASC' },
+      })
+      .then(transformUsers)
   }
 
   async findPrivateCustomers(): Promise<PrivateCustomer[]> {
     return this.privateCustomersRepository
-      .find({ where: { deleteState: Not(DeleteState.DELETED) } })
+      .find({
+        where: { deleteState: Not(DeleteState.DELETED) },
+        order: { firstName: 'ASC', lastName: 'ASC' },
+      })
       .then(transformUsers)
   }
 
   async findClassCustomers(): Promise<ClassCustomer[]> {
     return this.classCustomersRepository
-      .find({ where: { deleteState: Not(DeleteState.DELETED) } })
+      .find({
+        where: { deleteState: Not(DeleteState.DELETED) },
+        order: { className: 'ASC' },
+      })
       .then(transformUsers)
   }
   async findSchools(): Promise<School[]> {
     return this.schoolsRepository
-      .find({ where: { deleteState: Not(DeleteState.DELETED) } })
+      .find({ where: { deleteState: Not(DeleteState.DELETED) }, order: {schoolName: "ASC"} })
       .then(transformUsers)
   }
 
@@ -174,6 +184,7 @@ export class UsersService {
       .find({
         relations: ['subjects'],
         where: { deleteState: Not(DeleteState.DELETED) },
+        order: { firstName: 'ASC', lastName: 'ASC' }
       })
       .then(transformUsers)
   }
@@ -224,6 +235,7 @@ export class UsersService {
       .where('c.schoolId = :schoolId', {
         schoolId: schoolId,
       })
+      .orderBy('c.className', 'ASC')
 
     return q.getMany().then(transformUsers)
   }
@@ -267,7 +279,7 @@ export class UsersService {
       school: { id: dto.school },
     })
 
-    return this.classCustomersRepository.save(classCustomer)
+    return this.classCustomersRepository.save(classCustomer).then(transformUser)
   }
 
   async createSchool(dto: CreateSchoolDto): Promise<School> {
@@ -302,6 +314,7 @@ export class UsersService {
       city: dto.city,
       phone: dto.phone,
       grade: dto.grade,
+      schoolType: dto.schoolType,
       timesAvailable: formatTimesAvailable(dto.timesAvailable),
     })
   }

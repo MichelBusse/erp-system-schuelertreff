@@ -15,7 +15,4 @@ export class PrivateCustomer extends Customer {
 
   @Column({type: "decimal", precision: 5, scale: 2, default: 0})
   fee: number
-
-  @Column()
-  grade: number
 }

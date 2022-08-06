@@ -1,5 +1,4 @@
-import { UpdateUserDto } from './update-user.dto'
+import { UpdateCustomerDto } from './update-customer.dto';
 
-export class UpdatePrivateCustomerDto extends UpdateUserDto {
-  grade: number
+export class UpdatePrivateCustomerDto extends UpdateCustomerDto {
 }

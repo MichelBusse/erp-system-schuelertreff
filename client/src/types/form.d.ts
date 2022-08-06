@@ -1,6 +1,6 @@
 import { Dayjs } from 'dayjs'
 
-import { TeacherState } from './enums'
+import { SchoolType, TeacherState } from './enums'
 import { LessonState } from './lesson'
 import subject from './subject'
 import timeAvailable from './timeAvailable'
@@ -35,12 +35,14 @@ export interface schoolForm
 export interface classCustomerForm {
   id: number
   className: string
-  numberOfStudents: number
   timesAvailable: timeAvailable[]
+  schoolType: SchoolType | null
+  grade: number | null
 }
 
 export interface privateCustomerForm extends userForm {
-  grade: number
+  grade: number | null
+  schoolType: SchoolType | null
   fee: number
 }
 

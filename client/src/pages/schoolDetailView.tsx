@@ -28,6 +28,10 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
+import ConfirmationDialog, {
+  ConfirmationDialogProps,
+  defaultConfirmationDialogProps,
+} from '../components/ConfirmationDialog'
 import InvoiceDataSelect from '../components/InvoiceDateSelect'
 import {
   defaultClassCustomerFormData,
@@ -55,6 +59,9 @@ const SchoolDetailView: React.FC = () => {
     defaultClassCustomerFormData,
   )
   const [addClassDialogOpen, setAddClassDialogOpen] = useState<boolean>(false)
+
+  const [confirmationDialogProps, setConfirmationDialogProps] =
+    useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
 
   useEffect(() => {
     API.get('users/school/' + requestedId).then((res) => {
@@ -98,7 +105,8 @@ const SchoolDetailView: React.FC = () => {
           {
             id: classCustomer.id,
             className: classCustomer.className,
-            numberOfStudents: classCustomer.numberOfStudents,
+            schoolType: classCustomer.schoolType,
+            grade: classCustomer.grade,
             timesAvailable: newTimesAvailable,
           },
         ])
@@ -118,22 +126,54 @@ const SchoolDetailView: React.FC = () => {
   }
 
   const deleteUser = () => {
-    API.delete('users/school/' + requestedId)
-      .then(() => {
-        enqueueSnackbar(school.schoolName + ' gelöscht')
-        navigate('/schools')
-      })
-      .catch(() => {
-        enqueueSnackbar(
-          school.schoolName +
-            ' kann nicht gelöscht werden, da sie noch Klassen hat',
-        )
-      })
+    setConfirmationDialogProps({
+      open: true,
+      setProps: setConfirmationDialogProps,
+      title: `${school.schoolName} wirklich löschen?`,
+      text: `Möchtest du die Schule '${school.schoolName}' wirklich löschen? Wenn noch laufende Verträge mit einigen Klassen existieren, kann die Schule nicht gelöscht werden.`,
+      action: () => {
+        API.delete('users/school/' + requestedId)
+          .then(() => {
+            enqueueSnackbar(school.schoolName + ' gelöscht')
+            navigate('/schools')
+          })
+          .catch(() => {
+            enqueueSnackbar(
+              school.schoolName +
+                ' kann nicht gelöscht werden, da sie noch Klassen hat',
+              snackbarOptionsError,
+            )
+          })
+      },
+    })
   }
 
-  const updateClassCustomer = (newValue: timeAvailable[], index: number) => {
-    const updatedClassCutomer: classCustomerForm = { ...classCustomers[index] }
-    updatedClassCutomer.timesAvailable = newValue
+  const editClassCustomer = (
+    newValue: {
+      timesAvailable?: timeAvailable[]
+      schoolType?: SchoolType
+      grade?: number
+      className?: string
+    },
+    index: number,
+  ) => {
+    const updatedClassCutomer: classCustomerForm = {
+      ...classCustomers[index],
+      ...newValue,
+    }
+
+    setClassCustomers((classCustomers) => {
+      const newClassCustomers = [...classCustomers]
+      newClassCustomers[index] = updatedClassCutomer
+
+      return newClassCustomers
+    })
+  }
+
+  const saveClassCustomer = (index: number) => {
+    const updatedClassCutomer = classCustomers[index]
+
+    if(updatedClassCutomer.className.trim() === "") return;
 
     API.post('users/classCustomer/' + updatedClassCutomer.id, {
       ...updatedClassCutomer,
@@ -145,12 +185,6 @@ const SchoolDetailView: React.FC = () => {
     })
       .then(() => {
         enqueueSnackbar(updatedClassCutomer.className + ' gespeichert')
-        setClassCustomers((classCustomers) => {
-          const newClassCustomers = [...classCustomers]
-          newClassCustomers[index] = updatedClassCutomer
-
-          return newClassCustomers
-        })
       })
       .catch((res) => {
         console.log(res)
@@ -161,23 +195,34 @@ const SchoolDetailView: React.FC = () => {
   const deleteClass = (index: number) => {
     const classCustomer = classCustomers[index]
 
-    API.delete('users/classCustomer/' + classCustomer.id)
-      .then(() => {
-        enqueueSnackbar(classCustomer.className + ' gelöscht', snackbarOptions)
-        setClassCustomers(classCustomers.filter((_, i) => i !== index))
-      })
-      .catch(() => {
-        enqueueSnackbar(
-          classCustomer.className +
-            ' kann nicht gelöscht werden, da noch laufende Verträge existieren.',
-          snackbarOptionsError,
-        )
-      })
+    setConfirmationDialogProps({
+      open: true,
+      setProps: setConfirmationDialogProps,
+      title: `${classCustomer.className} wirklich löschen?`,
+      text: `Möchtest du die Klasse ${classCustomer.className} wirklich löschen?`,
+      action: () => {
+        API.delete('users/classCustomer/' + classCustomer.id)
+          .then(() => {
+            enqueueSnackbar(
+              classCustomer.className + ' gelöscht',
+              snackbarOptions,
+            )
+            setClassCustomers(classCustomers.filter((_, i) => i !== index))
+          })
+          .catch(() => {
+            enqueueSnackbar(
+              classCustomer.className +
+                ' kann nicht gelöscht werden, da noch laufende Verträge existieren.',
+              snackbarOptionsError,
+            )
+          })
+      },
+    })
   }
 
   const addClass = () => {
     setAddClassDialogOpen(false)
-    if (newClassCustomer.className && newClassCustomer.numberOfStudents != 0) {
+    if (newClassCustomer.className) {
       API.post('users/classCustomer/', {
         ...newClassCustomer,
         school: requestedId,
@@ -187,10 +232,31 @@ const SchoolDetailView: React.FC = () => {
           end: time.end?.format('HH:mm'),
         })),
       })
-        .then(() => {
+        .then((res) => {
+          const newTimesAvailable =
+            res.data.timesAvailableParsed.length === 1 &&
+            res.data.timesAvailableParsed[0].dow === 1 &&
+            res.data.timesAvailableParsed[0].start === '00:00' &&
+            res.data.timesAvailableParsed[0].end === '00:00'
+              ? []
+              : res.data.timesAvailableParsed.map(
+                  (time: timesAvailableParsed) => ({
+                    dow: time.dow,
+                    start: dayjs(time.start, 'HH:mm'),
+                    end: dayjs(time.end, 'HH:mm'),
+                    id: nanoid(),
+                  }),
+                )
+
           setClassCustomers((classCustomers) => [
             ...classCustomers,
-            newClassCustomer,
+            {
+              id: res.data.id,
+              className: res.data.className,
+              schoolType: res.data.schoolType,
+              grade: res.data.grade,
+              timesAvailable: newTimesAvailable,
+            },
           ])
 
           setNewClassCustomer(defaultClassCustomerFormData)
@@ -209,8 +275,12 @@ const SchoolDetailView: React.FC = () => {
     setNewClassCustomer(defaultClassCustomerFormData)
   }
 
-  const generateInvoice = (year: number, month: number, invoiceData?: {invoiceNumber: number, invoiceType: string}) => {
-    API.post('lessons/invoice/customer', invoiceData,  {
+  const generateInvoice = (
+    year: number,
+    month: number,
+    invoiceData?: { invoiceNumber: number; invoiceType: string },
+  ) => {
+    API.post('lessons/invoice/customer', invoiceData, {
       params: {
         of: dayjs().year(year).month(month).format('YYYY-MM-DD'),
         schoolId: id,
@@ -252,38 +322,6 @@ const SchoolDetailView: React.FC = () => {
               InputProps={{
                 readOnly: requestedId === 'me',
               }}
-            />
-            <Autocomplete
-              fullWidth
-              multiple
-              id="schoolTypes"
-              options={[
-                SchoolType.GRUNDSCHULE,
-                SchoolType.OBERSCHULE,
-                SchoolType.GYMSEK1,
-                SchoolType.GYMSEK2,
-              ]}
-              getOptionLabel={(option) => {
-                switch (option) {
-                  case SchoolType.GRUNDSCHULE:
-                    return 'Grundschule'
-                  case SchoolType.OBERSCHULE:
-                    return 'Oberschule'
-                  case SchoolType.GYMSEK1:
-                    return 'Gymnasium Sek. 1'
-                  case SchoolType.GYMSEK2:
-                    return 'Gymnasium Sek. 2'
-                  default:
-                    return ''
-                }
-              }}
-              renderInput={(params) => (
-                <TextField {...params} variant="outlined" label="Schularten" />
-              )}
-              value={school.schoolTypes}
-              onChange={(_, value) =>
-                setSchool((data) => ({ ...data, schoolTypes: value }))
-              }
             />
           </Stack>
           <h3>Ansprechpartner</h3>
@@ -383,7 +421,7 @@ const SchoolDetailView: React.FC = () => {
           </Stack>
           {classCustomers.map((classCustomer, index) => (
             <Accordion
-              key={classCustomer.className}
+              key={classCustomer.id}
               sx={{
                 border: '1px solid rgba(0, 0, 0, 0.23)',
                 boxShadow: 'none',
@@ -406,9 +444,6 @@ const SchoolDetailView: React.FC = () => {
                   <Typography sx={{ width: '10em' }}>
                     {classCustomer.className}
                   </Typography>
-                  <Typography sx={{ color: 'text.secondary' }}>
-                    {classCustomer.numberOfStudents} Schüler
-                  </Typography>
                   <IconButton
                     onClick={() => deleteClass(index)}
                     sx={{ marginLeft: 'auto' }}
@@ -420,12 +455,70 @@ const SchoolDetailView: React.FC = () => {
               </AccordionSummary>
               <AccordionDetails>
                 <Box>
-                  <AddTimes
-                    value={classCustomer.timesAvailable}
-                    setValue={(newValue) =>
-                      updateClassCustomer(newValue, index)
-                    }
-                  />
+                  <Stack direction={'column'} rowGap={2}>
+                    <Stack direction={'row'} columnGap={2}>
+                      <TextField 
+                        fullWidth
+                        value={classCustomer.className}
+                        label={"Klassenname"}
+                        onChange= {(e) => editClassCustomer({className: e.target.value}, index)}
+                      />
+                    </Stack>
+                    <Stack direction={'row'} columnGap={2}>
+                      <FormControl fullWidth>
+                        <InputLabel id="invoiceMonthLabel">Schulart</InputLabel>
+                        <Select
+                          label={'Schulart'}
+                          fullWidth
+                          value={classCustomer.schoolType ?? ''}
+                          onChange={(e) => {
+                            editClassCustomer(
+                              { schoolType: e.target.value as SchoolType },
+                              index,
+                            )
+                          }}
+                        >
+                          <MenuItem value={SchoolType.GRUNDSCHULE}>
+                            Grundschule
+                          </MenuItem>
+                          <MenuItem value={SchoolType.OBERSCHULE}>
+                            Oberschule
+                          </MenuItem>
+                          <MenuItem value={SchoolType.GYMNASIUM}>
+                            Gymnasium
+                          </MenuItem>
+                          <MenuItem value={SchoolType.ANDERE}>Andere</MenuItem>
+                        </Select>
+                      </FormControl>
+                      <TextField
+                        type="number"
+                        label={'Klassenstufe'}
+                        InputProps={{ inputProps: { min: 0, max: 13 } }}
+                        fullWidth
+                        value={classCustomer.grade ?? ''}
+                        onChange={(e) => {
+                          editClassCustomer(
+                            { grade: Number(e.target.value) },
+                            index,
+                          )
+                        }}
+                      />
+                    </Stack>
+                    <AddTimes
+                      value={classCustomer.timesAvailable}
+                      setValue={(newValue) =>
+                        editClassCustomer({ timesAvailable: newValue }, index)
+                      }
+                    />
+                    <Stack direction={'row'}>
+                      <Button
+                        variant="contained"
+                        onClick={() => saveClassCustomer(index)}
+                      >
+                        Klasse Speichern
+                      </Button>
+                    </Stack>
+                  </Stack>
                 </Box>
               </AccordionDetails>
             </Accordion>
@@ -442,7 +535,7 @@ const SchoolDetailView: React.FC = () => {
               </Button>
             )}
             <Button onClick={submitForm} variant="contained">
-              Speichern
+              Schule Speichern
             </Button>
             {id && (
               <Button
@@ -456,7 +549,10 @@ const SchoolDetailView: React.FC = () => {
             )}
           </Stack>
           <h3>Rechnung generieren:</h3>
-          <InvoiceDataSelect generateInvoice={generateInvoice} invoiceDialog={true}/>
+          <InvoiceDataSelect
+            generateInvoice={generateInvoice}
+            invoiceDialog={true}
+          />
         </Stack>
       </Box>
       <Dialog open={addClassDialogOpen}>
@@ -478,20 +574,41 @@ const SchoolDetailView: React.FC = () => {
                   }))
                 }
               />
+            </Stack>
+            <Stack direction={'row'} columnGap={2}>
+              <FormControl fullWidth>
+                <InputLabel id="invoiceMonthLabel">Schulart</InputLabel>
+                <Select
+                  label={'Schulart'}
+                  fullWidth
+                  value={newClassCustomer.schoolType ?? ''}
+                  onChange={(e) => {
+                    setNewClassCustomer((c) => ({
+                      ...c,
+                      schoolType: e.target.value as SchoolType,
+                    }))
+                  }}
+                >
+                  <MenuItem value={SchoolType.GRUNDSCHULE}>
+                    Grundschule
+                  </MenuItem>
+                  <MenuItem value={SchoolType.OBERSCHULE}>Oberschule</MenuItem>
+                  <MenuItem value={SchoolType.GYMNASIUM}>Gymnasium</MenuItem>
+                  <MenuItem value={SchoolType.ANDERE}>Andere</MenuItem>
+                </Select>
+              </FormControl>
               <TextField
                 type="number"
-                id="numberOfStudents"
-                label="Schüler"
-                variant="outlined"
+                label={'Klassenstufe'}
                 fullWidth
-                value={newClassCustomer.numberOfStudents}
-                InputProps={{ inputProps: { min: 0, max: 50 } }}
-                onChange={(event) =>
-                  setNewClassCustomer((data) => ({
-                    ...data,
-                    numberOfStudents: Number(event.target.value),
+                value={newClassCustomer.grade ?? ''}
+                InputProps={{ inputProps: { min: 0, max: 13 } }}
+                onChange={(e) => {
+                  setNewClassCustomer((c) => ({
+                    ...c,
+                    grade: Number(e.target.value),
                   }))
-                }
+                }}
               />
             </Stack>
             <AddTimes
@@ -514,6 +631,7 @@ const SchoolDetailView: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
     </div>
   )
 }

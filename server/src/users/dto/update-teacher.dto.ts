@@ -4,7 +4,7 @@ import { IsArray, IsOptional, ValidateNested } from 'class-validator'
 import { Subject } from 'src/subjects/subject.entity'
 
 import { TeacherState } from '../entities/teacher.entity'
-import { SchoolType } from '../entities/user.entity'
+import { SchoolType, TeacherSchoolType } from '../entities/user.entity'
 import { UpdateUserDto } from './update-user.dto'
 
 export class UpdateTeacherDto extends UpdateUserDto {
@@ -13,7 +13,7 @@ export class UpdateTeacherDto extends UpdateUserDto {
 
   @IsOptional()
   @IsArray()
-  schoolTypes: SchoolType[]
+  schoolTypes: TeacherSchoolType[]
 
   @Type(() => Subject)
   @ValidateNested({ each: true })
