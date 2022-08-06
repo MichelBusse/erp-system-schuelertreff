@@ -41,4 +41,14 @@ export class SuggestContractsDto {
   @IsOptional()
   @IsValidDate()
   endDate?: string
+
+  @IsOptional()
+  @Type(() => String)
+  @Transform(({ value }) => value.split(',').map(parseFloat))
+  @IsInt({ each: true })
+  ignoreContracts: number[] = []
+
+  @IsOptional()
+  @IsInt()
+  originalTeacher?: number
 }

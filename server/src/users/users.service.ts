@@ -189,6 +189,10 @@ export class UsersService {
       .addSelect('u.id')
       .getOneOrFail()
 
+    if (!leave.hasAttachment && typeof dto.attachment !== 'undefined') {
+      return repo.save({ ...leave, attachment: dto.attachment })
+    }
+
     // leave cannot be edited after it was accepted/declined
     if (leave.state !== LeaveState.PENDING) throw new BadRequestException()
 

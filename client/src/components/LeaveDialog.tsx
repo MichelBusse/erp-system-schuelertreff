@@ -345,15 +345,15 @@ const LeaveDialog: React.FC<Props> = ({
               </Box>
             ) : (
               <Box>
-                <Typography>Nachweis:</Typography>
-                <IconButton
+                <Button
+                  variant="outlined"
+                  startIcon={<DownloadIcon />}
                   color="primary"
                   disabled={!value.hasAttachment}
-                  aria-label="Nachweis"
                   onClick={getAttachment}
                 >
-                  <DownloadIcon />
-                </IconButton>
+                  Nachweis
+                </Button>
               </Box>
             )}
 

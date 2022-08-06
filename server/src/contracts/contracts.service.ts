@@ -228,12 +228,18 @@ export class ContractsService {
       .andWhere('con.endDate > :startDate', {
         startDate: dto.startDate ?? dayjs().format('YYYY-MM-DD'),
       })
+
     if (typeof dto.endDate !== 'undefined')
       contractQuery.andWhere('con.startDate < :endDate', {
         endDate: dto.endDate,
       })
 
     if (dto.interval !== 1) contractQuery.andWhere('con.interval = 1')
+
+    if (dto.ignoreContracts.length)
+      contractQuery.andWhere('con.id NOT IN (:...ignoreContracts)', {
+        ignoreContracts: dto.ignoreContracts,
+      })
 
     /* MAIN QUERY */
 
@@ -257,6 +263,12 @@ export class ContractsService {
           .where('t.type = :tt', { tt: 'Teacher' })
           .andWhere(`t.state = 'employed'`)
           .andWhere('subject.id = :subjectId', { subjectId: dto.subjectId })
+
+        // suggestSubstitute: filter out original teacher
+        if (dto.originalTeacher)
+          sq.andWhere(`t.id <> :blockTeacher`, {
+            blockTeacher: dto.originalTeacher,
+          })
 
         sq.groupBy('t.id')
 
@@ -350,6 +362,7 @@ export class ContractsService {
       .createQueryBuilder('c')
       .leftJoin('c.subject', 'subject')
       .leftJoin('c.customers', 'customer')
+      .leftJoin('c.teacher', 'teacher')
       .select([
         'c',
         'subject',
@@ -358,10 +371,8 @@ export class ContractsService {
         'customer.firstName',
         'customer.lastName',
         'customer.className',
+        'teacher.id',
       ])
-      .loadAllRelationIds({
-        relations: ['teacher'],
-      })
       .where(
         `c.startDate <= date_trunc('week', :week::date) + interval '4 day'`,
         { week: week.format() },
@@ -399,7 +410,16 @@ export class ContractsService {
       .leftJoinAndSelect('c.lessons', 'lesson')
       .andWhere(`lesson.date >= :start::date`)
       .andWhere(`lesson.date <= :end::date`)
-      .leftJoinAndSelect('c.childContracts', 'childContract')
+      .leftJoinAndSelect(
+        'c.childContracts',
+        'cc',
+        `cc."startDate" <= :end::date AND cc."endDate" >= :start::date`,
+      )
+      .leftJoin('c.customers', 'customer')
+      .addSelect('customer.id')
+      .leftJoinAndSelect('c.subject', 'subject')
+      .leftJoin('c.teacher', 'teacher')
+      .addSelect('teacher.id')
 
     const contracts: Contract[] = await qb.getMany()
 

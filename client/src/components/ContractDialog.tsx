@@ -92,10 +92,6 @@ const ContractDialog: React.FC<Props> = ({
         form0.classCustomers.length > 0))
   )
 
-  const setSelSuggestion = (value: string) => {
-    setForm1((f) => ({ ...f, selsuggestion: value }))
-  }
-
   const handleSubmit0 = () => {
     setLoading0(true)
 
@@ -140,7 +136,6 @@ const ContractDialog: React.FC<Props> = ({
         setSuggestions(res.data)
         setActiveStep(1)
 
-        setSelSuggestion('')
         setForm1({
           startDate: form0.startDate,
           endDate: form0.endDate,
@@ -175,7 +170,6 @@ const ContractDialog: React.FC<Props> = ({
                     ) &&
                     !dayjs(timeSuggestion.end, 'hh:mm').isBefore(initialEndTime)
                   ) {
-                    setSelSuggestion(teacherIndex + ',' + timeIndex)
                     setForm1((form1) => {
                       const initialForm1Entry: ContractCreationForm = {
                         ...form1,
@@ -185,6 +179,7 @@ const ContractDialog: React.FC<Props> = ({
                         endTime: initialEndTime,
                         teacher: initialContract.teacher.id.toString(),
                         dow: initialStartDate.day(),
+                        selsuggestion: teacherIndex + ',' + timeIndex,
                       }
 
                       return initialForm1Entry
