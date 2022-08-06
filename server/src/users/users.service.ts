@@ -28,6 +28,7 @@ import {
 } from './entities'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
+import { Invoice } from '../lessons/invoice.entity'
 
 /**
  * Format Array of {@link timeAvailable} as Postgres `tstzmultirange`
@@ -517,4 +518,5 @@ export class UsersService {
 
     return this.usersRepository.save(user)
   }
+
 }

@@ -12,7 +12,8 @@ import {
   TextField,
 } from '@mui/material'
 import dayjs from 'dayjs'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useAuth } from './AuthProvider'
 
 type Props = {
   generateInvoice: (
@@ -38,7 +39,16 @@ const InvoiceDataSelect: React.FC<Props> = ({
   const [invoiceData, setInvoiceData] = useState<{
     invoiceNumber: number
     invoiceType: string
-  }>({ invoiceNumber: 1, invoiceType: 'Nachhilfe' })
+  }>({ invoiceNumber: 0, invoiceType: 'Nachhilfe' })
+
+  const {API} = useAuth()
+
+
+  useEffect(() => {
+    API.get('lessons/latestInvoice').then((res) => {
+      setInvoiceData((data) => ({...data, invoiceNumber: res.data + 1}))
+    })
+  }, [invoiceDialogOpen])
 
   return (
     <>

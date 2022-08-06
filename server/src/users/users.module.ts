@@ -12,6 +12,7 @@ import {
   Teacher,
   User,
 } from './entities'
+import { Invoice } from '../lessons/invoice.entity'
 import { UsersController } from './users.controller'
 import { UsersService } from './users.service'
 

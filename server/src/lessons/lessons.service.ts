@@ -14,6 +14,7 @@ import path from 'path'
 import * as puppeteer from 'puppeteer'
 import { UsersService } from 'src/users/users.service'
 import { Role } from 'src/auth/role.enum'
+import { Invoice } from './invoice.entity'
 
 require('dayjs/locale/de')
 
@@ -22,6 +23,9 @@ export class LessonsService {
   constructor(
     @InjectRepository(Lesson)
     private readonly lessonsRepository: Repository<Lesson>,
+
+    @InjectRepository(Invoice)
+    private readonly invoiceRepository: Repository<Invoice>,
 
     private readonly contractsService: ContractsService,
 
@@ -180,6 +184,7 @@ export class LessonsService {
       q.andWhere('teacher.id = :teacherId', { teacherId: teacherId })
 
     q.orderBy('l.date');
+    
 
     return q.getMany()
   }
@@ -337,6 +342,18 @@ export class LessonsService {
 
     await browser.close()
 
+    this.invoiceRepository.insert({number: invoiceData.invoiceNumber})
+
     return buffer
+  }
+
+  async getLatestInvoiceNumber() : Promise<number>{
+    const latestInvoices = await this.invoiceRepository.createQueryBuilder('i').select('i.number').orderBy('i.generationTime', "DESC").getMany()
+
+    if(latestInvoices.length > 0){
+      return latestInvoices[0].number
+    }else{
+      return 1
+    }
   }
 }

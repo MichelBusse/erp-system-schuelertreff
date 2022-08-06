@@ -29,7 +29,6 @@ const LessonOverview: React.FC<Props> = ({
         backgroundColor: contract.subject.color + 50,
         p: 2,
         borderRadius: 2,
-        cursor: 'pointer',
       }}
     >
       <span>

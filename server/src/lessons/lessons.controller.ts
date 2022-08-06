@@ -25,6 +25,11 @@ import { LessonsService } from './lessons.service'
 export class LessonsController {
   constructor(private readonly lessonsService: LessonsService) {}
 
+  @Get('latestInvoice')
+  getLatestInvoice(): Promise<number> {
+    return this.lessonsService.getLatestInvoiceNumber()
+  }
+
   @Get('myLessons')
   findMyContracts(
     @Request() req,
