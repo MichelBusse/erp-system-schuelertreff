@@ -1,4 +1,9 @@
-import { IconButton, InputAdornment } from '@mui/material'
+import {
+  IconButton,
+  InputAdornment,
+  Tooltip,
+  TooltipProps,
+} from '@mui/material'
 import SvgIcon from '@mui/material/SvgIcon'
 
 type Props = {
@@ -7,6 +12,9 @@ type Props = {
   onClick?: React.MouseEventHandler<HTMLButtonElement>
   margin?: string | number
   hidden?: boolean
+  disabled?: boolean
+  tooltip?: TooltipProps['title']
+  color?: React.ComponentProps<typeof IconButton>['color']
 }
 
 const IconButtonAdornment: React.FC<Props> = ({
@@ -15,16 +23,24 @@ const IconButtonAdornment: React.FC<Props> = ({
   onClick,
   margin = '-4px',
   hidden = false,
+  disabled = false,
+  tooltip = '',
+  color,
 }) => (
-  <InputAdornment position={position}>
-    <IconButton
-      disabled={hidden}
-      onClick={onClick}
-      sx={{ margin: margin, opacity: hidden ? 0 : 1 }}
-      size="small"
-    >
-      <Icon fontSize="small" />
-    </IconButton>
+  <InputAdornment position={position} sx={{ margin: margin }}>
+    <Tooltip title={tooltip}>
+      <div>
+        <IconButton
+          disabled={hidden || disabled}
+          onClick={onClick}
+          sx={{ opacity: hidden ? 0 : 1 }}
+          size="small"
+          color={color}
+        >
+          <Icon fontSize="small" />
+        </IconButton>
+      </div>
+    </Tooltip>
   </InputAdornment>
 )
 

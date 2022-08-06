@@ -5,6 +5,7 @@ import { GridCellParams } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 
 import { useAuth } from '../components/AuthProvider'
 import Calendar from '../components/Calendar'
@@ -14,8 +15,6 @@ import TeacherCalendar from '../components/TeacherCalendar'
 import { contract } from '../types/contract'
 import { lesson } from '../types/lesson'
 import { Role, teacher } from '../types/user'
-import { useParams } from 'react-router-dom'
-import { isNumberObject } from 'util/types'
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)
@@ -35,7 +34,11 @@ const Timetable: React.FC = () => {
     lessons: [],
   })
   const { initialDate } = useParams()
-  const [date, setDate] = useState((initialDate && dayjs(initialDate, 'YYYY-MM-DD').isValid()) ? dayjs(initialDate, 'YYYY-MM-DD').day(1) : dayjs().day(1))
+  const [date, setDate] = useState(
+    initialDate && dayjs(initialDate, 'YYYY-MM-DD').isValid()
+      ? dayjs(initialDate, 'YYYY-MM-DD').day(1)
+      : dayjs().day(1),
+  )
 
   const [open, setOpen] = useState(false)
 

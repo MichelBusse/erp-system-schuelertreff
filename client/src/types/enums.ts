@@ -26,3 +26,14 @@ export enum TeacherSchoolType {
   GYMSEK1 = 'sek1',
   GYMSEK2 = 'sek2',
 }
+
+export enum LeaveType {
+  REGULAR = 'regular',
+  SICK = 'sick',
+}
+
+export enum LeaveState {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  DECLINED = 'declined',
+}

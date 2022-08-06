@@ -10,11 +10,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TextField,
   Typography,
@@ -318,7 +314,7 @@ const SchoolDetailView: React.FC = () => {
                   schoolName: event.target.value,
                 }))
               }
-              value={school.schoolName}
+              value={school.schoolName ?? ''}
               InputProps={{
                 readOnly: requestedId === 'me',
               }}
@@ -335,7 +331,7 @@ const SchoolDetailView: React.FC = () => {
                   firstName: event.target.value,
                 }))
               }
-              value={school.firstName}
+              value={school.firstName ?? ''}
               InputProps={{
                 readOnly: requestedId === 'me',
               }}
@@ -349,7 +345,7 @@ const SchoolDetailView: React.FC = () => {
                   lastName: event.target.value,
                 }))
               }
-              value={school.lastName}
+              value={school.lastName ?? ''}
               InputProps={{
                 readOnly: requestedId === 'me',
               }}

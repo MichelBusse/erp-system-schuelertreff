@@ -4,9 +4,11 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm'
 
+import { Lesson } from 'src/lessons/lesson.entity'
 import { Subject } from 'src/subjects/subject.entity'
 import { Customer } from 'src/users/entities/customer.entity'
 import { Teacher } from 'src/users/entities/teacher.entity'
@@ -53,4 +55,15 @@ export class Contract {
 
   @Column()
   interval: number
+
+  @ManyToOne(() => Contract, (contract) => contract.childContracts, {
+    nullable: true,
+  })
+  parentContract: Contract
+
+  @OneToMany(() => Contract, (contract) => contract.parentContract)
+  childContracts: Contract[]
+
+  @OneToMany(() => Lesson, (lesson) => lesson.contract)
+  lessons: Lesson[]
 }

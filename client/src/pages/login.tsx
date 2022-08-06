@@ -81,7 +81,7 @@ const Login: React.FC = () => {
         />
         <Button
           variant="contained"
-          style={{  width: '300px', maxWidth: '100%' }}
+          style={{ width: '300px', maxWidth: '100%' }}
           onClick={handleSubmit}
           fullWidth
         >

@@ -1,3 +1,4 @@
+import { lesson } from './lesson'
 import subject from './subject'
 import { customer, teacher } from './user'
 
@@ -16,9 +17,13 @@ export type contract = {
   interval: 1
   subject: subject
   customers: customer[]
-  teacher: number
+  teacher: teacher
   state: ContractState
+  parentContract?: contract
+  childContracts: contract[]
+  lessons: lesson[]
 }
+
 export type contractWithTeacher = {
   id: number
   startTime: string

@@ -1,10 +1,22 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common'
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import dayjs, { Dayjs } from 'dayjs'
-import { Repository } from 'typeorm'
+import ejs from 'ejs'
+import path from 'path'
+import * as puppeteer from 'puppeteer'
+import { DataSource, DeepPartial, Repository } from 'typeorm'
 
-import { ContractState } from 'src/contracts/contract.entity'
+import { Role } from 'src/auth/role.enum'
+import { Contract, ContractState } from 'src/contracts/contract.entity'
 import { ContractsService } from 'src/contracts/contracts.service'
+import { getNextDow, maxDate, minDate } from 'src/date'
+import { Leave, LeaveState } from 'src/users/entities/leave.entity'
+import { UsersService } from 'src/users/users.service'
 
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Lesson, LessonState } from './lesson.entity'
@@ -18,6 +30,28 @@ import { Invoice } from './invoice.entity'
 
 require('dayjs/locale/de')
 
+export function getLessonDates(
+  contract: Contract,
+  startDate: Dayjs,
+  endDate: Dayjs,
+): Dayjs[] {
+  const dow = dayjs(contract.startDate).day()
+  const start = maxDate(dayjs(contract.startDate), startDate)
+  const end = minDate(dayjs(contract.endDate), endDate)
+
+  const dates: Dayjs[] = []
+
+  for (
+    let i = getNextDow(dow, start);
+    !i.isAfter(end);
+    i = i.add(contract.interval, 'week')
+  ) {
+    dates.push(i)
+  }
+
+  return dates
+}
+
 @Injectable()
 export class LessonsService {
   constructor(
@@ -29,19 +63,24 @@ export class LessonsService {
 
     private readonly contractsService: ContractsService,
 
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
+
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
   ) {}
 
-  async create(
-    createLessonDto: CreateLessonDto,
-    teacherId?: number,
-  ): Promise<Lesson> {
+  async create(dto: CreateLessonDto, teacherId?: number): Promise<Lesson> {
     const lesson = new Lesson()
 
     const contract = await this.contractsService.findOne(
-      Number(createLessonDto.contractId),
+      dto.contractId,
       teacherId,
     )
+
+    // check for intersecting leaves
+    if ((await this.checkLeave(dto.date, contract.teacher.id)) > 0)
+      throw new BadRequestException('Lesson is blocked')
 
     if (contract) {
       if (contract.state !== ContractState.ACCEPTED)
@@ -49,9 +88,9 @@ export class LessonsService {
           'You cannot create lessons of unaccepted contracts',
         )
 
-      lesson.date = createLessonDto.date
-      lesson.state = createLessonDto.state
-      lesson.notes = createLessonDto.notes
+      lesson.date = dto.date
+      lesson.state = dto.state
+      lesson.notes = dto.notes
       lesson.contract = contract
 
       return this.lessonsRepository.save(lesson)
@@ -64,7 +103,7 @@ export class LessonsService {
 
   async update(
     id: number,
-    createLessonDto: CreateLessonDto,
+    dto: CreateLessonDto,
     teacherId?: number,
   ): Promise<Lesson> {
     const lesson = await this.lessonsRepository.findOne({
@@ -72,13 +111,17 @@ export class LessonsService {
       relations: ['contract', 'contract.teacher'],
     })
 
+    // check for intersecting leaves
+    if ((await this.checkLeave(dto.date, lesson.contract.teacher.id)) > 0)
+      throw new BadRequestException('Lesson is blocked')
+
     if (
       lesson.contract.state === ContractState.ACCEPTED &&
       (!teacherId || (teacherId && lesson.contract.teacher.id === teacherId))
     ) {
-      lesson.state = createLessonDto.state
-      lesson.notes = createLessonDto.notes
- 
+      lesson.state = dto.state
+      lesson.notes = dto.notes
+
       return this.lessonsRepository.save(lesson)
     } else {
       throw new BadRequestException(
@@ -106,13 +149,11 @@ export class LessonsService {
     if (teacherId)
       lessonQuery.andWhere('c.teacherId = :teacherId', { teacherId: teacherId })
 
-    let lesson = await lessonQuery.getOne()
-
-    const contract = await this.contractsService.findOne(contractId)
-    
-    return {lesson, contract}
+    const lesson = await lessonQuery.getOne()
+    const contract = await this.contractsService.findOne(contractId, teacherId)
+    const blocked = (await this.checkLeave(date, contract.teacher.id)) > 0
+    return { contract, lesson, blocked }
   }
-
 
   async remove(id: number): Promise<void> {
     await this.lessonsRepository.delete(id)
@@ -184,7 +225,7 @@ export class LessonsService {
       q.andWhere('teacher.id = :teacherId', { teacherId: teacherId })
 
     q.orderBy('l.date');
-    
+
 
     return q.getMany()
   }
@@ -196,22 +237,30 @@ export class LessonsService {
     invoiceMonth: Dayjs
     teacherId: number
   }): Promise<Buffer> {
-
     const teacher = await this.usersService.findOneTeacher(teacherId)
 
-    const lessons = await this.findInvoiceReadyByMonth({invoiceMonth, teacherId})
+    const lessons = await this.findInvoiceReadyByMonth({
+      invoiceMonth,
+      teacherId,
+    })
 
     if (!teacher) throw new BadRequestException('The customer does not exist')
-
 
     const rows = []
 
     lessons.forEach((lesson) => {
       rows.push({
         subject: lesson.contract.subject.name,
-        duration: (dayjs(lesson.contract.endTime, 'HH:mm').diff(dayjs(lesson.contract.startTime, 'HH:mm'), 'minute') / 60).toFixed(2).replace('.', ','),
+        duration: (
+          dayjs(lesson.contract.endTime, 'HH:mm').diff(
+            dayjs(lesson.contract.startTime, 'HH:mm'),
+            'minute',
+          ) / 60
+        )
+          .toFixed(2)
+          .replace('.', ','),
         date: dayjs(lesson.date).format('DD.MM.YYYY'),
-        notes: lesson.notes
+        notes: lesson.notes,
       })
     })
 
@@ -252,14 +301,13 @@ export class LessonsService {
     invoiceMonth,
     customerId,
     schoolId,
-    invoiceData
+    invoiceData,
   }: {
     invoiceMonth: Dayjs
     customerId?: number
-    schoolId?: number,
-    invoiceData: {invoiceNumber: number, invoiceType: string}
+    schoolId?: number
+    invoiceData: { invoiceNumber: number; invoiceType: string }
   }): Promise<Buffer> {
-
     let customer = null
 
     if (customerId) {
@@ -268,7 +316,11 @@ export class LessonsService {
       customer = await this.usersService.findOneSchool(customerId)
     }
 
-    const lessons = await this.findInvoiceReadyByMonth({invoiceMonth, customerId, schoolId})
+    const lessons = await this.findInvoiceReadyByMonth({
+      invoiceMonth,
+      customerId,
+      schoolId,
+    })
 
     if (!customer) throw new BadRequestException('The customer does not exist')
 
@@ -287,12 +339,16 @@ export class LessonsService {
 
     const subjectCounts = new Map()
 
-    for (let lesson of lessons) {
+    for (const lesson of lessons) {
       const name = lesson.contract.subject.name
-      const duration = dayjs(lesson.contract.endTime, 'HH:mm').diff(dayjs(lesson.contract.startTime, 'HH:mm'), 'minute') / 60
+      const duration =
+        dayjs(lesson.contract.endTime, 'HH:mm').diff(
+          dayjs(lesson.contract.startTime, 'HH:mm'),
+          'minute',
+        ) / 60
       subjectCounts.set(
         name,
-        subjectCounts.get(name) ? subjectCounts.get(name) + duration : duration
+        subjectCounts.get(name) ? subjectCounts.get(name) + duration : duration,
       )
     }
 
@@ -302,9 +358,11 @@ export class LessonsService {
     subjectCounts.forEach((count, subject) => {
       rows.push({
         subject,
-        unitPrice: Number(customer.fee).toFixed(2).replace(".", ","),
-        count: count.toFixed(2).replace(".", ","),
-        totalPrice: Number(customer.fee * count).toFixed(2).replace(".", ","),
+        unitPrice: Number(customer.fee).toFixed(2).replace('.', ','),
+        count: count.toFixed(2).replace('.', ','),
+        totalPrice: Number(customer.fee * count)
+          .toFixed(2)
+          .replace('.', ','),
       })
       totalPrice += Number(customer.fee * count)
     })
@@ -314,7 +372,7 @@ export class LessonsService {
       month: invoiceMonth.locale('de').format('MMMM / YYYY'),
       number: invoiceData.invoiceNumber,
       type: invoiceData.invoiceType,
-      totalPrice: totalPrice.toFixed(2).replace(".", ","),
+      totalPrice: totalPrice.toFixed(2).replace('.', ','),
     }
 
     const filePath = path.join(__dirname, '../templates/customerInvoice.ejs')
@@ -346,7 +404,6 @@ export class LessonsService {
 
     return buffer
   }
-
   async getLatestInvoiceNumber() : Promise<number>{
     const latestInvoices = await this.invoiceRepository.createQueryBuilder('i').select('i.number').orderBy('i.generationTime', "DESC").getMany()
 
@@ -355,5 +412,110 @@ export class LessonsService {
     }else{
       return 1
     }
+  async cancelByLeave(leave: Leave) {
+    const qb = this.dataSource.createQueryBuilder()
+
+    qb.select('c')
+      .from(Contract, 'c')
+      .where(`c."teacherId" = :userId`, { userId: leave.user.id })
+      .andWhere(`c.state = :state`, { state: ContractState.ACCEPTED })
+      .andWhere(`c."startDate" <= :end::date`, { end: leave.endDate })
+      .andWhere(`c."endDate" >= :start::date`, { start: leave.startDate })
+      .leftJoinAndSelect('c.lessons', 'lesson')
+
+    const contracts: Contract[] = await qb.getMany()
+
+    const lessons: DeepPartial<Lesson>[] = contracts.flatMap((c) => {
+      const dates = getLessonDates(
+        c,
+        dayjs(leave.startDate),
+        dayjs(leave.endDate),
+      ).map((d) => d.format('YYYY-MM-DD'))
+
+      return dates.map((d) => {
+        const existingLesson = c.lessons.find((l) => l.date === d)
+
+        if (typeof existingLesson === 'undefined') {
+          // lesson does not exist yet
+          return {
+            contract: { id: c.id },
+            date: d,
+            state: LessonState.CANCELLED,
+          }
+        } else {
+          // lesson already exists, set it to cancelled
+          return {
+            ...existingLesson,
+            state: LessonState.CANCELLED,
+          }
+        }
+      })
+    })
+
+    return this.lessonsRepository.save(lessons)
+  }
+
+  async cancelByContract(contract: Contract) {
+    const qb = this.dataSource.createQueryBuilder()
+
+    qb.select('l')
+      .from(Leave, 'l')
+      .where(`l."userId" = :userId`, { userId: contract.teacher.id })
+      .andWhere(`l.state = :state`, { state: LeaveState.ACCEPTED })
+      .andWhere(`l."startDate" <= :end::date`, { end: contract.endDate })
+      .andWhere(`l."endDate" >= :start::date`, { start: contract.startDate })
+
+    const leaves: Leave[] = await qb.getMany()
+
+    const contractLessons = await this.lessonsRepository
+      .createQueryBuilder('l')
+      .where(`l.contractId = :contractId`, { contractId: contract.id })
+      .getMany()
+
+    const lessons: DeepPartial<Lesson>[] = leaves.flatMap((l) => {
+      const dates = getLessonDates(
+        contract,
+        dayjs(l.startDate),
+        dayjs(l.endDate),
+      )
+
+      return dates.map((d) => {
+        const dateString = d.format('YYYY-MM-DD')
+
+        const existingLesson = contractLessons.find(
+          (l) => l.date === dateString,
+        )
+
+        if (typeof existingLesson === 'undefined') {
+          // lesson does not exist yet
+          return {
+            contract: { id: contract.id },
+            date: dateString,
+            state: LessonState.CANCELLED,
+          }
+        } else {
+          // lesson already exists, set it to cancelled
+          return {
+            ...existingLesson,
+            state: LessonState.CANCELLED,
+          }
+        }
+      })
+    })
+
+    return this.lessonsRepository.save(lessons)
+  }
+
+  async checkLeave(date: string, userId: number) {
+    const q = this.dataSource
+      .createQueryBuilder()
+      .select('l')
+      .from(Leave, 'l')
+      .where(`l."userId" = :userId`, { userId })
+      .andWhere(`l."startDate" <= :lessonDate::date`, { lessonDate: date })
+      .andWhere(`l."endDate" >= :lessonDate::date`)
+      .andWhere(`l.state = :state`, { state: LeaveState.ACCEPTED })
+
+    return q.getCount()
   }
 }

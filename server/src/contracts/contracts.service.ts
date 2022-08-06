@@ -1,8 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import dayjs, { Dayjs } from 'dayjs'
 import { Brackets, DataSource, Repository } from 'typeorm'
 
+import { LessonsService } from 'src/lessons/lessons.service'
 import { timeAvailable } from 'src/users/dto/timeAvailable'
 import { Customer, Teacher, User } from 'src/users/entities'
 import { parseMultirange, UsersService } from 'src/users/users.service'
@@ -22,7 +28,11 @@ export class ContractsService {
     @InjectDataSource()
     private connection: DataSource,
 
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
+
+    @Inject(forwardRef(() => LessonsService))
+    private readonly lessonsService: LessonsService,
   ) {}
 
   async create(dto: CreateContractDto): Promise<Contract> {
@@ -37,9 +47,15 @@ export class ContractsService {
           this.usersService.findOneCustomer(id).then((c) => ({ id: c.id })),
         ),
       ),
+      parentContract: dto.parentContract ? { id: dto.parentContract } : null,
     })
 
-    return this.contractsRepository.save(contract)
+    const savedContract = await this.contractsRepository.save(contract)
+
+    if (savedContract.state === ContractState.ACCEPTED)
+      await this.lessonsService.cancelByContract(savedContract)
+
+    return savedContract
   }
 
   async findAll(): Promise<Contract[]> {
@@ -137,14 +153,24 @@ export class ContractsService {
     id: number,
     dto: AcceptOrDeclineContractDto,
   ): Promise<void> {
-    let contract: any = await this.contractsRepository.findOneBy({ id })
+    const contract = await this.contractsRepository
+      .createQueryBuilder('c')
+      .select('c')
+      .where('c.id = :id', { id })
+      .leftJoin('c.teacher', 't')
+      .addSelect('t.id')
+      .getOne()
 
-    contract = {
+    const newContract = {
       ...contract,
       ...dto,
     }
 
-    await this.contractsRepository.save(contract)
+    // cancel blocked lessons
+    if (dto.state === ContractState.ACCEPTED)
+      await this.lessonsService.cancelByContract(newContract)
+
+    await this.contractsRepository.save(newContract)
   }
 
   async suggestContracts(dto: SuggestContractsDto): Promise<any[]> {
@@ -209,9 +235,9 @@ export class ContractsService {
       .subQuery()
       .select(
         `union_multirange((
-      '{[2001-01-0' || extract(dow from "con"."startDate") || ' ' || "con"."startTime" ||
-      ', 2001-01-0' || extract(dow from "con"."startDate") || ' ' || "con"."endTime" || ')}'
-    )::tstzmultirange)`,
+          '{[2001-01-0' || extract(dow from "con"."startDate") || ' ' || "con"."startTime" ||
+          ', 2001-01-0' || extract(dow from "con"."startDate") || ' ' || "con"."endTime" || ')}'
+        )::tstzmultirange)`,
         'contractTimes',
       )
       .from(Contract, 'con')
@@ -226,15 +252,21 @@ export class ContractsService {
       .andWhere('con.state = :contractState', {
         contractState: ContractState.ACCEPTED,
       })
-      .andWhere('con.endDate > :minDate', {
-        minDate: dto.minDate ?? dayjs().format('YYYY-MM-DD'),
+      .andWhere('con.endDate > :startDate', {
+        startDate: dto.startDate ?? dayjs().format('YYYY-MM-DD'),
       })
-    if (typeof dto.maxDate !== 'undefined')
-      contractQuery.andWhere('con.startDate < :maxDate', {
-        maxDate: dto.maxDate,
+
+    if (typeof dto.endDate !== 'undefined')
+      contractQuery.andWhere('con.startDate < :endDate', {
+        endDate: dto.endDate,
       })
 
     if (dto.interval !== 1) contractQuery.andWhere('con.interval = 1')
+
+    if (dto.ignoreContracts.length)
+      contractQuery.andWhere('con.id NOT IN (:...ignoreContracts)', {
+        ignoreContracts: dto.ignoreContracts,
+      })
 
     /* MAIN QUERY */
 
@@ -264,6 +296,12 @@ export class ContractsService {
                 .orWhere('t.schoolTypes @> :requestedSchoolTypes', {requestedSchoolTypes})
             }),
           )
+
+        // suggestSubstitute: filter out original teacher
+        if (dto.originalTeacher)
+          sq.andWhere(`t.id <> :blockTeacher`, {
+            blockTeacher: dto.originalTeacher,
+          })
 
         sq.groupBy('t.id')
 
@@ -302,18 +340,27 @@ export class ContractsService {
         teacherName: a.firstName + ' ' + a.lastName,
         suggestions: await Promise.all(
           [1, 2, 3, 4, 5].flatMap((n) =>
-            parseMultirange(a[n]).map(async (r) => ({
-              ...r,
-              overlap: (
-                await this.checkOverlap(a.teacherId, dto.customers, r)
-              ).map((c) => c.id),
-            })),
+            parseMultirange(a[n])
+              .filter((r) => this.durationMinutes(r) >= 45)
+              .map(async (r) => ({
+                ...r,
+                overlap: (
+                  await this.checkOverlap(a.teacherId, dto.customers, r)
+                ).map((c) => c.id),
+              })),
           ),
         ),
       })),
     )
 
     return suggestions
+  }
+
+  durationMinutes(range: timeAvailable): number {
+    return dayjs('2001-01-01 ' + range.end).diff(
+      '2001-01-01 ' + range.start,
+      'minute',
+    )
   }
 
   async checkOverlap(
@@ -349,15 +396,8 @@ export class ContractsService {
       .leftJoin('c.subject', 'subject')
       .leftJoin('c.customers', 'customer')
       .leftJoin('customer.school', 'school')
-      .select([
-        'c',
-        'subject',
-        'customer',
-        'school'
-      ])
-      .loadAllRelationIds({
-        relations: ['teacher'],
-      })
+      .leftJoin('c.teacher', 'teacher')
+      .select(['c', 'subject', 'customer', 'school', 'teacher.id'])
       .where(
         `c.startDate <= date_trunc('week', :week::date) + interval '4 day'`,
         { week: week.format() },
@@ -374,5 +414,42 @@ export class ContractsService {
       q.andWhere('c.teacherId = :teacherId', { teacherId: teacherId })
 
     return q.getMany()
+  }
+
+  /**
+   * find blocked contracts of teacher between dates
+   */
+  async findBlocked(
+    startDate: string,
+    endDate: string,
+    teacherId: number,
+  ): Promise<Contract[]> {
+    const qb = this.connection.createQueryBuilder()
+
+    qb.select('c')
+      .from(Contract, 'c')
+      .where(`c."teacherId" = :teacherId`, { teacherId })
+      .andWhere(`c.state = :state`, { state: ContractState.ACCEPTED })
+      .andWhere(`c."startDate" <= :end::date`, { end: endDate })
+      .andWhere(`c."endDate" >= :start::date`, { start: startDate })
+      .leftJoinAndSelect('c.lessons', 'lesson')
+      .andWhere(`lesson.date >= :start::date`)
+      .andWhere(`lesson.date <= :end::date`)
+      .leftJoinAndSelect(
+        'c.childContracts',
+        'cc',
+        `cc."startDate" <= :end::date AND cc."endDate" >= :start::date`,
+      )
+      .leftJoinAndSelect('cc.teacher', 'cc_teacher')
+      .leftJoin('c.customers', 'customer')
+      .addSelect('customer.id')
+      .leftJoinAndSelect('c.subject', 'subject')
+      .leftJoin('c.teacher', 'teacher')
+      .addSelect('teacher.id')
+
+    const contracts: Contract[] = await qb.getMany()
+
+    // if no lessons (between given dates) are found, contract is not affected
+    return contracts.filter((c) => c.lessons.length > 0)
   }
 }

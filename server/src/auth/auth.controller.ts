@@ -1,21 +1,11 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common'
+import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common'
 
 import { UsersService } from 'src/users/users.service'
 
 import { AuthService } from './auth.service'
 import { Public } from './decorators/public.decorator'
-import { Roles } from './decorators/roles.decorator'
 import { ResetPasswordDto } from './dto/reset-password.dto'
 import { LocalAuthGuard } from './guards/local-auth.guard'
-import { Role } from './role.enum'
 
 @Controller('auth')
 export class AuthController {
@@ -38,10 +28,10 @@ export class AuthController {
 
   @Public()
   @Post('reset/mail')
-  async adminReset(@Body() body: {mail: string}) {
+  async adminReset(@Body() body: { mail: string }) {
     const user = await this.usersService.findByEmailAuth(body.mail)
 
-    return this.authService.initReset(user)
+    this.authService.initReset(user)
   }
 
   @Public()

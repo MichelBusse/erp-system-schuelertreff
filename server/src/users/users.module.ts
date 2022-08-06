@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { AuthModule } from 'src/auth/auth.module'
+import { LessonsModule } from 'src/lessons/lessons.module'
 
 import {
   Admin,
@@ -13,6 +14,7 @@ import {
   User,
 } from './entities'
 import { Invoice } from '../lessons/invoice.entity'
+import { Leave } from './entities/leave.entity'
 import { UsersController } from './users.controller'
 import { UsersService } from './users.service'
 
@@ -26,8 +28,10 @@ import { UsersService } from './users.service'
       Teacher,
       Admin,
       ClassCustomer,
+      Leave,
     ]),
     forwardRef(() => AuthModule),
+    forwardRef(() => LessonsModule),
   ],
   providers: [UsersService],
   controllers: [UsersController],

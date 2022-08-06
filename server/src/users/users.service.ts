@@ -1,16 +1,22 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import * as argon2 from 'argon2'
 import dayjs from 'dayjs'
 import { DataSource, Not, Repository } from 'typeorm'
 
 import { Contract } from 'src/contracts/contract.entity'
+import { LessonsService } from 'src/lessons/lessons.service'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolDto } from './dto/create-school.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
+import { LeaveDto } from './dto/leave.dto'
 import { timeAvailable } from './dto/timeAvailable'
 import { UpdateClassCustomerDto } from './dto/update-classCustomer.dto'
 import { UpdatePrivateCustomerDto } from './dto/update-privateCustomer.dto'
@@ -26,6 +32,7 @@ import {
   Teacher,
   User,
 } from './entities'
+import { Leave, LeaveState } from './entities/leave.entity'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
 import { Invoice } from '../lessons/invoice.entity'
@@ -101,6 +108,8 @@ export class UsersService {
 
     @InjectDataSource()
     private connection: DataSource,
+
+    private readonly lessonsService: LessonsService,
   ) {}
 
   /**
@@ -135,6 +144,131 @@ export class UsersService {
       .where({ email: email })
       .addSelect(['user.passwordHash', 'user.mayAuthenticate'])
       .getOne()
+  }
+
+  /**
+   * Detect the file type of a `Buffer`, `Uint8Array`, or `ArrayBuffer`.
+   *
+   * @returns The detected file type and MIME type, or `undefined` when there is no match.
+   **/
+  async fileTypeFromBuffer(buffer: Uint8Array | ArrayBuffer) {
+    // workaround for a bug in typescript: https://github.com/microsoft/TypeScript/issues/43329#issuecomment-1008361973
+    return (
+      Function('return import("file-type")')() as Promise<
+        typeof import('file-type')
+      >
+    ).then((f) => f.fileTypeFromBuffer(buffer))
+  }
+
+  async createLeave(userId: number, dto: LeaveDto): Promise<Leave> {
+    const repo = this.connection.getRepository(Leave)
+
+    const leave = repo.create({
+      user: { id: userId },
+      type: dto.type,
+      startDate: dto.startDate,
+      endDate: dto.endDate,
+      state: dto.state,
+    })
+
+    // cancel lessons of intersecting contracts
+    if (dto.state === LeaveState.ACCEPTED) {
+      await this.lessonsService.cancelByLeave(leave)
+    }
+
+    return repo.save(leave)
+  }
+
+  async updateLeave(id: number, userId: number, dto: LeaveDto): Promise<Leave> {
+    const repo = this.connection.getRepository(Leave)
+
+    const leave = await repo
+      .createQueryBuilder('l')
+      .where('l."userId" = :userId', { userId })
+      .andWhere('l.id = :id', { id })
+      .leftJoin('l.user', 'u')
+      .addSelect('u.id')
+      .getOneOrFail()
+
+    if (!leave.hasAttachment && typeof dto.attachment !== 'undefined') {
+      return repo.save({ ...leave, attachment: dto.attachment })
+    }
+
+    // leave cannot be edited after it was accepted/declined
+    if (leave.state !== LeaveState.PENDING) throw new BadRequestException()
+
+    const newLeave = {
+      ...leave,
+      ...dto,
+    }
+
+    // cancel lessons of intersecting contracts
+    if (dto.state === LeaveState.ACCEPTED) {
+      await this.lessonsService.cancelByLeave(newLeave)
+    }
+
+    return repo.save(newLeave)
+  }
+
+  async deleteLeave(id: number, userId: number) {
+    const repo = this.connection.getRepository(Leave)
+
+    return repo
+      .createQueryBuilder()
+      .delete()
+      .from(Leave)
+      .where('"userId" = :userId', { userId })
+      .andWhere('id = :id', { id })
+      .execute()
+  }
+
+  async getLeaveAttachment(id: number, userId: number): Promise<Buffer> {
+    const q = this.connection
+      .createQueryBuilder()
+      .from(Leave, 'l')
+      .addSelect('l.attachment')
+      .where('l.id = :id', { id })
+      .andWhere('l."userId" = :userId', { userId })
+
+    const leave = await q.getOne()
+
+    if (leave === null || leave.attachment === null)
+      throw new NotFoundException()
+
+    return leave.attachment
+  }
+
+  async getLeaves(state: LeaveState): Promise<Leave[]> {
+    const q = this.connection
+      .createQueryBuilder()
+      .select('l')
+      .from(Leave, 'l')
+      .leftJoin('l.user', 'u')
+      .addSelect('u.id')
+      .addSelect('u.firstName')
+      .addSelect('u.lastName')
+      .where('l."userId" IS NOT NULL')
+      .andWhere('l."state" = :state', { state })
+      .andWhere(`l."endDate" > now() - interval '1 day'`)
+
+    return q.getMany()
+  }
+
+  async getIntersectingLeaves(start: string, end: string): Promise<Leave[]> {
+    const qb = this.connection.createQueryBuilder()
+
+    qb.select('l')
+      .from(Leave, 'l')
+      .leftJoin('l.user', 'u')
+      .addSelect('u.id')
+      .addSelect('u.firstName')
+      .addSelect('u.lastName')
+      .where('l."userId" IS NOT NULL')
+      .andWhere(`l.state = :state`, { state: LeaveState.ACCEPTED })
+      .andWhere(`l.startDate < :end::date`, { end })
+      .andWhere(`l.endDate > :start::date`, { start })
+
+    return qb.getMany()
   }
 
   /**

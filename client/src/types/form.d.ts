@@ -4,7 +4,7 @@ import { SchoolType, TeacherState } from './enums'
 import { LessonState } from './lesson'
 import subject from './subject'
 import timeAvailable from './timeAvailable'
-import { customer, teacher } from './user'
+import { classCustomer, customer, privateCustomer, teacher } from './user'
 
 export interface userForm {
   firstName: string
@@ -25,8 +25,7 @@ export interface teacherForm extends userForm {
   state: TeacherState
 }
 
-export interface schoolForm
-  extends Omit<userForm, 'timesAvailable'> {
+export interface schoolForm extends Omit<userForm, 'timesAvailable'> {
   schoolName: string
   schoolTypes: string[]
   fee: number
@@ -61,4 +60,31 @@ export type contractForm = {
   interval: number
   customers: customer[]
   subject: subject | null
+}
+
+export type ContractFilterForm = {
+  school: {
+    id: number
+    schoolName: string
+  } | null
+  classCustomers: classCustomer[]
+  privateCustomers: privateCustomer[]
+  subject: subject | null
+  interval: number
+  startDate: Dayjs | null
+  endDate: Dayjs | null
+  customerType: CustomerType
+}
+
+export type ContractCreationForm = {
+  startDate: Dayjs | null
+  endDate: Dayjs | null
+  startTime: Dayjs | null
+  endTime: Dayjs | null
+  minTime: Dayjs | null
+  maxTime: Dayjs | null
+  teacher: string
+  teacherConfirmation: boolean
+  dow: number
+  selsuggestion: string
 }

@@ -1,11 +1,19 @@
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
-import { Box, IconButton, Stack, Typography } from '@mui/material'
+import {
+  Box,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Stack,
+  Typography,
+} from '@mui/material'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
-import { ContractState, contractWithTeacher } from '../../types/contract'
+import { contractWithTeacher } from '../../types/contract'
 import { useAuth } from '../AuthProvider'
 import ContractDialog from '../ContractDialog'
 
@@ -23,7 +31,6 @@ const PendingContracts: React.FC = () => {
 
   useEffect(() => {
     API.get('contracts/pending').then((res) => {
-      console.log(res.data)
       setPendingContracts(res.data)
     })
   }, [refresh])
@@ -52,40 +59,46 @@ const PendingContracts: React.FC = () => {
       <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px' }}>
         <Stack direction="column" spacing={2}>
           <Typography variant="h6">Ausstehende Verträge</Typography>
-          <Stack direction="column" spacing={2}>
-            {pendingContracts.map((contract) => {
-              return (
-                <Stack
-                  direction={'row'}
-                  alignItems={'center'}
-                  justifyContent={'space-between'}
-                  key={contract.id}
-                  sx={{
-                    padding: '2px 16px',
-                    borderRadius: '50px',
-                    background:
-                      contract.state === ContractState.PENDING
-                        ? '#cccccc'
-                        : '#cc6e6e',
-                  }}
-                >
-                  <span>
-                    {contract.teacher.firstName} {contract.teacher.lastName}
-                  </span>
-                  <span>{contract.subject.name}</span>
-                  <span>{dayjs(contract.startDate).format('dddd')}s</span>
-                  <div>
+          <List
+            dense={true}
+            sx={{
+              backgroundColor: '#f5f5f5',
+              borderRadius: '4px',
+              margin: '5px 0',
+            }}
+          >
+            {pendingContracts.length === 0 && (
+              <ListItem>
+                <ListItemText primary="keine Einträge" />
+              </ListItem>
+            )}
+            {pendingContracts.map((contract) => (
+              <ListItem
+                key={contract.id}
+                secondaryAction={
+                  <>
                     <IconButton onClick={() => editContract(contract)}>
                       <EditIcon />
                     </IconButton>
                     <IconButton onClick={() => deleteContract(contract.id)}>
                       <DeleteIcon />
                     </IconButton>
-                  </div>
-                </Stack>
-              )
-            })}
-          </Stack>
+                  </>
+                }
+              >
+                <ListItemText
+                  primary={`${contract.teacher.firstName} ${contract.teacher.lastName}`}
+                  secondary={
+                    dayjs(contract.startDate).format('dddd') +
+                    ' ' +
+                    dayjs(contract.startTime, 'HH:mm').format('HH:mm') +
+                    ' - ' +
+                    dayjs(contract.endTime, 'HH:mm').format('HH:mm')
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
         </Stack>
       </Box>
       <ContractDialog
