@@ -20,7 +20,6 @@ import { leave, teacher } from '../../types/user'
 import { formatDate, getNextDow } from '../../utils/date'
 import { useAuth } from '../AuthProvider'
 import BetterTimePicker from '../BetterTimePicker'
-import EqualStack from '../EqualStack'
 import IconButtonAdornment from '../IconButtonAdornment'
 
 export type suggestion = {
@@ -190,53 +189,41 @@ const ContractCreation: React.FC<Props> = ({
             ))}
         </Select>
       </FormControl>
-      <EqualStack direction="row" spacing={2}>
-        <FormControl variant="outlined" fullWidth required>
-          <InputLabel htmlFor="weekday-select">Wochentag</InputLabel>
-          <Select
-            id="weekday-select"
-            label={'Wochentag'}
-            value={form.dow}
-            disabled={form.selsuggestion !== ''}
-            onChange={(e) => {
-              setForm((data) => ({
-                ...data,
-                dow: e.target.value as number,
-                startDate:
-                  minStartDate &&
-                  getNextDow(e.target.value as number, minStartDate),
-              }))
-            }}
-          >
-            <MenuItem value={1}>{`Montag (Start: ${
-              minStartDate
-                ? getNextDow(1, minStartDate).format('DD.MM.YYYY')
-                : ''
-            })`}</MenuItem>
-            <MenuItem value={2}>{`Dienstag (Start: ${
-              minStartDate
-                ? getNextDow(2, minStartDate).format('DD.MM.YYYY')
-                : ''
-            })`}</MenuItem>
-            <MenuItem value={3}>{`Mittwoch (Start: ${
-              minStartDate
-                ? getNextDow(3, minStartDate).format('DD.MM.YYYY')
-                : ''
-            })`}</MenuItem>
-            <MenuItem value={4}>{`Donnerstag (Start: ${
-              minStartDate
-                ? getNextDow(4, minStartDate).format('DD.MM.YYYY')
-                : ''
-            })`}</MenuItem>
-            <MenuItem value={5}>{`Freitag (Start: ${
-              minStartDate
-                ? getNextDow(5, minStartDate).format('DD.MM.YYYY')
-                : ''
-            })`}</MenuItem>
-          </Select>
-        </FormControl>
-      </EqualStack>
-      <EqualStack direction="row" spacing={2}>
+      <FormControl variant="outlined" fullWidth required>
+        <InputLabel htmlFor="weekday-select">Wochentag</InputLabel>
+        <Select
+          id="weekday-select"
+          label={'Wochentag'}
+          value={form.dow}
+          disabled={form.selsuggestion !== ''}
+          onChange={(e) => {
+            setForm((data) => ({
+              ...data,
+              dow: e.target.value as number,
+              startDate:
+                minStartDate &&
+                getNextDow(e.target.value as number, minStartDate),
+            }))
+          }}
+        >
+          <MenuItem value={1}>{`Montag (Start: ${
+            minStartDate ? getNextDow(1, minStartDate).format('DD.MM.YYYY') : ''
+          })`}</MenuItem>
+          <MenuItem value={2}>{`Dienstag (Start: ${
+            minStartDate ? getNextDow(2, minStartDate).format('DD.MM.YYYY') : ''
+          })`}</MenuItem>
+          <MenuItem value={3}>{`Mittwoch (Start: ${
+            minStartDate ? getNextDow(3, minStartDate).format('DD.MM.YYYY') : ''
+          })`}</MenuItem>
+          <MenuItem value={4}>{`Donnerstag (Start: ${
+            minStartDate ? getNextDow(4, minStartDate).format('DD.MM.YYYY') : ''
+          })`}</MenuItem>
+          <MenuItem value={5}>{`Freitag (Start: ${
+            minStartDate ? getNextDow(5, minStartDate).format('DD.MM.YYYY') : ''
+          })`}</MenuItem>
+        </Select>
+      </FormControl>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
         <BetterTimePicker
           label="Startzeit"
           required
@@ -265,7 +252,7 @@ const ContractCreation: React.FC<Props> = ({
             setForm((data) => ({ ...data, endTime: null }))
           }}
         />
-      </EqualStack>
+      </Stack>
 
       <FormControlLabel
         label="Bestätigung der Lehrkraft anfordern"

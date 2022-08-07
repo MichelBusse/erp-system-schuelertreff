@@ -204,7 +204,7 @@ const PrivateCustomerDetailView: React.FC = () => {
             />
           </Stack>
           <h3>Adresse:</h3>
-          <Stack direction="row" columnGap={2}>
+          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
             <TextField
               helperText={errors.street}
               label="Straße"
@@ -252,7 +252,7 @@ const PrivateCustomerDetailView: React.FC = () => {
             />
           </Stack>
           <h3>Kontakt:</h3>
-          <Stack direction="row" columnGap={2}>
+          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
             <TextField
               fullWidth={true}
               helperText={errors.email}
@@ -282,7 +282,7 @@ const PrivateCustomerDetailView: React.FC = () => {
               value={data.phone}
             />
           </Stack>
-          <h3>Weitere Infos</h3>
+          <h3>Weitere Infos:</h3>
           <Stack direction="row" columnGap={2}>
             <FormControl fullWidth>
               <InputLabel id="invoiceMonthLabel">Schulart</InputLabel>
@@ -369,7 +369,7 @@ const PrivateCustomerDetailView: React.FC = () => {
             fullWidth
             rows={3}
           />
-          <Stack direction={'row'} columnGap={5} sx={{ marginTop: '15px' }}>
+          <Stack direction={{xs: "column", sm:"row"}} spacing={2} sx={{ marginTop: '15px' }}>
             {id && (
               <Button
                 onClick={() => {

@@ -40,3 +40,26 @@
     }
   }
 }
+
+@media only screen and (max-width: 899px) {
+  /* For mobile phones: */
+  .wrapper {
+    padding-bottom: 82px;
+  }
+}
+
+@media only screen and (max-width: 599px) {
+  /* For mobile phones: */
+  .wrapper {
+    padding: 0px;
+    padding-bottom: 32px;
+  }
+}
+
+@media only screen and (max-width: 599px) {
+  /* For mobile phones: */
+  .pageWrapper {
+    padding: 16px;
+    padding-bottom: 32px;
+  }
+}

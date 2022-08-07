@@ -4,6 +4,7 @@ import {
   DataGrid,
   getGridStringOperators,
   GridColumns,
+  GridColumnVisibilityModel,
   GridEventListener,
   GridRowSpacingParams,
   GridToolbarContainer,
@@ -18,50 +19,7 @@ import { dataGridLocaleText } from '../consts'
 import { school } from '../types/user'
 import styles from './gridList.module.scss'
 
-//definition of the columns
-const cols: GridColumns = [
-  {
-    field: 'customerName',
-    headerClassName: 'DataGridHead',
-    headerName: 'Name',
-    minWidth: 300,
-    flex: 1,
-    filterOperators: getGridStringOperators().filter(
-      (operator) => operator.value === 'contains',
-    ),
-    renderCell: (params) => (
-      <div
-        style={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          paddingLeft: 15,
-        }}
-      >
-        {params.value}
-      </div>
-    ),
-  },
-  {
-    field: 'customerEmail',
-    headerClassName: 'DataGridHead',
-    filterOperators: getGridStringOperators().filter(
-      (operator) => operator.value === 'contains',
-    ),
-    headerName: 'Email',
-    minWidth: 300,
-    flex: 1,
-  },
-  {
-    field: 'customerPhone',
-    headerClassName: 'DataGridHead',
-    filterOperators: getGridStringOperators().filter(
-      (operator) => operator.value === 'contains',
-    ),
-    headerName: 'Phone',
-    minWidth: 300,
-    flex: 1,
-  },
-]
+import useMeasure from 'react-use-measure'
 
 const Schools: React.FC = () => {
   const [open, setOpen] = useState(false)
@@ -70,11 +28,81 @@ const Schools: React.FC = () => {
   const location = useLocation()
 
   const { API } = useAuth()
+  
+  const [ref, bounds] = useMeasure()
+  const small = bounds.width < 600
+
+  const [columnVisibilityModel, setColumnVisibilityModel] =
+    useState<GridColumnVisibilityModel>({
+      customerName: true,
+      customerEmail: true,
+      customerPhone: true,
+    })
 
   //Get subjects, teachers from DB
   useEffect(() => {
     API.get(`users/school`).then((res) => setCustomers(res.data))
   }, [location])
+
+  useEffect(() => {
+    if(small){
+      setColumnVisibilityModel({
+        customerName: true,
+        customerEmail: true,
+        customerPhone: false,
+      })
+    }else{
+      setColumnVisibilityModel({
+        customerName: true,
+        customerEmail: true,
+        customerPhone: true,
+      })
+    }
+  }, [small])
+
+  //definition of the columns
+  const cols: GridColumns = [
+    {
+      field: 'customerName',
+      headerClassName: 'DataGridHead',
+      headerName: 'Name',
+      minWidth: 160,
+      flex: 1.5,
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains',
+      ),
+      renderCell: (params) => (
+        <div
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            paddingLeft: 15,
+          }}
+        >
+          {params.value}
+        </div>
+      ),
+    },
+    {
+      field: 'customerEmail',
+      headerClassName: 'DataGridHead',
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains',
+      ),
+      headerName: 'Email',
+      minWidth: 160,
+      flex: 1,
+    },
+    {
+      field: 'customerPhone',
+      headerClassName: 'DataGridHead',
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains',
+      ),
+      headerName: 'Phone',
+      flex: 1,
+    },
+  ]
 
   //creating rows out of the teachers
   const rows = customers.map((customer) => ({
@@ -99,13 +127,21 @@ const Schools: React.FC = () => {
   }
 
   return (
-    <div className={styles.wrapper} style={{ minHeight: '100vh' }}>
+    <div
+      className={styles.wrapper + ' ' + styles.pageWrapper}
+      style={{ minHeight: '100vh' }}
+    >
       <div style={{ flexGrow: 1 }}>
         <DataGrid
           headerHeight={0}
           disableSelectionOnClick={true}
           onRowClick={onRowClick}
           localeText={dataGridLocaleText}
+          columnVisibilityModel={columnVisibilityModel}
+          onColumnVisibilityModelChange={(newModel) =>
+            setColumnVisibilityModel(newModel)
+          }
+          ref={ref}
           components={{
             Toolbar: () => (
               <GridToolbarContainer

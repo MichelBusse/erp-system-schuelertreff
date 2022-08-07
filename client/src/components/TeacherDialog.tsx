@@ -64,13 +64,14 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
   return (
     <Dialog open={open}>
       <DialogTitle>Lehrkraft hinzufügen</DialogTitle>
-      <DialogContent sx={{ boxSizing: 'border-box', minWidth: '400px' }}>
+      <DialogContent sx={{ width: '300px' }}>
         <Stack
           direction={'column'}
           rowGap={3}
           alignItems={'stretch'}
           sx={{ paddingTop: '15px' }}
         >
+          <Stack direction={'column'} spacing={2}>
           <TextField
             fullWidth
             variant="outlined"
@@ -94,7 +95,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
             }
           />
           <TextField
-            fullWidth
+            fullWidth={true}
             required={true}
             id="email"
             label="E-Mail"
@@ -104,6 +105,7 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
               setForm((data) => ({ ...data, email: event.target.value }))
             }
           />
+          </Stack>
         </Stack>
       </DialogContent>
       <DialogActions>

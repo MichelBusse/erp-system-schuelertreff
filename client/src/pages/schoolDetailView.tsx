@@ -310,7 +310,7 @@ const SchoolDetailView: React.FC = () => {
       >
         <Stack direction="column" alignItems={'stretch'}>
           <h3>Schule:</h3>
-          <Stack direction="row" columnGap={2}>
+          <Stack direction={{xs: "column", md:"row"}} spacing={2}>
             <TextField
               fullWidth={true}
               label="Schulname"
@@ -358,7 +358,7 @@ const SchoolDetailView: React.FC = () => {
             />
           </Stack>
           <h3>Adresse:</h3>
-          <Stack direction="row" columnGap={2}>
+          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
             <TextField
               label="Straße"
               fullWidth={true}
@@ -419,7 +419,7 @@ const SchoolDetailView: React.FC = () => {
             />
           </Stack>
           <h3>Kontakt:</h3>
-          <Stack direction="row" columnGap={2}>
+          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
             <TextField fullWidth={true} label="Email" value={school.email} />
 
             <TextField
@@ -556,7 +556,7 @@ const SchoolDetailView: React.FC = () => {
               </AccordionDetails>
             </Accordion>
           ))}
-          <Stack direction={'row'} columnGap={5} sx={{ marginTop: '15px' }}>
+          <Stack direction={{xs: "column", sm:"row"}} spacing={2} sx={{ marginTop: '15px' }}>
             {id && (
               <Button
                 onClick={() => {

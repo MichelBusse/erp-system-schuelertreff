@@ -106,12 +106,26 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
           </Stack>
           <Stack direction={'row'} columnGap={2}>
             <TextField
+              helperText={errors.street}
+              id="street"
+              label="Straße"
+              variant="outlined"
+              required={true}
+              fullWidth={true}
+              value={data.street}
+              onChange={(event) =>
+                setData((data) => ({ ...data, street: event.target.value }))
+              }
+            />
+          </Stack>
+          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
+            <TextField
               helperText={errors.city}
               id="city"
               label="Stadt"
               variant="outlined"
               required={true}
-              sx={{ width: '70%' }}
+              fullWidth={true}
               value={data.city}
               onChange={(event) =>
                 setData((data) => ({ ...data, city: event.target.value }))
@@ -123,35 +137,21 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
               label="Postleitzahl"
               variant="outlined"
               required={true}
-              sx={{ width: '30%' }}
+              fullWidth={true}
               value={data.postalCode}
               onChange={(event) =>
                 setData((data) => ({ ...data, postalCode: event.target.value }))
               }
             />
           </Stack>
-          <Stack direction={'row'} columnGap={2}>
-            <TextField
-              helperText={errors.street}
-              id="street"
-              label="Straße"
-              variant="outlined"
-              required={true}
-              fullWidth
-              value={data.street}
-              onChange={(event) =>
-                setData((data) => ({ ...data, street: event.target.value }))
-              }
-            />
-          </Stack>
-          <Stack direction={'row'} columnGap={2}>
+          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
             <TextField
               helperText={errors.email}
               id="email"
               label="E-Mail Adresse"
               variant="outlined"
               required={true}
-              sx={{ width: '60%' }}
+              fullWidth={true}
               value={data.email}
               onChange={(event) =>
                 setData((data) => ({ ...data, email: event.target.value }))
@@ -163,7 +163,7 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
               label="Telefonnummer"
               variant="outlined"
               required={true}
-              sx={{ width: '40%' }}
+              fullWidth={true}
               value={data.phone}
               onChange={(event) =>
                 setData((data) => ({ ...data, phone: event.target.value }))

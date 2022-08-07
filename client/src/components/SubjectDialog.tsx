@@ -4,6 +4,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Stack,
   TextField,
 } from '@mui/material'
 import { useSnackbar } from 'notistack'
@@ -118,30 +119,32 @@ const SubjectDialog: React.FC<Props> = ({
         Fach {initialSubject ? 'bearbeiten' : 'hinzufügen'}
       </DialogTitle>
       <DialogContent>
-        <TextField
-          helperText={errors.name}
-          id="subjectName"
-          label="Fachbezeichnung"
-          variant="outlined"
-          required={true}
-          sx={{ margin: '10px', marginLeft: '0px' }}
-          value={data.name}
-          onChange={(event) =>
-            setData((data) => ({ ...data, name: event.target.value }))
-          }
-        />
-        <TextField
-          helperText={errors.shortForm}
-          id="shortForm"
-          label="Abkürzung"
-          variant="outlined"
-          required={true}
-          sx={{ margin: '10px' }}
-          value={data.shortForm}
-          onChange={(event) =>
-            setData((data) => ({ ...data, shortForm: event.target.value }))
-          }
-        />
+        <Stack direction={{xs: "column", sm:"row"}} spacing={2} sx={{marginBottom: '20px'}}>
+          <TextField
+            helperText={errors.name}
+            id="subjectName"
+            label="Fachbezeichnung"
+            variant="outlined"
+            required={true}
+            fullWidth={true}
+            value={data.name}
+            onChange={(event) =>
+              setData((data) => ({ ...data, name: event.target.value }))
+            }
+          />
+          <TextField
+            helperText={errors.shortForm}
+            id="shortForm"
+            label="Abkürzung"
+            variant="outlined"
+            required={true}
+            fullWidth={true}
+            value={data.shortForm}
+            onChange={(event) =>
+              setData((data) => ({ ...data, shortForm: event.target.value }))
+            }
+          />
+        </Stack>
         <SketchPicker
           color={data.color}
           onChange={(color) =>
