@@ -4,6 +4,8 @@ import {
 } from '@mui/icons-material'
 import LogoutIcon from '@mui/icons-material/Logout'
 import {
+  BottomNavigation,
+  BottomNavigationAction,
   Divider,
   Drawer,
   IconButton,
@@ -21,6 +23,8 @@ import { NavLink as NavLinkBase, NavLinkProps } from 'react-router-dom'
 
 import logo from '../assets/logo.png'
 import { useAuth } from './AuthProvider'
+
+import { useTheme } from '@mui/material/styles'
 
 const drawerWidth = 240
 
@@ -68,8 +72,18 @@ const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
   const toggleDrawer = () => setOpen(!open)
   const { isAuthed, handleLogout, decodeToken } = useAuth()
 
+  const theme = useTheme()
+
   return (
-    <StyledDrawer variant="permanent" open={open}>
+    <StyledDrawer
+      variant="permanent"
+      open={open}
+      sx={{
+        [theme.breakpoints.down('md')]: {
+          display: 'none',
+        },
+      }}
+    >
       <Toolbar
         sx={{
           display: 'flex',

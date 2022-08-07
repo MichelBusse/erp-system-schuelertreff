@@ -38,8 +38,8 @@ const Subjects: React.FC = () => {
 
   return (
     <Box sx={{ p: 4 }} className={styles.wrapper}>
-      <Grid container spacing={4} columns={24}>
-        <Grid item sm={12} md={6} lg={4} xl={3}>
+      <Grid container spacing={{xs: 2, sm: 3, md: 4, lg: 5}} columns={24}>
+        <Grid item xs={12} sm={8} md={8} lg={6} xl={4}>
           <IconButton
             className={styles.card}
             onClick={() => openSubjectDialog()}
@@ -48,7 +48,7 @@ const Subjects: React.FC = () => {
           </IconButton>
         </Grid>
         {subjects.map((subject) => (
-          <Grid key={subject.id} item sm={12} md={6} lg={4} xl={3}>
+          <Grid key={subject.id} item xs={12} sm={8} md={8} lg={6} xl={4}>
             <Paper
               className={styles.card}
               sx={{ whiteSpace: 'nowrap', cursor: 'pointer' }}

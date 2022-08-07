@@ -26,6 +26,8 @@ import ContractCreation, { suggestion } from './contractDialog/ContractCreation'
 import Filter from './contractDialog/Filter'
 import { ContractType } from '../types/enums'
 
+import { useTheme } from '@mui/material/styles'
+
 dayjs.extend(customParseFormat)
 
 export enum CustomerType {
@@ -50,6 +52,7 @@ const ContractDialog: React.FC<Props> = ({
   const { enqueueSnackbar } = useSnackbar()
 
   const [activeStep, setActiveStep] = useState(0)
+  const theme = useTheme()
 
   // step 0
   const [loading0, setLoading0] = useState(false)
@@ -62,7 +65,7 @@ const ContractDialog: React.FC<Props> = ({
     startDate: dayjs().add(1, 'day'),
     endDate: dayjs().add(1, 'day').add(1, 'year'),
     customerType: CustomerType.PRIVATE,
-    contractType: ContractType.STANDARD
+    contractType: ContractType.STANDARD,
   })
 
   // step 1
@@ -302,20 +305,34 @@ const ContractDialog: React.FC<Props> = ({
   ]
 
   return (
-    <Dialog open={open}>
+    <Dialog
+      open={open}
+    >
       <DialogTitle>Einsatz hinzufügen</DialogTitle>
       <DialogContent
         sx={{
-          width: 500,
           '& .MuiStepConnector-root': {
             maxWidth: '100px',
+          },
+          [theme.breakpoints.down('sm')]: {
+            width: '82vw',
           },
         }}
       >
         <Stepper activeStep={activeStep}>
           {steps.map((step) => (
             <Step key={step.label}>
-              <StepLabel>{step.label}</StepLabel>
+              <StepLabel>
+                <Box
+                  sx={{
+                    [theme.breakpoints.down('sm')]: {
+                      display: 'none',
+                    },
+                  }}
+                >
+                  {step.label}
+                </Box>
+              </StepLabel>
             </Step>
           ))}
         </Stepper>

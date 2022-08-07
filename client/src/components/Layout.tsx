@@ -12,6 +12,7 @@ import { Outlet } from 'react-router-dom'
 
 import { TeacherState } from '../types/enums'
 import { useAuth } from './AuthProvider'
+import BottomMenu from './BottomMenu'
 import MainMenu from './MainMenu'
 
 const menuItems = [
@@ -19,6 +20,7 @@ const menuItems = [
     icon: ExploreIcon,
     text: 'Cockpit',
     href: '/cockpit',
+    roles: ['admin'],
   },
   {
     icon: TableChartIcon,
@@ -80,6 +82,14 @@ const Layout: React.FC = () => {
           overflow: 'auto',
         }}
       >
+        {
+        // hide menu for non-employed teachers
+        !(
+          isAuthed() &&
+          decodeToken().role === 'teacher' &&
+          decodeToken().state !== TeacherState.EMPLOYED
+        ) && <BottomMenu items={menuItems} />
+        }
         <Outlet />
       </Box>
     </Box>

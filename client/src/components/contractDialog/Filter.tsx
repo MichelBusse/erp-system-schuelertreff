@@ -24,7 +24,6 @@ import subject from '../../types/subject'
 import { classCustomer, privateCustomer, school } from '../../types/user'
 import { useAuth } from '../AuthProvider'
 import { CustomerType } from '../ContractDialog'
-import EqualStack from '../EqualStack'
 import IconButtonAdornment from '../IconButtonAdornment'
 
 dayjs.extend(customParseFormat)
@@ -217,8 +216,9 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
         <SchoolSelect />
       )}
 
-      <EqualStack direction="row" spacing={2}>
+      <Stack direction="row" spacing={2}>
         <Autocomplete
+          fullWidth
           options={subjects}
           getOptionLabel={(o) => o.name}
           isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -234,6 +234,7 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
           variant="outlined"
           type="number"
           value={form.interval}
+          sx={{width: '150px'}}
           onChange={(e) => {
             let value = parseInt(e.target.value, 10) || 1
             value = Math.max(1, Math.min(value, 4))
@@ -250,8 +251,8 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
             },
           }}
         />
-      </EqualStack>
-      <EqualStack direction="row" spacing={2}>
+      </Stack>
+      <Stack direction={{xs: "column", sm: 'row'}} spacing={2}>
         <DatePicker
           label="Startdatum"
           mask="__.__.____"
@@ -312,7 +313,7 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
             ),
           }}
         />
-      </EqualStack>
+      </Stack>
       <Select
         value={form.contractType}
         onChange={(e) => setForm((f) => ({...f, contractType: e.target.value as ContractType}))}

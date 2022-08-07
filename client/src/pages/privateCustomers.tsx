@@ -1,9 +1,10 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import { IconButton } from '@mui/material'
+import { Box, IconButton } from '@mui/material'
 import {
   DataGrid,
   getGridStringOperators,
   GridColumns,
+  GridColumnVisibilityModel,
   GridEventListener,
   GridRowSpacingParams,
   GridToolbarContainer,
@@ -18,50 +19,7 @@ import { dataGridLocaleText } from '../consts'
 import { privateCustomer } from '../types/user'
 import styles from './gridList.module.scss'
 
-//definition of the columns
-const cols: GridColumns = [
-  {
-    field: 'customerName',
-    headerClassName: 'DataGridHead',
-    headerName: 'Name',
-    minWidth: 300,
-    flex: 1,
-    filterOperators: getGridStringOperators().filter(
-      (operator) => operator.value === 'contains',
-    ),
-    renderCell: (params) => (
-      <div
-        style={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          paddingLeft: 15,
-        }}
-      >
-        {params.value}
-      </div>
-    ),
-  },
-  {
-    field: 'customerEmail',
-    headerClassName: 'DataGridHead',
-    headerName: 'Email',
-    filterOperators: getGridStringOperators().filter(
-      (operator) => operator.value === 'contains',
-    ),
-    minWidth: 300,
-    flex: 1,
-  },
-  {
-    field: 'customerPhone',
-    headerClassName: 'DataGridHead',
-    headerName: 'Phone',
-    filterOperators: getGridStringOperators().filter(
-      (operator) => operator.value === 'contains',
-    ),
-    minWidth: 300,
-    flex: 1,
-  },
-]
+import useMeasure from 'react-use-measure'
 
 const PrivateCustomers: React.FC = () => {
   const [open, setOpen] = useState(false)
@@ -71,10 +29,80 @@ const PrivateCustomers: React.FC = () => {
 
   const { API } = useAuth()
 
+  const [ref, bounds] = useMeasure()
+  const small = bounds.width < 600
+
+  const [columnVisibilityModel, setColumnVisibilityModel] =
+    useState<GridColumnVisibilityModel>({
+      customerName: true,
+      customerEmail: true,
+      customerPhone: true,
+    })
+
   //Get subjects, teachers from DB
   useEffect(() => {
     API.get(`users/privateCustomer`).then((res) => setCustomers(res.data))
   }, [location])
+
+  useEffect(() => {
+    if(small){
+      setColumnVisibilityModel({
+        customerName: true,
+        customerEmail: true,
+        customerPhone: false,
+      })
+    }else{
+      setColumnVisibilityModel({
+        customerName: true,
+        customerEmail: true,
+        customerPhone: true,
+      })
+    }
+  }, [small])
+
+  //definition of the columns
+  const cols: GridColumns = [
+    {
+      field: 'customerName',
+      headerClassName: 'DataGridHead',
+      headerName: 'Name',
+      flex: 1.5,
+      minWidth: 160,
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains',
+      ),
+      renderCell: (params) => (
+        <div
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            paddingLeft: 15,
+          }}
+        >
+          {params.value}
+        </div>
+      ),
+    },
+    {
+      field: 'customerEmail',
+      headerClassName: 'DataGridHead',
+      headerName: 'Email',
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains',
+      ),
+      flex: 1,
+      minWidth: 160,
+    },
+    {
+      field: 'customerPhone',
+      headerClassName: 'DataGridHead',
+      headerName: 'Phone',
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains',
+      ),
+      flex: 1,
+    },
+  ]
 
   //creating rows out of the teachers
   const rows = customers.map((customer) => ({
@@ -99,9 +127,14 @@ const PrivateCustomers: React.FC = () => {
   }
 
   return (
-    <div className={styles.wrapper} style={{ minHeight: '100vh' }}>
+    <div className={styles.wrapper + " " + styles.pageWrapper} style={{ minHeight: '100vh' }}>
       <div style={{ flexGrow: 1 }}>
         <DataGrid
+          columnVisibilityModel={columnVisibilityModel}
+          onColumnVisibilityModelChange={(newModel) =>
+            setColumnVisibilityModel(newModel)
+          }
+          ref={ref}
           localeText={dataGridLocaleText}
           headerHeight={0}
           disableSelectionOnClick={true}

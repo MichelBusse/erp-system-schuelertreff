@@ -33,7 +33,6 @@ import {
 import { LeaveState, LeaveType } from '../types/enums'
 import { leave, Role } from '../types/user'
 import { useAuth } from './AuthProvider'
-import EqualStack from './EqualStack'
 import IconButtonAdornment from './IconButtonAdornment'
 import LeaveDialogSubstitute from './LeaveDialogSubstitute'
 
@@ -212,7 +211,7 @@ const LeaveDialog: React.FC<Props> = ({
                     />
                   </RadioGroup>
                 </FormControl>
-                <EqualStack direction="row" spacing={2}>
+                <Stack direction="row" spacing={2}>
                   <DatePicker
                     label="Startdatum"
                     mask="__.__.____"
@@ -230,7 +229,7 @@ const LeaveDialog: React.FC<Props> = ({
                     }}
                     shouldDisableDate={(date) => [0, 6].includes(date.day())}
                     renderInput={(params) => (
-                      <TextField {...params} required variant="outlined" />
+                      <TextField {...params} fullWidth required variant="outlined" />
                     )}
                     InputAdornmentProps={{
                       position: 'start',
@@ -264,7 +263,7 @@ const LeaveDialog: React.FC<Props> = ({
                       setValue((data) => ({ ...data, endDate: value }))
                     }}
                     renderInput={(params) => (
-                      <TextField {...params} required variant="outlined" />
+                      <TextField {...params} required variant="outlined" fullWidth />
                     )}
                     InputAdornmentProps={{
                       position: 'start',
@@ -281,7 +280,7 @@ const LeaveDialog: React.FC<Props> = ({
                       ),
                     }}
                   />
-                </EqualStack>
+                </Stack>
               </>
             ) : (
               <>

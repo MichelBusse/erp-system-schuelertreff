@@ -41,6 +41,8 @@ import subject from '../types/subject'
 import { leave, Role, teacher, timesAvailableParsed } from '../types/user'
 import { formValidation } from '../utils/formValidation'
 
+import { useTheme } from '@mui/material/styles';
+
 dayjs.extend(customParseFormat)
 
 const TeacherDetailView: React.FC = () => {
@@ -54,6 +56,8 @@ const TeacherDetailView: React.FC = () => {
   const [data, setData] = useState<teacherForm>(defaultTeacherFormData)
   const [leaveData, setLeaveData] = useState<leave[]>([])
   const [errors, setErrors] = useState(defaultTeacherFormData)
+
+  const theme = useTheme();
 
   const requestedId = id ?? 'me'
   const activeTeacherState = decodeToken().state
@@ -170,6 +174,9 @@ const TeacherDetailView: React.FC = () => {
           padding: '30px',
           boxSizing: 'border-box',
           borderRadius: '25px',
+          [theme.breakpoints.down('sm')]: {
+            borderRadius: '0px',
+          },
         }}
       >
         <Stack direction="column" alignItems="stretch" spacing={2}>
@@ -209,7 +216,7 @@ const TeacherDetailView: React.FC = () => {
             />
           </Stack>
           <Typography variant="h6">Adresse:</Typography>
-          <Stack direction="row" columnGap={2}>
+          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
             <TextField
               helperText={errors.street}
               label="Straße"
@@ -242,7 +249,6 @@ const TeacherDetailView: React.FC = () => {
             />
             <TextField
               label="Postleitzahl"
-              sx={{ width: '300px' }}
               helperText={errors.postalCode}
               fullWidth={true}
               onChange={(event) =>
@@ -258,7 +264,7 @@ const TeacherDetailView: React.FC = () => {
             />
           </Stack>
           <Typography variant="h6">Kontakt:</Typography>
-          <Stack direction="row" columnGap={2}>
+          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
             <TextField
               fullWidth={true}
               helperText={errors.email}
@@ -398,7 +404,7 @@ const TeacherDetailView: React.FC = () => {
             setValue={setLeaveData}
           />
 
-          <Stack direction={'row'} columnGap={5} sx={{ marginTop: '15px' }}>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ marginTop: '15px' }}>
             {id && (
               <Button
                 onClick={() => {

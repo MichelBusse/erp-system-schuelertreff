@@ -15,6 +15,7 @@ import {
   getGridStringOperators,
   GridCellParams,
   GridColumns,
+  GridColumnVisibilityModel,
   GridEventListener,
   GridFilterInputValueProps,
   GridFilterItem,
@@ -34,12 +35,15 @@ import subject from '../types/subject'
 import { teacher } from '../types/user'
 import styles from './gridList.module.scss'
 
+import useMeasure from 'react-use-measure'
+
 //definition of subject filter input
 const SubjectsFilterInputValue: React.FC<GridFilterInputValueProps> = ({
   item,
   applyValue,
 }) => {
   const { API } = useAuth()
+
   const [subjects, setSubjects] = useState<subject[]>([])
 
   useEffect(() => {
@@ -211,86 +215,6 @@ const stateOperator: GridFilterOperator = {
   InputComponentProps: { type: 'string' },
 }
 
-//definition of the columns
-const cols: GridColumns = [
-  {
-    field: 'teacherName',
-    headerClassName: 'DataGridHead',
-    headerName: 'Name',
-    width: 200,
-    filterOperators: getGridStringOperators().filter(
-      (operator) => operator.value === 'contains',
-    ),
-    renderCell: (params) => (
-      <div
-        style={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          paddingLeft: 15,
-        }}
-      >
-        {params.value}
-      </div>
-    ),
-  },
-  {
-    field: 'subjectName',
-    headerClassName: 'DataGridHead',
-    headerName: 'Fächer',
-    // width: 650,
-    minWidth: 300,
-    flex: 1,
-    filterOperators: [subjectOperator],
-    renderCell: (params) => (
-      <Stack direction="row" spacing={2}>
-        {params.value?.map((subject: subject) => (
-          <Chip
-            key={subject.id}
-            label={subject.name}
-            sx={{ bgcolor: subject.color + 50 }}
-          />
-        ))}
-      </Stack>
-    ),
-  },
-  {
-    field: 'city',
-    headerClassName: 'DataGridHead',
-    headerName: 'Stadt',
-    hide: true,
-    filterOperators: getGridStringOperators().filter(
-      (operator) => operator.value === 'contains',
-    ),
-    renderCell: () => <></>,
-  },
-  {
-    field: 'degree',
-    headerClassName: 'DataGridHead',
-    headerName: 'Abschluss',
-    hide: true,
-    filterOperators: [degreeOperator],
-    renderCell: () => <></>,
-  },
-  {
-    field: 'state',
-    headerClassName: 'DataGridHead',
-    headerName: 'Status',
-    minWidth: 150,
-    filterOperators: [stateOperator],
-    renderCell: (params) => (
-      <div
-        style={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          paddingLeft: 15,
-        }}
-      >
-        {teacherStateToString[params.value as TeacherState]}
-      </div>
-    ),
-  },
-]
-
 const Teachers: React.FC = () => {
   const [open, setOpen] = useState(false)
   const [teachers, setTeachers] = useState<teacher[]>([])
@@ -299,12 +223,127 @@ const Teachers: React.FC = () => {
 
   const { API } = useAuth()
 
+  const [ref, bounds] = useMeasure()
+  const small = bounds.width < 600
+
+  const [columnVisibilityModel, setColumnVisibilityModel] =
+    useState<GridColumnVisibilityModel>({
+      teacherName: true,
+      subjectName: true,
+      state: true,
+      city: false,
+      degree: false,
+    })
+
+  useEffect(() => {
+    if(small){
+      setColumnVisibilityModel({
+        teacherName: true,
+        subjectName: false,
+        state: true,
+        city: false,
+        degree: false,
+      })
+    }else{
+      setColumnVisibilityModel({
+        teacherName: true,
+        subjectName: true,
+        state: true,
+        city: false,
+        degree: false,
+      })
+    }
+  }, [small])
+
   //Get subjects, teachers from DB
   useEffect(() => {
     API.get(`users/teacher`).then((res) => {
       setTeachers(res.data)
     })
   }, [location])
+
+  //definition of the columns
+  const cols: GridColumns = [
+    {
+      field: 'teacherName',
+      headerClassName: 'DataGridHead',
+      headerName: 'Name',
+      width: 150,
+      flex: 1,
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains',
+      ),
+      renderCell: (params) => (
+        <div
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            paddingLeft: 15,
+          }}
+        >
+          {params.value}
+        </div>
+      ),
+    },
+    {
+      field: 'subjectName',
+      headerClassName: 'DataGridHead',
+      headerName: 'Fächer',
+      // width: 650,
+      //hide: true,
+      flex: 1,
+      filterOperators: [subjectOperator],
+      renderCell: (params) => (
+        <Stack
+          direction="row"
+          spacing={2}
+        >
+          {params.value?.map((subject: subject) => (
+            <Chip
+              key={subject.id}
+              label={subject.name}
+              sx={{ bgcolor: subject.color + 50 }}
+            />
+          ))}
+        </Stack>
+      ),
+    },
+    {
+      field: 'city',
+      headerClassName: 'DataGridHead',
+      headerName: 'Stadt',
+      filterOperators: getGridStringOperators().filter(
+        (operator) => operator.value === 'contains',
+      ),
+      renderCell: () => <></>,
+    },
+    {
+      field: 'degree',
+      headerClassName: 'DataGridHead',
+      headerName: 'Abschluss',
+      filterOperators: [degreeOperator],
+      renderCell: () => <></>,
+    },
+    {
+      field: 'state',
+      headerClassName: 'DataGridHead',
+      headerName: 'Status',
+      minWidth: 150,
+      flex: 0,
+      filterOperators: [stateOperator],
+      renderCell: (params) => (
+        <div
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            paddingLeft: 15,
+          }}
+        >
+          {teacherStateToString[params.value as TeacherState]}
+        </div>
+      ),
+    },
+  ]
 
   //creating rows out of the teachers
   const rows = teachers.map((teacher) => ({
@@ -331,9 +370,14 @@ const Teachers: React.FC = () => {
   }
 
   return (
-    <div className={styles.wrapper} style={{ minHeight: '100vh' }}>
+    <div className={styles.wrapper + " " + styles.pageWrapper} style={{ minHeight: '100vh' }}>
       <div style={{ flexGrow: 1 }}>
         <DataGrid
+          columnVisibilityModel={columnVisibilityModel}
+          onColumnVisibilityModelChange={(newModel) =>
+            setColumnVisibilityModel(newModel)
+          }
+          ref={ref}
           localeText={dataGridLocaleText}
           headerHeight={0}
           disableSelectionOnClick={true}

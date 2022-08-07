@@ -42,7 +42,13 @@ const ProtectedRoute: React.FC<{ roles?: Role[] }> = ({
   return <>{children}</>
 }
 
-const theme = createTheme()
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#54e2fd',
+    },
+  },
+})
 
 const App: React.FC = () => {
   const { isAuthed } = useAuth()
