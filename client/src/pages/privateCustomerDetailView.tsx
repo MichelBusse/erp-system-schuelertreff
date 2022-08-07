@@ -22,7 +22,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
-import InvoiceDataSelect from '../components/InvoiceDateSelect'
+import InvoiceDataSelect, { InvoiceData } from '../components/InvoiceDateSelect'
 import {
   defaultPrivateCustomerFormData,
   snackbarOptions,
@@ -31,7 +31,7 @@ import {
 import styles from '../pages/gridList.module.scss'
 import { SchoolType } from '../types/enums'
 import { privateCustomerForm } from '../types/form'
-import { timesAvailableParsed } from '../types/user'
+import { Role, timesAvailableParsed } from '../types/user'
 import { formValidation } from '../utils/formValidation'
 
 dayjs.extend(customParseFormat)
@@ -81,7 +81,9 @@ const PrivateCustomerDetailView: React.FC = () => {
         timesAvailable: newTimesAvailable,
         grade: res.data.grade,
         schoolType: res.data.schoolType,
-        fee: res.data.fee,
+        feeStandard: res.data.feeStandard,
+        feeOnline: res.data.feeOnline,
+        notes: res.data.notes,
       }))
     })
   }, [])
@@ -132,15 +134,22 @@ const PrivateCustomerDetailView: React.FC = () => {
   const generateInvoice = (
     year: number,
     month: number,
-    invoiceData?: { invoiceNumber: number; invoiceType: string },
+    invoiceData?: InvoiceData,
   ) => {
-    API.post('lessons/invoice/customer', invoiceData, {
-      params: {
-        of: dayjs().year(year).month(month).format('YYYY-MM-DD'),
-        customerId: id,
+    API.post(
+      'lessons/invoice/customer',
+      {
+        ...invoiceData,
+        invoiceDate: invoiceData?.invoiceDate.format('YYYY-MM-DD'),
       },
-      responseType: 'blob',
-    })
+      {
+        params: {
+          of: dayjs().year(year).month(month).format('YYYY-MM-DD'),
+          customerId: id,
+        },
+        responseType: 'blob',
+      },
+    )
       .then((res) => {
         window.open(URL.createObjectURL(res.data))
       })
@@ -313,15 +322,30 @@ const PrivateCustomerDetailView: React.FC = () => {
             <TextField
               type="number"
               id="fee"
-              label="Stundensatz"
+              label="Stundensatz Präsenz"
               variant="outlined"
               fullWidth
               disabled={requestedId === 'me'}
-              value={data.fee ?? ''}
+              value={data.feeStandard ?? ''}
               onChange={(event) =>
                 setData((data) => ({
                   ...data,
-                  fee: Number(event.target.value),
+                  feeStandard: Number(event.target.value),
+                }))
+              }
+            />
+            <TextField
+              type="number"
+              id="fee"
+              label="Stundensatz Online"
+              variant="outlined"
+              fullWidth
+              disabled={requestedId === 'me'}
+              value={data.feeOnline ?? ''}
+              onChange={(event) =>
+                setData((data) => ({
+                  ...data,
+                  feeOnline: Number(event.target.value),
                 }))
               }
             />
@@ -335,6 +359,16 @@ const PrivateCustomerDetailView: React.FC = () => {
               }
             />
           </Box>
+          <h3>Notizen</h3>
+          <TextField
+            multiline
+            value={data.notes}
+            onChange={(e) => {
+              setData((data) => ({ ...data, notes: e.target.value }))
+            }}
+            fullWidth
+            rows={3}
+          />
           <Stack direction={'row'} columnGap={5} sx={{ marginTop: '15px' }}>
             {id && (
               <Button
@@ -363,7 +397,7 @@ const PrivateCustomerDetailView: React.FC = () => {
           <h3>Rechnung generieren:</h3>
           <InvoiceDataSelect
             generateInvoice={generateInvoice}
-            invoiceDialog={true}
+            type={Role.PRIVATECUSTOMER}
           />
         </Stack>
       </Box>

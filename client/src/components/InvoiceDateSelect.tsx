@@ -1,3 +1,4 @@
+import { DatePicker } from '@mui/x-date-pickers'
 import {
   Button,
   Dialog,
@@ -11,23 +12,28 @@ import {
   Stack,
   TextField,
 } from '@mui/material'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
+import { Role } from '../types/user'
 import { useAuth } from './AuthProvider'
+
+export type InvoiceData = {
+  invoiceNumber: number
+  invoiceType: string
+  invoicePreparationTime: number
+  invoiceDate: Dayjs
+}
 
 type Props = {
   generateInvoice: (
     year: number,
     month: number,
-    invoiceData?: { invoiceNumber: number; invoiceType: string },
+    invoiceData?: InvoiceData,
   ) => void
-  invoiceDialog: boolean
+  type: Role
 }
 
-const InvoiceDataSelect: React.FC<Props> = ({
-  generateInvoice,
-  invoiceDialog,
-}) => {
+const InvoiceDataSelect: React.FC<Props> = ({ generateInvoice, type }) => {
   const [invoiceDate, setInvoiceDate] = useState<{
     month: number
     year: number
@@ -36,17 +42,29 @@ const InvoiceDataSelect: React.FC<Props> = ({
     year: dayjs().subtract(27, 'day').year(),
   })
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState<boolean>(false)
-  const [invoiceData, setInvoiceData] = useState<{
-    invoiceNumber: number
-    invoiceType: string
-  }>({ invoiceNumber: 0, invoiceType: 'Nachhilfe' })
 
-  const {API} = useAuth()
+  let defaultInvoiceData: InvoiceData = {
+    invoiceNumber: 1,
+    invoiceType: 'Nachhilfe',
+    invoicePreparationTime: 0,
+    invoiceDate: dayjs(),
+  }
 
+  if (type === Role.SCHOOL)
+    defaultInvoiceData = {
+      ...defaultInvoiceData,
+      invoiceType: 'GTA',
+      invoicePreparationTime: 15,
+    }
+
+  const [invoiceData, setInvoiceData] =
+    useState<InvoiceData>(defaultInvoiceData)
+
+  const { API } = useAuth()
 
   useEffect(() => {
     API.get('lessons/latestInvoice').then((res) => {
-      setInvoiceData((data) => ({...data, invoiceNumber: res.data + 1}))
+      setInvoiceData((data) => ({ ...data, invoiceNumber: res.data + 1 }))
     })
   }, [invoiceDialogOpen])
 
@@ -120,7 +138,7 @@ const InvoiceDataSelect: React.FC<Props> = ({
           variant={'outlined'}
           fullWidth
           onClick={() => {
-            if (invoiceDialog) {
+            if (type === Role.PRIVATECUSTOMER || type === Role.SCHOOL) {
               setInvoiceDialogOpen(true)
             } else {
               generateInvoice(invoiceDate.year, invoiceDate.month)
@@ -134,6 +152,20 @@ const InvoiceDataSelect: React.FC<Props> = ({
         <DialogTitle>Rechnungsdaten</DialogTitle>
         <DialogContent>
           <Stack direction={'column'} rowGap={2} sx={{ marginTop: '5px' }}>
+            <DatePicker
+              label="Rechnungsdatum"
+              mask="__.__.____"
+              value={invoiceData.invoiceDate}
+              onChange={(value) => {
+                setInvoiceData((data) => ({
+                  ...data,
+                  invoiceDate: value ?? dayjs(),
+                }))
+              }}
+              renderInput={(params) => (
+                <TextField {...params} required variant="outlined" />
+              )}
+            />
             <TextField
               label={'Nummer'}
               type={'number'}
@@ -155,13 +187,24 @@ const InvoiceDataSelect: React.FC<Props> = ({
                 }))
               }}
             />
+            <TextField
+              label={'Vorbereitungszeit (min)'}
+              type={'number'}
+              value={invoiceData.invoicePreparationTime}
+              onChange={(e) => {
+                setInvoiceData((data) => ({
+                  ...data,
+                  invoicePreparationTime: Number(e.target.value),
+                }))
+              }}
+            />
           </Stack>
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => {
               setInvoiceDialogOpen(false)
-              setInvoiceData({ invoiceNumber: 1, invoiceType: 'Nachhilfe' })
+              setInvoiceData(defaultInvoiceData)
             }}
           >
             Abbrechen
@@ -170,7 +213,7 @@ const InvoiceDataSelect: React.FC<Props> = ({
             onClick={() => {
               generateInvoice(invoiceDate.year, invoiceDate.month, invoiceData)
               setInvoiceDialogOpen(false)
-              setInvoiceData({ invoiceNumber: 1, invoiceType: 'Nachhilfe' })
+              setInvoiceData(defaultInvoiceData)
             }}
           >
             Erstellen

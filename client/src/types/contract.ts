@@ -1,3 +1,4 @@
+import { ContractType } from './enums'
 import { lesson } from './lesson'
 import subject from './subject'
 import { customer, teacher } from './user'
@@ -22,6 +23,7 @@ export type contract = {
   parentContract?: contract
   childContracts: contract[]
   lessons: lesson[]
+  contractType: ContractType
 }
 
 export type contractWithTeacher = {

@@ -9,6 +9,7 @@ import { Dayjs } from 'dayjs'
 import { useNavigate } from 'react-router-dom'
 
 import { contract } from '../types/contract'
+import { ContractType } from '../types/enums'
 import { lesson, LessonState } from '../types/lesson'
 import styles from './Calendar.module.scss'
 
@@ -42,7 +43,9 @@ const LessonOverview: React.FC<Props> = ({
           ' - ' +
           contract.endTime.substring(0, 5)}
       </span>
-      <span>{contract.subject.name}</span>
+      <span>
+        {contract.subject.name + (contract.contractType === ContractType.STANDARD ? ' (Präsenz)' : ' (Online)')}
+      </span>
       <span>Kunden:</span>
       <ul className={styles.list}>
         {contract.customers.map((s) => (

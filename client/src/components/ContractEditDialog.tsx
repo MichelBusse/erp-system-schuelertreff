@@ -149,7 +149,7 @@ const ContractEditDialog: React.FC<Props> = ({
         keepMounted
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>{'Vertrag bearbeiten'}</DialogTitle>
+        <DialogTitle>{'Einsatz bearbeiten'}</DialogTitle>
         <DialogContent
           sx={{
             width: 500,

@@ -10,7 +10,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   TextField,
   Typography,
@@ -28,7 +32,7 @@ import ConfirmationDialog, {
   ConfirmationDialogProps,
   defaultConfirmationDialogProps,
 } from '../components/ConfirmationDialog'
-import InvoiceDataSelect from '../components/InvoiceDateSelect'
+import InvoiceDataSelect, { InvoiceData } from '../components/InvoiceDateSelect'
 import {
   defaultClassCustomerFormData,
   defaultSchoolFormData,
@@ -39,7 +43,7 @@ import styles from '../pages/gridList.module.scss'
 import { SchoolType } from '../types/enums'
 import { classCustomerForm, schoolForm } from '../types/form'
 import timeAvailable from '../types/timeAvailable'
-import { classCustomer, timesAvailableParsed } from '../types/user'
+import { classCustomer, Role, timesAvailableParsed } from '../types/user'
 
 const SchoolDetailView: React.FC = () => {
   const { API } = useAuth()
@@ -72,7 +76,9 @@ const SchoolDetailView: React.FC = () => {
         email: res.data.email,
         phone: res.data.phone,
         schoolTypes: res.data.schoolTypes,
-        fee: res.data.fee,
+        feeStandard: res.data.feeStandard,
+        feeOnline: res.data.feeOnline,
+        notes: res.data.notes
       }))
     })
   }, [])
@@ -169,7 +175,7 @@ const SchoolDetailView: React.FC = () => {
   const saveClassCustomer = (index: number) => {
     const updatedClassCutomer = classCustomers[index]
 
-    if(updatedClassCutomer.className.trim() === "") return;
+    if (updatedClassCutomer.className.trim() === '') return
 
     API.post('users/classCustomer/' + updatedClassCutomer.id, {
       ...updatedClassCutomer,
@@ -274,7 +280,7 @@ const SchoolDetailView: React.FC = () => {
   const generateInvoice = (
     year: number,
     month: number,
-    invoiceData?: { invoiceNumber: number; invoiceType: string },
+    invoiceData?: InvoiceData,
   ) => {
     API.post('lessons/invoice/customer', invoiceData, {
       params: {
@@ -384,14 +390,30 @@ const SchoolDetailView: React.FC = () => {
             <TextField
               type="number"
               id="fee"
-              label="Stundensatz"
+              label="Stundensatz Standard"
               variant="outlined"
+              fullWidth
               disabled={requestedId === 'me'}
-              value={school.fee ?? ''}
+              value={school.feeStandard ?? ''}
               onChange={(event) =>
                 setSchool((data) => ({
                   ...data,
-                  fee: Number(event.target.value),
+                  feeStandard: Number(event.target.value),
+                }))
+              }
+            />
+            <TextField
+              type="number"
+              id="fee"
+              label="Stundensatz Online"
+              variant="outlined"
+              fullWidth
+              disabled={requestedId === 'me'}
+              value={school.feeOnline ?? ''}
+              onChange={(event) =>
+                setSchool((data) => ({
+                  ...data,
+                  feeOnline: Number(event.target.value),
                 }))
               }
             />
@@ -406,6 +428,16 @@ const SchoolDetailView: React.FC = () => {
               value={school.phone}
             />
           </Stack>
+          <h3>Notizen</h3>
+          <TextField
+            multiline
+            value={school.notes}
+            onChange={(e) => {
+              setSchool((data) => ({ ...data, notes: e.target.value }))
+            }}
+            fullWidth
+            rows={3}
+          />
           <Stack direction={'row'} columnGap={2}>
             <h3>Klassen:</h3>
             <IconButton
@@ -453,11 +485,16 @@ const SchoolDetailView: React.FC = () => {
                 <Box>
                   <Stack direction={'column'} rowGap={2}>
                     <Stack direction={'row'} columnGap={2}>
-                      <TextField 
+                      <TextField
                         fullWidth
                         value={classCustomer.className}
-                        label={"Klassenname"}
-                        onChange= {(e) => editClassCustomer({className: e.target.value}, index)}
+                        label={'Klassenname'}
+                        onChange={(e) =>
+                          editClassCustomer(
+                            { className: e.target.value },
+                            index,
+                          )
+                        }
                       />
                     </Stack>
                     <Stack direction={'row'} columnGap={2}>
@@ -547,7 +584,7 @@ const SchoolDetailView: React.FC = () => {
           <h3>Rechnung generieren:</h3>
           <InvoiceDataSelect
             generateInvoice={generateInvoice}
-            invoiceDialog={true}
+            type={Role.SCHOOL}
           />
         </Stack>
       </Box>

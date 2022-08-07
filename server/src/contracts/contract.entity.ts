@@ -19,6 +19,12 @@ export enum ContractState {
   DECLINED = 'declined',
 }
 
+
+export enum ContractType {
+  STANDARD = 'standard',
+  ONLINE = 'online',
+}
+
 @Entity()
 export class Contract {
   @PrimaryGeneratedColumn()
@@ -66,4 +72,13 @@ export class Contract {
 
   @OneToMany(() => Lesson, (lesson) => lesson.contract)
   lessons: Lesson[]
+
+
+  @Column({
+    type: 'enum',
+    enum: ContractType,
+    default: ContractType.STANDARD,
+  })
+  contractType: ContractType
+
 }

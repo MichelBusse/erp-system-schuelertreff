@@ -19,6 +19,12 @@ export class School extends User {
   })
   schoolTypes: SchoolType[]
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
-  fee: number
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 30.00 })
+  feeStandard: number
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 20.00 })
+  feeOnline: number
+
+  @Column({ type: 'text', default: '' })
+  notes: string
 }

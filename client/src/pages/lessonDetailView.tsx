@@ -210,7 +210,7 @@ const LessonDetailView: React.FC = () => {
               Speichern
             </Button>
           </Stack>
-          <h3>Vertragsinfos</h3>
+          <h3>Einsatzinfos</h3>
           <Stack direction={'row'} columnGap={2}>
             <TextField
               label="Startdatum"
@@ -243,7 +243,7 @@ const LessonDetailView: React.FC = () => {
                     })
                   }
                 >
-                  Vertrag bearbeiten
+                  Einsatz bearbeiten
                 </Button>
               )}
           </Stack>

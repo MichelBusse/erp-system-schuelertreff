@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
@@ -35,7 +37,7 @@ import {
 import { Leave, LeaveState } from './entities/leave.entity'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
-import { Invoice } from '../lessons/invoice.entity'
+import { AuthService } from 'src/auth/auth.service'
 
 /**
  * Format Array of {@link timeAvailable} as Postgres `tstzmultirange`
@@ -110,6 +112,9 @@ export class UsersService {
     private connection: DataSource,
 
     private readonly lessonsService: LessonsService,
+
+    @Inject(forwardRef(() => AuthService))
+    private authService: AuthService,
   ) {}
 
   /**
@@ -524,6 +529,10 @@ export class UsersService {
       updatedTeacher.phone
     ) {
       updatedTeacher.state = TeacherState.APPLIED
+    }
+
+    if(user.email !== updatedTeacher.email){
+      this.authService.initReset(user)
     }
 
     return this.teachersRepository.save(updatedTeacher)

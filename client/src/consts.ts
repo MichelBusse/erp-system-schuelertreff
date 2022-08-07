@@ -6,6 +6,7 @@ import { LeaveState, LeaveType, TeacherState } from './types/enums'
 import {
   classCustomerForm,
   privateCustomerForm,
+  schoolForm,
   teacherForm,
 } from './types/form'
 
@@ -44,7 +45,8 @@ export const defaultPrivateCustomerFormData: privateCustomerForm = {
   grade: null,
   schoolType: null,
   timesAvailable: [],
-  fee: 0,
+  feeStandard: 30,
+  feeOnline: 20,
 }
 
 export const snackbarOptions: SnackbarOptions = {
@@ -63,8 +65,6 @@ export const teacherStateToString: { [key in TeacherState]: string } = {
   created: 'Registriert',
   applied: 'Beworben',
   employed: 'Angestellt',
-  suspended: 'Suspendiert',
-  deleted: 'Gelöscht',
 }
 
 export const leaveTypeToString: { [key in LeaveType]: string } = {
@@ -84,7 +84,7 @@ export const contractStateToString: { [key in ContractState]: string } = {
   declined: 'abgelehnt',
 }
 
-export const defaultSchoolFormData = {
+export const defaultSchoolFormData : schoolForm = {
   firstName: '',
   lastName: '',
   schoolName: '',
@@ -94,7 +94,8 @@ export const defaultSchoolFormData = {
   email: '',
   phone: '',
   schoolTypes: [],
-  fee: 0,
+  feeStandard: 30,
+  feeOnline: 20,
 }
 
 export const defaultClassCustomerFormData: classCustomerForm = {

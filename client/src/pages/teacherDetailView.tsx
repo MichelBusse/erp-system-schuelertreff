@@ -38,7 +38,7 @@ import styles from '../pages/gridList.module.scss'
 import { Degree, TeacherSchoolType, TeacherState } from '../types/enums'
 import { teacherForm } from '../types/form'
 import subject from '../types/subject'
-import { leave, teacher, timesAvailableParsed } from '../types/user'
+import { leave, Role, teacher, timesAvailableParsed } from '../types/user'
 import { formValidation } from '../utils/formValidation'
 
 dayjs.extend(customParseFormat)
@@ -263,7 +263,7 @@ const TeacherDetailView: React.FC = () => {
               fullWidth={true}
               helperText={errors.email}
               label="Email"
-              disabled
+              disabled={requestedId === 'me'}
               onChange={(event) =>
                 setData((data) => ({
                   ...data,
@@ -449,7 +449,7 @@ const TeacherDetailView: React.FC = () => {
           <h3>Abrechnung generieren:</h3>
           <InvoiceDataSelect
             generateInvoice={generateInvoice}
-            invoiceDialog={false}
+            type={Role.TEACHER}
           />
         </Stack>
       </Box>

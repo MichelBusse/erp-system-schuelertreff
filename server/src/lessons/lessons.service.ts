@@ -12,7 +12,7 @@ import * as puppeteer from 'puppeteer'
 import { DataSource, DeepPartial, Repository } from 'typeorm'
 
 import { Role } from 'src/auth/role.enum'
-import { Contract, ContractState } from 'src/contracts/contract.entity'
+import { Contract, ContractState, ContractType } from 'src/contracts/contract.entity'
 import { ContractsService } from 'src/contracts/contracts.service'
 import { getNextDow, maxDate, minDate } from 'src/date'
 import { Leave, LeaveState } from 'src/users/entities/leave.entity'
@@ -21,11 +21,6 @@ import { UsersService } from 'src/users/users.service'
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Lesson, LessonState } from './lesson.entity'
 
-import ejs from 'ejs'
-import path from 'path'
-import * as puppeteer from 'puppeteer'
-import { UsersService } from 'src/users/users.service'
-import { Role } from 'src/auth/role.enum'
 import { Invoice } from './invoice.entity'
 
 require('dayjs/locale/de')
@@ -50,6 +45,11 @@ export function getLessonDates(
   }
 
   return dates
+}
+
+
+function formatInvoiceNumber(year: number, number: number) : string {
+  return String(year) + 'ST-' + String(number).padStart(5, '0')
 }
 
 @Injectable()
@@ -224,8 +224,7 @@ export class LessonsService {
     if (teacherId)
       q.andWhere('teacher.id = :teacherId', { teacherId: teacherId })
 
-    q.orderBy('l.date');
-
+    q.orderBy('l.date')
 
     return q.getMany()
   }
@@ -306,7 +305,12 @@ export class LessonsService {
     invoiceMonth: Dayjs
     customerId?: number
     schoolId?: number
-    invoiceData: { invoiceNumber: number; invoiceType: string }
+    invoiceData: {
+      invoiceNumber: number
+      invoiceType: string
+      invoicePreparationTime: number
+      invoiceDate: string
+    }
   }): Promise<Buffer> {
     let customer = null
 
@@ -339,38 +343,46 @@ export class LessonsService {
 
     const subjectCounts = new Map()
 
+
     for (const lesson of lessons) {
-      const name = lesson.contract.subject.name
+      const name = lesson.contract.subject.name + (lesson.contract.contractType === 'standard' ? ' (Präsenz)' : ' (Online)')
       const duration =
-        dayjs(lesson.contract.endTime, 'HH:mm').diff(
+        (dayjs(lesson.contract.endTime, 'HH:mm').diff(
           dayjs(lesson.contract.startTime, 'HH:mm'),
           'minute',
-        ) / 60
+        ) /
+          60) *
+        ((45 + invoiceData.invoicePreparationTime) / 45)
+      
+      const type = lesson.contract.contractType
+
       subjectCounts.set(
         name,
-        subjectCounts.get(name) ? subjectCounts.get(name) + duration : duration,
+        {count: subjectCounts.get(name) ? subjectCounts.get(name).count + duration : duration, type: type},
       )
     }
 
     const rows = []
     let totalPrice = 0
 
-    subjectCounts.forEach((count, subject) => {
+    subjectCounts.forEach(({count, type} : {count: number, type: ContractType}, subject) => {
+      const fee = type === ContractType.STANDARD ? customer.feeStandard : customer.feeOnline
+
       rows.push({
         subject,
-        unitPrice: Number(customer.fee).toFixed(2).replace('.', ','),
+        unitPrice: Number(fee).toFixed(2).replace('.', ','),
         count: count.toFixed(2).replace('.', ','),
-        totalPrice: Number(customer.fee * count)
+        totalPrice: Number(fee * count)
           .toFixed(2)
           .replace('.', ','),
       })
-      totalPrice += Number(customer.fee * count)
+      totalPrice += Number(fee * count)
     })
 
     const invoiceInfo = {
-      date: dayjs().format('DD.MM.YYYY'),
+      date: dayjs(invoiceData.invoiceDate, 'YYYY-MM-DD').format('DD.MM.YYYY'),
       month: invoiceMonth.locale('de').format('MMMM / YYYY'),
-      number: invoiceData.invoiceNumber,
+      number: formatInvoiceNumber(dayjs(invoiceData.invoiceDate, 'YYYY-MM-DD').year(), invoiceData.invoiceNumber),
       type: invoiceData.invoiceType,
       totalPrice: totalPrice.toFixed(2).replace('.', ','),
     }
@@ -400,18 +412,26 @@ export class LessonsService {
 
     await browser.close()
 
-    this.invoiceRepository.insert({number: invoiceData.invoiceNumber})
+    this.invoiceRepository.insert({ number: invoiceData.invoiceNumber })
 
     return buffer
   }
-  async getLatestInvoiceNumber() : Promise<number>{
-    const latestInvoices = await this.invoiceRepository.createQueryBuilder('i').select('i.number').orderBy('i.generationTime', "DESC").getMany()
 
-    if(latestInvoices.length > 0){
+  async getLatestInvoiceNumber(): Promise<number> {
+    const latestInvoices = await this.invoiceRepository
+      .createQueryBuilder('i')
+      .select('i.number')
+      .where(`date_trunc('year', i.generationTime) = date_trunc('year', CURRENT_TIMESTAMP)`)
+      .orderBy('i.number', 'DESC')
+      .getMany()
+
+    if (latestInvoices.length > 0) {
       return latestInvoices[0].number
-    }else{
+    } else {
       return 1
     }
+  }
+
   async cancelByLeave(leave: Leave) {
     const qb = this.dataSource.createQueryBuilder()
 

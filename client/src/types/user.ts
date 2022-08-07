@@ -66,15 +66,17 @@ export interface admin extends user {
 
 export interface privateCustomer extends user {
   role: 'privateCustomer'
-  fee: number,
-  schoolType: SchoolType,
+  feeStandard: number
+  feeOnline: number
+  schoolType: SchoolType
   grade: number
 }
 
 export interface school extends Omit<user, 'lastName' | 'firstName'> {
   role: 'school'
   schoolName: string
-  fee: number
+  feeStandard: number
+  feeOnline: number
 }
 
 export interface classCustomer {

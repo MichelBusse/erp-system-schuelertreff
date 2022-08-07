@@ -24,6 +24,7 @@ import { leave } from '../types/user'
 import { useAuth } from './AuthProvider'
 import ContractCreation, { suggestion } from './contractDialog/ContractCreation'
 import Filter from './contractDialog/Filter'
+import { ContractType } from '../types/enums'
 
 dayjs.extend(customParseFormat)
 
@@ -61,6 +62,7 @@ const ContractDialog: React.FC<Props> = ({
     startDate: dayjs().add(1, 'day'),
     endDate: dayjs().add(1, 'day').add(1, 'year'),
     customerType: CustomerType.PRIVATE,
+    contractType: ContractType.STANDARD
   })
 
   // step 1
@@ -223,6 +225,7 @@ const ContractDialog: React.FC<Props> = ({
       state: form1.teacherConfirmation
         ? ContractState.PENDING
         : ContractState.ACCEPTED,
+      contractType: form0.contractType,
     })
       .then(() => {
         onSuccess()
@@ -300,7 +303,7 @@ const ContractDialog: React.FC<Props> = ({
 
   return (
     <Dialog open={open}>
-      <DialogTitle>Contract hinzufügen</DialogTitle>
+      <DialogTitle>Einsatz hinzufügen</DialogTitle>
       <DialogContent
         sx={{
           width: 500,

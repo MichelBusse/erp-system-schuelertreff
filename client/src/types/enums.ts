@@ -2,8 +2,6 @@ export enum TeacherState {
   CREATED = 'created',
   APPLIED = 'applied',
   EMPLOYED = 'employed',
-  SUSPENDED = 'suspended',
-  DELETED = 'deleted',
 }
 
 export enum Degree {
@@ -11,6 +9,11 @@ export enum Degree {
   HIGHSCHOOL = 'highschool',
   BACHELOR = 'bachelor',
   MASTER = 'master',
+}
+
+export enum DeleteState {
+  ACTIVE = 'active',
+  DELETED = 'deleted'
 }
 
 export enum SchoolType {
@@ -36,4 +39,9 @@ export enum LeaveState {
   PENDING = 'pending',
   ACCEPTED = 'accepted',
   DECLINED = 'declined',
+}
+
+export enum ContractType {
+  STANDARD = 'standard',
+  ONLINE = 'online'
 }

@@ -1,10 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import * as argon2 from 'argon2'
 import nodemailer from 'nodemailer'
 
 import { Teacher, User } from 'src/users/entities'
+import { DeleteState } from 'src/users/entities/user.entity'
 import { UsersService } from 'src/users/users.service'
 
 import { Role } from './role.enum'
@@ -17,13 +18,17 @@ const transporter = nodemailer.createTransport({
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
+
     private jwtService: JwtService,
     private config: ConfigService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmailAuth(email)
+
+    if(user.deleteState === DeleteState.DELETED) return null
 
     try {
       if (

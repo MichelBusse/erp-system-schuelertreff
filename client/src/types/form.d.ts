@@ -1,6 +1,7 @@
 import { Dayjs } from 'dayjs'
+import { CustomerType } from '../components/ContractDialog'
 
-import { SchoolType, TeacherState } from './enums'
+import { ContractType, SchoolType, TeacherState } from './enums'
 import { LessonState } from './lesson'
 import subject from './subject'
 import timeAvailable from './timeAvailable'
@@ -28,7 +29,9 @@ export interface teacherForm extends userForm {
 export interface schoolForm extends Omit<userForm, 'timesAvailable'> {
   schoolName: string
   schoolTypes: string[]
-  fee: number
+  feeStandard: number
+  feeOnline: number
+  notes: string
 }
 
 export interface classCustomerForm {
@@ -42,7 +45,9 @@ export interface classCustomerForm {
 export interface privateCustomerForm extends userForm {
   grade: number | null
   schoolType: SchoolType | null
-  fee: number
+  feeStandard: number
+  feeOnline: number
+  notes: string
 }
 
 export interface lessonForm {
@@ -74,6 +79,7 @@ export type ContractFilterForm = {
   startDate: Dayjs | null
   endDate: Dayjs | null
   customerType: CustomerType
+  contractType: ContractType
 }
 
 export type ContractCreationForm = {

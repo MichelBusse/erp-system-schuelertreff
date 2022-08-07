@@ -102,6 +102,12 @@ export class UsersController {
     return this.usersService.findOnePrivateCustomer(id)
   }
 
+  @Get('teacher/all')
+  @Roles(Role.ADMIN)
+  getAllTeachers() {
+    return this.usersService.findTeachers()
+  }
+ 
   @Get('teacher/me')
   getMeAsTeacher(@Request() req) {
     return this.usersService.findOneTeacher(req.user.id)
@@ -201,8 +207,6 @@ export class UsersController {
       phone: dto.phone,
       city: dto.city,
       schoolTypes: dto.schoolTypes,
-      // TODO: email could easily be updated, but should be verified first
-      // email: dto.email,
     })
   }
 

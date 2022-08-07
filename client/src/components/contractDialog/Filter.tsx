@@ -3,8 +3,10 @@ import {
   Autocomplete,
   FormControl,
   FormControlLabel,
+  MenuItem,
   Radio,
   RadioGroup,
+  Select,
   Stack,
   TextField,
 } from '@mui/material'
@@ -16,6 +18,7 @@ import { useEffect, useState } from 'react'
 
 import { snackbarOptionsError } from '../../consts'
 import { contractWithTeacher } from '../../types/contract'
+import { ContractType } from '../../types/enums'
 import { ContractFilterForm } from '../../types/form'
 import subject from '../../types/subject'
 import { classCustomer, privateCustomer, school } from '../../types/user'
@@ -310,6 +313,13 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
           }}
         />
       </EqualStack>
+      <Select
+        value={form.contractType}
+        onChange={(e) => setForm((f) => ({...f, contractType: e.target.value as ContractType}))}
+      >
+        <MenuItem value={ContractType.STANDARD}>Präsenz</MenuItem>
+        <MenuItem value={ContractType.ONLINE}>Online</MenuItem>
+      </Select>
     </Stack>
   )
 }
