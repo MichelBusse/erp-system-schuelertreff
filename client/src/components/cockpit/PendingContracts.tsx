@@ -13,7 +13,7 @@ import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
-import { contractWithTeacher } from '../../types/contract'
+import { ContractState, contractWithTeacher } from '../../types/contract'
 import { useAuth } from '../AuthProvider'
 import ContractDialog from '../ContractDialog'
 
@@ -87,7 +87,7 @@ const PendingContracts: React.FC = () => {
                 }
               >
                 <ListItemText
-                  primary={`${contract.teacher.firstName} ${contract.teacher.lastName}`}
+                  primary={`${contract.teacher.firstName} ${contract.teacher.lastName} ${contract.state === ContractState.PENDING ? '(ausstehend)' : '(abgelehnt)'}`}
                   secondary={
                     dayjs(contract.startDate).format('dddd') +
                     ' ' +
