@@ -4,10 +4,48 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
+import ejs from 'ejs'
+import path from 'path'
+import * as puppeteer from 'puppeteer'
 import { DataSource, Repository } from 'typeorm'
 
 import { Document } from './document.entity'
 import { CreateDocumentDto } from './dto/create-document.dto'
+
+/**
+ * render document from template
+ */
+export async function renderTemplate(
+  template: string,
+  data?: ejs.Data,
+): Promise<Buffer> {
+  const filePath = path.join(
+    __dirname,
+    '../templates',
+    template.replace('/', '') + '.ejs',
+  )
+
+  const content = await ejs.renderFile(filePath, data)
+
+  const browser = await puppeteer.launch({ headless: true })
+  const page = await browser.newPage()
+  await page.setContent(content)
+
+  const buffer = await page.pdf({
+    format: 'A4',
+    printBackground: true,
+    margin: {
+      left: '40px',
+      top: '40px',
+      right: '40px',
+      bottom: '40px',
+    },
+  })
+
+  await browser.close()
+
+  return buffer
+}
 
 @Injectable()
 export class DocumentsService {

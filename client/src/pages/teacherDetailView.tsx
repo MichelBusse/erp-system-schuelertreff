@@ -432,6 +432,15 @@ const TeacherDetailView: React.FC = () => {
                 variant="contained"
                 color="success"
                 disabled={data.degree === Degree.NOINFO || !data.fee}
+                onClick={() => submitForm({ state: TeacherState.CONTRACT })}
+              >
+                Arbeitsvertrag senden
+              </Button>
+            )}
+            {id && data.state === TeacherState.CONTRACT && (
+              <Button
+                variant="contained"
+                color="success"
                 onClick={() => submitForm({ state: TeacherState.EMPLOYED })}
               >
                 Bewerbung annehmen

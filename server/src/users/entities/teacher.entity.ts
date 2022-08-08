@@ -8,6 +8,7 @@ import { TeacherSchoolType, User } from './user.entity'
 export enum TeacherState {
   CREATED = 'created',
   APPLIED = 'applied',
+  CONTRACT = 'contract',
   EMPLOYED = 'employed',
 }
 

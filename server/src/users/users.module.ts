@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { AuthModule } from 'src/auth/auth.module'
+import { DocumentsModule } from 'src/documents/documents.module'
 import { LessonsModule } from 'src/lessons/lessons.module'
 
 import {
@@ -31,6 +32,7 @@ import { UsersService } from './users.service'
     ]),
     forwardRef(() => AuthModule),
     forwardRef(() => LessonsModule),
+    forwardRef(() => DocumentsModule),
   ],
   providers: [UsersService],
   controllers: [UsersController],
