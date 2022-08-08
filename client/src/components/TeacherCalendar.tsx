@@ -1,3 +1,4 @@
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh'
 import { Fab, Paper } from '@mui/material'
 import { Box } from '@mui/system'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
@@ -11,7 +12,6 @@ import AcceptContractsDialog from './AcceptContractsDialog'
 import { useAuth } from './AuthProvider'
 import CalendarControl from './CalendarControl'
 import styles from './TeacherCalendar.module.scss'
-import PriorityHighIcon from '@mui/icons-material/PriorityHigh'
 
 type Props = {
   date: Dayjs
@@ -173,7 +173,7 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
             position: 'absolute',
             bottom: 64,
             right: 16,
-            display: pendingContracts.length > 0 ? 'block' : 'none'
+            display: pendingContracts.length > 0 ? 'block' : 'none',
           }}
           onClick={() => setDialogOpen(true)}
         >

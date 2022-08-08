@@ -1,4 +1,3 @@
-import { Dayjs } from 'dayjs'
 import {
   Degree,
   LeaveState,

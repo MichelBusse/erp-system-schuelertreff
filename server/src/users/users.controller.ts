@@ -211,7 +211,7 @@ export class UsersController {
       bankAccountOwner: dto.bankAccountOwner,
       bankInstitution: dto.bankInstitution,
       iban: dto.iban,
-      bic: dto.bic
+      bic: dto.bic,
     })
   }
 

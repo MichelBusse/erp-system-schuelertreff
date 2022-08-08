@@ -157,10 +157,7 @@ const AcceptContractsDialog: React.FC<Props> = ({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button
-          variant="text"
-          onClick={() => setOpen(false)}
-        >
+        <Button variant="text" onClick={() => setOpen(false)}>
           Abbrechen
         </Button>
       </DialogActions>
