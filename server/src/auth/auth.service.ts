@@ -35,8 +35,7 @@ export class AuthService {
         user.mayAuthenticate &&
         (await argon2.verify(user.passwordHash, password))
       ) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { passwordHash, ...result } = user
+        const { passwordHash: _, ...result } = user
 
         return result
       }

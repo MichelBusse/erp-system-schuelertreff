@@ -18,6 +18,7 @@ module.exports = {
     '@typescript-eslint',
     'jsx-a11y',
     'prettier',
+    'unused-imports',
     'simple-import-sort',
   ],
   extends: [
@@ -39,5 +40,16 @@ module.exports = {
     'simple-import-sort/imports': 'off',
     'simple-import-sort/exports': 'off',
     '@typescript-eslint/no-empty-function': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
+    'unused-imports/no-unused-imports': 'warn',
+    'unused-imports/no-unused-vars': [
+      'warn',
+      {
+        vars: 'all',
+        varsIgnorePattern: '^_',
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+      },
+    ],
   },
 }

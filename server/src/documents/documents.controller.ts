@@ -24,7 +24,7 @@ export class DocumentsController {
   @Post()
   async create(@Request() req, @Body() dto: CreateDocumentDto) {
     // filter out content, doesn't need to be transferred back (huge overhead!)
-    const { content, ...response } = await this.documentsService.create({
+    const { content: _, ...response } = await this.documentsService.create({
       ...dto,
       owner:
         req.user.role !== Role.ADMIN || !dto.owner ? req.user.id : dto.owner,
