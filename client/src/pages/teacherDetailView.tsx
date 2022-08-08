@@ -1,4 +1,5 @@
 import CheckIcon from '@mui/icons-material/Check'
+import { Clear as ClearIcon } from '@mui/icons-material'
 import {
   Autocomplete,
   Box,
@@ -27,6 +28,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
+import IconButtonAdornment from '../components/IconButtonAdornment'
 import InvoiceDataSelect from '../components/InvoiceDateSelect'
 import Leave from '../components/Leave'
 import UserDocuments from '../components/UserDocuments'
@@ -42,11 +44,12 @@ import { teacherForm } from '../types/form'
 import subject from '../types/subject'
 import { leave, Role, teacher, timesAvailableParsed } from '../types/user'
 import { formValidation } from '../utils/formValidation'
+import { DatePicker } from '@mui/x-date-pickers'
 
 dayjs.extend(customParseFormat)
 
 const TeacherDetailView: React.FC = () => {
-  const { API, decodeToken } = useAuth()
+  const { API, decodeToken, handleLogout } = useAuth()
   const { id } = useParams()
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
@@ -97,6 +100,14 @@ const TeacherDetailView: React.FC = () => {
       state: newData.state,
       fee: newData.fee,
       timesAvailable: newTimesAvailable,
+      dateOfBirth: newData.dateOfBirth ? dayjs(newData.dateOfBirth) : null,
+      dateOfEmploymentStart: newData.dateOfEmploymentStart
+        ? dayjs(newData.dateOfEmploymentStart)
+        : null,
+      iban: newData.iban,
+      bic: newData.bic,
+      bankAccountOwner: newData.bankAccountOwner,
+      bankInstitution: newData.bankInstitution,
     })
 
     setLeaveData(newData.leave)
@@ -106,24 +117,30 @@ const TeacherDetailView: React.FC = () => {
     setErrors(formValidation('teacher', data))
 
     if (formValidation('teacher', data).validation) {
+
+      if (id) navigate('/teachers')
+      
       API.post('users/teacher/' + requestedId, {
         ...data,
         ...override,
+        dateOfBirth: data.dateOfBirth?.format(),
         timesAvailable: data.timesAvailable.map((time) => ({
           dow: time.dow,
           start: time.start?.format('HH:mm'),
           end: time.end?.format('HH:mm'),
         })),
-      }).then((res) => {
-        enqueueSnackbar(
-          data.firstName + ' ' + data.lastName + ' gespeichert',
-          snackbarOptions,
-        )
-
-        updateData(res.data)
-
-        if (id) navigate('/teachers')
       })
+        .then((res) => {
+          enqueueSnackbar(
+            data.firstName + ' ' + data.lastName + ' gespeichert',
+            snackbarOptions,
+          )
+
+          updateData(res.data)
+        })
+        .catch(() => {
+          enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        })
     }
   }
 
@@ -215,6 +232,30 @@ const TeacherDetailView: React.FC = () => {
               }}
             />
           </Stack>
+          <DatePicker
+            label="Geburtsdatum"
+            mask="__.__.____"
+            maxDate={dayjs()}
+            value={data.dateOfBirth}
+            onChange={(value) => {
+              setData((d) => ({ ...d, dateOfBirth: value }))
+            }}
+            renderInput={(params) => (
+              <TextField {...params} required variant="outlined" />
+            )}
+            InputAdornmentProps={{
+              position: 'start',
+            }}
+            InputProps={{
+              endAdornment: (
+                <IconButtonAdornment
+                  icon={ClearIcon}
+                  hidden={data.dateOfBirth === null}
+                  onClick={() => setData((d) => ({ ...d, dateOfBirth: null }))}
+                />
+              ),
+            }}
+          />
           <Typography variant="h6">Adresse:</Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
@@ -261,6 +302,57 @@ const TeacherDetailView: React.FC = () => {
               InputProps={{
                 readOnly: false,
               }}
+            />
+          </Stack>
+          <Typography variant="h6">Zahlungsdaten:</Typography>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <TextField
+              fullWidth={true}
+              label="Kontoinhaber"
+              onChange={(event) =>
+                setData((data) => ({
+                  ...data,
+                  bankAccountOwner: event.target.value,
+                }))
+              }
+              value={data.bankAccountOwner ?? ''}
+            />
+
+            <TextField
+              fullWidth={true}
+              label="Kreditinstitut"
+              onChange={(event) =>
+                setData((data) => ({
+                  ...data,
+                  bankInstitution: event.target.value,
+                }))
+              }
+              value={data.bankInstitution ?? ''}
+            />
+          </Stack>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <TextField
+              fullWidth={true}
+              label="IBAN"
+              onChange={(event) =>
+                setData((data) => ({
+                  ...data,
+                  iban: event.target.value,
+                }))
+              }
+              value={data.iban ?? ''}
+            />
+
+            <TextField
+              fullWidth={true}
+              label="BIC"
+              onChange={(event) =>
+                setData((data) => ({
+                  ...data,
+                  bic: event.target.value,
+                }))
+              }
+              value={data.bic ?? ''}
             />
           </Stack>
           <Typography variant="h6">Kontakt:</Typography>
@@ -365,8 +457,39 @@ const TeacherDetailView: React.FC = () => {
                 </Select>
                 <FormHelperText>{errors.degree}</FormHelperText>
               </FormControl>
+              <DatePicker
+                label="Beginn Arbeitsvertrag"
+                mask="__.__.____"
+                value={data.dateOfEmploymentStart}
+                onChange={(value) => {
+                  setData((d) => ({ ...d, dateOfEmploymentStart: value }))
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    required
+                    variant="outlined"
+                  />
+                )}
+                InputAdornmentProps={{
+                  position: 'start',
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <IconButtonAdornment
+                      icon={ClearIcon}
+                      hidden={data.dateOfEmploymentStart === null}
+                      onClick={() =>
+                        setData((d) => ({ ...d, dateOfEmploymentStart: null }))
+                      }
+                    />
+                  ),
+                }}
+              />
               <TextField
                 type="number"
+                fullWidth
                 id="fee"
                 label="Stundensatz"
                 variant="outlined"
@@ -396,14 +519,21 @@ const TeacherDetailView: React.FC = () => {
               }
             />
           </Box>
+          {data.state === TeacherState.EMPLOYED && (
+            <>
+              <Typography variant="h6">Urlaub/Krankmeldung:</Typography>
+              <Leave
+                userId={requestedId}
+                value={leaveData}
+                setValue={setLeaveData}
+              />
+            </>
+          )}
 
-          <Typography variant="h6">Urlaub/Krankmeldung:</Typography>
-          <Leave
-            userId={requestedId}
-            value={leaveData}
-            setValue={setLeaveData}
+          <h3>Dokumente:</h3>
+          <UserDocuments
+            userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
           />
-
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={2}
@@ -419,6 +549,11 @@ const TeacherDetailView: React.FC = () => {
                 Abbrechen
               </Button>
             )}
+            {requestedId === 'me' && data.state !== TeacherState.EMPLOYED && (
+              <Button onClick={() => handleLogout()} variant="text" color='error'>
+                Logout
+              </Button>
+            )}
             <Button
               variant="contained"
               onClick={() => submitForm()}
@@ -431,8 +566,14 @@ const TeacherDetailView: React.FC = () => {
               <Button
                 variant="contained"
                 color="success"
-                disabled={data.degree === Degree.NOINFO || !data.fee}
-                onClick={() => submitForm({ state: TeacherState.CONTRACT })}
+                disabled={!data.fee || !data.dateOfEmploymentStart}
+                onClick={() => {
+                  enqueueSnackbar(
+                    'Arbeitsvertrag wird generiert',
+                    snackbarOptions,
+                  )
+                  submitForm({ state: TeacherState.CONTRACT })
+                }}
               >
                 Arbeitsvertrag senden
               </Button>
@@ -466,16 +607,15 @@ const TeacherDetailView: React.FC = () => {
             </Stack>
           )}
 
-          <h3>Dokumente:</h3>
-          <UserDocuments
-            userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
-          />
-
-          <h3>Abrechnung generieren:</h3>
-          <InvoiceDataSelect
-            generateInvoice={generateInvoice}
-            type={Role.TEACHER}
-          />
+          {requestedId !== 'me' && data.state === TeacherState.EMPLOYED && (
+            <>
+              <Typography variant="h6">Abrechnung:</Typography>
+              <InvoiceDataSelect
+                generateInvoice={generateInvoice}
+                type={Role.TEACHER}
+              />
+            </>
+          )}
         </Stack>
       </Box>
       <Dialog

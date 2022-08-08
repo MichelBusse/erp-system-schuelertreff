@@ -23,7 +23,13 @@ export interface teacherForm extends userForm {
   fee: number | null
   degree: string
   schoolTypes: string[]
-  state: TeacherState
+  state: TeacherState,
+  iban: string
+  bic: string
+  bankAccountOwner: string
+  bankInstitution: string
+  dateOfBirth: Dayjs | null
+  dateOfEmploymentStart: Dayjs | null
 }
 
 export interface schoolForm extends Omit<userForm, 'timesAvailable'> {

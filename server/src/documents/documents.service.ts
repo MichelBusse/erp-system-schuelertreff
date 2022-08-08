@@ -18,6 +18,7 @@ import { CreateDocumentDto } from './dto/create-document.dto'
 export async function renderTemplate(
   template: string,
   data?: ejs.Data,
+  margin?: puppeteer.PDFMargin
 ): Promise<Buffer> {
   const filePath = path.join(
     __dirname,
@@ -34,7 +35,7 @@ export async function renderTemplate(
   const buffer = await page.pdf({
     format: 'A4',
     printBackground: true,
-    margin: {
+    margin: margin ?? {
       left: '40px',
       top: '40px',
       right: '40px',

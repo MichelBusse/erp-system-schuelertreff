@@ -50,4 +50,40 @@ export class Teacher extends User {
   @ManyToMany(() => Subject)
   @JoinTable()
   subjects: Subject[]
+
+  @Column({
+    type: 'date',
+    nullable: true
+  })
+  dateOfBirth: Date
+
+  @Column({
+    type: 'date',
+    nullable: true
+  })
+  dateOfEmploymentStart: Date
+
+  @Column({
+    type: 'text',
+    default: ''
+  })
+  bankAccountOwner: string
+
+  @Column({
+    type: 'text',
+    default: ''
+  })
+  bankInstitution: string
+
+  @Column({
+    type: 'text',
+    default: ''
+  })
+  iban: string
+
+  @Column({
+    type: 'text',
+    default: ''
+  })
+  bic: string
 }

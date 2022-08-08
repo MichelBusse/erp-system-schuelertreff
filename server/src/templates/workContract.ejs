@@ -3,9 +3,309 @@
   <head>
     <meta charset="UTF-8" />
     <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        position: relative;
+        box-sizing: border-box;
+        height: 100%;
+        font-size: 11px;
+      }
+      h1 {
+        text-align: center;
+        font-size: 20px;
+        text-decoration: underline;
+      }
+      h2 {
+        font-size: 11px;
+        font-weight: normal;
+      }
+      .center {
+        text-align: center;
+        margin: 2em 0;
+      }
+      .text p {
+        margin-left: 1em;
+        margin-top: 1.5em;
+        margin-bottom: 1.5em;
+      }
+      .text table {
+        margin-left: 2em;
+        margin-top: 1.5em;
+        margin-bottom: 1.5em;
+      }
+      .signature table {
+        width: 100%;
+      }
+      .signature td {
+        padding: 5em 0;
+        width: 50%;
+      }
+      .input {
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
-    <h1>Arbeitsvertrag</h1>
+    <h1>Freier Mitarbeitervertrag</h1>
+    <p class="center">Zwischen</p>
+    <p class="center">
+      Schülertreff GbR<br />
+      August-Bebel-Straße 22 09217 Burgstädt<br />
+      Vertreten durch:<br />
+      Marek Pijala & Nikita Soldatov
+    </p>
+    <p class="center">– im folgenden Arbeitgeber genannt –</p>
+    <p class="center">Und</p>
+    <p class="input center">
+      <%= customerInfo.firstName %> <%= customerInfo.lastName %>,<br />
+      <%= customerInfo.street %><br />
+      <%= customerInfo.zip %> <%= customerInfo.city %>
+    </p>
+    <p class="center">(Name, Anschrift)</p>
+    <p class="center">geboren am:</p>
+    <p class="input center"><%= customerInfo.dateOfBirth %></p>
+    <p class="center">(Geburtsdatum)</p>
+    <p class="center">– im folgenden Arbeitnehmer genannt –</p>
+    <p class="center">wird folgendes vereinbart:</p>
+    <div class="text">
+      <h2>1. Vertragsgegenstand/Durchführung und Arbeitnehmerdaten</h2>
+      <p>
+        (1) Herr/Frau
+        <span class="input"
+          ><%= customerInfo.firstName %> <%= customerInfo.lastName %></span
+        >
+        wird ab dem
+        <span class="input"><%= customerInfo.dateOfEmploymentStart %></span> als
+        Nachhilfelehrer/in für den Auftraggeber tätig.
+      </p>
+      <p>
+        (2) Der Auftragnehmer ist im Rahmen des vereinbarten Zeitvolumens und
+        der betrieblichen Gegebenheiten frei in der Wahl von Ort und Zeit seiner
+        Tätigkeit.
+      </p>
+      <p>
+        (3) Bei der Durchführung seiner Tätigkeit ist der Auftragnehmer keinen
+        Weisungen des Auftraggebers unterworfen.
+      </p>
+      <p>
+        (4) Der Auftragnehmer hat das Recht, einzelne Aufträge des Auftraggebers
+        ohne Angabe von Gründen abzulehnen. Umgekehrt hat der Auftraggeber
+        keinen Anspruch auf ein bestimmtes Mindestvolumen von Aufträgen.
+      </p>
+      <p>
+        (5) Im Hinblick auf die sonstigen Tätigkeiten des Unterrichtenden
+        betragen die Unterrichtszeiten bei Schülertreff GbR nicht mehr als 30
+        Stunden in der Woche.
+      </p>
+      <p>
+        (6) In der Gestaltung des Unterrichts unterliegt der Unterrichtende
+        keinen Weisungen. Der Unterricht sollte jedoch mit den Arbeitsgeber
+        besprochen werden. Wünsche seitens aller Partner müssen berücksichtigt
+        werden.
+      </p>
+      <p>(7) Im Folgenden werden die wichtigsten Arbeitnehmerdaten benötigt:</p>
+      <table>
+        <tr>
+          <td>Name, Vorname:</td>
+          <td class="input"><%= customerInfo.firstName %> <%= customerInfo.lastName %></td>
+        </tr>
+        <tr>
+          <td>Anschrift:</td>
+          <td class="input">
+            <%= customerInfo.street %><br />
+            <%= customerInfo.zip %> <%= customerInfo.city %>
+          </td>
+        </tr>
+        <tr>
+          <td>Telefonnummer:</td>
+          <td class="input"><%= customerInfo.phone %></td>
+        </tr>
+        <tr>
+          <td>E-Mail:</td>
+          <td class="input"><%= customerInfo.email %></td>
+        </tr>
+      </table>
+      <h2>2. Vertragsbeginn, Dauer und Beendigung</h2>
+      <p>
+        (1) Die Tätigkeit beginnt am <span class="input"><%= customerInfo.dateOfEmploymentStart %></span> und ist auf
+        unbestimmte Zeit angelegt.
+      </p>
+      <p>
+        (2) Das Vertragsverhältnis kann außerdem von beiden Seiten mit den
+        gesetzlichen Fristen nach § 621 BGB gekündigt werden.
+      </p>
+      <p>
+        (3) Sollte der DRV-Bund die Sozialversicherungspflicht dieses
+        Vertragsverhältnisses feststellen, endet dieses auch ohne Kündigung mit
+        Rechtskraft der Entscheidung / mit Bekanntgabe des Bescheides.
+      </p>
+      <p>
+        (4) Die Mindestlaufzeit des Vertrages ist auf 3 Monate festgesetzt. Eine
+        vorzeitige Kündigung kann daher nicht erfolgen.
+      </p>
+      <p>
+        (5) Die Kündigungsfrist beträgt 2 Monate und ist in der Mindestlaufzeit
+        enthalten.
+      </p>
+      <h2>3. Vergütung</h2>
+      <p>
+        (1) Der Auftragnehmer erhält ein Honorar von <span class="input"><%= customerInfo.fee %></span> Euro für jede in
+        Absprache mit dem Auftraggeber geleistete Stunde (60min). Hiermit sind
+        alle Auslagen und Nebenkosten abgegolten. Fahrtkosten werden nach
+        Absprache mit dem Arbeitsgeber bestimmt und sind je nach Einsatzort zu
+        berechnen.
+      </p>
+      <p>
+        (2) Der Auftragnehmer wird über die erbrachten Leistungen eine
+        prüffähige Abrechnung stellen. Zahlungen für erbrachte Leistungen werden
+        monatlich nachträglich und nur nach Vorlage einer Abrechnung geleistet.
+        Die genannte Abrechnung muss immer zum Ende (bis zum 28.) des jeweiligen
+        Monats an folgende E- Mail-Adresse zugesendet werden:
+        abrechnungen@schuelertreff-nachhilfe.de Geschieht dies nicht, werden die
+        Stunden erst im Folgemonat abgerechnet. Ausfallstunden jeglicher Art
+        werden nicht vergütet.
+      </p>
+      <p>
+        (3) Der Auftragnehmer ist für die Versteuerung und Abführung etwaiger
+        Sozialversicherungsbeiträge selbst verantwortlich.
+      </p>
+      <p>
+        (4) Schülertreff GbR übernimmt keine Garantie für eine bestimmte Anzahl
+        an Unterrichtsstunden und für ein Mindesthonorar.
+      </p>
+      <p>
+        (5) Der Auftragnehmer verpflichtet sich direkt nach seiner Stunde in der
+        Management-Software von Schülertreff die geforderten
+        Angaben/Informationen (Anwesenheitsliste, Thema der Stunden etc.)
+        einzutragen. Werden die Informationen nicht direkt nach der Stunde
+        geteilt, so kann die Zählung der Stunden nicht gewährleistet werden.
+        Somit wird die erbrachte Leistung (für die konkrete Stunde) nicht
+        vergütet.
+      </p>
+      <p>
+        (6) Die monatliche Vergütung wird dabei auf folgendes Konto überwiesen:
+      </p>
+      <table>
+        <tr>
+          <td>Kontoinhaber/in:</td>
+          <td class="input"><%= customerInfo.bankAccountOwner %></td>
+        </tr>
+        <tr>
+          <td>Kreditinstitut:</td>
+          <td  class="input"><%= customerInfo.bankInstitution %></td>
+        </tr>
+        <tr>
+          <td>IBAN:</td>
+          <td  class="input"><%= customerInfo.iban %></td>
+        </tr>
+        <tr>
+          <td>BIC:</td>
+          <td  class="input"><%= customerInfo.bic %></td>
+        </tr>
+      </table>
+      <h2>4. Verhinderung</h2>
+      <p>
+        (1) Bei Krankheit, Urlaub oder sonstiger Arbeitsverhinderung besteht
+        kein Honoraranspruch.
+      </p>
+
+      <p>
+        (2) Der Auftragnehmer wird seine Abwesenheit wegen Krankheit, Urlaub
+        oder sonstigen Gründen dem Auftraggeber unverzüglich mitteilen.
+      </p>
+      <h2>5. Sonstige Tätigkeiten</h2>
+      <p>
+        (1) Dem Auftragnehmer steht es frei, für andere Auftraggeber tätig zu
+        werden. Einer vorherigen Zustimmung des Auftraggebers bedarf es hierfür
+        nicht.
+      </p>
+      <h2>6. Urheber-, Nutzungs- und Verwertungsrechte</h2>
+      <p>
+        (1) Alle Urheber-, Nutzungs- und Verwertungsrechte, die aufgrund der
+        Tätigkeit des Auftragnehmers entstehen, werden auf den Auftraggeber
+        übertragen, soweit zwingende gesetzliche Bestimmungen nicht
+        entgegenstehen.
+      </p>
+      <p>
+        (2) Die Übertragung dieser Rechte ist durch die vereinbarte Vergütung
+        abgegolten.
+      </p>
+      <h2>7. Verschwiegenheitsklausel</h2>
+      <p>
+        (1) Der Auftragnehmer verpflichtet sich, über ihm bekannt gewordene
+        Betriebs- und Geschäftsgeheimnisse des Auftraggebers auch über die
+        Vertragslaufzeit hinaus Stillschweigen zu bewahren.
+      </p>
+      <h2>8. Anderweitige Tätigkeiten, Wettbewerbsverbot</h2>
+      <p>
+        (1) Während der Laufzeit dieses Vertrages darf der freie Mitarbeiter
+        auch für andere Auftraggeber tätig werden, ohne dass es einer Zustimmung
+        des Auftraggebers bedarf. Eine Tätigkeit für andere Auftraggeber darf
+        jedoch die Tätigkeit für den Auftraggeber nicht beeinträchtigen. Eine
+        Tätigkeit für einen direkten Wettbewerber des Auftraggebers bedarf stets
+        dessen schriftlicher Zustimmung, die aus wichtigem Grund verweigert
+        werden darf.
+      </p>
+      <p>
+        (2) Der freie Mitarbeiter verpflichtet sich, mit dem Auftraggeber nicht
+        zu konkurrieren, insbesondere nicht in direkten geschäftlichen Kontakt
+        mit den Kunden des Auftraggebers zu treten oder über Dritte einen
+        solchen Kontakt herzustellen, mit denen der Auftraggeber vor der
+        Beendigung dieses Vertrages eine Geschäftsbeziehung hatte, anbahnte oder
+        versuchte, anzubahnen. Das Wettbewerbsverbot besteht 2 Jahre nach
+        Beendigung dieses Vertrages fort.
+      </p>
+      <h2>9. Schlussbestimmungen</h2>
+      <p>
+        (1) Nebenabreden, Änderungen, Ergänzungen oder Erweiterungen dieses
+        Vertrages bedürfen der Schriftform. Dies gilt auch für diese
+        Schriftformvereinbarung.
+      </p>
+      <p>
+        (2) Sollten sich einzelne Bestimmungen dieses Vertrags als ungültig
+        erweisen, werden die übrigen Bestimmungen dieses Vertrags davon nicht
+        berührt. Die Parteien verpflichten sich, anstelle der unwirksamen
+        Bestimmung eine dieser Bestimmung möglichst nahekommende wirksame
+        Regelung zu treffen.
+      </p>
+      <h2>10. Zusatz</h2>
+      <p>
+        (1) Der freie Mitarbeiter erklärt, dass gegen ihn keinerlei Vorstrafen
+        verhängt wurden. Bei einem Einsatz in der Schule, muss ein erweitertes
+        Führungszeugnis beantragt werden. Hierzu stellt der Arbeitsgeber eine
+        Bescheinigung, welche zum Beantragen benötigt wird. Die koste für ein
+        erweitertes Führungszeugnis trägt der Arbeitnehmer, solang es nicht von
+        den jeweiligen Partnerschulen abgerechnet werden kann.
+      </p>
+      <p>
+        (2) Dem freien Mitarbeiter ist es untersagt, Schüler von Schülertreff
+        GbR, die ihm oder ihr aufgrund der Tätigkeit bekannt geworden sind, zum
+        Zwecke der Erteilung von Nachhilfeunterricht durch ihn selbst oder durch
+        andere abzuwerben. Für den Fall der Nichteinhaltung dieser Klausel,
+        verpflichtet sich der Unterrichtende eine Vertragsstrafe in Höhe des
+        entstanden wirtschaftlichen Schadens (mindestens 500€) pro abgeworbenem
+        Schüler/in an die Schülertreff GbR zu zahlen.
+      </p>
+    </div>
+    <div class="signature">
+      <table>
+        <tr>
+          <td>________________________________<br />Ort, Datum</td>
+          <td>
+            ________________________________<br />Unterschrift Arbeitnehmer
+          </td>
+        </tr>
+        <tr>
+          <td>________________________________<br />Ort, Datum</td>
+          <td>
+            ________________________________<br />Unterschrift Arbeitgeber
+          </td>
+        </tr>
+      </table>
+    </div>
   </body>
 </html>

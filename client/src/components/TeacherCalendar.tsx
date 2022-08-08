@@ -1,4 +1,4 @@
-import { Paper } from '@mui/material'
+import { Fab, Paper } from '@mui/material'
 import { Box } from '@mui/system'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
@@ -11,6 +11,7 @@ import AcceptContractsDialog from './AcceptContractsDialog'
 import { useAuth } from './AuthProvider'
 import CalendarControl from './CalendarControl'
 import styles from './TeacherCalendar.module.scss'
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh'
 
 type Props = {
   date: Dayjs
@@ -47,7 +48,6 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
         }),
       )
       setPendingContracts(res.data.pendingContracts)
-      setDialogOpen(res.data.pendingContracts.length > 0)
       setLessons(res.data.lessons)
     })
   }, [date, refresh])
@@ -165,13 +165,25 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
             }
           }}
         />
+
+        <Fab
+          color="primary"
+          aria-label="add"
+          style={{
+            position: 'absolute',
+            bottom: 64,
+            right: 16,
+            display: pendingContracts.length > 0 ? 'block' : 'none'
+          }}
+          onClick={() => setDialogOpen(true)}
+        >
+          <PriorityHighIcon />
+        </Fab>
       </Paper>
       <AcceptContractsDialog
         contracts={pendingContracts}
         open={dialogOpen}
-        setOpen={(open) => {
-          setDialogOpen(open)
-        }}
+        setOpen={setDialogOpen}
         refresh={() => setRefresh((re) => ++re)}
       />
     </>

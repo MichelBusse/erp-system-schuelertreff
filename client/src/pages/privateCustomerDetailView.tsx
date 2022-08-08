@@ -370,6 +370,11 @@ const PrivateCustomerDetailView: React.FC = () => {
             fullWidth
             rows={3}
           />
+
+          <h3>Dokumente:</h3>
+          <UserDocuments
+            userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
+          />
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={2}
@@ -399,11 +404,6 @@ const PrivateCustomerDetailView: React.FC = () => {
               </Button>
             )}
           </Stack>
-
-          <h3>Dokumente:</h3>
-          <UserDocuments
-            userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
-          />
 
           <h3>Rechnung generieren:</h3>
           <InvoiceDataSelect

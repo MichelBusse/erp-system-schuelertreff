@@ -558,9 +558,35 @@ export class UsersService {
       updatedTeacher.state === TeacherState.CONTRACT
     ) {
       // generate work contract
-      const buffer = await renderTemplate('workContract', {
-        user: updatedTeacher,
-      })
+      const buffer = await renderTemplate(
+        'workContract',
+        {
+          customerInfo: {
+            firstName: updatedTeacher.firstName,
+            lastName: updatedTeacher.lastName,
+            street: updatedTeacher.street,
+            zip: updatedTeacher.postalCode,
+            city: updatedTeacher.city,
+            dateOfBirth: dayjs(updatedTeacher.dateOfBirth).format('DD.MM.YYYY'),
+            phone: updatedTeacher.phone,
+            email: updatedTeacher.email,
+            fee: updatedTeacher.fee.toFixed(2).replace('.', ','),
+            dateOfEmploymentStart: dayjs(
+              updatedTeacher.dateOfEmploymentStart,
+            ).format('DD.MM.YYYY'),
+            bankAccountOwner: updatedTeacher.bankAccountOwner,
+            bankInstitution: updatedTeacher.bankInstitution,
+            iban: updatedTeacher.iban,
+            bic: updatedTeacher.bic,
+          },
+        },
+        {
+          left: '90px',
+          top: '70px',
+          right: '90px',
+          bottom: '70px',
+        },
+      )
 
       await this.documentsService.create({
         fileName: 'Arbeitsvertrag.pdf',
