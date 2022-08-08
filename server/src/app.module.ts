@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module'
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard'
 import { RolesGuard } from './auth/guards/roles.guard'
 import { ContractsModule } from './contracts/contracts.module'
+import { DocumentsModule } from './documents/documents.module'
 import { LessonsModule } from './lessons/lessons.module'
 import { SubjectsModule } from './subjects/subjects.module'
 import { UsersModule } from './users/users.module'
@@ -40,6 +41,7 @@ const ENV = process.env.NODE_ENV
     ContractsModule,
     UsersModule,
     AuthModule,
+    DocumentsModule,
   ],
   controllers: [AppController],
   providers: [

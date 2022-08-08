@@ -28,6 +28,7 @@ import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
 import InvoiceDataSelect from '../components/InvoiceDateSelect'
 import Leave from '../components/Leave'
+import UserDocuments from '../components/UserDocuments'
 import {
   defaultTeacherFormData,
   snackbarOptions,
@@ -446,6 +447,12 @@ const TeacherDetailView: React.FC = () => {
               </Typography>
             </Stack>
           )}
+
+          <h3>Dokumente:</h3>
+          <UserDocuments
+            userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
+          />
+
           <h3>Abrechnung generieren:</h3>
           <InvoiceDataSelect
             generateInvoice={generateInvoice}
