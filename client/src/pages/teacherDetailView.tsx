@@ -1,5 +1,5 @@
-import CheckIcon from '@mui/icons-material/Check'
 import { Clear as ClearIcon } from '@mui/icons-material'
+import CheckIcon from '@mui/icons-material/Check'
 import {
   Autocomplete,
   Box,
@@ -19,6 +19,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
+import { DatePicker } from '@mui/x-date-pickers'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { nanoid } from 'nanoid'
@@ -44,7 +45,6 @@ import { teacherForm } from '../types/form'
 import subject from '../types/subject'
 import { leave, Role, teacher, timesAvailableParsed } from '../types/user'
 import { formValidation } from '../utils/formValidation'
-import { DatePicker } from '@mui/x-date-pickers'
 
 dayjs.extend(customParseFormat)
 
@@ -117,9 +117,8 @@ const TeacherDetailView: React.FC = () => {
     setErrors(formValidation('teacher', data))
 
     if (formValidation('teacher', data).validation) {
-
       if (id) navigate('/teachers')
-      
+
       API.post('users/teacher/' + requestedId, {
         ...data,
         ...override,
@@ -552,7 +551,11 @@ const TeacherDetailView: React.FC = () => {
               </Button>
             )}
             {requestedId === 'me' && data.state !== TeacherState.EMPLOYED && (
-              <Button onClick={() => handleLogout()} variant="text" color='error'>
+              <Button
+                onClick={() => handleLogout()}
+                variant="text"
+                color="error"
+              >
                 Logout
               </Button>
             )}

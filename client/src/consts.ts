@@ -32,6 +32,12 @@ export const defaultTeacherFormData: teacherForm = {
   schoolTypes: [],
   timesAvailable: [],
   state: TeacherState.CREATED,
+  iban: '',
+  bic: '',
+  bankAccountOwner: '',
+  bankInstitution: '',
+  dateOfBirth: null,
+  dateOfEmploymentStart: null,
 }
 
 export const defaultPrivateCustomerFormData: privateCustomerForm = {

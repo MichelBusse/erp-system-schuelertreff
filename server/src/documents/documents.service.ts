@@ -18,7 +18,7 @@ import { CreateDocumentDto } from './dto/create-document.dto'
 export async function renderTemplate(
   template: string,
   data?: ejs.Data,
-  margin?: puppeteer.PDFMargin
+  margin?: puppeteer.PDFMargin,
 ): Promise<Buffer> {
   const filePath = path.join(
     __dirname,

@@ -53,37 +53,37 @@ export class Teacher extends User {
 
   @Column({
     type: 'date',
-    nullable: true
+    nullable: true,
   })
   dateOfBirth: Date
 
   @Column({
     type: 'date',
-    nullable: true
+    nullable: true,
   })
   dateOfEmploymentStart: Date
 
   @Column({
     type: 'text',
-    default: ''
+    default: '',
   })
   bankAccountOwner: string
 
   @Column({
     type: 'text',
-    default: ''
+    default: '',
   })
   bankInstitution: string
 
   @Column({
     type: 'text',
-    default: ''
+    default: '',
   })
   iban: string
 
   @Column({
     type: 'text',
-    default: ''
+    default: '',
   })
   bic: string
 }
