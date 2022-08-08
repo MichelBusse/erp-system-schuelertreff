@@ -12,16 +12,19 @@ import * as puppeteer from 'puppeteer'
 import { DataSource, DeepPartial, Repository } from 'typeorm'
 
 import { Role } from 'src/auth/role.enum'
-import { Contract, ContractState, ContractType } from 'src/contracts/contract.entity'
+import {
+  Contract,
+  ContractState,
+  ContractType,
+} from 'src/contracts/contract.entity'
 import { ContractsService } from 'src/contracts/contracts.service'
 import { getNextDow, maxDate, minDate } from 'src/date'
 import { Leave, LeaveState } from 'src/users/entities/leave.entity'
 import { UsersService } from 'src/users/users.service'
 
 import { CreateLessonDto } from './dto/create-lesson.dto'
-import { Lesson, LessonState } from './lesson.entity'
-
 import { Invoice } from './invoice.entity'
+import { Lesson, LessonState } from './lesson.entity'
 
 require('dayjs/locale/de')
 
@@ -47,8 +50,7 @@ export function getLessonDates(
   return dates
 }
 
-
-function formatInvoiceNumber(year: number, number: number) : string {
+function formatInvoiceNumber(year: number, number: number): string {
   return String(year) + 'ST-' + String(number).padStart(5, '0')
 }
 
@@ -343,9 +345,12 @@ export class LessonsService {
 
     const subjectCounts = new Map()
 
-
     for (const lesson of lessons) {
-      const name = lesson.contract.subject.name + (lesson.contract.contractType === 'standard' ? ' (Präsenz)' : ' (Online)')
+      const name =
+        lesson.contract.subject.name +
+        (lesson.contract.contractType === 'standard'
+          ? ' (Präsenz)'
+          : ' (Online)')
       const duration =
         (dayjs(lesson.contract.endTime, 'HH:mm').diff(
           dayjs(lesson.contract.startTime, 'HH:mm'),
@@ -353,36 +358,46 @@ export class LessonsService {
         ) /
           60) *
         ((45 + invoiceData.invoicePreparationTime) / 45)
-      
+
       const type = lesson.contract.contractType
 
-      subjectCounts.set(
-        name,
-        {count: subjectCounts.get(name) ? subjectCounts.get(name).count + duration : duration, type: type},
-      )
+      subjectCounts.set(name, {
+        count: subjectCounts.get(name)
+          ? subjectCounts.get(name).count + duration
+          : duration,
+        type: type,
+      })
     }
 
     const rows = []
     let totalPrice = 0
 
-    subjectCounts.forEach(({count, type} : {count: number, type: ContractType}, subject) => {
-      const fee = type === ContractType.STANDARD ? customer.feeStandard : customer.feeOnline
+    subjectCounts.forEach(
+      ({ count, type }: { count: number; type: ContractType }, subject) => {
+        const fee =
+          type === ContractType.STANDARD
+            ? customer.feeStandard
+            : customer.feeOnline
 
-      rows.push({
-        subject,
-        unitPrice: Number(fee).toFixed(2).replace('.', ','),
-        count: count.toFixed(2).replace('.', ','),
-        totalPrice: Number(fee * count)
-          .toFixed(2)
-          .replace('.', ','),
-      })
-      totalPrice += Number(fee * count)
-    })
+        rows.push({
+          subject,
+          unitPrice: Number(fee).toFixed(2).replace('.', ','),
+          count: count.toFixed(2).replace('.', ','),
+          totalPrice: Number(fee * count)
+            .toFixed(2)
+            .replace('.', ','),
+        })
+        totalPrice += Number(fee * count)
+      },
+    )
 
     const invoiceInfo = {
       date: dayjs(invoiceData.invoiceDate, 'YYYY-MM-DD').format('DD.MM.YYYY'),
       month: invoiceMonth.locale('de').format('MMMM / YYYY'),
-      number: formatInvoiceNumber(dayjs(invoiceData.invoiceDate, 'YYYY-MM-DD').year(), invoiceData.invoiceNumber),
+      number: formatInvoiceNumber(
+        dayjs(invoiceData.invoiceDate, 'YYYY-MM-DD').year(),
+        invoiceData.invoiceNumber,
+      ),
       type: invoiceData.invoiceType,
       totalPrice: totalPrice.toFixed(2).replace('.', ','),
     }
@@ -421,7 +436,9 @@ export class LessonsService {
     const latestInvoices = await this.invoiceRepository
       .createQueryBuilder('i')
       .select('i.number')
-      .where(`date_trunc('year', i.generationTime) = date_trunc('year', CURRENT_TIMESTAMP)`)
+      .where(
+        `date_trunc('year', i.generationTime) = date_trunc('year', CURRENT_TIMESTAMP)`,
+      )
       .orderBy('i.number', 'DESC')
       .getMany()
 

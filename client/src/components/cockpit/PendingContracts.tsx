@@ -87,7 +87,13 @@ const PendingContracts: React.FC = () => {
                 }
               >
                 <ListItemText
-                  primary={`${contract.teacher.firstName} ${contract.teacher.lastName} ${contract.state === ContractState.PENDING ? '(ausstehend)' : '(abgelehnt)'}`}
+                  primary={`${contract.teacher.firstName} ${
+                    contract.teacher.lastName
+                  } ${
+                    contract.state === ContractState.PENDING
+                      ? '(ausstehend)'
+                      : '(abgelehnt)'
+                  }`}
                   secondary={
                     dayjs(contract.startDate).format('dddd') +
                     ' ' +

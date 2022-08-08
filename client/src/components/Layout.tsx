@@ -83,12 +83,12 @@ const Layout: React.FC = () => {
         }}
       >
         {
-        // hide menu for non-employed teachers
-        !(
-          isAuthed() &&
-          decodeToken().role === 'teacher' &&
-          decodeToken().state !== TeacherState.EMPLOYED
-        ) && <BottomMenu items={menuItems} />
+          // hide menu for non-employed teachers
+          !(
+            isAuthed() &&
+            decodeToken().role === 'teacher' &&
+            decodeToken().state !== TeacherState.EMPLOYED
+          ) && <BottomMenu items={menuItems} />
         }
         <Outlet />
       </Box>

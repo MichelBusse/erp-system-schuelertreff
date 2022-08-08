@@ -5,7 +5,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Stack,
 } from '@mui/material'
 
 export type ConfirmationDialogProps = {
@@ -24,9 +23,9 @@ export const defaultConfirmationDialogProps: ConfirmationDialogProps = {
   action: () => {},
 }
 
-const ConfirmationDialog: React.FC<{ confirmationDialogProps: ConfirmationDialogProps }> = ({
-  confirmationDialogProps,
-}) => (
+const ConfirmationDialog: React.FC<{
+  confirmationDialogProps: ConfirmationDialogProps
+}> = ({ confirmationDialogProps }) => (
   <Dialog
     open={confirmationDialogProps.open}
     keepMounted
@@ -39,7 +38,11 @@ const ConfirmationDialog: React.FC<{ confirmationDialogProps: ConfirmationDialog
       </DialogContentText>
     </DialogContent>
     <DialogActions>
-      <Button onClick={() => confirmationDialogProps.setProps(defaultConfirmationDialogProps)}>
+      <Button
+        onClick={() =>
+          confirmationDialogProps.setProps(defaultConfirmationDialogProps)
+        }
+      >
         Abbrechen
       </Button>
       <Button

@@ -96,7 +96,7 @@ const AddTimes: React.FC<Props> = ({ value, setValue }) => {
   return (
     <>
       <Stack direction="row" spacing={2} justifyContent={'space-between'}>
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} flexGrow={1}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} flexGrow={1}>
           <FormControl fullWidth>
             <InputLabel id="DowLable">Wochentag</InputLabel>
             <Select

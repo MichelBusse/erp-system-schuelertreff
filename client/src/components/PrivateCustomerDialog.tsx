@@ -136,7 +136,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
               }
             />
           </Stack>
-          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               helperText={errors.city}
               id="city"
@@ -162,7 +162,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
               }
             />
           </Stack>
-          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               helperText={errors.email}
               id="email"

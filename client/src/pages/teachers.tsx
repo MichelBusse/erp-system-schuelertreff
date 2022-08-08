@@ -26,6 +26,7 @@ import {
 } from '@mui/x-data-grid'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import useMeasure from 'react-use-measure'
 
 import { useAuth } from '../components/AuthProvider'
 import TeacherDialog from '../components/TeacherDialog'
@@ -34,8 +35,6 @@ import { Degree, TeacherState } from '../types/enums'
 import subject from '../types/subject'
 import { teacher } from '../types/user'
 import styles from './gridList.module.scss'
-
-import useMeasure from 'react-use-measure'
 
 //definition of subject filter input
 const SubjectsFilterInputValue: React.FC<GridFilterInputValueProps> = ({
@@ -236,7 +235,7 @@ const Teachers: React.FC = () => {
     })
 
   useEffect(() => {
-    if(small){
+    if (small) {
       setColumnVisibilityModel({
         teacherName: true,
         subjectName: false,
@@ -244,7 +243,7 @@ const Teachers: React.FC = () => {
         city: false,
         degree: false,
       })
-    }else{
+    } else {
       setColumnVisibilityModel({
         teacherName: true,
         subjectName: true,
@@ -294,10 +293,7 @@ const Teachers: React.FC = () => {
       flex: 1,
       filterOperators: [subjectOperator],
       renderCell: (params) => (
-        <Stack
-          direction="row"
-          spacing={2}
-        >
+        <Stack direction="row" spacing={2}>
           {params.value?.map((subject: subject) => (
             <Chip
               key={subject.id}
@@ -370,7 +366,10 @@ const Teachers: React.FC = () => {
   }
 
   return (
-    <div className={styles.wrapper + " " + styles.pageWrapper} style={{ minHeight: '100vh' }}>
+    <div
+      className={styles.wrapper + ' ' + styles.pageWrapper}
+      style={{ minHeight: '100vh' }}
+    >
       <div style={{ flexGrow: 1 }}>
         <DataGrid
           columnVisibilityModel={columnVisibilityModel}

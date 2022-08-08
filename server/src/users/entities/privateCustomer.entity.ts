@@ -13,10 +13,10 @@ export enum CustomerState {
 export class PrivateCustomer extends Customer {
   role = Role.PRIVATECUSTOMER
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 30.00 })
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 30.0 })
   feeStandard: number
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 20.00 })
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 20.0 })
   feeOnline: number
 
   @Column({ type: 'text', default: '' })

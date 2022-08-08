@@ -119,7 +119,11 @@ const SubjectDialog: React.FC<Props> = ({
         Fach {initialSubject ? 'bearbeiten' : 'hinzufügen'}
       </DialogTitle>
       <DialogContent>
-        <Stack direction={{xs: "column", sm:"row"}} spacing={2} sx={{marginBottom: '20px'}}>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={2}
+          sx={{ marginBottom: '20px' }}
+        >
           <TextField
             helperText={errors.name}
             id="subjectName"

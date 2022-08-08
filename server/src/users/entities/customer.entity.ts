@@ -4,15 +4,13 @@ import { SchoolType, User } from './user.entity'
 
 @ChildEntity()
 export abstract class Customer extends User {
-
   @Column()
   grade: number
 
   @Column({
     type: 'enum',
     enum: SchoolType,
-    nullable: true
+    nullable: true,
   })
   schoolType: SchoolType
-
 }

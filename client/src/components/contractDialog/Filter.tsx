@@ -234,7 +234,7 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
           variant="outlined"
           type="number"
           value={form.interval}
-          sx={{width: '150px'}}
+          sx={{ width: '150px' }}
           onChange={(e) => {
             let value = parseInt(e.target.value, 10) || 1
             value = Math.max(1, Math.min(value, 4))
@@ -252,7 +252,7 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
           }}
         />
       </Stack>
-      <Stack direction={{xs: "column", sm: 'row'}} spacing={2}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
         <DatePicker
           label="Startdatum"
           mask="__.__.____"
@@ -316,7 +316,12 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
       </Stack>
       <Select
         value={form.contractType}
-        onChange={(e) => setForm((f) => ({...f, contractType: e.target.value as ContractType}))}
+        onChange={(e) =>
+          setForm((f) => ({
+            ...f,
+            contractType: e.target.value as ContractType,
+          }))
+        }
       >
         <MenuItem value={ContractType.STANDARD}>Präsenz</MenuItem>
         <MenuItem value={ContractType.ONLINE}>Online</MenuItem>

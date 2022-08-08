@@ -12,14 +12,13 @@ import {
 } from '@mui/x-data-grid'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import useMeasure from 'react-use-measure'
 
 import { useAuth } from '../components/AuthProvider'
 import SchoolDialog from '../components/SchoolDialog'
 import { dataGridLocaleText } from '../consts'
 import { school } from '../types/user'
 import styles from './gridList.module.scss'
-
-import useMeasure from 'react-use-measure'
 
 const Schools: React.FC = () => {
   const [open, setOpen] = useState(false)
@@ -28,7 +27,7 @@ const Schools: React.FC = () => {
   const location = useLocation()
 
   const { API } = useAuth()
-  
+
   const [ref, bounds] = useMeasure()
   const small = bounds.width < 600
 
@@ -45,13 +44,13 @@ const Schools: React.FC = () => {
   }, [location])
 
   useEffect(() => {
-    if(small){
+    if (small) {
       setColumnVisibilityModel({
         customerName: true,
         customerEmail: true,
         customerPhone: false,
       })
-    }else{
+    } else {
       setColumnVisibilityModel({
         customerName: true,
         customerEmail: true,

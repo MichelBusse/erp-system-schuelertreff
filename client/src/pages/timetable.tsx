@@ -1,6 +1,7 @@
 import 'dayjs/locale/de'
 
 import { Box, Button, Drawer, Stack, Typography } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import { GridCellParams } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
@@ -15,8 +16,6 @@ import TeacherCalendar from '../components/TeacherCalendar'
 import { contract } from '../types/contract'
 import { lesson } from '../types/lesson'
 import { Role, teacher } from '../types/user'
-
-import { useTheme } from '@mui/material/styles';
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)
@@ -49,7 +48,7 @@ const Timetable: React.FC = () => {
   const [refreshCalendar, setRefreshCalendar] = useState(0)
   const [teachers, setTeachers] = useState<teacher[]>([])
 
-  const theme = useTheme();
+  const theme = useTheme()
 
   useEffect(() => {
     API.get('users/teacher').then((res) => setTeachers(res.data))

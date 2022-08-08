@@ -1,5 +1,5 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import { Box, IconButton } from '@mui/material'
+import { IconButton } from '@mui/material'
 import {
   DataGrid,
   getGridStringOperators,
@@ -12,14 +12,13 @@ import {
 } from '@mui/x-data-grid'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import useMeasure from 'react-use-measure'
 
 import { useAuth } from '../components/AuthProvider'
 import PrivateCustomerDialog from '../components/PrivateCustomerDialog'
 import { dataGridLocaleText } from '../consts'
 import { privateCustomer } from '../types/user'
 import styles from './gridList.module.scss'
-
-import useMeasure from 'react-use-measure'
 
 const PrivateCustomers: React.FC = () => {
   const [open, setOpen] = useState(false)
@@ -45,13 +44,13 @@ const PrivateCustomers: React.FC = () => {
   }, [location])
 
   useEffect(() => {
-    if(small){
+    if (small) {
       setColumnVisibilityModel({
         customerName: true,
         customerEmail: true,
         customerPhone: false,
       })
-    }else{
+    } else {
       setColumnVisibilityModel({
         customerName: true,
         customerEmail: true,
@@ -127,7 +126,10 @@ const PrivateCustomers: React.FC = () => {
   }
 
   return (
-    <div className={styles.wrapper + " " + styles.pageWrapper} style={{ minHeight: '100vh' }}>
+    <div
+      className={styles.wrapper + ' ' + styles.pageWrapper}
+      style={{ minHeight: '100vh' }}
+    >
       <div style={{ flexGrow: 1 }}>
         <DataGrid
           columnVisibilityModel={columnVisibilityModel}

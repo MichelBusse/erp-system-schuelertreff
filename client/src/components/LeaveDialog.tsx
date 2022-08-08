@@ -229,7 +229,12 @@ const LeaveDialog: React.FC<Props> = ({
                     }}
                     shouldDisableDate={(date) => [0, 6].includes(date.day())}
                     renderInput={(params) => (
-                      <TextField {...params} fullWidth required variant="outlined" />
+                      <TextField
+                        {...params}
+                        fullWidth
+                        required
+                        variant="outlined"
+                      />
                     )}
                     InputAdornmentProps={{
                       position: 'start',
@@ -263,7 +268,12 @@ const LeaveDialog: React.FC<Props> = ({
                       setValue((data) => ({ ...data, endDate: value }))
                     }}
                     renderInput={(params) => (
-                      <TextField {...params} required variant="outlined" fullWidth />
+                      <TextField
+                        {...params}
+                        required
+                        variant="outlined"
+                        fullWidth
+                      />
                     )}
                     InputAdornmentProps={{
                       position: 'start',

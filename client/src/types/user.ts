@@ -85,8 +85,8 @@ export interface classCustomer {
   className: string
   timesAvailableParsed: timesAvailableParsed[]
   timesAvailable: timeAvailable[]
-  school: school,
-  schoolType: SchoolType,
+  school: school
+  schoolType: SchoolType
   grade: number
 }
 

@@ -13,7 +13,7 @@ export enum Degree {
 
 export enum DeleteState {
   ACTIVE = 'active',
-  DELETED = 'deleted'
+  DELETED = 'deleted',
 }
 
 export enum SchoolType {
@@ -43,5 +43,5 @@ export enum LeaveState {
 
 export enum ContractType {
   STANDARD = 'standard',
-  ONLINE = 'online'
+  ONLINE = 'online',
 }

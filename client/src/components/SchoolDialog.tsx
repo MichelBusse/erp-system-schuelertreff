@@ -118,7 +118,7 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
               }
             />
           </Stack>
-          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               helperText={errors.city}
               id="city"
@@ -144,7 +144,7 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
               }
             />
           </Stack>
-          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               helperText={errors.email}
               id="email"

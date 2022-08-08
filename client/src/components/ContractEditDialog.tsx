@@ -119,7 +119,7 @@ const ContractEditDialog: React.FC<Props> = ({
           setDialogInfo(false, -1)
           onSuccess()
         })
-      }
+      },
     })
   }
 
@@ -135,7 +135,7 @@ const ContractEditDialog: React.FC<Props> = ({
           setDialogInfo(false, -1)
           onSuccess()
         })
-      }
+      },
     })
   }
   const cancel = () => {

@@ -4,8 +4,6 @@ import {
 } from '@mui/icons-material'
 import LogoutIcon from '@mui/icons-material/Logout'
 import {
-  BottomNavigation,
-  BottomNavigationAction,
   Divider,
   Drawer,
   IconButton,
@@ -17,14 +15,13 @@ import {
   SvgIcon,
   Toolbar,
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import { Box } from '@mui/system'
 import React, { useState } from 'react'
 import { NavLink as NavLinkBase, NavLinkProps } from 'react-router-dom'
 
 import logo from '../assets/logo.png'
 import { useAuth } from './AuthProvider'
-
-import { useTheme } from '@mui/material/styles'
 
 const drawerWidth = 240
 

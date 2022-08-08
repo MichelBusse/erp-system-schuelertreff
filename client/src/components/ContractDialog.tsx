@@ -12,6 +12,7 @@ import {
   StepLabel,
   Stepper,
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useSnackbar } from 'notistack'
@@ -19,14 +20,12 @@ import React, { useState } from 'react'
 
 import { snackbarOptionsError } from '../consts'
 import { ContractState, contractWithTeacher } from '../types/contract'
+import { ContractType } from '../types/enums'
 import { ContractCreationForm, ContractFilterForm } from '../types/form'
 import { leave } from '../types/user'
 import { useAuth } from './AuthProvider'
 import ContractCreation, { suggestion } from './contractDialog/ContractCreation'
 import Filter from './contractDialog/Filter'
-import { ContractType } from '../types/enums'
-
-import { useTheme } from '@mui/material/styles'
 
 dayjs.extend(customParseFormat)
 
@@ -305,9 +304,7 @@ const ContractDialog: React.FC<Props> = ({
   ]
 
   return (
-    <Dialog
-      open={open}
-    >
+    <Dialog open={open}>
       <DialogTitle>Einsatz hinzufügen</DialogTitle>
       <DialogContent
         sx={{

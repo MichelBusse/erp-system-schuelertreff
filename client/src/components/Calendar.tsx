@@ -119,8 +119,8 @@ const Calendar: React.FC<Props> = ({
   return (
     <Paper
       className={styles.wrapper}
-      sx={{ 
-        width: columns.reduce((p, c) => p + (c.width ?? 100), 0)
+      sx={{
+        width: columns.reduce((p, c) => p + (c.width ?? 100), 0),
       }}
     >
       <CalendarControl date={date} setDate={setDate} />

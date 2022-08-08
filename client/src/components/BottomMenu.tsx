@@ -2,17 +2,14 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import {
   BottomNavigation,
   BottomNavigationAction,
-  IconButton,
   Paper,
   SvgIcon,
 } from '@mui/material'
-import { Box } from '@mui/system'
-import React, { useState } from 'react'
+import { useTheme } from '@mui/material/styles'
+import React from 'react'
 import { NavLink as NavLinkBase, NavLinkProps } from 'react-router-dom'
 
 import { useAuth } from './AuthProvider'
-
-import { useTheme } from '@mui/material/styles'
 
 const NavLink = React.forwardRef<HTMLAnchorElement, NavLinkProps>(
   (props, ref) => (
@@ -42,7 +39,9 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ items }) => {
   const theme = useTheme()
 
   return (
-    <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10000}}>
+    <Paper
+      sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10000 }}
+    >
       <BottomNavigation
         showLabels
         sx={{

@@ -10,14 +10,14 @@ import { Brackets, DataSource, Repository } from 'typeorm'
 
 import { LessonsService } from 'src/lessons/lessons.service'
 import { timeAvailable } from 'src/users/dto/timeAvailable'
-import { Customer, Teacher, User } from 'src/users/entities'
+import { Customer, User } from 'src/users/entities'
+import { SchoolType, TeacherSchoolType } from 'src/users/entities/user.entity'
 import { parseMultirange, UsersService } from 'src/users/users.service'
 
 import { Contract, ContractState } from './contract.entity'
 import { AcceptOrDeclineContractDto } from './dto/accept-or-decline-contract-dto'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
-import { SchoolType, TeacherSchoolType } from 'src/users/entities/user.entity'
 
 @Injectable()
 export class ContractsService {
@@ -190,27 +190,36 @@ export class ContractsService {
     const dowTimeFilter = `{${dowTime.join(', ')}}`
 
     // get schoolTypes from customers
-    
-    const customers = await this.connection.createQueryBuilder().select('c').from(Customer, 'c').where('c.id IN (:...cid)', { cid: dto.customers }).getMany()
 
-    const requestedSchoolTypes : TeacherSchoolType[] = []
+    const customers = await this.connection
+      .createQueryBuilder()
+      .select('c')
+      .from(Customer, 'c')
+      .where('c.id IN (:...cid)', { cid: dto.customers })
+      .getMany()
+
+    const requestedSchoolTypes: TeacherSchoolType[] = []
 
     customers.forEach((customer) => {
-      if(customer.schoolType && customer.schoolType !== SchoolType.ANDERE && customer.grade){
-        switch(customer.schoolType){
+      if (
+        customer.schoolType &&
+        customer.schoolType !== SchoolType.ANDERE &&
+        customer.grade
+      ) {
+        switch (customer.schoolType) {
           case SchoolType.GRUNDSCHULE:
             requestedSchoolTypes.push(TeacherSchoolType.GRUNDSCHULE)
-            break;
+            break
           case SchoolType.OBERSCHULE:
             requestedSchoolTypes.push(TeacherSchoolType.OBERSCHULE)
-            break;
+            break
           case SchoolType.GYMNASIUM:
-            if(customer.grade < 11) {
+            if (customer.grade < 11) {
               requestedSchoolTypes.push(TeacherSchoolType.GYMSEK1)
-            }else{
+            } else {
               requestedSchoolTypes.push(TeacherSchoolType.GYMSEK2)
             }
-            break;
+            break
         }
       }
     })
@@ -292,8 +301,10 @@ export class ContractsService {
           .andWhere('subject.id = :subjectId', { subjectId: dto.subjectId })
           .andWhere(
             new Brackets((qb) => {
-              qb.where('cardinality(t.schoolTypes) = 0')
-                .orWhere('t.schoolTypes @> :requestedSchoolTypes', {requestedSchoolTypes})
+              qb.where('cardinality(t.schoolTypes) = 0').orWhere(
+                't.schoolTypes @> :requestedSchoolTypes',
+                { requestedSchoolTypes },
+              )
             }),
           )
 

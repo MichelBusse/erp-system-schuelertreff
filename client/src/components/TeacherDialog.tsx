@@ -72,39 +72,39 @@ const TeacherDialog: React.FC<Props> = ({ open, setOpen, setTeachers }) => {
           sx={{ paddingTop: '15px' }}
         >
           <Stack direction={'column'} spacing={2}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            id="firstName"
-            label="Vorname"
-            required={true}
-            value={form.firstName}
-            onChange={(event) =>
-              setForm((data) => ({ ...data, firstName: event.target.value }))
-            }
-          />
-          <TextField
-            fullWidth
-            variant="outlined"
-            id="lastName"
-            label="Nachname"
-            required={true}
-            value={form.lastName}
-            onChange={(event) =>
-              setForm((data) => ({ ...data, lastName: event.target.value }))
-            }
-          />
-          <TextField
-            fullWidth={true}
-            required={true}
-            id="email"
-            label="E-Mail"
-            variant="outlined"
-            value={form.email}
-            onChange={(event) =>
-              setForm((data) => ({ ...data, email: event.target.value }))
-            }
-          />
+            <TextField
+              fullWidth
+              variant="outlined"
+              id="firstName"
+              label="Vorname"
+              required={true}
+              value={form.firstName}
+              onChange={(event) =>
+                setForm((data) => ({ ...data, firstName: event.target.value }))
+              }
+            />
+            <TextField
+              fullWidth
+              variant="outlined"
+              id="lastName"
+              label="Nachname"
+              required={true}
+              value={form.lastName}
+              onChange={(event) =>
+                setForm((data) => ({ ...data, lastName: event.target.value }))
+              }
+            />
+            <TextField
+              fullWidth={true}
+              required={true}
+              id="email"
+              label="E-Mail"
+              variant="outlined"
+              value={form.email}
+              onChange={(event) =>
+                setForm((data) => ({ ...data, email: event.target.value }))
+              }
+            />
           </Stack>
         </Stack>
       </DialogContent>

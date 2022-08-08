@@ -1,6 +1,6 @@
 import { Dayjs } from 'dayjs'
-import { CustomerType } from '../components/ContractDialog'
 
+import { CustomerType } from '../components/ContractDialog'
 import { ContractType, SchoolType, TeacherState } from './enums'
 import { LessonState } from './lesson'
 import subject from './subject'

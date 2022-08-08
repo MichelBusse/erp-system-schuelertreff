@@ -13,7 +13,6 @@ import {
   Teacher,
   User,
 } from './entities'
-import { Invoice } from '../lessons/invoice.entity'
 import { Leave } from './entities/leave.entity'
 import { UsersController } from './users.controller'
 import { UsersService } from './users.service'

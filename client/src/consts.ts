@@ -84,7 +84,7 @@ export const contractStateToString: { [key in ContractState]: string } = {
   declined: 'abgelehnt',
 }
 
-export const defaultSchoolFormData : schoolForm = {
+export const defaultSchoolFormData: schoolForm = {
   firstName: '',
   lastName: '',
   schoolName: '',

@@ -10,7 +10,7 @@ import {
   Request,
   Res,
 } from '@nestjs/common'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import { Response } from 'express'
 
 import { Roles } from 'src/auth/decorators/roles.decorator'
@@ -85,7 +85,13 @@ export class LessonsController {
   @Roles(Role.ADMIN)
   async getInvoiceCustomer(
     @Res() res: Response,
-    @Body() invoiceData: { invoiceNumber: number; invoiceType: string, invoicePreparationTime: number, invoiceDate: string },
+    @Body()
+    invoiceData: {
+      invoiceNumber: number
+      invoiceType: string
+      invoicePreparationTime: number
+      invoiceDate: string
+    },
     @Query('of') month: string,
     @Query('customerId') customerId: string,
     @Query('schoolId') schoolId: string,

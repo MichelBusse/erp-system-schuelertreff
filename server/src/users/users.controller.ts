@@ -107,7 +107,7 @@ export class UsersController {
   getAllTeachers() {
     return this.usersService.findTeachers()
   }
- 
+
   @Get('teacher/me')
   getMeAsTeacher(@Request() req) {
     return this.usersService.findOneTeacher(req.user.id)

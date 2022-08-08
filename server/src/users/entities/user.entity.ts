@@ -8,6 +8,7 @@ import {
 } from 'typeorm'
 
 import { Role } from 'src/auth/role.enum'
+
 import { Leave } from './leave.entity'
 
 export enum TeacherSchoolType {

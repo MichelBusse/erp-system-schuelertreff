@@ -4,7 +4,6 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Autocomplete,
   Button,
   Dialog,
   DialogActions,
@@ -79,7 +78,7 @@ const SchoolDetailView: React.FC = () => {
         schoolTypes: res.data.schoolTypes,
         feeStandard: res.data.feeStandard,
         feeOnline: res.data.feeOnline,
-        notes: res.data.notes
+        notes: res.data.notes,
       }))
     })
   }, [])
@@ -311,7 +310,7 @@ const SchoolDetailView: React.FC = () => {
       >
         <Stack direction="column" alignItems={'stretch'}>
           <h3>Schule:</h3>
-          <Stack direction={{xs: "column", md:"row"}} spacing={2}>
+          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
             <TextField
               fullWidth={true}
               label="Schulname"
@@ -359,7 +358,7 @@ const SchoolDetailView: React.FC = () => {
             />
           </Stack>
           <h3>Adresse:</h3>
-          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               label="Straße"
               fullWidth={true}
@@ -420,7 +419,7 @@ const SchoolDetailView: React.FC = () => {
             />
           </Stack>
           <h3>Kontakt:</h3>
-          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField fullWidth={true} label="Email" value={school.email} />
 
             <TextField
@@ -557,7 +556,11 @@ const SchoolDetailView: React.FC = () => {
               </AccordionDetails>
             </Accordion>
           ))}
-          <Stack direction={{xs: "column", sm:"row"}} spacing={2} sx={{ marginTop: '15px' }}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={2}
+            sx={{ marginTop: '15px' }}
+          >
             {id && (
               <Button
                 onClick={() => {

@@ -1,4 +1,3 @@
-import { UpdateCustomerDto } from './update-customer.dto';
+import { UpdateCustomerDto } from './update-customer.dto'
 
-export class UpdatePrivateCustomerDto extends UpdateCustomerDto {
-}
+export class UpdatePrivateCustomerDto extends UpdateCustomerDto {}

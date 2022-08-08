@@ -44,7 +44,10 @@ const LessonOverview: React.FC<Props> = ({
           contract.endTime.substring(0, 5)}
       </span>
       <span>
-        {contract.subject.name + (contract.contractType === ContractType.STANDARD ? ' (Präsenz)' : ' (Online)')}
+        {contract.subject.name +
+          (contract.contractType === ContractType.STANDARD
+            ? ' (Präsenz)'
+            : ' (Online)')}
       </span>
       <span>Kunden:</span>
       <ul className={styles.list}>

@@ -38,7 +38,7 @@ const Subjects: React.FC = () => {
 
   return (
     <Box sx={{ p: 4 }} className={styles.wrapper}>
-      <Grid container spacing={{xs: 2, sm: 3, md: 4, lg: 5}} columns={24}>
+      <Grid container spacing={{ xs: 2, sm: 3, md: 4, lg: 5 }} columns={24}>
         <Grid item xs={12} sm={8} md={8} lg={6} xl={4}>
           <IconButton
             className={styles.card}

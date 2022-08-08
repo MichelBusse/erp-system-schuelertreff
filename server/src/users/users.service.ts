@@ -10,6 +10,7 @@ import * as argon2 from 'argon2'
 import dayjs from 'dayjs'
 import { DataSource, Not, Repository } from 'typeorm'
 
+import { AuthService } from 'src/auth/auth.service'
 import { Contract } from 'src/contracts/contract.entity'
 import { LessonsService } from 'src/lessons/lessons.service'
 
@@ -37,7 +38,6 @@ import {
 import { Leave, LeaveState } from './entities/leave.entity'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
-import { AuthService } from 'src/auth/auth.service'
 
 /**
  * Format Array of {@link timeAvailable} as Postgres `tstzmultirange`
@@ -315,7 +315,10 @@ export class UsersService {
   }
   async findSchools(): Promise<School[]> {
     return this.schoolsRepository
-      .find({ where: { deleteState: Not(DeleteState.DELETED) }, order: {schoolName: "ASC"} })
+      .find({
+        where: { deleteState: Not(DeleteState.DELETED) },
+        order: { schoolName: 'ASC' },
+      })
       .then(transformUsers)
   }
 
@@ -324,7 +327,7 @@ export class UsersService {
       .find({
         relations: ['subjects'],
         where: { deleteState: Not(DeleteState.DELETED) },
-        order: { firstName: 'ASC', lastName: 'ASC' }
+        order: { firstName: 'ASC', lastName: 'ASC' },
       })
       .then(transformUsers)
   }
@@ -531,7 +534,7 @@ export class UsersService {
       updatedTeacher.state = TeacherState.APPLIED
     }
 
-    if(user.email !== updatedTeacher.email){
+    if (user.email !== updatedTeacher.email) {
       this.authService.initReset(user)
     }
 
@@ -661,5 +664,4 @@ export class UsersService {
 
     return this.usersRepository.save(user)
   }
-
 }

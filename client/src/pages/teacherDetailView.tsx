@@ -17,6 +17,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { nanoid } from 'nanoid'
@@ -42,8 +43,6 @@ import subject from '../types/subject'
 import { leave, Role, teacher, timesAvailableParsed } from '../types/user'
 import { formValidation } from '../utils/formValidation'
 
-import { useTheme } from '@mui/material/styles';
-
 dayjs.extend(customParseFormat)
 
 const TeacherDetailView: React.FC = () => {
@@ -58,7 +57,7 @@ const TeacherDetailView: React.FC = () => {
   const [leaveData, setLeaveData] = useState<leave[]>([])
   const [errors, setErrors] = useState(defaultTeacherFormData)
 
-  const theme = useTheme();
+  const theme = useTheme()
 
   const requestedId = id ?? 'me'
   const activeTeacherState = decodeToken().state
@@ -217,7 +216,7 @@ const TeacherDetailView: React.FC = () => {
             />
           </Stack>
           <Typography variant="h6">Adresse:</Typography>
-          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               helperText={errors.street}
               label="Straße"
@@ -265,7 +264,7 @@ const TeacherDetailView: React.FC = () => {
             />
           </Stack>
           <Typography variant="h6">Kontakt:</Typography>
-          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               fullWidth={true}
               helperText={errors.email}
@@ -405,7 +404,11 @@ const TeacherDetailView: React.FC = () => {
             setValue={setLeaveData}
           />
 
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ marginTop: '15px' }}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={2}
+            sx={{ marginTop: '15px' }}
+          >
             {id && (
               <Button
                 onClick={() => {

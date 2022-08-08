@@ -3,8 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { ContractsModule } from 'src/contracts/contracts.module'
 import { UsersModule } from 'src/users/users.module'
-import { Invoice } from './invoice.entity'
 
+import { Invoice } from './invoice.entity'
 import { Lesson } from './lesson.entity'
 import { LessonsController } from './lessons.controller'
 import { LessonsService } from './lessons.service'

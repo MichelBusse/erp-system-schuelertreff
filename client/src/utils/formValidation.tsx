@@ -30,7 +30,8 @@ export function formValidation(form: string, data: any): any {
     temp.firstName = data.firstName ? '' : errorText.firstName
     temp.lastName = data.lastName ? '' : errorText.lastName
     temp.city = data.city ? '' : errorText.city
-    temp.postalCode = data.postalCode && data.postalCode.length == 5 ? '' : errorText.postalCode
+    temp.postalCode =
+      data.postalCode && data.postalCode.length == 5 ? '' : errorText.postalCode
     temp.street = data.street ? '' : errorText.street
     temp.email = testEmail(data.email) ? '' : errorText.email
     temp.phone = data.phone.length > 9 ? '' : errorText.phone

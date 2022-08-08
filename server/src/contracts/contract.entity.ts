@@ -19,7 +19,6 @@ export enum ContractState {
   DECLINED = 'declined',
 }
 
-
 export enum ContractType {
   STANDARD = 'standard',
   ONLINE = 'online',
@@ -73,12 +72,10 @@ export class Contract {
   @OneToMany(() => Lesson, (lesson) => lesson.contract)
   lessons: Lesson[]
 
-
   @Column({
     type: 'enum',
     enum: ContractType,
     default: ContractType.STANDARD,
   })
   contractType: ContractType
-
 }
