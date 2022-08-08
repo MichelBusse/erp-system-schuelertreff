@@ -47,6 +47,7 @@ export const defaultPrivateCustomerFormData: privateCustomerForm = {
   timesAvailable: [],
   feeStandard: 30,
   feeOnline: 20,
+  notes: '',
 }
 
 export const snackbarOptions: SnackbarOptions = {
@@ -96,6 +97,7 @@ export const defaultSchoolFormData: schoolForm = {
   schoolTypes: [],
   feeStandard: 30,
   feeOnline: 20,
+  notes: '',
 }
 
 export const defaultClassCustomerFormData: classCustomerForm = {

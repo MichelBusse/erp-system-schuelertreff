@@ -78,8 +78,8 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
               options={[
                 SchoolType.GRUNDSCHULE,
                 SchoolType.OBERSCHULE,
-                SchoolType.GYMSEK1,
-                SchoolType.GYMSEK2,
+                SchoolType.GYMNASIUM,
+                SchoolType.ANDERE,
               ]}
               getOptionLabel={(option) => {
                 switch (option) {
@@ -87,10 +87,10 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
                     return 'Grundschule'
                   case SchoolType.OBERSCHULE:
                     return 'Oberschule'
-                  case SchoolType.GYMSEK1:
-                    return 'Gymnasium Sek. 1'
-                  case SchoolType.GYMSEK2:
-                    return 'Gymnasium Sek. 2'
+                  case SchoolType.GYMNASIUM:
+                    return 'Gymnasium'
+                  case SchoolType.ANDERE:
+                    return 'Andere'
                   default:
                     return ''
                 }
