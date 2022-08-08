@@ -207,6 +207,11 @@ export class UsersController {
       phone: dto.phone,
       city: dto.city,
       schoolTypes: dto.schoolTypes,
+      dateOfBirth: dto.dateOfBirth,
+      bankAccountOwner: dto.bankAccountOwner,
+      bankInstitution: dto.bankInstitution,
+      iban: dto.iban,
+      bic: dto.bic
     })
   }
 
