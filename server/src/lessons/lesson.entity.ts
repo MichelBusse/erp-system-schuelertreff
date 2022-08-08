@@ -1,29 +1,31 @@
-import { Contract } from 'src/contracts/contract.entity';
-import { Teacher } from 'src/users/entities/teacher.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+
+import { Contract } from 'src/contracts/contract.entity'
 
 export enum LessonState {
+  IDLE = 'idle',
   HELD = 'held',
-  POSTPONED = 'postponed',
+  CANCELLED = 'cancelled',
 }
 
 @Entity()
 export class Lesson {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
-  @Column({ type: 'timestamptz' })
-  date: Date;
+  @Column({ type: 'date' })
+  date: string
 
   @Column({
     type: 'enum',
     enum: LessonState,
+    default: LessonState.IDLE,
   })
-  state: LessonState;
+  state: LessonState
 
-  @ManyToOne(() => Teacher)
-  teacher: Teacher;
+  @ManyToOne(() => Contract, (contract) => contract.lessons)
+  contract: Contract
 
-  @ManyToOne(() => Contract)
-  contract: Contract;
+  @Column({ type: 'text', default: '' })
+  notes: string
 }

@@ -1,30 +1,50 @@
-import { ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
-import { Weekdays } from '../contract.entity';
-import { Teacher } from 'src/users/entities/teacher.entity';
-import { Customer } from 'src/users/entities/customer.entity';
-import { Subject } from 'src/subjects/subject.entity';
+import {
+  ArrayNotEmpty,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  Max,
+  Min,
+} from 'class-validator'
+
+import { IsTime24h } from 'src/IsTime24h.decorator'
+import { IsValidDate } from 'src/IsValidDate.decorator'
+
+import { ContractState } from '../contract.entity'
 
 export class CreateContractDto {
-  //TODO:
+  @ArrayNotEmpty()
+  @IsInt({ each: true })
+  customers: number[]
 
-  @Type(() => Customer)
-  @ValidateNested({ each: true })
-  customers: Customer[];
+  @IsInt()
+  teacher: number
 
-  teacher: Teacher;
+  @IsInt()
+  subject: number
 
-  subject: Subject;
+  @IsTime24h()
+  startTime: string
 
-  weekday: Weekdays;
+  @IsTime24h()
+  endTime: string
 
-  from: string;
+  @IsValidDate()
+  startDate: string
 
-  to: string;
+  @IsValidDate()
+  endDate: string
 
-  startDate: Date;
+  @Min(1)
+  @Max(4)
+  @IsInt()
+  interval: number
 
-  endDate: Date;
+  @IsOptional()
+  @IsInt()
+  parentContract?: number
 
-  frequency: number;
+  @IsOptional()
+  @IsEnum(ContractState)
+  state?: ContractState
 }

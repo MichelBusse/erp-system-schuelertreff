@@ -1,5 +1,7 @@
 export enum Role {
-  CUSTOMER = 'customer',
+  PRIVATECUSTOMER = 'privateCustomer',
+  SCHOOL = 'school',
   TEACHER = 'teacher',
   ADMIN = 'admin',
+  CLASSCUSTOMER = 'classCustomer',
 }

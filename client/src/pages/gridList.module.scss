@@ -1,0 +1,65 @@
+.wrapper {
+  display: flex;
+  width: 100%;
+  padding: 32px;
+
+  :global(.MuiDataGrid-row) {
+    border-radius: 50px;
+    cursor: pointer;
+    background-color: white !important;
+  }
+
+  :global(.MuiDataGrid-root) {
+    border: none !important;
+  }
+
+  :global(.MuiDataGrid-columnHeaders) {
+    border-bottom: none !important;
+    display: none;
+  }
+
+  :global(.MuiDataGrid-cell) {
+    border-bottom: none !important;
+    outline: none !important;
+  }
+
+  :global(.MuiDataGrid-virtualScrollerRenderZone) {
+    padding-bottom: 20px;
+  }
+
+  .customGridToolbarContainer {
+    border-radius: 50px;
+    height: 52px;
+    background-color: white;
+    padding: 0px 20px;
+    display: flex;
+    justify-content: space-between;
+
+    :global(.MuiDataGrid-filterFormOperatorInput) {
+      display: none;
+    }
+  }
+}
+
+@media only screen and (max-width: 899px) {
+  /* For mobile phones: */
+  .wrapper {
+    padding-bottom: 82px;
+  }
+}
+
+@media only screen and (max-width: 599px) {
+  /* For mobile phones: */
+  .wrapper {
+    padding: 0px;
+    padding-bottom: 32px;
+  }
+}
+
+@media only screen and (max-width: 599px) {
+  /* For mobile phones: */
+  .pageWrapper {
+    padding: 16px;
+    padding-bottom: 32px;
+  }
+}

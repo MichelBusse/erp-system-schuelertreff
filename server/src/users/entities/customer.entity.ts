@@ -1,8 +1,16 @@
-import { ChildEntity } from 'typeorm';
-import { Role } from 'src/auth/role.enum';
-import { User } from './user.entity';
+import { ChildEntity, Column } from 'typeorm'
+
+import { SchoolType, User } from './user.entity'
 
 @ChildEntity()
-export class Customer extends User {
-  role = Role.CUSTOMER;
+export abstract class Customer extends User {
+  @Column()
+  grade: number
+
+  @Column({
+    type: 'enum',
+    enum: SchoolType,
+    nullable: true,
+  })
+  schoolType: SchoolType
 }

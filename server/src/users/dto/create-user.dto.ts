@@ -1,19 +1,24 @@
-import { Salutation } from '../entities/user.entity';
+import { IsArray, IsNotEmpty, IsOptional } from 'class-validator'
+
+import { SchoolType } from '../entities/user.entity'
 
 export abstract class CreateUserDto {
-  lastName: string;
+  @IsNotEmpty()
+  street: string
 
-  firstName: string;
+  @IsNotEmpty()
+  city: string
 
-  salutation: Salutation;
+  @IsNotEmpty()
+  postalCode: string
 
-  street: string;
+  @IsNotEmpty()
+  email: string
 
-  city: string;
+  @IsNotEmpty()
+  phone: string
 
-  postalCode: string;
-
-  email: string;
-
-  phone: string;
+  @IsOptional()
+  @IsArray()
+  schoolTypes?: SchoolType[]
 }

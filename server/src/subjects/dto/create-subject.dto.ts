@@ -1,3 +1,5 @@
 export class CreateSubjectDto {
-  name: string;
+  name: string
+  color: string
+  shortForm: string
 }

@@ -3,6 +3,7 @@ FROM node:16-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
+COPY patches ./patches
 RUN npm clean-install
 
 COPY . .
@@ -16,6 +17,7 @@ ENV NODE_ENV=production
 WORKDIR /app
 
 COPY package*.json ./
+COPY patches ./patches
 RUN npm clean-install --only=prod
 
 COPY --from=builder /app/dist ./dist

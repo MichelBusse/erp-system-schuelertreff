@@ -1,58 +1,81 @@
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
+  Entity,
   JoinTable,
   ManyToMany,
-} from 'typeorm';
-import { Customer } from 'src/users/entities/customer.entity';
-import { Teacher } from 'src/users/entities/teacher.entity';
-import { Subject } from 'src/subjects/subject.entity';
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm'
 
-export enum Weekdays {
-  MONDAY = 'monday',
-  TUESDAY = 'tuesday',
-  WEDNESDAY = 'wednesday',
-  THURSTDAY = 'thurstday',
-  FRIDAY = 'friday',
-  SATURDAY = 'sturday',
-  SUNDAY = 'sunday',
+import { Lesson } from 'src/lessons/lesson.entity'
+import { Subject } from 'src/subjects/subject.entity'
+import { Customer } from 'src/users/entities/customer.entity'
+import { Teacher } from 'src/users/entities/teacher.entity'
+
+export enum ContractState {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  DECLINED = 'declined',
+}
+
+export enum ContractType {
+  STANDARD = 'standard',
+  ONLINE = 'online',
 }
 
 @Entity()
 export class Contract {
   @PrimaryGeneratedColumn()
-  id: number;
-
-  @ManyToMany(() => Customer, { cascade: true })
-  @JoinTable()
-  customers: Customer[];
-
-  @ManyToOne(() => Teacher)
-  teacher: Teacher;
-
-  @ManyToOne(() => Subject)
-  subject: Subject;
+  id: number
 
   @Column({
     type: 'enum',
-    enum: Weekdays,
+    enum: ContractState,
+    default: ContractState.PENDING,
   })
-  weekday: Weekdays;
+  state: ContractState
+
+  @ManyToMany(() => Customer)
+  @JoinTable()
+  customers: Customer[]
+
+  @ManyToOne(() => Teacher)
+  teacher: Teacher
+
+  @ManyToOne(() => Subject)
+  subject: Subject
 
   @Column({ type: 'time' })
-  from: string;
+  startTime: string
 
   @Column({ type: 'time' })
-  to: string;
+  endTime: string
 
-  @Column({ type: 'timestamptz' })
-  startDate: Date;
+  @Column({ type: 'date' })
+  startDate: string
 
-  @Column({ type: 'timestamptz' })
-  endDate: Date;
+  @Column({ type: 'date', nullable: true })
+  endDate: string
 
   @Column()
-  frequency: number;
+  interval: number
+
+  @ManyToOne(() => Contract, (contract) => contract.childContracts, {
+    nullable: true,
+  })
+  parentContract: Contract
+
+  @OneToMany(() => Contract, (contract) => contract.parentContract)
+  childContracts: Contract[]
+
+  @OneToMany(() => Lesson, (lesson) => lesson.contract)
+  lessons: Lesson[]
+
+  @Column({
+    type: 'enum',
+    enum: ContractType,
+    default: ContractType.STANDARD,
+  })
+  contractType: ContractType
 }

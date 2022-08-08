@@ -1,4 +1,9 @@
 import {
+  ChevronLeft as ChevronLeftIcon,
+  Menu as MenuIcon,
+} from '@mui/icons-material'
+import LogoutIcon from '@mui/icons-material/Logout'
+import {
   Divider,
   Drawer,
   IconButton,
@@ -10,12 +15,13 @@ import {
   SvgIcon,
   Toolbar,
 } from '@mui/material'
-import {
-  ChevronLeft as ChevronLeftIcon,
-  Menu as MenuIcon,
-} from '@mui/icons-material'
+import { useTheme } from '@mui/material/styles'
+import { Box } from '@mui/system'
 import React, { useState } from 'react'
 import { NavLink as NavLinkBase, NavLinkProps } from 'react-router-dom'
+
+import logo from '../assets/logo.png'
+import { useAuth } from './AuthProvider'
 
 const drawerWidth = 240
 
@@ -47,21 +53,34 @@ const NavLink = React.forwardRef<HTMLAnchorElement, NavLinkProps>(
     />
   ),
 )
+NavLink.displayName = 'NavLink' // for debugging
 
 export type MainMenuProps = {
   items: Array<{
     icon: typeof SvgIcon
     text: string
     href: string
+    roles?: string[]
   }>
 }
 
 const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
   const [open, setOpen] = useState(true)
   const toggleDrawer = () => setOpen(!open)
+  const { isAuthed, handleLogout, decodeToken } = useAuth()
+
+  const theme = useTheme()
 
   return (
-    <StyledDrawer variant="permanent" open={open}>
+    <StyledDrawer
+      variant="permanent"
+      open={open}
+      sx={{
+        [theme.breakpoints.down('md')]: {
+          display: 'none',
+        },
+      }}
+    >
       <Toolbar
         sx={{
           display: 'flex',
@@ -74,17 +93,47 @@ const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
           {open ? <ChevronLeftIcon /> : <MenuIcon />}
         </IconButton>
       </Toolbar>
+      <img
+        src={logo}
+        alt="Schülertreff"
+        style={{
+          margin: '10%',
+          userSelect: 'none',
+        }}
+      />
       <Divider />
       <List component="nav">
-        {items.map((item, i) => (
-          <ListItemButton key={i} component={NavLink} to={item.href}>
-            <ListItemIcon>
-              <item.icon />
-            </ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItemButton>
-        ))}
+        {items
+          .filter(
+            (item) =>
+              typeof item.roles === 'undefined' ||
+              (isAuthed() && item.roles.includes(decodeToken().role)),
+          )
+          .map((item, i) => (
+            <ListItemButton key={i} component={NavLink} to={item.href}>
+              <ListItemIcon>
+                <item.icon />
+              </ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          ))}
       </List>
+      <Divider />
+      {isAuthed() && (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            mt: 1,
+          }}
+        >
+          {open && <span>{decodeToken().username}</span>}
+          <IconButton onClick={() => handleLogout()}>
+            <LogoutIcon />
+          </IconButton>
+        </Box>
+      )}
     </StyledDrawer>
   )
 }

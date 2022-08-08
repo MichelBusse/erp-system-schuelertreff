@@ -1,13 +1,18 @@
-import { Contract } from 'src/contracts/contract.entity';
-import { Teacher } from 'src/users/entities/teacher.entity';
-import { LessonState } from '../lesson.entity';
+import { IsEnum, IsNumber } from 'class-validator'
+
+import { IsValidDate } from 'src/IsValidDate.decorator'
+
+import { LessonState } from '../lesson.entity'
 
 export class CreateLessonDto {
-  date: Date;
+  @IsValidDate()
+  date: string
 
-  state: LessonState;
+  @IsEnum(LessonState)
+  state: LessonState
 
-  contract: Contract;
+  @IsNumber()
+  contractId: number
 
-  teacher: Teacher;
+  notes: string
 }

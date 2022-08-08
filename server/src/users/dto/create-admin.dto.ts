@@ -1,3 +1,11 @@
-import { CreateUserDto } from './create-user.dto';
+import { IsNotEmpty } from 'class-validator'
 
-export class CreateAdminDto extends CreateUserDto {}
+import { CreateUserDto } from './create-user.dto'
+
+export class CreateAdminDto extends CreateUserDto {
+  @IsNotEmpty()
+  lastName: string
+
+  @IsNotEmpty()
+  firstName: string
+}

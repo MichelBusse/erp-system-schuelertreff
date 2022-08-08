@@ -1,5 +1,8 @@
-export class ResetPasswordDto {
-  token: string;
+import { MinLength } from 'class-validator'
 
-  password: string;
+export class ResetPasswordDto {
+  token: string
+
+  @MinLength(8)
+  password: string
 }
