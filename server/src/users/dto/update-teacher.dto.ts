@@ -21,4 +21,11 @@ export class UpdateTeacherDto extends UpdateUserDto {
 
   @IsOptional()
   state: TeacherState
+
+  dateOfBirth: Date
+
+  bankAccountOwner: string
+  bankInstitution: string
+  iban: string
+  bic: string
 }

@@ -124,6 +124,7 @@ const TeacherDetailView: React.FC = () => {
         ...data,
         ...override,
         dateOfBirth: data.dateOfBirth?.format(),
+        dateOfEmploymentStart: data.dateOfEmploymentStart?.format(),
         timesAvailable: data.timesAvailable.map((time) => ({
           dow: time.dow,
           start: time.start?.format('HH:mm'),
@@ -461,6 +462,7 @@ const TeacherDetailView: React.FC = () => {
                 label="Beginn Arbeitsvertrag"
                 mask="__.__.____"
                 value={data.dateOfEmploymentStart}
+                disabled={requestedId === 'me'}
                 onChange={(value) => {
                   setData((d) => ({ ...d, dateOfEmploymentStart: value }))
                 }}
