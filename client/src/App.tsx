@@ -46,7 +46,6 @@ const theme = createTheme({
   palette: {
     // TODO: custom primary color with sufficient contrast
     // https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_WCAG/Perceivable/Color_contrast
-
     // primary: {
     //   main: '#54e2fd',
     // },

@@ -1,6 +1,7 @@
 import {
   Button,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
   Stack,
@@ -134,19 +135,19 @@ const AcceptContractsDialog: React.FC<Props> = ({
                     direction={'row'}
                     columnGap={2}
                     alignItems={'center'}
-                    justifyContent={'space-between'}
+                    justifyContent={'flex-end'}
                   >
+                    <Button
+                      variant="text"
+                      onClick={() => acceptOrDecline(c, ContractState.DECLINED)}
+                    >
+                      Ablehnen
+                    </Button>
                     <Button
                       variant="contained"
                       onClick={() => acceptOrDecline(c, ContractState.ACCEPTED)}
                     >
                       Annehmen
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={() => acceptOrDecline(c, ContractState.DECLINED)}
-                    >
-                      Ablehnen
                     </Button>
                   </Stack>
                 </Stack>
@@ -155,6 +156,14 @@ const AcceptContractsDialog: React.FC<Props> = ({
           })}
         </Stack>
       </DialogContent>
+      <DialogActions>
+        <Button
+          variant="text"
+          onClick={() => setOpen(false)}
+        >
+          Abbrechen
+        </Button>
+      </DialogActions>
     </Dialog>
   )
 }

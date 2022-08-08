@@ -556,6 +556,11 @@ const SchoolDetailView: React.FC = () => {
               </AccordionDetails>
             </Accordion>
           ))}
+
+          <h3>Dokumente:</h3>
+          <UserDocuments
+            userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
+          />
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={2}
@@ -585,11 +590,6 @@ const SchoolDetailView: React.FC = () => {
               </Button>
             )}
           </Stack>
-
-          <h3>Dokumente:</h3>
-          <UserDocuments
-            userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
-          />
 
           <h3>Rechnung generieren:</h3>
           <InvoiceDataSelect

@@ -12,6 +12,10 @@ import { DataSource, Not, Repository } from 'typeorm'
 
 import { AuthService } from 'src/auth/auth.service'
 import { Contract } from 'src/contracts/contract.entity'
+import {
+  DocumentsService,
+  renderTemplate,
+} from 'src/documents/documents.service'
 import { LessonsService } from 'src/lessons/lessons.service'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
@@ -38,6 +42,13 @@ import {
 import { Leave, LeaveState } from './entities/leave.entity'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
+
+const allowedStateTransitions: Record<TeacherState, TeacherState[]> = {
+  created: [TeacherState.CREATED],
+  applied: [TeacherState.APPLIED, TeacherState.CONTRACT],
+  contract: [TeacherState.CONTRACT, TeacherState.EMPLOYED],
+  employed: [TeacherState.EMPLOYED],
+}
 
 /**
  * Format Array of {@link timeAvailable} as Postgres `tstzmultirange`
@@ -115,6 +126,8 @@ export class UsersService {
 
     @Inject(forwardRef(() => AuthService))
     private authService: AuthService,
+
+    private readonly documentsService: DocumentsService,
   ) {}
 
   /**
@@ -514,6 +527,11 @@ export class UsersService {
   ): Promise<Teacher> {
     const user = await this.findOneTeacher(id)
 
+    // reject non-successive state transitions
+    if (dto.state && !allowedStateTransitions[user.state].includes(dto.state)) {
+      throw new BadRequestException()
+    }
+
     const updatedTeacher: Teacher = {
       ...user,
       ...dto,
@@ -532,6 +550,67 @@ export class UsersService {
       updatedTeacher.phone
     ) {
       updatedTeacher.state = TeacherState.APPLIED
+    }
+
+    // auto-generate documents
+    if (
+      user.state !== TeacherState.CONTRACT &&
+      updatedTeacher.state === TeacherState.CONTRACT
+    ) {
+      // generate work contract
+      const buffer = await renderTemplate(
+        'workContract',
+        {
+          customerInfo: {
+            firstName: updatedTeacher.firstName,
+            lastName: updatedTeacher.lastName,
+            street: updatedTeacher.street,
+            zip: updatedTeacher.postalCode,
+            city: updatedTeacher.city,
+            dateOfBirth: dayjs(updatedTeacher.dateOfBirth).format('DD.MM.YYYY'),
+            phone: updatedTeacher.phone,
+            email: updatedTeacher.email,
+            fee: updatedTeacher.fee.toFixed(2).replace('.', ','),
+            dateOfEmploymentStart: dayjs(
+              updatedTeacher.dateOfEmploymentStart,
+            ).format('DD.MM.YYYY'),
+            bankAccountOwner: updatedTeacher.bankAccountOwner,
+            bankInstitution: updatedTeacher.bankInstitution,
+            iban: updatedTeacher.iban,
+            bic: updatedTeacher.bic,
+          },
+        },
+        {
+          left: '90px',
+          top: '70px',
+          right: '90px',
+          bottom: '70px',
+        },
+      )
+
+      await this.documentsService.create({
+        fileName: 'Arbeitsvertrag.pdf',
+        fileType: 'application/pdf',
+        owner: user.id,
+        mayRead: true,
+        mayDelete: false,
+        content: buffer,
+      })
+    } else if (
+      user.state !== TeacherState.EMPLOYED &&
+      updatedTeacher.state === TeacherState.EMPLOYED
+    ) {
+      // generate efs form
+      const buffer = await renderTemplate('efsForm', { user: updatedTeacher })
+
+      await this.documentsService.create({
+        fileName: 'Antrag für erweitertes FZ.pdf',
+        fileType: 'application/pdf',
+        owner: user.id,
+        mayRead: true,
+        mayDelete: false,
+        content: buffer,
+      })
     }
 
     if (user.email !== updatedTeacher.email) {

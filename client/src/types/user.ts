@@ -1,3 +1,4 @@
+import { Dayjs } from 'dayjs'
 import {
   Degree,
   LeaveState,
@@ -58,6 +59,12 @@ export interface teacher extends user {
   degree: Degree
   subjects: subject[]
   schoolTypes: SchoolType[]
+  iban: string
+  bic: string
+  bankAccountOwner: string
+  bankInstitution: string
+  dateOfBirth: string | null
+  dateOfEmploymentStart: string | null
 }
 
 export interface admin extends user {
