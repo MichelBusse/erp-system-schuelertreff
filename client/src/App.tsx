@@ -44,9 +44,12 @@ const ProtectedRoute: React.FC<{ roles?: Role[] }> = ({
 
 const theme = createTheme({
   palette: {
-    primary: {
-      main: '#54e2fd',
-    },
+    // TODO: custom primary color with sufficient contrast
+    // https://developer.mozilla.org/en-US/docs/Web/Accessibility/Understanding_WCAG/Perceivable/Color_contrast
+
+    // primary: {
+    //   main: '#54e2fd',
+    // },
   },
 })
 
