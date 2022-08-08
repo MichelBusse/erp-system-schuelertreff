@@ -33,6 +33,7 @@ import ConfirmationDialog, {
   defaultConfirmationDialogProps,
 } from '../components/ConfirmationDialog'
 import InvoiceDataSelect, { InvoiceData } from '../components/InvoiceDateSelect'
+import UserDocuments from '../components/UserDocuments'
 import {
   defaultClassCustomerFormData,
   defaultSchoolFormData,
@@ -581,6 +582,12 @@ const SchoolDetailView: React.FC = () => {
               </Button>
             )}
           </Stack>
+
+          <h3>Dokumente:</h3>
+          <UserDocuments
+            userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
+          />
+
           <h3>Rechnung generieren:</h3>
           <InvoiceDataSelect
             generateInvoice={generateInvoice}

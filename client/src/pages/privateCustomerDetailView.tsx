@@ -23,6 +23,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
 import InvoiceDataSelect, { InvoiceData } from '../components/InvoiceDateSelect'
+import UserDocuments from '../components/UserDocuments'
 import {
   defaultPrivateCustomerFormData,
   snackbarOptions,
@@ -394,6 +395,12 @@ const PrivateCustomerDetailView: React.FC = () => {
               </Button>
             )}
           </Stack>
+
+          <h3>Dokumente:</h3>
+          <UserDocuments
+            userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
+          />
+
           <h3>Rechnung generieren:</h3>
           <InvoiceDataSelect
             generateInvoice={generateInvoice}
