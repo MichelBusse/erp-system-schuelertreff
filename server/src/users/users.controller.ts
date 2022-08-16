@@ -212,6 +212,7 @@ export class UsersController {
       bankInstitution: dto.bankInstitution,
       iban: dto.iban,
       bic: dto.bic,
+      timesAvailable: dto.timesAvailable,
     })
   }
 
