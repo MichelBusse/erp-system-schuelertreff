@@ -1,6 +1,13 @@
 import { Type } from 'class-transformer'
-import { IsArray, IsInt, IsNotEmpty, ValidateNested } from 'class-validator'
+import {
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  ValidateNested,
+} from 'class-validator'
 
+import { SchoolType } from '../entities/user.entity'
 import { timeAvailable } from './timeAvailable'
 
 export class CreateClassCustomerDto {
@@ -14,4 +21,7 @@ export class CreateClassCustomerDto {
   @Type(() => timeAvailable)
   @ValidateNested({ each: true })
   timesAvailable: timeAvailable[]
+
+  @IsEnum(SchoolType)
+  schoolType: SchoolType
 }

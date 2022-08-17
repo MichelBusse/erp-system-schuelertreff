@@ -29,7 +29,7 @@ export const defaultTeacherFormData: teacherForm = {
   subjects: [],
   fee: null,
   degree: '',
-  schoolTypes: [],
+  teacherSchoolTypes: [],
   timesAvailable: [],
   state: TeacherState.CREATED,
   iban: '',

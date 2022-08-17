@@ -61,6 +61,8 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           start: time.start?.format('HH:mm'),
           end: time.end?.format('HH:mm'),
         })),
+        grade: data.grade,
+        schoolType: data.schoolType,
       })
         .then((res) => {
           setCustomers((s) => [...s, res.data])

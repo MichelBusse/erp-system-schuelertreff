@@ -4,6 +4,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Autocomplete,
   Button,
   Dialog,
   DialogActions,
@@ -117,7 +118,11 @@ const SchoolDetailView: React.FC = () => {
   }, [])
 
   const submitForm = () => {
-    API.post('users/school/' + requestedId, school)
+    API.post('users/school/' + requestedId, {
+      ...school,
+      firstName: school.firstName !== '' ? school.firstName : undefined,
+      lastName: school.lastName !== '' ? school.lastName : undefined,
+    })
       .then(() => {
         enqueueSnackbar(school.schoolName + ' gespeichert')
         if (id) navigate('/schools')
@@ -325,6 +330,38 @@ const SchoolDetailView: React.FC = () => {
                 readOnly: requestedId === 'me',
               }}
             />
+            <Autocomplete
+              fullWidth
+              multiple
+              id="schoolTypes"
+              options={[
+                SchoolType.GRUNDSCHULE,
+                SchoolType.OBERSCHULE,
+                SchoolType.GYMNASIUM,
+                SchoolType.ANDERE,
+              ]}
+              getOptionLabel={(option) => {
+                switch (option) {
+                  case SchoolType.GRUNDSCHULE:
+                    return 'Grundschule'
+                  case SchoolType.OBERSCHULE:
+                    return 'Oberschule'
+                  case SchoolType.GYMNASIUM:
+                    return 'Gymnasium'
+                  case SchoolType.ANDERE:
+                    return 'Andere'
+                  default:
+                    return ''
+                }
+              }}
+              renderInput={(params) => (
+                <TextField {...params} variant="outlined" label="Schularten" />
+              )}
+              value={school.schoolTypes}
+              onChange={(_, value) =>
+                setSchool((data) => ({ ...data, schoolTypes: value }))
+              }
+            />
           </Stack>
           <h3>Ansprechpartner</h3>
           <Stack direction="row" columnGap={2}>
@@ -363,6 +400,12 @@ const SchoolDetailView: React.FC = () => {
               label="Straße"
               fullWidth={true}
               value={school.street}
+              onChange={(event) =>
+                setSchool((data) => ({
+                  ...data,
+                  street: event.target.value,
+                }))
+              }
               InputProps={{
                 readOnly: false,
               }}
@@ -371,6 +414,12 @@ const SchoolDetailView: React.FC = () => {
               label="Postleitzahl"
               fullWidth={true}
               value={school.postalCode}
+              onChange={(event) =>
+                setSchool((data) => ({
+                  ...data,
+                  postalCode: event.target.value,
+                }))
+              }
               InputProps={{
                 readOnly: false,
               }}
@@ -379,6 +428,12 @@ const SchoolDetailView: React.FC = () => {
               label="Stadt"
               fullWidth={true}
               value={school.city}
+              onChange={(event) =>
+                setSchool((data) => ({
+                  ...data,
+                  city: event.target.value,
+                }))
+              }
               InputProps={{
                 readOnly: false,
               }}
@@ -420,12 +475,28 @@ const SchoolDetailView: React.FC = () => {
           </Stack>
           <h3>Kontakt:</h3>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-            <TextField fullWidth={true} label="Email" value={school.email} />
+            <TextField
+              fullWidth={true}
+              label="Email"
+              value={school.email}
+              onChange={(event) =>
+                setSchool((data) => ({
+                  ...data,
+                  email: event.target.value,
+                }))
+              }
+            />
 
             <TextField
               fullWidth={true}
               label="Telefonnummer"
               value={school.phone}
+              onChange={(event) =>
+                setSchool((data) => ({
+                  ...data,
+                  phone: event.target.value,
+                }))
+              }
             />
           </Stack>
           <h3>Notizen</h3>

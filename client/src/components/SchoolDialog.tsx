@@ -36,7 +36,7 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
     if (formValidation('school', data).validation)
       API.post('users/school', data).then((res) => {
         setCustomers((s) => [...s, res.data])
-        setOpen(false)
+        closeForm()
       })
   }
 

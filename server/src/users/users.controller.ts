@@ -206,12 +206,13 @@ export class UsersController {
       subjects: dto.subjects,
       phone: dto.phone,
       city: dto.city,
-      schoolTypes: dto.schoolTypes,
+      teacherSchoolTypes: dto.teacherSchoolTypes,
       dateOfBirth: dto.dateOfBirth,
       bankAccountOwner: dto.bankAccountOwner,
       bankInstitution: dto.bankInstitution,
       iban: dto.iban,
       bic: dto.bic,
+      timesAvailable: dto.timesAvailable,
     })
   }
 

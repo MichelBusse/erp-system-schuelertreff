@@ -68,7 +68,7 @@ export function formatTimesAvailable(times: timeAvailable[]) {
  * Parse Postgres `tstzmultirange` literal to Array of {@link timeAvailable}
  */
 export function parseMultirange(multirange: string): timeAvailable[] {
-  const regex = /[\[\(]"([^"]*)","([^"]*)"[\]\)]/g
+  const regex = /\["?([^",]*)"?, ?"?([^",]*)"?\)/g
 
   return [...multirange.matchAll(regex)].map((range) => {
     const start = dayjs(range[1].substring(0, 16))
@@ -463,16 +463,18 @@ export class UsersService {
   ): Promise<PrivateCustomer> {
     const user = await this.findOne(id)
 
-    return this.privateCustomersRepository.save({
-      ...user,
-      street: dto.street,
-      postalCode: dto.postalCode,
-      city: dto.city,
-      phone: dto.phone,
-      grade: dto.grade,
-      schoolType: dto.schoolType,
-      timesAvailable: formatTimesAvailable(dto.timesAvailable),
-    })
+    return this.privateCustomersRepository
+      .save({
+        ...user,
+        street: dto.street,
+        postalCode: dto.postalCode,
+        city: dto.city,
+        phone: dto.phone,
+        grade: dto.grade,
+        schoolType: dto.schoolType,
+        timesAvailable: formatTimesAvailable(dto.timesAvailable),
+      })
+      .then(transformUser)
   }
 
   async updatePrivateCustomerAdmin(
@@ -481,11 +483,13 @@ export class UsersService {
   ): Promise<PrivateCustomer> {
     const user = await this.findOne(id)
 
-    return this.privateCustomersRepository.save({
-      ...user,
-      ...dto,
-      timesAvailable: formatTimesAvailable(dto.timesAvailable),
-    })
+    return this.privateCustomersRepository
+      .save({
+        ...user,
+        ...dto,
+        timesAvailable: formatTimesAvailable(dto.timesAvailable),
+      })
+      .then(transformUser)
   }
 
   async updateClassCustomerAdmin(
@@ -494,31 +498,37 @@ export class UsersService {
   ): Promise<ClassCustomer> {
     const user = await this.findOne(id)
 
-    return this.classCustomersRepository.save({
-      ...user,
-      ...dto,
-      timesAvailable: formatTimesAvailable(dto.timesAvailable),
-    })
+    return this.classCustomersRepository
+      .save({
+        ...user,
+        ...dto,
+        timesAvailable: formatTimesAvailable(dto.timesAvailable),
+      })
+      .then(transformUser)
   }
 
   async updateSchoolAdmin(id: number, dto: UpdateSchoolDto): Promise<School> {
     const school = await this.findOne(id)
 
-    return this.schoolsRepository.save({
-      ...school,
-      ...dto,
-      timesAvailable: `{${maxTimeRange}}`,
-    })
+    return this.schoolsRepository
+      .save({
+        ...school,
+        ...dto,
+        timesAvailable: `{${maxTimeRange}}`,
+      })
+      .then(transformUser)
   }
 
   async updateUserAdmin(id: number, dto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id)
 
-    return this.usersRepository.save({
-      ...user,
-      ...dto,
-      timesAvailable: formatTimesAvailable(dto.timesAvailable),
-    })
+    return this.usersRepository
+      .save({
+        ...user,
+        ...dto,
+        timesAvailable: formatTimesAvailable(dto.timesAvailable),
+      })
+      .then(transformUser)
   }
 
   async updateTeacher(
@@ -531,8 +541,6 @@ export class UsersService {
     if (dto.state && !allowedStateTransitions[user.state].includes(dto.state)) {
       throw new BadRequestException()
     }
-
-    console.log(dto)
 
     const updatedTeacher: Teacher = {
       ...user,
@@ -619,7 +627,7 @@ export class UsersService {
       this.authService.initReset(user)
     }
 
-    return this.teachersRepository.save(updatedTeacher)
+    return this.teachersRepository.save(updatedTeacher).then(transformUser)
   }
 
   async deleteTeacher(id: number) {
