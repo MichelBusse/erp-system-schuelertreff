@@ -68,18 +68,18 @@ const SchoolDetailView: React.FC = () => {
     API.get('users/school/' + requestedId).then((res) => {
       setSchool((data) => ({
         ...data,
-        firstName: res.data.firstName,
-        lastName: res.data.lastName,
-        schoolName: res.data.schoolName,
-        city: res.data.city,
-        postalCode: res.data.postalCode,
-        street: res.data.street,
-        email: res.data.email,
-        phone: res.data.phone,
-        schoolTypes: res.data.schoolTypes,
+        firstName: res.data.firstName ?? '',
+        lastName: res.data.lastName ?? '',
+        schoolName: res.data.schoolName ?? '',
+        city: res.data.city ?? '',
+        postalCode: res.data.postalCode ?? '',
+        street: res.data.street ?? '',
+        email: res.data.email ?? '',
+        phone: res.data.phone ?? '',
+        schoolTypes: res.data.schoolTypes ?? [],
         feeStandard: res.data.feeStandard,
         feeOnline: res.data.feeOnline,
-        notes: res.data.notes,
+        notes: res.data.notes ?? '',
       }))
     })
   }, [])

@@ -72,19 +72,19 @@ const PrivateCustomerDetailView: React.FC = () => {
 
       setData((data) => ({
         ...data,
-        firstName: res.data.firstName,
-        lastName: res.data.lastName,
-        city: res.data.city,
-        postalCode: res.data.postalCode,
-        street: res.data.street,
-        email: res.data.email,
-        phone: res.data.phone,
+        firstName: res.data.firstName ?? '',
+        lastName: res.data.lastName ?? '',
+        city: res.data.city ?? '',
+        postalCode: res.data.postalCode ?? '',
+        street: res.data.street ?? '',
+        email: res.data.email ?? '',
+        phone: res.data.phone ?? '',
         timesAvailable: newTimesAvailable,
         grade: res.data.grade,
-        schoolType: res.data.schoolType,
+        schoolType: res.data.schoolType ?? '',
         feeStandard: res.data.feeStandard,
         feeOnline: res.data.feeOnline,
-        notes: res.data.notes,
+        notes: res.data.notes ?? '',
       }))
     })
   }, [])
