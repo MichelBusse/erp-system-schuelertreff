@@ -183,7 +183,7 @@ const PrivateCustomerDetailView: React.FC = () => {
                   firstName: event.target.value,
                 }))
               }
-              value={data.firstName}
+              value={data.firstName ?? ''}
               InputProps={{
                 readOnly: requestedId === 'me',
               }}
@@ -198,7 +198,7 @@ const PrivateCustomerDetailView: React.FC = () => {
                   lastName: event.target.value,
                 }))
               }
-              value={data.lastName}
+              value={data.lastName ?? ''}
               InputProps={{
                 readOnly: requestedId === 'me',
               }}
@@ -216,7 +216,7 @@ const PrivateCustomerDetailView: React.FC = () => {
                   street: event.target.value,
                 }))
               }
-              value={data.street}
+              value={data.street ?? ''}
               InputProps={{
                 readOnly: false,
               }}
@@ -231,7 +231,7 @@ const PrivateCustomerDetailView: React.FC = () => {
                   postalCode: event.target.value,
                 }))
               }
-              value={data.postalCode}
+              value={data.postalCode ?? ''}
               InputProps={{
                 readOnly: false,
               }}
@@ -246,7 +246,7 @@ const PrivateCustomerDetailView: React.FC = () => {
                   city: event.target.value,
                 }))
               }
-              value={data.city}
+              value={data.city ?? ''}
               InputProps={{
                 readOnly: false,
               }}
@@ -264,7 +264,7 @@ const PrivateCustomerDetailView: React.FC = () => {
                   email: event.target.value,
                 }))
               }
-              value={data.email}
+              value={data.email ?? ''}
               InputProps={{
                 readOnly: requestedId === 'me',
               }}
@@ -280,7 +280,7 @@ const PrivateCustomerDetailView: React.FC = () => {
                   phone: event.target.value,
                 }))
               }
-              value={data.phone}
+              value={data.phone ?? ''}
             />
           </Stack>
           <h3>Weitere Infos:</h3>
@@ -363,7 +363,7 @@ const PrivateCustomerDetailView: React.FC = () => {
           <h3>Notizen</h3>
           <TextField
             multiline
-            value={data.notes}
+            value={data.notes ?? ''}
             onChange={(e) => {
               setData((data) => ({ ...data, notes: e.target.value }))
             }}

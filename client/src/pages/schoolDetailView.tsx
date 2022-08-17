@@ -357,7 +357,7 @@ const SchoolDetailView: React.FC = () => {
               renderInput={(params) => (
                 <TextField {...params} variant="outlined" label="Schularten" />
               )}
-              value={school.schoolTypes}
+              value={school.schoolTypes ?? []}
               onChange={(_, value) =>
                 setSchool((data) => ({ ...data, schoolTypes: value }))
               }
@@ -399,7 +399,7 @@ const SchoolDetailView: React.FC = () => {
             <TextField
               label="Straße"
               fullWidth={true}
-              value={school.street}
+              value={school.street ?? ''}
               onChange={(event) =>
                 setSchool((data) => ({
                   ...data,
@@ -413,7 +413,7 @@ const SchoolDetailView: React.FC = () => {
             <TextField
               label="Postleitzahl"
               fullWidth={true}
-              value={school.postalCode}
+              value={school.postalCode ?? ''}
               onChange={(event) =>
                 setSchool((data) => ({
                   ...data,
@@ -427,7 +427,7 @@ const SchoolDetailView: React.FC = () => {
             <TextField
               label="Stadt"
               fullWidth={true}
-              value={school.city}
+              value={school.city ?? ''}
               onChange={(event) =>
                 setSchool((data) => ({
                   ...data,
@@ -478,7 +478,7 @@ const SchoolDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               label="Email"
-              value={school.email}
+              value={school.email ?? ''}
               onChange={(event) =>
                 setSchool((data) => ({
                   ...data,
@@ -490,7 +490,7 @@ const SchoolDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               label="Telefonnummer"
-              value={school.phone}
+              value={school.phone ?? ''}
               onChange={(event) =>
                 setSchool((data) => ({
                   ...data,
@@ -502,7 +502,7 @@ const SchoolDetailView: React.FC = () => {
           <h3>Notizen</h3>
           <TextField
             multiline
-            value={school.notes}
+            value={school.notes ?? ''}
             onChange={(e) => {
               setSchool((data) => ({ ...data, notes: e.target.value }))
             }}
@@ -558,7 +558,7 @@ const SchoolDetailView: React.FC = () => {
                     <Stack direction={'row'} columnGap={2}>
                       <TextField
                         fullWidth
-                        value={classCustomer.className}
+                        value={classCustomer.className ?? ''}
                         label={'Klassenname'}
                         onChange={(e) =>
                           editClassCustomer(
@@ -609,7 +609,7 @@ const SchoolDetailView: React.FC = () => {
                       />
                     </Stack>
                     <AddTimes
-                      value={classCustomer.timesAvailable}
+                      value={classCustomer.timesAvailable ?? []}
                       setValue={(newValue) =>
                         editClassCustomer({ timesAvailable: newValue }, index)
                       }

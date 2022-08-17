@@ -168,7 +168,7 @@ const LessonDetailView: React.FC = () => {
               <InputLabel>Status</InputLabel>
               <Select
                 label="Satus"
-                value={data.state}
+                value={data.state ?? ''}
                 onChange={(event) =>
                   setData((data) => ({
                     ...data,
@@ -184,7 +184,7 @@ const LessonDetailView: React.FC = () => {
           </Stack>
           <TextField
             label="Notizen"
-            value={data.notes}
+            value={data.notes ?? ''}
             variant={'outlined'}
             multiline
             rows={3}
