@@ -8,8 +8,10 @@ import {
 } from '@mui/icons-material'
 import ExploreIcon from '@mui/icons-material/Explore'
 import { Box, useTheme } from '@mui/material'
+import { ErrorBoundary } from 'react-error-boundary'
 import { Outlet } from 'react-router-dom'
 
+import ErrorPage from '../pages/error'
 import { TeacherState } from '../types/enums'
 import { useAuth } from './AuthProvider'
 import BottomMenu from './BottomMenu'
@@ -90,7 +92,14 @@ const Layout: React.FC = () => {
             decodeToken().state !== TeacherState.EMPLOYED
           ) && <BottomMenu items={menuItems} />
         }
-        <Outlet />
+        <ErrorBoundary
+          FallbackComponent={() => (
+            <ErrorPage code="" message="Ein Fehler ist aufgetreten" />
+          )}
+        >
+          <Outlet />
+        </ErrorBoundary>
+        ,
       </Box>
     </Box>
   )
