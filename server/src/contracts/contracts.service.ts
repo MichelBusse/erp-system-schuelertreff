@@ -301,10 +301,10 @@ export class ContractsService {
           .andWhere('subject.id = :subjectId', { subjectId: dto.subjectId })
           .andWhere(
             new Brackets((qb) => {
-              qb.where('cardinality(t.schoolTypes) = 0').orWhere(
-                't.schoolTypes @> :requestedSchoolTypes',
-                { requestedSchoolTypes },
-              )
+              qb.where('cardinality(t.teacherSchoolTypes) = 0')
+              qb.orWhere('t.teacherSchoolTypes @> :requestedSchoolTypes', {
+                requestedSchoolTypes,
+              })
             }),
           )
 

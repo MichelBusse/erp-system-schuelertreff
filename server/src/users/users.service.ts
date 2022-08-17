@@ -542,8 +542,6 @@ export class UsersService {
       throw new BadRequestException()
     }
 
-    console.log(dto)
-
     const updatedTeacher: Teacher = {
       ...user,
       ...dto,

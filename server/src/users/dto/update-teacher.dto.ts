@@ -13,7 +13,7 @@ export class UpdateTeacherDto extends UpdateUserDto {
 
   @IsOptional()
   @IsArray()
-  schoolTypes: TeacherSchoolType[]
+  teacherSchoolTypes: TeacherSchoolType[]
 
   @Type(() => Subject)
   @ValidateNested({ each: true })

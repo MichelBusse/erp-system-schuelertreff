@@ -45,7 +45,7 @@ export class Teacher extends User {
     array: true,
     default: '{}',
   })
-  schoolTypes: TeacherSchoolType[]
+  teacherSchoolTypes: TeacherSchoolType[]
 
   @ManyToMany(() => Subject)
   @JoinTable()

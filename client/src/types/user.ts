@@ -3,6 +3,7 @@ import {
   LeaveState,
   LeaveType,
   SchoolType,
+  TeacherSchoolType,
   TeacherState,
 } from './enums'
 import subject from './subject'
@@ -57,7 +58,7 @@ export interface teacher extends user {
   state: TeacherState
   degree: Degree
   subjects: subject[]
-  schoolTypes: SchoolType[]
+  teacherSchoolTypes: TeacherSchoolType[]
   iban: string
   bic: string
   bankAccountOwner: string

@@ -22,7 +22,7 @@ export interface teacherForm extends userForm {
   subjects: subject[]
   fee: number | null
   degree: string
-  schoolTypes: string[]
+  teacherSchoolTypes: string[]
   state: TeacherState
   iban: string
   bic: string

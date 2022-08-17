@@ -96,7 +96,7 @@ const TeacherDetailView: React.FC = () => {
       phone: newData.phone,
       subjects: newData.subjects,
       degree: newData.degree,
-      schoolTypes: newData.schoolTypes,
+      teacherSchoolTypes: newData.teacherSchoolTypes,
       state: newData.state,
       fee: newData.fee,
       timesAvailable: newTimesAvailable,
@@ -416,9 +416,9 @@ const TeacherDetailView: React.FC = () => {
               renderInput={(params) => (
                 <TextField {...params} variant="outlined" label="Schularten" />
               )}
-              value={data.schoolTypes}
+              value={data.teacherSchoolTypes}
               onChange={(_, value) =>
-                setData((data) => ({ ...data, schoolTypes: value }))
+                setData((data) => ({ ...data, teacherSchoolTypes: value }))
               }
             />
             <Autocomplete
