@@ -87,16 +87,16 @@ const TeacherDetailView: React.FC = () => {
           }))
 
     setData({
-      firstName: newData.firstName,
-      lastName: newData.lastName,
-      city: newData.city,
-      postalCode: newData.postalCode,
-      street: newData.street,
-      email: newData.email,
-      phone: newData.phone,
-      subjects: newData.subjects,
-      degree: newData.degree,
-      teacherSchoolTypes: newData.teacherSchoolTypes,
+      firstName: newData.firstName ?? '',
+      lastName: newData.lastName ?? '',
+      city: newData.city ?? '',
+      postalCode: newData.postalCode ?? '',
+      street: newData.street ?? '',
+      email: newData.email ?? '',
+      phone: newData.phone ?? '',
+      subjects: newData.subjects ?? [],
+      degree: newData.degree ?? '',
+      teacherSchoolTypes: newData.teacherSchoolTypes ?? [],
       state: newData.state,
       fee: newData.fee,
       timesAvailable: newTimesAvailable,
@@ -104,10 +104,10 @@ const TeacherDetailView: React.FC = () => {
       dateOfEmploymentStart: newData.dateOfEmploymentStart
         ? dayjs(newData.dateOfEmploymentStart)
         : null,
-      iban: newData.iban,
-      bic: newData.bic,
-      bankAccountOwner: newData.bankAccountOwner,
-      bankInstitution: newData.bankInstitution,
+      iban: newData.iban ?? '',
+      bic: newData.bic ?? '',
+      bankAccountOwner: newData.bankAccountOwner ?? '',
+      bankInstitution: newData.bankInstitution ?? '',
     })
 
     setLeaveData(newData.leave)
