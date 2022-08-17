@@ -210,7 +210,7 @@ const TeacherDetailView: React.FC = () => {
                   firstName: event.target.value,
                 }))
               }
-              value={data.firstName}
+              value={data.firstName ?? ''}
               InputProps={{
                 readOnly: requestedId === 'me',
               }}
@@ -226,7 +226,7 @@ const TeacherDetailView: React.FC = () => {
                   lastName: event.target.value,
                 }))
               }
-              value={data.lastName}
+              value={data.lastName ?? ''}
               InputProps={{
                 readOnly: requestedId === 'me',
               }}
@@ -268,7 +268,7 @@ const TeacherDetailView: React.FC = () => {
                   street: event.target.value,
                 }))
               }
-              value={data.street}
+              value={data.street ?? ''}
               InputProps={{
                 readOnly: false,
               }}
@@ -283,7 +283,7 @@ const TeacherDetailView: React.FC = () => {
                   city: event.target.value,
                 }))
               }
-              value={data.city}
+              value={data.city ?? ''}
               InputProps={{
                 readOnly: false,
               }}
@@ -298,7 +298,7 @@ const TeacherDetailView: React.FC = () => {
                   postalCode: event.target.value,
                 }))
               }
-              value={data.postalCode}
+              value={data.postalCode ?? ''}
               InputProps={{
                 readOnly: false,
               }}
@@ -368,7 +368,7 @@ const TeacherDetailView: React.FC = () => {
                   email: event.target.value,
                 }))
               }
-              value={data.email}
+              value={data.email ?? ''}
               InputProps={{
                 readOnly: requestedId === 'me',
               }}
@@ -384,7 +384,7 @@ const TeacherDetailView: React.FC = () => {
                   phone: event.target.value,
                 }))
               }
-              value={data.phone}
+              value={data.phone ?? ''}
             />
           </Stack>
           <Typography variant="h6">Lehrkraftdaten:</Typography>
@@ -416,7 +416,7 @@ const TeacherDetailView: React.FC = () => {
               renderInput={(params) => (
                 <TextField {...params} variant="outlined" label="Schularten" />
               )}
-              value={data.teacherSchoolTypes}
+              value={data.teacherSchoolTypes ?? []}
               onChange={(_, value) =>
                 setData((data) => ({ ...data, teacherSchoolTypes: value }))
               }
@@ -430,7 +430,7 @@ const TeacherDetailView: React.FC = () => {
               renderInput={(params) => (
                 <TextField {...params} variant="outlined" label="Fächer *" />
               )}
-              value={data.subjects}
+              value={data.subjects ?? []}
               onChange={(_, value) =>
                 setData((data) => ({ ...data, subjects: value }))
               }
@@ -442,7 +442,7 @@ const TeacherDetailView: React.FC = () => {
                   id="Degree"
                   label="Höchster Abschluss"
                   disabled={requestedId === 'me'}
-                  value={data.degree}
+                  value={data.degree ?? ''}
                   onChange={(event) =>
                     setData((data) => ({
                       ...data,
@@ -514,7 +514,7 @@ const TeacherDetailView: React.FC = () => {
           <Typography variant="h6">Verfügbarkeit:</Typography>
           <Box>
             <AddTimes
-              value={data.timesAvailable}
+              value={data.timesAvailable ?? []}
               setValue={(newValue) =>
                 setData((data) => ({ ...data, timesAvailable: newValue }))
               }
