@@ -119,7 +119,7 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
         multiple
         size="small"
         options={privCustomers}
-        getOptionLabel={(o) => o.firstName + ' ' + o.lastName}
+        getOptionLabel={(o) => o.firstName + ' ' + o.lastName + ` (${o.city})`}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         value={form.privateCustomers}
         onChange={(_, value) =>
