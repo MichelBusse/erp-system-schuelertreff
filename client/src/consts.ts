@@ -2,7 +2,7 @@ import { GridLocaleText } from '@mui/x-data-grid'
 import { OptionsObject as SnackbarOptions } from 'notistack'
 
 import { ContractState } from './types/contract'
-import { LeaveState, LeaveType, TeacherState } from './types/enums'
+import { LeaveState, LeaveType, SchoolType, TeacherState } from './types/enums'
 import {
   classCustomerForm,
   privateCustomerForm,
@@ -49,7 +49,7 @@ export const defaultPrivateCustomerFormData: privateCustomerForm = {
   email: '',
   phone: '',
   grade: null,
-  schoolType: null,
+  schoolType: SchoolType.ANDERE,
   timesAvailable: [],
   feeStandard: 30,
   feeOnline: 20,
