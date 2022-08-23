@@ -13,6 +13,7 @@ export type ConfirmationDialogProps = {
   title: string
   text: string
   action: () => void
+  actionText?: string
 }
 
 export const defaultConfirmationDialogProps: ConfirmationDialogProps = {
@@ -51,7 +52,7 @@ const ConfirmationDialog: React.FC<{
           confirmationDialogProps.setProps(defaultConfirmationDialogProps)
         }}
       >
-        Löschen
+        {confirmationDialogProps.actionText ?? "Bestätigen"}
       </Button>
     </DialogActions>
   </Dialog>

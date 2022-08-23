@@ -298,7 +298,7 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
             setForm((f) => ({ ...f, endDate: value }))
           }}
           renderInput={(params) => (
-            <TextField {...params} required variant="outlined" />
+            <TextField {...params} variant="outlined" />
           )}
           InputAdornmentProps={{
             position: 'start',

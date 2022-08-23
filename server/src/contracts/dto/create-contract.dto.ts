@@ -32,6 +32,7 @@ export class CreateContractDto {
   @IsValidDate()
   startDate: string
 
+  @IsOptional()
   @IsValidDate()
   endDate: string
 
