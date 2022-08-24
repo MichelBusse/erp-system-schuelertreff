@@ -56,7 +56,9 @@ const LessonDetailView: React.FC = () => {
     API.get('lessons/' + contractId + '/' + date).then((res) => {
       const contract = {
         startDate: dayjs(res.data.contract.startDate),
-        endDate: res.data.contract.endDate ? dayjs(res.data.contract.endDate) : null,
+        endDate: res.data.contract.endDate
+          ? dayjs(res.data.contract.endDate)
+          : null,
         startTime: dayjs(res.data.contract.startTime, 'HH:mm'),
         endTime: dayjs(res.data.contract.endTime, 'HH:mm'),
         teacher: res.data.contract.teacher,
@@ -233,7 +235,8 @@ const LessonDetailView: React.FC = () => {
           </Stack>
           <Stack direction={'row'} columnGap={2}>
             {decodeToken().role === 'admin' &&
-              (!contract.endDate || dayjs(contract.endDate).isAfter(dayjs())) && (
+              (!contract.endDate ||
+                dayjs(contract.endDate).isAfter(dayjs())) && (
                 <Button
                   variant="contained"
                   onClick={() =>

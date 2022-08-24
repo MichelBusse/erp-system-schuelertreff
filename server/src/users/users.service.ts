@@ -639,7 +639,7 @@ export class UsersService {
 
     return this.teachersRepository.save(updatedTeacher).then(transformUser)
   }
-  
+
   async unarchiveTeacher(id: number): Promise<Teacher> {
     const teacher = await this.findOneTeacher(id)
 
@@ -676,9 +676,9 @@ export class UsersService {
         )
       }
     } else {
-      if((await this.findOneTeacher(id)).deleteState === DeleteState.ACTIVE){
+      if ((await this.findOneTeacher(id)).deleteState === DeleteState.ACTIVE) {
         this.teachersRepository.update(id, { deleteState: DeleteState.DELETED })
-      }else{
+      } else {
         this.teachersRepository.delete(id)
       }
     }

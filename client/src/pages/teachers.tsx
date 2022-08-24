@@ -1,4 +1,5 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle'
+import FolderDeleteIcon from '@mui/icons-material/FolderDelete'
 import {
   Autocomplete,
   Box,
@@ -27,7 +28,6 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
-import FolderDeleteIcon from '@mui/icons-material/FolderDelete';
 
 import { useAuth } from '../components/AuthProvider'
 import TeacherDialog from '../components/TeacherDialog'
@@ -271,7 +271,8 @@ const Teachers: React.FC = () => {
   const [teachers, setTeachers] = useState<teacher[]>([])
   const navigate = useNavigate()
   const location = useLocation()
-  const [deletedTeacherToggle, setDeletedTeacherToggle] = useState<boolean>(false)
+  const [deletedTeacherToggle, setDeletedTeacherToggle] =
+    useState<boolean>(false)
 
   const { API } = useAuth()
 
@@ -311,11 +312,11 @@ const Teachers: React.FC = () => {
 
   //Get subjects, teachers from DB
   useEffect(() => {
-    if(!deletedTeacherToggle){
+    if (!deletedTeacherToggle) {
       API.get(`users/teacher`).then((res) => {
         setTeachers(res.data)
       })
-    }else{
+    } else {
       API.get(`users/teacher/deleted`).then((res) => {
         setTeachers(res.data)
       })
@@ -408,7 +409,7 @@ const Teachers: React.FC = () => {
       // hide: true,
       flex: 1,
       filterOperators: [schoolTypesOperator],
-      renderCell: (params) => <></>,
+      renderCell: () => <></>,
     },
   ]
 
@@ -459,7 +460,11 @@ const Teachers: React.FC = () => {
                 className={styles.customGridToolbarContainer}
               >
                 <GridToolbarFilterButton />
-                <IconButton color={deletedTeacherToggle ? "secondary" : "default"} onClick={() => setDeletedTeacherToggle((data) => (!data))} sx={{marginLeft: 'auto'}}>
+                <IconButton
+                  color={deletedTeacherToggle ? 'secondary' : 'default'}
+                  onClick={() => setDeletedTeacherToggle((data) => !data)}
+                  sx={{ marginLeft: 'auto' }}
+                >
                   <FolderDeleteIcon fontSize="large" />
                 </IconButton>
                 <IconButton onClick={() => setOpen(true)}>

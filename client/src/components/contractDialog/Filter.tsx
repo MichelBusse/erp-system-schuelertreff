@@ -56,7 +56,9 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
       const initialForm0Entry: ContractFilterForm = {
         ...f,
         startDate: dayjs(initialContract.startDate, 'YYYY-MM-DD'),
-        endDate: initialContract.endDate ? dayjs(initialContract.endDate, 'YYYY-MM-DD') : null,
+        endDate: initialContract.endDate
+          ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
+          : null,
         subject: initialContract.subject,
         interval: initialContract.interval,
       }
@@ -297,9 +299,7 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
           onChange={(value) => {
             setForm((f) => ({ ...f, endDate: value }))
           }}
-          renderInput={(params) => (
-            <TextField {...params} variant="outlined" />
-          )}
+          renderInput={(params) => <TextField {...params} variant="outlined" />}
           InputAdornmentProps={{
             position: 'start',
           }}

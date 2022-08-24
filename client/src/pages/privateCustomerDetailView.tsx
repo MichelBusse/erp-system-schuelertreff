@@ -111,7 +111,7 @@ const PrivateCustomerDetailView: React.FC = () => {
         )
         if (id) navigate('/privateCustomers')
       })
-    }else{
+    } else {
       setErrors(errorTexts)
       enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
     }

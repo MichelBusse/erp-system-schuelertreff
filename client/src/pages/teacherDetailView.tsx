@@ -4,11 +4,6 @@ import {
   Autocomplete,
   Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   FormControl,
   FormHelperText,
   InputLabel,
@@ -159,7 +154,7 @@ const TeacherDetailView: React.FC = () => {
         .catch(() => {
           enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
         })
-    }else{
+    } else {
       setErrors(errorTexts)
       enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
     }

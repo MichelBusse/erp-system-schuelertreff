@@ -32,7 +32,7 @@ export class ContractsController {
     const endTime = dayjs(dto.endTime, 'HH:mm')
     const startDate = dayjs(dto.startDate)
     const endDate = dto.endDate ? dayjs(dto.endDate) : null
-    
+
     if (endDate && endDate.isBefore(startDate))
       throw new BadRequestException('endDate must not be before startDate')
 
