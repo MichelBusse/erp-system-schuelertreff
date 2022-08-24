@@ -368,7 +368,7 @@ const PrivateCustomerDetailView: React.FC = () => {
               setData((data) => ({ ...data, notes: e.target.value }))
             }}
             fullWidth
-            rows={3}
+            rows={5}
           />
 
           <h3>Dokumente:</h3>

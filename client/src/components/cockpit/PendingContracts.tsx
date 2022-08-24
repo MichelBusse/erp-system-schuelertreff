@@ -58,7 +58,7 @@ const PendingContracts: React.FC = () => {
     <>
       <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px' }}>
         <Stack direction="column" spacing={2}>
-          <Typography variant="h6">Ausstehende Verträge</Typography>
+          <Typography variant="h6">Ausstehende Bestätigungen</Typography>
           <List
             dense={true}
             sx={{

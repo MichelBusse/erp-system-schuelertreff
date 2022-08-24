@@ -27,11 +27,16 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
+import FolderDeleteIcon from '@mui/icons-material/FolderDelete';
 
 import { useAuth } from '../components/AuthProvider'
 import TeacherDialog from '../components/TeacherDialog'
-import { dataGridLocaleText, teacherStateToString } from '../consts'
-import { Degree, TeacherState } from '../types/enums'
+import {
+  dataGridLocaleText,
+  teacherSchoolTypeToString,
+  teacherStateToString,
+} from '../consts'
+import { Degree, TeacherSchoolType, TeacherState } from '../types/enums'
 import subject from '../types/subject'
 import { teacher } from '../types/user'
 import styles from './gridList.module.scss'
@@ -56,7 +61,6 @@ const SubjectsFilterInputValue: React.FC<GridFilterInputValueProps> = ({
         flexDirection: 'row',
         alignItems: 'center',
         height: 48,
-        pl: '20px',
       }}
     >
       <Autocomplete
@@ -130,6 +134,34 @@ const StateFilterInputValue: React.FC<GridFilterInputValueProps> = ({
       {Object.values(TeacherState).map((state) => (
         <option key={state} value={state}>
           {teacherStateToString[state]}
+        </option>
+      ))}
+    </NativeSelect>
+  </FormControl>
+)
+
+const SchoolTypesFilterValue: React.FC<GridFilterInputValueProps> = ({
+  item,
+  applyValue,
+}) => (
+  <FormControl fullWidth>
+    <InputLabel variant="standard" htmlFor="degree-select">
+      Schulart
+    </InputLabel>
+    <NativeSelect
+      inputProps={{
+        name: 'degree',
+        id: 'degree-select',
+      }}
+      required
+      onChange={(event) => {
+        applyValue({ ...item, value: event.target.value })
+      }}
+    >
+      <option value={''}></option>
+      {Object.values(TeacherSchoolType).map((schoolType) => (
+        <option key={schoolType} value={schoolType}>
+          {teacherSchoolTypeToString[schoolType]}
         </option>
       ))}
     </NativeSelect>
@@ -214,11 +246,32 @@ const stateOperator: GridFilterOperator = {
   InputComponentProps: { type: 'string' },
 }
 
+const schoolTypesOperator: GridFilterOperator = {
+  label: 'enthalten',
+  value: 'includes',
+  getApplyFilterFn: (filterItem: GridFilterItem) => {
+    if (
+      !filterItem.columnField ||
+      !filterItem.value ||
+      !filterItem.operatorValue
+    ) {
+      return null
+    }
+
+    return (params: GridCellParams): boolean => {
+      return params.value.includes(filterItem.value)
+    }
+  },
+  InputComponent: SchoolTypesFilterValue,
+  InputComponentProps: { type: 'string' },
+}
+
 const Teachers: React.FC = () => {
   const [open, setOpen] = useState(false)
   const [teachers, setTeachers] = useState<teacher[]>([])
   const navigate = useNavigate()
   const location = useLocation()
+  const [deletedTeacherToggle, setDeletedTeacherToggle] = useState<boolean>(false)
 
   const { API } = useAuth()
 
@@ -242,6 +295,7 @@ const Teachers: React.FC = () => {
         state: true,
         city: false,
         degree: false,
+        schoolTypes: false,
       })
     } else {
       setColumnVisibilityModel({
@@ -250,16 +304,23 @@ const Teachers: React.FC = () => {
         state: true,
         city: false,
         degree: false,
+        schoolTypes: false,
       })
     }
   }, [small])
 
   //Get subjects, teachers from DB
   useEffect(() => {
-    API.get(`users/teacher`).then((res) => {
-      setTeachers(res.data)
-    })
-  }, [location])
+    if(!deletedTeacherToggle){
+      API.get(`users/teacher`).then((res) => {
+        setTeachers(res.data)
+      })
+    }else{
+      API.get(`users/teacher/deleted`).then((res) => {
+        setTeachers(res.data)
+      })
+    }
+  }, [location, deletedTeacherToggle])
 
   //definition of the columns
   const cols: GridColumns = [
@@ -339,6 +400,16 @@ const Teachers: React.FC = () => {
         </div>
       ),
     },
+    {
+      field: 'schoolTypes',
+      headerClassName: 'DataGridHead',
+      headerName: 'Schularten',
+      // width: 650,
+      // hide: true,
+      flex: 1,
+      filterOperators: [schoolTypesOperator],
+      renderCell: (params) => <></>,
+    },
   ]
 
   //creating rows out of the teachers
@@ -349,6 +420,7 @@ const Teachers: React.FC = () => {
     city: teacher.city,
     degree: teacher.degree,
     state: teacher.state,
+    schoolTypes: teacher.teacherSchoolTypes,
   }))
 
   //space between rows
@@ -387,6 +459,9 @@ const Teachers: React.FC = () => {
                 className={styles.customGridToolbarContainer}
               >
                 <GridToolbarFilterButton />
+                <IconButton color={deletedTeacherToggle ? "secondary" : "default"} onClick={() => setDeletedTeacherToggle((data) => (!data))} sx={{marginLeft: 'auto'}}>
+                  <FolderDeleteIcon fontSize="large" />
+                </IconButton>
                 <IconButton onClick={() => setOpen(true)}>
                   <AddCircleIcon fontSize="large" color="primary" />
                 </IconButton>

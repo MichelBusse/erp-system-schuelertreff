@@ -1,7 +1,7 @@
 import { Dayjs } from 'dayjs'
 
 import { CustomerType } from '../components/ContractDialog'
-import { ContractType, SchoolType, TeacherState } from './enums'
+import { ContractType, DeleteState, SchoolType, TeacherState } from './enums'
 import { LessonState } from './lesson'
 import subject from './subject'
 import timeAvailable from './timeAvailable'
@@ -16,6 +16,7 @@ export interface userForm {
   email: string
   phone: string
   timesAvailable: timeAvailable[]
+  deleteState?: DeleteState
 }
 
 export interface teacherForm extends userForm {

@@ -507,7 +507,7 @@ const SchoolDetailView: React.FC = () => {
               setSchool((data) => ({ ...data, notes: e.target.value }))
             }}
             fullWidth
-            rows={3}
+            rows={5}
           />
           <Stack direction={'row'} columnGap={2}>
             <h3>Klassen:</h3>
