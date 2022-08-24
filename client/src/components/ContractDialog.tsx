@@ -177,7 +177,9 @@ const ContractDialog: React.FC<Props> = ({
                       const initialForm1Entry: ContractCreationForm = {
                         ...form1,
                         startDate: initialStartDate,
-                        endDate: initialContract.endDate ? dayjs(initialContract.endDate, 'YYYY-MM-DD') : null,
+                        endDate: initialContract.endDate
+                          ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
+                          : null,
                         startTime: initialStartTime,
                         endTime: initialEndTime,
                         teacher: initialContract.teacher.id.toString(),

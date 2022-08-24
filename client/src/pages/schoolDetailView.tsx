@@ -42,10 +42,17 @@ import {
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { SchoolType } from '../types/enums'
-import { classCustomerForm, schoolForm, schoolFormErrorTexts } from '../types/form'
+import {
+  classCustomerForm,
+  schoolForm,
+  schoolFormErrorTexts,
+} from '../types/form'
 import timeAvailable from '../types/timeAvailable'
 import { classCustomer, Role, timesAvailableParsed } from '../types/user'
-import { defaultSchoolFormErrorTexts, schoolFormValidation } from '../utils/formValidation'
+import {
+  defaultSchoolFormErrorTexts,
+  schoolFormValidation,
+} from '../utils/formValidation'
 
 const SchoolDetailView: React.FC = () => {
   const { API } = useAuth()
@@ -65,7 +72,9 @@ const SchoolDetailView: React.FC = () => {
   const [confirmationDialogProps, setConfirmationDialogProps] =
     useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
 
-  const [schoolErrors, setSchoolErrors] = useState<schoolFormErrorTexts>(defaultSchoolFormErrorTexts)
+  const [schoolErrors, setSchoolErrors] = useState<schoolFormErrorTexts>(
+    defaultSchoolFormErrorTexts,
+  )
 
   useEffect(() => {
     API.get('users/school/' + requestedId).then((res) => {
@@ -124,22 +133,19 @@ const SchoolDetailView: React.FC = () => {
     const errorTexts = schoolFormValidation(school)
 
     if (errorTexts.valid) {
-
-
-    API.post('users/school/' + requestedId, {
-      ...school,
-      firstName: school.firstName !== '' ? school.firstName : undefined,
-      lastName: school.lastName !== '' ? school.lastName : undefined,
-    })
-      .then(() => {
-        enqueueSnackbar(school.schoolName + ' gespeichert')
-        if (id) navigate('/schools')
+      API.post('users/school/' + requestedId, {
+        ...school,
+        firstName: school.firstName !== '' ? school.firstName : undefined,
+        lastName: school.lastName !== '' ? school.lastName : undefined,
       })
-      .catch(() => {
-        enqueueSnackbar('Fehler beim Speichern der Schuldaten')
-      })
-
-    }else{
+        .then(() => {
+          enqueueSnackbar(school.schoolName + ' gespeichert')
+          if (id) navigate('/schools')
+        })
+        .catch(() => {
+          enqueueSnackbar('Fehler beim Speichern der Schuldaten')
+        })
+    } else {
       setSchoolErrors(errorTexts)
       enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
     }

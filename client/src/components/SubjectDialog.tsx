@@ -15,7 +15,10 @@ import { useAuth } from '../components/AuthProvider'
 import { defaultSubjectFormData, snackbarOptionsError } from '../consts'
 import { subjectForm, subjectFormErrorTexts } from '../types/form'
 import subject from '../types/subject'
-import { defaultSubjectFormErrorTexts, subjectFormValidation } from '../utils/formValidation'
+import {
+  defaultSubjectFormErrorTexts,
+  subjectFormValidation,
+} from '../utils/formValidation'
 
 type Props = {
   open: boolean
@@ -31,7 +34,9 @@ const SubjectDialog: React.FC<Props> = ({
   initialSubject,
 }) => {
   const [data, setData] = useState<subjectForm>(defaultSubjectFormData)
-  const [errors, setErrors] = useState<subjectFormErrorTexts>(defaultSubjectFormErrorTexts)
+  const [errors, setErrors] = useState<subjectFormErrorTexts>(
+    defaultSubjectFormErrorTexts,
+  )
   const { enqueueSnackbar } = useSnackbar()
 
   const { API } = useAuth()
@@ -40,7 +45,7 @@ const SubjectDialog: React.FC<Props> = ({
   const submitForm = () => {
     const errorTexts = subjectFormValidation(data)
 
-    if (errorTexts.valid){
+    if (errorTexts.valid) {
       if (initialSubject) {
         API.post('subjects/' + initialSubject.id, data).then((res) => {
           setSubjects((s) => {
@@ -63,7 +68,7 @@ const SubjectDialog: React.FC<Props> = ({
           setOpen(false)
         })
       }
-    }else{
+    } else {
       setErrors(errorTexts)
       enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
     }

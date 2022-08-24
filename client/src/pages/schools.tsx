@@ -26,7 +26,6 @@ import { SchoolType } from '../types/enums'
 import { school } from '../types/user'
 import styles from './gridList.module.scss'
 
-
 const SubjectsFilterInputValue: React.FC<GridFilterInputValueProps> = ({
   item,
   applyValue,

@@ -52,7 +52,7 @@ const ConfirmationDialog: React.FC<{
           confirmationDialogProps.setProps(defaultConfirmationDialogProps)
         }}
       >
-        {confirmationDialogProps.actionText ?? "Bestätigen"}
+        {confirmationDialogProps.actionText ?? 'Bestätigen'}
       </Button>
     </DialogActions>
   </Dialog>
