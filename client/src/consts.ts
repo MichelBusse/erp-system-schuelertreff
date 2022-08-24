@@ -121,3 +121,9 @@ export const defaultClassCustomerFormData: classCustomerForm = {
   schoolType: null,
   grade: null,
 }
+
+export const defaultSubjectFormData = {
+  color: '#FF0000',
+  name: '',
+  shortForm: '',
+}

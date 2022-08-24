@@ -42,9 +42,10 @@ import {
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { SchoolType } from '../types/enums'
-import { classCustomerForm, schoolForm } from '../types/form'
+import { classCustomerForm, schoolForm, schoolFormErrorTexts } from '../types/form'
 import timeAvailable from '../types/timeAvailable'
 import { classCustomer, Role, timesAvailableParsed } from '../types/user'
+import { defaultSchoolFormErrorTexts, schoolFormValidation } from '../utils/formValidation'
 
 const SchoolDetailView: React.FC = () => {
   const { API } = useAuth()
@@ -63,6 +64,8 @@ const SchoolDetailView: React.FC = () => {
 
   const [confirmationDialogProps, setConfirmationDialogProps] =
     useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
+
+  const [schoolErrors, setSchoolErrors] = useState<schoolFormErrorTexts>(defaultSchoolFormErrorTexts)
 
   useEffect(() => {
     API.get('users/school/' + requestedId).then((res) => {
@@ -118,6 +121,11 @@ const SchoolDetailView: React.FC = () => {
   }, [])
 
   const submitForm = () => {
+    const errorTexts = schoolFormValidation(school)
+
+    if (errorTexts.valid) {
+
+
     API.post('users/school/' + requestedId, {
       ...school,
       firstName: school.firstName !== '' ? school.firstName : undefined,
@@ -130,6 +138,11 @@ const SchoolDetailView: React.FC = () => {
       .catch(() => {
         enqueueSnackbar('Fehler beim Speichern der Schuldaten')
       })
+
+    }else{
+      setSchoolErrors(errorTexts)
+      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+    }
   }
 
   const deleteUser = () => {
@@ -325,6 +338,8 @@ const SchoolDetailView: React.FC = () => {
                   schoolName: event.target.value,
                 }))
               }
+              helperText={schoolErrors.schoolName}
+              error={schoolErrors.schoolName !== ''}
               value={school.schoolName ?? ''}
               InputProps={{
                 readOnly: requestedId === 'me',
@@ -368,6 +383,8 @@ const SchoolDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               label="Vorname"
+              helperText={schoolErrors.firstName}
+              error={schoolErrors.firstName !== ''}
               onChange={(event) =>
                 setSchool((data) => ({
                   ...data,
@@ -382,6 +399,8 @@ const SchoolDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               label="Nachname"
+              helperText={schoolErrors.lastName}
+              error={schoolErrors.lastName !== ''}
               onChange={(event) =>
                 setSchool((data) => ({
                   ...data,
@@ -398,6 +417,8 @@ const SchoolDetailView: React.FC = () => {
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               label="Straße"
+              helperText={schoolErrors.street}
+              error={schoolErrors.street !== ''}
               fullWidth={true}
               value={school.street ?? ''}
               onChange={(event) =>
@@ -414,6 +435,8 @@ const SchoolDetailView: React.FC = () => {
               label="Postleitzahl"
               fullWidth={true}
               value={school.postalCode ?? ''}
+              helperText={schoolErrors.postalCode}
+              error={schoolErrors.postalCode !== ''}
               onChange={(event) =>
                 setSchool((data) => ({
                   ...data,
@@ -427,6 +450,8 @@ const SchoolDetailView: React.FC = () => {
             <TextField
               label="Stadt"
               fullWidth={true}
+              helperText={schoolErrors.city}
+              error={schoolErrors.city !== ''}
               value={school.city ?? ''}
               onChange={(event) =>
                 setSchool((data) => ({
@@ -446,6 +471,8 @@ const SchoolDetailView: React.FC = () => {
               type="number"
               id="fee"
               label="Stundensatz Standard"
+              helperText={schoolErrors.feeStandard}
+              error={schoolErrors.feeStandard !== ''}
               variant="outlined"
               fullWidth
               disabled={requestedId === 'me'}
@@ -461,6 +488,8 @@ const SchoolDetailView: React.FC = () => {
               type="number"
               id="fee"
               label="Stundensatz Online"
+              helperText={schoolErrors.feeOnline}
+              error={schoolErrors.feeOnline !== ''}
               variant="outlined"
               fullWidth
               disabled={requestedId === 'me'}
@@ -478,6 +507,8 @@ const SchoolDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               label="Email"
+              helperText={schoolErrors.email}
+              error={schoolErrors.email !== ''}
               value={school.email ?? ''}
               onChange={(event) =>
                 setSchool((data) => ({
@@ -490,6 +521,8 @@ const SchoolDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               label="Telefonnummer"
+              helperText={schoolErrors.phone}
+              error={schoolErrors.phone !== ''}
               value={school.phone ?? ''}
               onChange={(event) =>
                 setSchool((data) => ({

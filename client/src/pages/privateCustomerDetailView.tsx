@@ -31,9 +31,15 @@ import {
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { SchoolType } from '../types/enums'
-import { privateCustomerForm } from '../types/form'
+import {
+  privateCustomerForm,
+  privateCustomerFormErrorTexts,
+} from '../types/form'
 import { Role, timesAvailableParsed } from '../types/user'
-import { formValidation } from '../utils/formValidation'
+import {
+  defaultPrivateCustomerFormErrorTexts,
+  privateCustomerFormValidation,
+} from '../utils/formValidation'
 
 dayjs.extend(customParseFormat)
 
@@ -49,11 +55,9 @@ const PrivateCustomerDetailView: React.FC = () => {
   const [data, setData] = useState<privateCustomerForm>(
     defaultPrivateCustomerFormData,
   )
-  const [errors, setErrors] = useState({
-    ...defaultPrivateCustomerFormData,
-    grade: '',
-    fee: '',
-  })
+  const [errors, setErrors] = useState<privateCustomerFormErrorTexts>(
+    defaultPrivateCustomerFormErrorTexts,
+  )
 
   useEffect(() => {
     API.get('users/privateCustomer/' + requestedId).then((res) => {
@@ -90,9 +94,9 @@ const PrivateCustomerDetailView: React.FC = () => {
   }, [])
 
   const submitForm = () => {
-    setErrors(formValidation('privateCustomer', data))
+    const errorTexts = privateCustomerFormValidation(data)
 
-    if (formValidation('privateCustomer', data).validation) {
+    if (errorTexts.valid) {
       API.post('users/privateCustomer/' + requestedId, {
         ...data,
         timesAvailable: data.timesAvailable.map((time) => ({
@@ -107,6 +111,9 @@ const PrivateCustomerDetailView: React.FC = () => {
         )
         if (id) navigate('/privateCustomers')
       })
+    }else{
+      setErrors(errorTexts)
+      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
     }
   }
 
@@ -175,6 +182,7 @@ const PrivateCustomerDetailView: React.FC = () => {
           <Stack direction="row" columnGap={2}>
             <TextField
               helperText={errors.firstName}
+              error={errors.firstName !== ''}
               fullWidth={true}
               label="Vorname"
               onChange={(event) =>
@@ -190,6 +198,7 @@ const PrivateCustomerDetailView: React.FC = () => {
             />
             <TextField
               helperText={errors.lastName}
+              error={errors.lastName !== ''}
               fullWidth={true}
               label="Nachname"
               onChange={(event) =>
@@ -208,6 +217,7 @@ const PrivateCustomerDetailView: React.FC = () => {
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               helperText={errors.street}
+              error={errors.street !== ''}
               label="Straße"
               fullWidth={true}
               onChange={(event) =>
@@ -224,6 +234,7 @@ const PrivateCustomerDetailView: React.FC = () => {
             <TextField
               label="Postleitzahl"
               helperText={errors.postalCode}
+              error={errors.postalCode !== ''}
               fullWidth={true}
               onChange={(event) =>
                 setData((data) => ({
@@ -239,6 +250,7 @@ const PrivateCustomerDetailView: React.FC = () => {
             <TextField
               label="Stadt"
               helperText={errors.city}
+              error={errors.city !== ''}
               fullWidth={true}
               onChange={(event) =>
                 setData((data) => ({
@@ -257,6 +269,7 @@ const PrivateCustomerDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               helperText={errors.email}
+              error={errors.email !== ''}
               label="Email"
               onChange={(event) =>
                 setData((data) => ({
@@ -273,6 +286,7 @@ const PrivateCustomerDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               helperText={errors.phone}
+              error={errors.phone !== ''}
               label="Telefonnummer"
               onChange={(event) =>
                 setData((data) => ({
@@ -310,6 +324,7 @@ const PrivateCustomerDetailView: React.FC = () => {
               label="Klasse"
               variant="outlined"
               helperText={errors.grade}
+              error={errors.grade !== ''}
               fullWidth
               value={data.grade ?? ''}
               InputProps={{ inputProps: { min: 0, max: 13 } }}
@@ -328,6 +343,8 @@ const PrivateCustomerDetailView: React.FC = () => {
               fullWidth
               disabled={requestedId === 'me'}
               value={data.feeStandard ?? ''}
+              helperText={errors.feeStandard}
+              error={errors.feeStandard !== ''}
               onChange={(event) =>
                 setData((data) => ({
                   ...data,
@@ -343,6 +360,8 @@ const PrivateCustomerDetailView: React.FC = () => {
               fullWidth
               disabled={requestedId === 'me'}
               value={data.feeOnline ?? ''}
+              helperText={errors.feeOnline}
+              error={errors.feeOnline !== ''}
               onChange={(event) =>
                 setData((data) => ({
                   ...data,

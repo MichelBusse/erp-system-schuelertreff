@@ -18,6 +18,17 @@ export interface userForm {
   timesAvailable: timeAvailable[]
   deleteState?: DeleteState
 }
+export interface userFormErrorTexts {
+  firstName: string
+  lastName: string
+  city: string
+  postalCode: string
+  street: string
+  email: string
+  phone: string
+  timesAvailable: string
+  valid: boolean
+}
 
 export interface teacherForm extends userForm {
   subjects: subject[]
@@ -32,6 +43,19 @@ export interface teacherForm extends userForm {
   dateOfBirth: Dayjs | null
   dateOfEmploymentStart: Dayjs | null
 }
+export interface teacherFormErrorTexts extends userFormErrorTexts {
+  subjects: string
+  fee: string
+  degree: string
+  teacherSchoolTypes: string
+  state: string
+  iban: string
+  bic: string
+  bankAccountOwner: string
+  bankInstitution: string
+  dateOfBirth: string
+  dateOfEmploymentStart: string
+}
 
 export interface schoolForm extends Omit<userForm, 'timesAvailable'> {
   schoolName: string
@@ -39,6 +63,14 @@ export interface schoolForm extends Omit<userForm, 'timesAvailable'> {
   feeStandard: number
   feeOnline: number
   notes: string
+}
+export interface schoolFormErrorTexts extends userFormErrorTexts {
+  schoolName: string
+  schoolTypes: string
+  feeStandard: string
+  feeOnline: string
+  notes: string
+  valid: boolean
 }
 
 export interface classCustomerForm {
@@ -48,6 +80,13 @@ export interface classCustomerForm {
   schoolType: SchoolType | null
   grade: number | null
 }
+export interface classCustomerFormErrorTexts {
+  schoolName: string
+  schoolTypes: string
+  feeStandard: string
+  feeOnline: string
+  notes: string
+}
 
 export interface privateCustomerForm extends userForm {
   grade: number | null
@@ -56,10 +95,36 @@ export interface privateCustomerForm extends userForm {
   feeOnline: number
   notes: string
 }
+export interface privateCustomerFormErrorTexts extends userFormErrorTexts {
+  grade: string
+  schoolType: string
+  feeStandard: string
+  feeOnline: string
+  notes: string
+  valid: boolean
+}
 
 export interface lessonForm {
   state: LessonState
   notes: string
+}
+export interface lessonFormErrorTexts {
+  state: string
+  notes: string
+  valid: boolean
+}
+
+export interface subjectForm {
+  color: string
+  name: string
+  shortForm: string
+}
+
+export interface subjectFormErrorTexts {
+  color: string
+  name: string
+  shortForm: string
+  valid: boolean
 }
 
 export type contractForm = {
@@ -72,6 +137,17 @@ export type contractForm = {
   interval: number
   customers: customer[]
   subject: subject | null
+}
+export type contractFormErrorTexts = {
+  startDate: string
+  endDate: string
+  startTime: string
+  endTime: string
+  teacher: string
+  dow: string
+  interval: string
+  customers: string
+  subject: string
 }
 
 export type ContractFilterForm = {
@@ -88,6 +164,17 @@ export type ContractFilterForm = {
   customerType: CustomerType
   contractType: ContractType
 }
+export type ContractFilterFormErrorTexts = {
+  school: string
+  classCustomers: string
+  privateCustomers: string
+  subject: string
+  interval: string
+  startDate: string
+  endDate: string
+  customerType: string
+  contractType: string
+}
 
 export type ContractCreationForm = {
   startDate: Dayjs | null
@@ -99,5 +186,17 @@ export type ContractCreationForm = {
   teacher: string
   teacherConfirmation: boolean
   dow: number
+  selsuggestion: string
+}
+export type ContractCreationFormErrorTexts = {
+  startDate: string
+  endDate: string
+  startTime: string
+  endTime: string
+  minTime: string
+  maxTime: string
+  teacher: string
+  teacherConfirmation: string
+  dow: string
   selsuggestion: string
 }
