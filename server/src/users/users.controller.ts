@@ -79,6 +79,10 @@ export class UsersController {
   findAllSchools(): Promise<School[]> {
     return this.usersService.findSchools()
   }
+  @Get('school/startInFuture')
+  findSchoolsWithStartInFuture(): Promise<School[]> {
+    return this.usersService.findSchoolsWithStartInFuture()
+  }
 
   @Get('teacher')
   findAppliedTeachers(): Promise<Teacher[]> {

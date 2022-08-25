@@ -63,6 +63,7 @@ export interface schoolForm extends Omit<userForm, 'timesAvailable'> {
   feeStandard: number
   feeOnline: number
   notes: string
+  dateOfStart: Dayjs | null
 }
 export interface schoolFormErrorTexts extends userFormErrorTexts {
   schoolName: string
@@ -70,6 +71,7 @@ export interface schoolFormErrorTexts extends userFormErrorTexts {
   feeStandard: string
   feeOnline: string
   notes: string
+  dateOfStart: string
   valid: boolean
 }
 

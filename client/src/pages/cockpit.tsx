@@ -3,6 +3,7 @@ import { Box, Grid } from '@mui/material'
 import { useAuth } from '../components/AuthProvider'
 import CockpitLeaves from '../components/cockpit/CockpitLeaves'
 import PendingContracts from '../components/cockpit/PendingContracts'
+import SchoolStarts from '../components/cockpit/SchoolStarts'
 import { LeaveState } from '../types/enums'
 import { Role } from '../types/user'
 
@@ -25,6 +26,9 @@ const Cockpit: React.FC = () => {
             <CockpitLeaves state={LeaveState.ACCEPTED} />
           </Grid>
         )}
+        <Grid item xs={6}>
+          <SchoolStarts />
+        </Grid>
       </Grid>
     </Box>
   )

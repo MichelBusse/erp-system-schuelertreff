@@ -335,6 +335,18 @@ export class UsersService {
       .then(transformUsers)
   }
 
+  async findSchoolsWithStartInFuture(): Promise<School[]> {
+    const qb = this.schoolsRepository.createQueryBuilder('s')
+
+    qb.select(['s'])
+      .where('s.dateOfStart > now()')
+      .orderBy('s.dateOfStart', 'ASC')
+
+    console.log(await qb.getMany())
+
+    return qb.getMany()
+  }
+
   async findTeachers(): Promise<Teacher[]> {
     return this.teachersRepository
       .find({
