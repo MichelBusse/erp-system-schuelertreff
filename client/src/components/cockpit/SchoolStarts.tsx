@@ -1,5 +1,5 @@
-import DeleteIcon from '@mui/icons-material/Delete'
-import EditIcon from '@mui/icons-material/Edit'
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
 import {
   Box,
   IconButton,
@@ -9,7 +9,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -19,14 +19,18 @@ import { useAuth } from '../AuthProvider'
 const SchoolStarts: React.FC = () => {
   const { API } = useAuth()
   const [schools, setSchools] = useState<Partial<school>[]>([])
-  const [refresh, setRefresh] = useState<number>(0)
   const navigate = useNavigate()
+  const [date, setDate] = useState<Dayjs>(dayjs())
 
   useEffect(() => {
-    API.get('users/school/startInFuture').then((res) => {
+    API.get('users/school/startInFuture', {
+      params: {
+        of: date.format('YYYY-MM-DD'),
+      },
+    }).then((res) => {
       setSchools(res.data)
     })
-  }, [refresh])
+  }, [date])
 
   return (
     <>
@@ -41,6 +45,29 @@ const SchoolStarts: React.FC = () => {
               margin: '5px 0',
             }}
           >
+            <ListItem>
+              <Stack
+                direction="row"
+                spacing={1}
+                alignItems="center"
+                justifyContent={'center'}
+                width={'100%'}
+              >
+                <IconButton
+                  onClick={() => setDate((d) => d.subtract(1, 'week').clone())}
+                >
+                  <ArrowBackIosIcon fontSize="small" />
+                </IconButton>
+                <Typography variant="body1">
+                  {`Kalenderwoche ${date.week()}`}
+                </Typography>
+                <IconButton
+                  onClick={() => setDate((d) => d.add(1, 'week').clone())}
+                >
+                  <ArrowForwardIosIcon fontSize="small" />
+                </IconButton>
+              </Stack>
+            </ListItem>
             {schools.length === 0 && (
               <ListItem>
                 <ListItemText primary="keine Einträge" />
