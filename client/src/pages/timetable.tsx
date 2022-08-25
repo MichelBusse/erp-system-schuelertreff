@@ -8,8 +8,8 @@ import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
+import AdminCalendar from '../components/AdminCalendar'
 import { useAuth } from '../components/AuthProvider'
-import Calendar from '../components/Calendar'
 import ContractDialog from '../components/ContractDialog'
 import LessonOverview from '../components/LessonOverview'
 import TeacherCalendar from '../components/TeacherCalendar'
@@ -76,7 +76,7 @@ const Timetable: React.FC = () => {
         }}
       >
         {hasRole(Role.ADMIN) ? (
-          <Calendar
+          <AdminCalendar
             date={date}
             setDrawer={setDrawer}
             setDate={setDate}

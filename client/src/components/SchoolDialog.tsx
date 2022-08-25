@@ -15,7 +15,10 @@ import { defaultSchoolFormData, snackbarOptionsError } from '../consts'
 import { SchoolType } from '../types/enums'
 import { schoolForm } from '../types/form'
 import { school } from '../types/user'
-import { defaultSchoolFormErrorTexts, schoolFormValidation } from '../utils/formValidation'
+import {
+  defaultSchoolFormErrorTexts,
+  schoolFormValidation,
+} from '../utils/formValidation'
 import { useAuth } from './AuthProvider'
 
 type Props = {
@@ -27,7 +30,7 @@ type Props = {
 const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
   const [data, setData] = useState<schoolForm>(defaultSchoolFormData)
   const [errors, setErrors] = useState(defaultSchoolFormErrorTexts)
-  const {enqueueSnackbar} = useSnackbar()
+  const { enqueueSnackbar } = useSnackbar()
 
   const { API } = useAuth()
 
@@ -35,12 +38,12 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
   const submitForm = () => {
     const errorTexts = schoolFormValidation(data)
 
-    if (errorTexts.valid){
+    if (errorTexts.valid) {
       API.post('users/school', data).then((res) => {
         setCustomers((s) => [...s, res.data])
         closeForm()
       })
-    }else{
+    } else {
       setErrors(errorTexts)
       enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
     }

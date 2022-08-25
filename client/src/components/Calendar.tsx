@@ -1,109 +1,106 @@
-import AddIcon from '@mui/icons-material/Add'
-import { Fab, Paper } from '@mui/material'
-import { Box } from '@mui/system'
-import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
+import { Box } from '@mui/material'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
-import { useEffect, useState } from 'react'
 
 import { DrawerParameters } from '../pages/timetable'
 import { contract } from '../types/contract'
 import { lesson } from '../types/lesson'
-import { teacher } from '../types/user'
-import { useAuth } from './AuthProvider'
-import styles from './Calendar.module.scss'
-import CalendarControl from './CalendarControl'
 
 type Props = {
   date: Dayjs
-  setDrawer: (params: DrawerParameters) => void
-  setDate: (date: Dayjs) => void
-  openDialog: () => void
-  refresh?: number
-  teachers: teacher[]
+  contracts: contract[]
+  setDrawer?: (params: DrawerParameters) => void
+  lessons: lesson[]
 }
 
 const Calendar: React.FC<Props> = ({
   date,
+  contracts,
   setDrawer,
-  setDate,
-  openDialog,
-  refresh,
-  teachers,
-}) => {
-  const { API } = useAuth()
+  lessons,
+}: Props) => {
+  const rowHeight = 777
+  const startTimeAM = 7
+  const numberOfHours = 14
+  const hourHeight = rowHeight / numberOfHours
 
-  const [contracts, setContracts] = useState<Record<number, contract[]>>([])
-  const [lessons, setLessons] = useState<lesson[]>([])
-
-  useEffect(() => {
-    API.get('lessons/week', {
-      params: {
-        of: date.format('YYYY-MM-DD'),
-      },
-    }).then((res) => {
-      const contractsByTeacher: Record<number, contract[]> = {}
-
-      res.data.contracts
-        .sort((a: contract, b: contract) => {
-          return dayjs(a.startTime, 'HH:mm').isAfter(
-            dayjs(b.startTime, 'HH:mm'),
-          )
-            ? 1
-            : -1
-        })
-        .map((c: contract) => {
-          contractsByTeacher[c.teacher.id] = (
-            contractsByTeacher[c.teacher.id] ?? []
-          ).concat(c)
-        })
-
-      setContracts(contractsByTeacher)
-      setLessons(res.data.lessons)
-    })
-  }, [date, refresh])
-
-  const getCellValue: GridColDef['valueGetter'] = ({ id, colDef: { field } }) =>
-    contracts[id as number]?.filter(
-      (c) => dayjs(c.startDate).day().toString() === field,
-    )
+  const getCellValue: GridColDef['valueGetter'] = ({ colDef: { field } }) =>
+    contracts?.filter((c) => dayjs(c.startDate).day().toString() === field)
 
   const renderCell: GridColDef['renderCell'] = (params) => (
     <Box
       sx={{
-        width: '100%',
-        height: '100%',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
         cursor: (params.value ?? []).length > 0 ? 'pointer' : 'normal',
       }}
     >
       {(params.value as contract[])?.map((c) => {
+        const hours =
+          (Date.parse('01 Jan 1970 ' + c.endTime) -
+            Date.parse('01 Jan 1970 ' + c.startTime)) /
+          3600000
+        const begin =
+          (Date.parse('01 Jan 1970 ' + c.startTime) -
+            Date.parse('01 Jan 1970 0' + startTimeAM + ':00:00')) / //upper Time!!!
+          3600000
         return (
           <Box
             key={c.id}
             sx={{
               backgroundColor: c.subject.color + '70',
+              height: hourHeight * hours,
+              width: 180,
+              position: 'absolute',
+              top: hourHeight * begin,
               display: 'flex',
+              flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
               boxShadow: `0 0 2px ${c.subject.color} inset`,
             }}
           >
-            {c.subject.shortForm}
+            <div>{c.subject.name}</div>
+            <div>
+              {c.startTime.substring(0, 5) + ' - ' + c.endTime.substring(0, 5)}
+            </div>
           </Box>
         )
       })}
     </Box>
   )
-
   const columns: GridColDef[] = [
-    { field: 'teacher', headerName: '', width: 200, sortable: false },
-
+    {
+      field: 'times',
+      headerName: '',
+      width: 50,
+      sortable: false,
+      renderCell: () => (
+        <div>
+          {[...Array(numberOfHours)].map((_, i) => (
+            <div
+              key={i}
+              className="timeCell"
+              style={{
+                color: '#7b878880',
+                fontWeight: 'bold',
+                height: hourHeight,
+                width: '50px',
+                borderTopStyle: 'solid',
+                borderTopColor: '#7b878860',
+                textAlign: 'right',
+                padding: '3px',
+              }}
+            >
+              {startTimeAM + i} Uhr
+            </div>
+          ))}
+        </div>
+      ),
+    },
     ...[1, 2, 3, 4, 5].map(
       (n): GridColDef => ({
         field: n.toString(),
         headerName: date.day(n).format('dddd\nDD.MM.YYYY'),
-        width: 150,
+        width: 180,
         sortable: false,
         valueGetter: getCellValue,
         renderCell,
@@ -111,57 +108,40 @@ const Calendar: React.FC<Props> = ({
     ),
   ]
 
-  const rows: GridRowsProp = teachers.map((t) => ({
-    id: t.id,
-    teacher: `${t.firstName} ${t.lastName}`,
-  }))
-
   return (
-    <Paper
-      className={styles.wrapper}
-      sx={{
+    <div
+      style={{
         width: columns.reduce((p, c) => p + (c.width ?? 100), 0),
+        maxWidth: '100%',
+        height: '100%',
+        overflowX: 'scroll',
       }}
     >
-      <CalendarControl date={date} setDate={setDate} />
-
       <DataGrid
+        getRowHeight={() => rowHeight}
+        hideFooter={true}
         style={{
           flexGrow: 1,
           border: 'none',
         }}
-        rows={rows}
+        rows={[{ id: 0 }]}
         columns={columns}
         disableColumnMenu={true}
         disableSelectionOnClick={true}
         onCellClick={(params) => {
           if (
             params.colDef.field !== 'teacher' &&
-            (params.value ?? []).length > 0
+            (params.value ?? []).length > 0 &&
+            setDrawer
           ) {
-            setDrawer({
-              open: true,
-              params: params,
-              lessons: lessons,
-            })
+            setDrawer({ open: true, params: params, lessons: lessons })
           }
         }}
       />
-
-      <Fab
-        color="primary"
-        aria-label="add"
-        style={{
-          position: 'absolute',
-          bottom: 64,
-          right: 16,
-        }}
-        onClick={openDialog}
-      >
-        <AddIcon />
-      </Fab>
-    </Paper>
+    </div>
   )
+
+  return <></>
 }
 
 export default Calendar
