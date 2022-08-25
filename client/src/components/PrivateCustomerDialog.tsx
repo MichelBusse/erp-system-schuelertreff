@@ -22,7 +22,10 @@ import { defaultPrivateCustomerFormData, snackbarOptionsError } from '../consts'
 import { SchoolType } from '../types/enums'
 import { privateCustomerForm } from '../types/form'
 import { privateCustomer } from '../types/user'
-import { defaultPrivateCustomerFormErrorTexts, privateCustomerFormValidation } from '../utils/formValidation'
+import {
+  defaultPrivateCustomerFormErrorTexts,
+  privateCustomerFormValidation,
+} from '../utils/formValidation'
 
 type Props = {
   open: boolean
@@ -47,7 +50,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
   const submitForm = () => {
     const errorTexts = privateCustomerFormValidation(data)
 
-    if (errorTexts.valid){
+    if (errorTexts.valid) {
       API.post(`users/privateCustomer`, {
         firstName: data.firstName,
         lastName: data.lastName,
@@ -80,10 +83,10 @@ const PrivateCustomerDialog: React.FC<Props> = ({
             enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
           }
         })
-      }else{
-        setErrors(errorTexts)
-        enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
-      }
+    } else {
+      setErrors(errorTexts)
+      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+    }
   }
 
   const closeForm = () => {
