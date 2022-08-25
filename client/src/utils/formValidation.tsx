@@ -157,13 +157,14 @@ export const defaultSchoolFormErrorTexts: schoolFormErrorTexts = {
   feeStandard: '',
   feeOnline: '',
   notes: '',
+  dateOfStart: '',
   valid: true,
 }
 
 export function schoolFormValidation(form: schoolForm): schoolFormErrorTexts {
   const errorTexts = { ...defaultSchoolFormErrorTexts }
 
-  if (form.postalCode !== '' && form.postalCode.length !== 5) {
+  if (form.postalCode.trim() === '' || form.postalCode.length !== 5) {
     errorTexts.postalCode = 'PLZ muss aus 5 Ziffern bestehen'
     errorTexts.valid = false
   }
@@ -173,13 +174,31 @@ export function schoolFormValidation(form: schoolForm): schoolFormErrorTexts {
     errorTexts.valid = false
   }
 
-  if (form.phone !== '' && form.phone.length < 9) {
+  if (form.phone.trim() === '' || form.phone.length < 9) {
     errorTexts.phone = 'Tel. muss mind. 9 Ziffern besitzen'
     errorTexts.valid = false
   }
 
   if (form.schoolName.trim() === '') {
     errorTexts.schoolName = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (form.street.trim() === '') {
+    errorTexts.street = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (form.city.trim() === '') {
+    errorTexts.city = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (
+    form.dateOfStart !== null &&
+    !dayjs(form.dateOfStart).isValid()
+  ) {
+    errorTexts.dateOfStart = 'Kein korrektes Datum'
     errorTexts.valid = false
   }
 
