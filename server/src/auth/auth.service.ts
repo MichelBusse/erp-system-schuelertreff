@@ -33,7 +33,7 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmailAuth(email)
 
-    if (user.deleteState === DeleteState.DELETED) return null
+    if (!user || user.deleteState === DeleteState.DELETED) return null
 
     try {
       if (

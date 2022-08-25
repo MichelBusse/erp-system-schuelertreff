@@ -99,7 +99,6 @@ const Layout: React.FC = () => {
         >
           <Outlet />
         </ErrorBoundary>
-        ,
       </Box>
     </Box>
   )

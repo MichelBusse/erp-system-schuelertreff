@@ -1,134 +1,212 @@
+import dayjs from 'dayjs'
+
+import {
+  privateCustomerForm,
+  privateCustomerFormErrorTexts,
+  schoolForm,
+  schoolFormErrorTexts,
+  subjectForm,
+  subjectFormErrorTexts,
+  teacherForm,
+  teacherFormErrorTexts,
+} from '../types/form'
+
 export const testEmail = (email: string) => /.+@.+\.[A-Za-z]+$/.test(email)
 
-export function formValidation(form: string, data: any): any {
-  const errorText = {
-    schoolName: 'fehlt',
-    firstName: 'fehlt',
-    lastName: 'fehlt',
-    city: 'fehlt',
-    postalCode: 'genau 5 Stellen',
-    street: 'fehlt',
-    email: 'fehlt',
-    phone: 'mind. 10 Stellen',
-    subjectName: 'fehlt',
-    shortForm: 'fehlt',
-    grade: '1 bis 13',
+export const defaultTeacherFormErrorTexts: teacherFormErrorTexts = {
+  firstName: '',
+  lastName: '',
+  city: '',
+  postalCode: '',
+  street: '',
+  email: '',
+  phone: '',
+  timesAvailable: '',
+  subjects: '',
+  fee: '',
+  degree: '',
+  teacherSchoolTypes: '',
+  state: '',
+  iban: '',
+  bic: '',
+  bankAccountOwner: '',
+  bankInstitution: '',
+  dateOfBirth: '',
+  dateOfEmploymentStart: '',
+  valid: true,
+}
+
+export function teacherFormValidation(
+  form: teacherForm,
+): teacherFormErrorTexts {
+  const errorTexts = { ...defaultTeacherFormErrorTexts }
+
+  if (form.firstName.trim() === '') {
+    errorTexts.firstName = 'Fehlt'
+    errorTexts.valid = false
   }
 
-  if (form === 'teacher') {
-    const temp = {
-      firstName: '',
-      lastName: '',
-      city: '',
-      postalCode: '',
-      street: '',
-      email: '',
-      phone: '',
-      validation: false,
-    }
-
-    temp.firstName = data.firstName ? '' : errorText.firstName
-    temp.lastName = data.lastName ? '' : errorText.lastName
-    temp.city = data.city ? '' : errorText.city
-    temp.postalCode =
-      data.postalCode && data.postalCode.length == 5 ? '' : errorText.postalCode
-    temp.street = data.street ? '' : errorText.street
-    temp.email = testEmail(data.email) ? '' : errorText.email
-    temp.phone = data.phone.length > 9 ? '' : errorText.phone
-
-    if (
-      data.firstName &&
-      data.lastName &&
-      data.city &&
-      data.postalCode.length == 5 &&
-      data.street &&
-      testEmail(data.email) &&
-      data.phone.length > 9
-    )
-      temp.validation = true
-
-    return temp
+  if (form.lastName.trim() === '') {
+    errorTexts.lastName = 'Fehlt'
+    errorTexts.valid = false
   }
 
-  if (form === 'privateCustomer') {
-    const temp = {
-      firstName: '',
-      lastName: '',
-      city: '',
-      postalCode: '',
-      street: '',
-      email: '',
-      phone: '',
-      validation: false,
-      grade: '',
-    }
-
-    temp.firstName = data.firstName ? '' : errorText.firstName
-    temp.lastName = data.lastName ? '' : errorText.lastName
-    temp.city = data.city ? '' : errorText.city
-    temp.postalCode = data.postalCode.length == 5 ? '' : errorText.postalCode
-    temp.street = data.street ? '' : errorText.street
-    temp.email = testEmail(data.email) ? '' : errorText.email
-    temp.phone = data.phone.length > 9 ? '' : errorText.phone
-    temp.grade = data.grade > 0 && data.grade < 14 ? '' : errorText.grade
-
-    if (
-      data.firstName &&
-      data.lastName &&
-      data.city &&
-      data.postalCode.length == 5 &&
-      data.street &&
-      testEmail(data.email) &&
-      data.phone.length > 9
-    )
-      temp.validation = true
-
-    return temp
+  if (form.postalCode !== '' && form.postalCode.length !== 5) {
+    errorTexts.postalCode = 'PLZ muss aus 5 Ziffern bestehen'
+    errorTexts.valid = false
   }
 
-  if (form === 'school') {
-    const temp = {
-      schoolName: '',
-      city: '',
-      postalCode: '',
-      street: '',
-      email: '',
-      phone: '',
-      validation: false,
-    }
-
-    temp.schoolName = data.schoolName ? '' : errorText.schoolName
-    temp.city = data.city ? '' : errorText.city
-    temp.postalCode = data.postalCode.length == 5 ? '' : errorText.phone
-    temp.street = data.street ? '' : errorText.street
-    temp.email = testEmail(data.email) ? '' : errorText.email
-    temp.phone = data.phone.length > 9 ? '' : errorText.phone
-
-    if (
-      data.schoolName &&
-      data.city &&
-      data.postalCode.length == 5 &&
-      data.street &&
-      testEmail(data.email) &&
-      data.phone.length > 9
-    )
-      temp.validation = true
-
-    return temp
+  if (form.email.match(/\S+@\S+\.\S+/)?.length !== 1) {
+    errorTexts.email = 'Keine korrekte E-Mail'
+    errorTexts.valid = false
   }
 
-  if (form === 'subject') {
-    const temp = {
-      name: '',
-      shortForm: '',
-      validation: false,
-    }
-
-    temp.name = data.name ? '' : errorText.subjectName
-    temp.shortForm = data.shortForm ? '' : errorText.shortForm
-
-    if (data.name && data.shortForm) temp.validation = true
-
-    return temp
+  if (form.phone !== '' && form.phone.length < 9) {
+    errorTexts.phone = 'Tel. muss mind. 9 Ziffern besitzen'
+    errorTexts.valid = false
   }
+
+  if (form.iban !== '' && form.iban.length !== 22) {
+    errorTexts.iban = 'IBAN muss 22 Zeichen besitzen'
+    errorTexts.valid = false
+  }
+
+  if (form.dateOfBirth !== null && !dayjs(form.dateOfBirth).isValid()) {
+    errorTexts.dateOfBirth = 'Kein korrektes Datum'
+    errorTexts.valid = false
+  }
+
+  if (
+    form.dateOfEmploymentStart !== null &&
+    !dayjs(form.dateOfEmploymentStart).isValid()
+  ) {
+    errorTexts.dateOfEmploymentStart = 'Kein korrektes Datum'
+    errorTexts.valid = false
+  }
+
+  return errorTexts
+}
+
+export const defaultPrivateCustomerFormErrorTexts: privateCustomerFormErrorTexts =
+  {
+    firstName: '',
+    lastName: '',
+    city: '',
+    postalCode: '',
+    street: '',
+    email: '',
+    phone: '',
+    timesAvailable: '',
+    grade: '',
+    schoolType: '',
+    feeStandard: '',
+    feeOnline: '',
+    notes: '',
+    valid: true,
+  }
+
+export function privateCustomerFormValidation(
+  form: privateCustomerForm,
+): privateCustomerFormErrorTexts {
+  const errorTexts = { ...defaultPrivateCustomerFormErrorTexts }
+
+  if (form.firstName.trim() === '') {
+    errorTexts.firstName = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (form.lastName.trim() === '') {
+    errorTexts.lastName = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (form.postalCode !== '' && form.postalCode.length !== 5) {
+    errorTexts.postalCode = 'PLZ muss aus 5 Ziffern bestehen'
+    errorTexts.valid = false
+  }
+
+  if (form.email.match(/\S+@\S+\.\S+/)?.length !== 1) {
+    errorTexts.email = 'Keine korrekte E-Mail'
+    errorTexts.valid = false
+  }
+
+  if (form.phone !== '' && form.phone.length < 9) {
+    errorTexts.phone = 'Tel. muss mind. 9 Ziffern besitzen'
+    errorTexts.valid = false
+  }
+
+  if (form.grade && !(form.grade > 0 && form.grade < 14)) {
+    errorTexts.grade = 'Zwischen 1 und 13 liegen'
+    errorTexts.valid = false
+  }
+
+  return errorTexts
+}
+
+export const defaultSchoolFormErrorTexts: schoolFormErrorTexts = {
+  firstName: '',
+  lastName: '',
+  city: '',
+  postalCode: '',
+  street: '',
+  email: '',
+  phone: '',
+  timesAvailable: '',
+  schoolName: '',
+  schoolTypes: '',
+  feeStandard: '',
+  feeOnline: '',
+  notes: '',
+  valid: true,
+}
+
+export function schoolFormValidation(form: schoolForm): schoolFormErrorTexts {
+  const errorTexts = { ...defaultSchoolFormErrorTexts }
+
+  if (form.postalCode !== '' && form.postalCode.length !== 5) {
+    errorTexts.postalCode = 'PLZ muss aus 5 Ziffern bestehen'
+    errorTexts.valid = false
+  }
+
+  if (form.email.match(/\S+@\S+\.\S+/)?.length !== 1) {
+    errorTexts.email = 'Keine korrekte E-Mail'
+    errorTexts.valid = false
+  }
+
+  if (form.phone !== '' && form.phone.length < 9) {
+    errorTexts.phone = 'Tel. muss mind. 9 Ziffern besitzen'
+    errorTexts.valid = false
+  }
+
+  if (form.schoolName.trim() === '') {
+    errorTexts.schoolName = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  return errorTexts
+}
+
+export const defaultSubjectFormErrorTexts = {
+  color: '',
+  name: '',
+  shortForm: '',
+  valid: true,
+}
+
+export function subjectFormValidation(
+  form: subjectForm,
+): subjectFormErrorTexts {
+  const errorTexts = { ...defaultSubjectFormErrorTexts }
+
+  if (form.name.trim() === '') {
+    errorTexts.name = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (form.shortForm.trim() === '') {
+    errorTexts.shortForm = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  return errorTexts
 }

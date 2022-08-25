@@ -109,7 +109,7 @@ export class ContractsService {
     const contract = await this.contractsRepository.findOneByOrFail({ id })
 
     if (contract.state === ContractState.ACCEPTED) {
-      if (dayjs().isBefore(contract.endDate)) {
+      if (contract.endDate && dayjs().isBefore(contract.endDate)) {
         // Cannot delete past contracts
         if (dayjs().isBefore(contract.startDate)) {
           // Delete Future contracts completely
@@ -261,9 +261,14 @@ export class ContractsService {
       .andWhere('con.state = :contractState', {
         contractState: ContractState.ACCEPTED,
       })
-      .andWhere('con.endDate > :startDate', {
-        startDate: dto.startDate ?? dayjs().format('YYYY-MM-DD'),
-      })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('con.endDate IS NULL')
+          qb.orWhere('con.endDate > :startDate', {
+            startDate: dto.startDate ?? dayjs().format('YYYY-MM-DD'),
+          })
+        }),
+      )
 
     if (typeof dto.endDate !== 'undefined')
       contractQuery.andWhere('con.startDate < :endDate', {
@@ -413,7 +418,12 @@ export class ContractsService {
         `c.startDate <= date_trunc('week', :week::date) + interval '4 day'`,
         { week: week.format() },
       )
-      .andWhere(`c.endDate >= date_trunc('week', :week::date)`)
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('c.endDate IS NULL')
+          qb.orWhere(`c.endDate >= date_trunc('week', :week::date)`)
+        }),
+      )
       .andWhere('c.state = :contractState', {
         contractState: ContractState.ACCEPTED,
       })
@@ -441,15 +451,23 @@ export class ContractsService {
       .from(Contract, 'c')
       .where(`c."teacherId" = :teacherId`, { teacherId })
       .andWhere(`c.state = :state`, { state: ContractState.ACCEPTED })
-      .andWhere(`c."startDate" <= :end::date`, { end: endDate })
-      .andWhere(`c."endDate" >= :start::date`, { start: startDate })
+
+    if (endDate !== null)
+      qb.andWhere(`c."startDate" <= :end::date`, { end: endDate })
+
+    qb.andWhere(
+      new Brackets((qb) => {
+        qb.where('con.endDate IS NULL')
+        qb.orWhere(`c."endDate" >= :start::date`, { start: startDate })
+      }),
+    )
       .leftJoinAndSelect('c.lessons', 'lesson')
       .andWhere(`lesson.date >= :start::date`)
       .andWhere(`lesson.date <= :end::date`)
       .leftJoinAndSelect(
         'c.childContracts',
         'cc',
-        `cc."startDate" <= :end::date AND cc."endDate" >= :start::date`,
+        `cc."startDate" <= :end::date AND (cc."endDate" IS NULL OR cc."endDate" >= :start::date)`,
       )
       .leftJoinAndSelect('cc.teacher', 'cc_teacher')
       .leftJoin('c.customers', 'customer')

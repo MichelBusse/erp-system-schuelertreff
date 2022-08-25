@@ -1,11 +1,16 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import { IconButton } from '@mui/material'
+import { Autocomplete, IconButton, TextField } from '@mui/material'
+import { Box } from '@mui/system'
 import {
   DataGrid,
   getGridStringOperators,
+  GridCellParams,
   GridColumns,
   GridColumnVisibilityModel,
   GridEventListener,
+  GridFilterInputValueProps,
+  GridFilterItem,
+  GridFilterOperator,
   GridRowSpacingParams,
   GridToolbarContainer,
   GridToolbarFilterButton,
@@ -17,8 +22,81 @@ import useMeasure from 'react-use-measure'
 import { useAuth } from '../components/AuthProvider'
 import SchoolDialog from '../components/SchoolDialog'
 import { dataGridLocaleText } from '../consts'
+import { SchoolType } from '../types/enums'
 import { school } from '../types/user'
 import styles from './gridList.module.scss'
+
+const SubjectsFilterInputValue: React.FC<GridFilterInputValueProps> = ({
+  item,
+  applyValue,
+}) => {
+  return (
+    <Box
+      sx={{
+        display: 'inline-flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 48,
+      }}
+    >
+      <Autocomplete
+        id="schoolTypes"
+        options={[
+          SchoolType.GRUNDSCHULE,
+          SchoolType.OBERSCHULE,
+          SchoolType.GYMNASIUM,
+          SchoolType.ANDERE,
+        ]}
+        getOptionLabel={(option) => {
+          switch (option) {
+            case SchoolType.GRUNDSCHULE:
+              return 'Grundschule'
+            case SchoolType.OBERSCHULE:
+              return 'Oberschule'
+            case SchoolType.GYMNASIUM:
+              return 'Gymnasium'
+            case SchoolType.ANDERE:
+              return 'Andere'
+            default:
+              return ''
+          }
+        }}
+        value={item.value}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            variant="standard"
+            label="Schulart"
+            sx={{ minWidth: '150px' }}
+          />
+        )}
+        onChange={(event, newValue) => {
+          applyValue({ ...item, value: newValue })
+        }}
+      />
+    </Box>
+  )
+}
+
+const schoolTypesOperator: GridFilterOperator = {
+  label: 'enthalten',
+  value: 'includes',
+  getApplyFilterFn: (filterItem: GridFilterItem) => {
+    if (
+      !filterItem.columnField ||
+      !filterItem.value ||
+      !filterItem.operatorValue
+    ) {
+      return null
+    }
+
+    return (params: GridCellParams): boolean => {
+      return params.value.includes(filterItem.value)
+    }
+  },
+  InputComponent: SubjectsFilterInputValue,
+  InputComponentProps: { type: 'string' },
+}
 
 const Schools: React.FC = () => {
   const [open, setOpen] = useState(false)
@@ -49,12 +127,16 @@ const Schools: React.FC = () => {
         customerName: true,
         customerEmail: true,
         customerPhone: false,
+        city: false,
+        schoolTypes: false,
       })
     } else {
       setColumnVisibilityModel({
         customerName: true,
         customerEmail: true,
         customerPhone: true,
+        city: false,
+        schoolTypes: false,
       })
     }
   }, [small])
@@ -85,9 +167,7 @@ const Schools: React.FC = () => {
     {
       field: 'customerEmail',
       headerClassName: 'DataGridHead',
-      filterOperators: getGridStringOperators().filter(
-        (operator) => operator.value === 'contains',
-      ),
+      filterable: false,
       headerName: 'Email',
       minWidth: 160,
       flex: 1,
@@ -95,11 +175,25 @@ const Schools: React.FC = () => {
     {
       field: 'customerPhone',
       headerClassName: 'DataGridHead',
+      filterable: false,
+      headerName: 'Phone',
+      flex: 1,
+    },
+    {
+      field: 'city',
+      headerClassName: 'DataGridHead',
+      headerName: 'Stadt',
       filterOperators: getGridStringOperators().filter(
         (operator) => operator.value === 'contains',
       ),
-      headerName: 'Phone',
-      flex: 1,
+      renderCell: () => <></>,
+    },
+    {
+      field: 'schoolTypes',
+      headerClassName: 'DataGridHead',
+      headerName: 'Schulart',
+      filterOperators: [schoolTypesOperator],
+      renderCell: () => <></>,
     },
   ]
 
@@ -109,6 +203,8 @@ const Schools: React.FC = () => {
     customerName: customer.schoolName,
     customerEmail: customer.email,
     customerPhone: customer.phone,
+    city: customer.city,
+    schoolTypes: customer.schoolTypes,
   }))
 
   //space between rows

@@ -56,7 +56,9 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
       const initialForm0Entry: ContractFilterForm = {
         ...f,
         startDate: dayjs(initialContract.startDate, 'YYYY-MM-DD'),
-        endDate: dayjs(initialContract.endDate, 'YYYY-MM-DD'),
+        endDate: initialContract.endDate
+          ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
+          : null,
         subject: initialContract.subject,
         interval: initialContract.interval,
       }
@@ -96,6 +98,9 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
         console.error(err)
         enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
       })
+
+    // if school is already set, load classCustomers
+    if (form.school !== null) loadClasses(form.school.id)
   }, [])
 
   const loadClasses = (id: number) => {
@@ -144,7 +149,7 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
           isOptionEqualToValue={(option, value) => option.id === value.id}
           value={form.school}
           onChange={(_, value) => {
-            setForm((f) => ({ ...f, school: value }))
+            setForm((f) => ({ ...f, school: value, classCustomers: [] }))
 
             if (value !== null) loadClasses(value.id)
           }}
@@ -297,9 +302,7 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
           onChange={(value) => {
             setForm((f) => ({ ...f, endDate: value }))
           }}
-          renderInput={(params) => (
-            <TextField {...params} required variant="outlined" />
-          )}
+          renderInput={(params) => <TextField {...params} variant="outlined" />}
           InputAdornmentProps={{
             position: 'start',
           }}

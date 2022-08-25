@@ -12,9 +12,13 @@ import { useEffect, useState } from 'react'
 import { SketchPicker } from 'react-color'
 
 import { useAuth } from '../components/AuthProvider'
-import { snackbarOptionsError } from '../consts'
+import { defaultSubjectFormData, snackbarOptionsError } from '../consts'
+import { subjectForm, subjectFormErrorTexts } from '../types/form'
 import subject from '../types/subject'
-import { formValidation } from '../utils/formValidation'
+import {
+  defaultSubjectFormErrorTexts,
+  subjectFormValidation,
+} from '../utils/formValidation'
 
 type Props = {
   open: boolean
@@ -23,29 +27,25 @@ type Props = {
   initialSubject: subject | null
 }
 
-const defaultFormData = {
-  color: '#FF0000',
-  name: '',
-  shortForm: '',
-}
-
 const SubjectDialog: React.FC<Props> = ({
   open,
   setOpen,
   setSubjects,
   initialSubject,
 }) => {
-  const [data, setData] = useState(defaultFormData)
-  const [errors, setErrors] = useState(defaultFormData)
+  const [data, setData] = useState<subjectForm>(defaultSubjectFormData)
+  const [errors, setErrors] = useState<subjectFormErrorTexts>(
+    defaultSubjectFormErrorTexts,
+  )
   const { enqueueSnackbar } = useSnackbar()
 
   const { API } = useAuth()
 
   //TODO: validate filled fields
   const submitForm = () => {
-    setErrors(formValidation('subject', data))
+    const errorTexts = subjectFormValidation(data)
 
-    if (formValidation('subject', data).validation)
+    if (errorTexts.valid) {
       if (initialSubject) {
         API.post('subjects/' + initialSubject.id, data).then((res) => {
           setSubjects((s) => {
@@ -57,22 +57,27 @@ const SubjectDialog: React.FC<Props> = ({
             })
             return newSubjects
           })
-          setData(defaultFormData)
+          setData(defaultSubjectFormData)
+          setErrors(defaultSubjectFormErrorTexts)
           setOpen(false)
         })
       } else {
         API.post('subjects', data).then((res) => {
           setSubjects((s) => [...s, res.data])
-          setData(defaultFormData)
+          setData(defaultSubjectFormData)
           setOpen(false)
         })
       }
+    } else {
+      setErrors(errorTexts)
+      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+    }
   }
 
   const closeForm = () => {
     setOpen(false)
-    setData(defaultFormData)
-    setErrors(defaultFormData)
+    setData(defaultSubjectFormData)
+    setErrors(defaultSubjectFormErrorTexts)
   }
 
   const deleteSubject = () => {
@@ -88,7 +93,7 @@ const SubjectDialog: React.FC<Props> = ({
             })
             return newSubjects
           })
-          setData(defaultFormData)
+          setData(defaultSubjectFormData)
           setOpen(false)
         })
         .catch(() => {
@@ -126,6 +131,7 @@ const SubjectDialog: React.FC<Props> = ({
         >
           <TextField
             helperText={errors.name}
+            error={errors.name !== ''}
             id="subjectName"
             label="Fachbezeichnung"
             variant="outlined"
@@ -138,6 +144,7 @@ const SubjectDialog: React.FC<Props> = ({
           />
           <TextField
             helperText={errors.shortForm}
+            error={errors.shortForm !== ''}
             id="shortForm"
             label="Abkürzung"
             variant="outlined"

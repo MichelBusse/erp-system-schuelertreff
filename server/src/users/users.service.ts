@@ -345,6 +345,16 @@ export class UsersService {
       .then(transformUsers)
   }
 
+  async findDeletedTeachers(): Promise<Teacher[]> {
+    return this.teachersRepository
+      .find({
+        relations: ['subjects'],
+        where: { deleteState: DeleteState.DELETED },
+        order: { firstName: 'ASC', lastName: 'ASC' },
+      })
+      .then(transformUsers)
+  }
+
   async findOne(id: number): Promise<User> {
     return this.usersRepository.findOneByOrFail({ id }).then(transformUser)
   }
@@ -630,6 +640,14 @@ export class UsersService {
     return this.teachersRepository.save(updatedTeacher).then(transformUser)
   }
 
+  async unarchiveTeacher(id: number): Promise<Teacher> {
+    const teacher = await this.findOneTeacher(id)
+
+    teacher.deleteState = DeleteState.ACTIVE
+
+    return this.teachersRepository.save(teacher).then(transformUser)
+  }
+
   async deleteTeacher(id: number) {
     const qb = this.connection.createQueryBuilder()
 
@@ -658,7 +676,11 @@ export class UsersService {
         )
       }
     } else {
-      this.teachersRepository.delete(id)
+      if ((await this.findOneTeacher(id)).deleteState === DeleteState.ACTIVE) {
+        this.teachersRepository.update(id, { deleteState: DeleteState.DELETED })
+      } else {
+        this.teachersRepository.delete(id)
+      }
     }
   }
 

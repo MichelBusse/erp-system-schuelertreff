@@ -22,7 +22,10 @@ import { defaultPrivateCustomerFormData, snackbarOptionsError } from '../consts'
 import { SchoolType } from '../types/enums'
 import { privateCustomerForm } from '../types/form'
 import { privateCustomer } from '../types/user'
-import { formValidation } from '../utils/formValidation'
+import {
+  defaultPrivateCustomerFormErrorTexts,
+  privateCustomerFormValidation,
+} from '../utils/formValidation'
 
 type Props = {
   open: boolean
@@ -38,16 +41,16 @@ const PrivateCustomerDialog: React.FC<Props> = ({
   const [data, setData] = useState<privateCustomerForm>(
     defaultPrivateCustomerFormData,
   )
-  const [errors, setErrors] = useState(defaultPrivateCustomerFormData)
+  const [errors, setErrors] = useState(defaultPrivateCustomerFormErrorTexts)
 
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
 
   //TODO: validate filled fields
   const submitForm = () => {
-    setErrors(formValidation('privateCustomer', data))
+    const errorTexts = privateCustomerFormValidation(data)
 
-    if (formValidation('privateCustomer', data).validation)
+    if (errorTexts.valid) {
       API.post(`users/privateCustomer`, {
         firstName: data.firstName,
         lastName: data.lastName,
@@ -80,12 +83,16 @@ const PrivateCustomerDialog: React.FC<Props> = ({
             enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
           }
         })
+    } else {
+      setErrors(errorTexts)
+      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+    }
   }
 
   const closeForm = () => {
     setOpen(false)
     setData(defaultPrivateCustomerFormData)
-    setErrors(defaultPrivateCustomerFormData)
+    setErrors(defaultPrivateCustomerFormErrorTexts)
   }
 
   return (
@@ -101,6 +108,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           <Stack direction={'row'} columnGap={2}>
             <TextField
               helperText={errors.firstName}
+              error={errors.firstName !== ''}
               id="firstName"
               label="Vorname"
               variant="outlined"
@@ -113,6 +121,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
             />
             <TextField
               helperText={errors.lastName}
+              error={errors.lastName !== ''}
               id="lastName"
               label="Nachname"
               variant="outlined"
@@ -127,6 +136,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           <Stack direction={'row'} columnGap={2}>
             <TextField
               helperText={errors.street}
+              error={errors.street !== ''}
               id="street"
               label="Straße"
               variant="outlined"
@@ -141,6 +151,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               helperText={errors.city}
+              error={errors.city !== ''}
               id="city"
               label="Stadt"
               variant="outlined"
@@ -153,6 +164,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
             />
             <TextField
               helperText={errors.postalCode}
+              error={errors.postalCode !== ''}
               id="postalCode"
               label="Postleitzahl"
               variant="outlined"
@@ -167,6 +179,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               helperText={errors.email}
+              error={errors.email !== ''}
               id="email"
               label="E-Mail Adresse"
               variant="outlined"
@@ -179,6 +192,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
             />
             <TextField
               helperText={errors.phone}
+              error={errors.phone !== ''}
               id="phone"
               label="Telefonnummer"
               variant="outlined"
@@ -216,6 +230,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
               label="Klasse"
               variant="outlined"
               helperText={errors.grade}
+              error={errors.grade !== ''}
               value={data.grade ?? ''}
               fullWidth
               InputProps={{ inputProps: { min: 0, max: 13 } }}

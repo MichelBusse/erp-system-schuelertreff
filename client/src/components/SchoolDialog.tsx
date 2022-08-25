@@ -8,13 +8,17 @@ import {
   Stack,
   TextField,
 } from '@mui/material'
+import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 
-import { defaultSchoolFormData } from '../consts'
+import { defaultSchoolFormData, snackbarOptionsError } from '../consts'
 import { SchoolType } from '../types/enums'
 import { schoolForm } from '../types/form'
 import { school } from '../types/user'
-import { formValidation } from '../utils/formValidation'
+import {
+  defaultSchoolFormErrorTexts,
+  schoolFormValidation,
+} from '../utils/formValidation'
 import { useAuth } from './AuthProvider'
 
 type Props = {
@@ -25,25 +29,30 @@ type Props = {
 
 const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
   const [data, setData] = useState<schoolForm>(defaultSchoolFormData)
-  const [errors, setErrors] = useState(defaultSchoolFormData)
+  const [errors, setErrors] = useState(defaultSchoolFormErrorTexts)
+  const { enqueueSnackbar } = useSnackbar()
 
   const { API } = useAuth()
 
   //TODO: validate filled fields
   const submitForm = () => {
-    setErrors(formValidation('school', data))
+    const errorTexts = schoolFormValidation(data)
 
-    if (formValidation('school', data).validation)
+    if (errorTexts.valid) {
       API.post('users/school', data).then((res) => {
         setCustomers((s) => [...s, res.data])
         closeForm()
       })
+    } else {
+      setErrors(errorTexts)
+      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+    }
   }
 
   const closeForm = () => {
     setOpen(false)
     setData(defaultSchoolFormData)
-    setErrors(defaultSchoolFormData)
+    setErrors(defaultSchoolFormErrorTexts)
   }
 
   return (
@@ -59,6 +68,7 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
           <Stack direction={'row'} columnGap={2}>
             <TextField
               helperText={errors.schoolName}
+              error={errors.schoolName !== ''}
               id="schoolName"
               label="Schulname"
               variant="outlined"
@@ -107,6 +117,7 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
           <Stack direction={'row'} columnGap={2}>
             <TextField
               helperText={errors.street}
+              error={errors.street !== ''}
               id="street"
               label="Straße"
               variant="outlined"
@@ -121,6 +132,7 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               helperText={errors.city}
+              error={errors.city !== ''}
               id="city"
               label="Stadt"
               variant="outlined"
@@ -133,6 +145,7 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
             />
             <TextField
               helperText={errors.postalCode}
+              error={errors.postalCode !== ''}
               id="postalCode"
               label="Postleitzahl"
               variant="outlined"
@@ -147,6 +160,7 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               helperText={errors.email}
+              error={errors.email !== ''}
               id="email"
               label="E-Mail Adresse"
               variant="outlined"
@@ -159,6 +173,7 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
             />
             <TextField
               helperText={errors.phone}
+              error={errors.phone !== ''}
               id="phone"
               label="Telefonnummer"
               variant="outlined"

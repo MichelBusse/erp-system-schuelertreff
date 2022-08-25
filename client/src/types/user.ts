@@ -1,5 +1,6 @@
 import {
   Degree,
+  DeleteState,
   LeaveState,
   LeaveType,
   SchoolType,
@@ -44,6 +45,7 @@ interface user {
   timesAvailableParsed: timesAvailableParsed[]
   timesAvailable: (timeAvailable & { id: string })[]
   leave: leave[]
+  deleteState?: DeleteState
 }
 
 export type timesAvailableParsed = {
@@ -84,6 +86,7 @@ export interface school extends Omit<user, 'lastName' | 'firstName'> {
   schoolName: string
   feeStandard: number
   feeOnline: number
+  schoolTypes: string[]
 }
 
 export interface classCustomer {

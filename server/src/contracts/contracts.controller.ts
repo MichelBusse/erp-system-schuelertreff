@@ -31,9 +31,9 @@ export class ContractsController {
     const startTime = dayjs(dto.startTime, 'HH:mm')
     const endTime = dayjs(dto.endTime, 'HH:mm')
     const startDate = dayjs(dto.startDate)
-    const endDate = dayjs(dto.endDate)
+    const endDate = dto.endDate ? dayjs(dto.endDate) : null
 
-    if (endDate.isBefore(startDate))
+    if (endDate && endDate.isBefore(startDate))
       throw new BadRequestException('endDate must not be before startDate')
 
     if ([0, 6].includes(startDate.day()))
@@ -114,7 +114,7 @@ export class ContractsController {
       // If contract starts in future, then update excestingcontract
 
       this.contractsService.updateContract(id, dto)
-    } else if (dayjs(dto.endDate).isAfter(dayjs())) {
+    } else if (!dto.endDate || dayjs(dto.endDate).isAfter(dayjs())) {
       //If contract has already started and does not have ended yet, then end it and create new with updated params
       this.contractsService.endOrDeleteContract(id)
 

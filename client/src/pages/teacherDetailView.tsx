@@ -4,11 +4,6 @@ import {
   Autocomplete,
   Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   FormControl,
   FormHelperText,
   InputLabel,
@@ -29,6 +24,10 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
+import ConfirmationDialog, {
+  ConfirmationDialogProps,
+  defaultConfirmationDialogProps,
+} from '../components/ConfirmationDialog'
 import IconButtonAdornment from '../components/IconButtonAdornment'
 import InvoiceDataSelect from '../components/InvoiceDateSelect'
 import Leave from '../components/Leave'
@@ -37,14 +36,23 @@ import {
   defaultTeacherFormData,
   snackbarOptions,
   snackbarOptionsError,
+  teacherSchoolTypeToString,
   teacherStateToString,
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
-import { Degree, TeacherSchoolType, TeacherState } from '../types/enums'
-import { teacherForm } from '../types/form'
+import {
+  Degree,
+  DeleteState,
+  TeacherSchoolType,
+  TeacherState,
+} from '../types/enums'
+import { teacherForm, teacherFormErrorTexts } from '../types/form'
 import subject from '../types/subject'
 import { leave, Role, teacher, timesAvailableParsed } from '../types/user'
-import { formValidation } from '../utils/formValidation'
+import {
+  defaultTeacherFormErrorTexts,
+  teacherFormValidation,
+} from '../utils/formValidation'
 
 dayjs.extend(customParseFormat)
 
@@ -55,15 +63,19 @@ const TeacherDetailView: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar()
 
   const [subjects, setSubjects] = useState<subject[]>([])
-  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
   const [data, setData] = useState<teacherForm>(defaultTeacherFormData)
   const [leaveData, setLeaveData] = useState<leave[]>([])
-  const [errors, setErrors] = useState(defaultTeacherFormData)
+  const [errors, setErrors] = useState<teacherFormErrorTexts>(
+    defaultTeacherFormErrorTexts,
+  )
 
   const theme = useTheme()
 
   const requestedId = id ?? 'me'
   const activeTeacherState = decodeToken().state
+
+  const [confirmationDialogProps, setConfirmationDialogProps] =
+    useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
 
   // refresh data if teacher state is updated (i.e. application accepted)
   useEffect(() => {
@@ -108,15 +120,16 @@ const TeacherDetailView: React.FC = () => {
       bic: newData.bic ?? '',
       bankAccountOwner: newData.bankAccountOwner ?? '',
       bankInstitution: newData.bankInstitution ?? '',
+      deleteState: newData.deleteState,
     })
 
     setLeaveData(newData.leave)
   }
 
   const submitForm = (override: Partial<teacherForm> = {}) => {
-    setErrors(formValidation('teacher', data))
+    const errorTexts = teacherFormValidation(data)
 
-    if (formValidation('teacher', data).validation) {
+    if (errorTexts.valid) {
       if (id) navigate('/teachers')
 
       API.post('users/teacher/' + requestedId, {
@@ -141,28 +154,64 @@ const TeacherDetailView: React.FC = () => {
         .catch(() => {
           enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
         })
+    } else {
+      setErrors(errorTexts)
+      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
     }
   }
 
   const deleteUser = () => {
-    setDialogOpen(false)
+    setConfirmationDialogProps({
+      open: true,
+      setProps: setConfirmationDialogProps,
+      title:
+        data.deleteState === DeleteState.ACTIVE
+          ? 'Lehrkraft wirklich archivieren?'
+          : 'Lehrkraft wirklich löschen?',
+      text:
+        data.deleteState === DeleteState.ACTIVE
+          ? 'Lehrkräfte können nur archiviert werden, wenn sie in keinen laufenden oder zukünftigen Einsätzen mehr eingeplant sind.'
+          : 'Lehrkräfte können nur gelöscht werden, wenn sie in keinen vergangenen Einsätzen eingeplant waren.',
+      actionText:
+        data.deleteState === DeleteState.ACTIVE ? 'Archivieren' : 'Löschen',
+      action: () => {
+        API.delete('users/teacher/' + requestedId)
+          .then(() => {
+            enqueueSnackbar(
+              data.firstName +
+                ' ' +
+                data.lastName +
+                ' wurde ' +
+                (data.deleteState === DeleteState.ACTIVE
+                  ? 'archiviert'
+                  : 'gelöscht'),
+              snackbarOptions,
+            )
+            navigate('/teachers')
+          })
+          .catch(() => {
+            enqueueSnackbar(
+              data.firstName +
+                ' ' +
+                data.lastName +
+                ' kann nicht entfernt werden, da noch Verträge existieren.',
+              snackbarOptionsError,
+            )
+          })
+      },
+    })
+  }
 
-    API.delete('users/teacher/' + requestedId)
+  const unarchiveUser = () => {
+    API.get('users/teacher/unarchive/' + id)
       .then(() => {
         enqueueSnackbar(
-          data.firstName + ' ' + data.lastName + ' gelöscht',
-          snackbarOptions,
+          `${data.firstName} ${data.lastName} wurde entarchiviert!`,
         )
         navigate('/teachers')
       })
       .catch(() => {
-        enqueueSnackbar(
-          data.firstName +
-            ' ' +
-            data.lastName +
-            ' kann nicht gelöscht werden, da noch laufende Verträge existieren.',
-          snackbarOptionsError,
-        )
+        enqueueSnackbar('Ein Fehler ist aufgetreten!')
       })
   }
 
@@ -201,6 +250,7 @@ const TeacherDetailView: React.FC = () => {
           <Stack direction="row" columnGap={2}>
             <TextField
               helperText={errors.firstName}
+              error={errors.firstName !== ''}
               fullWidth={true}
               label="Vorname"
               disabled={requestedId === 'me'}
@@ -217,6 +267,7 @@ const TeacherDetailView: React.FC = () => {
             />
             <TextField
               helperText={errors.lastName}
+              error={errors.lastName !== ''}
               fullWidth={true}
               label="Nachname"
               disabled={requestedId === 'me'}
@@ -241,7 +292,13 @@ const TeacherDetailView: React.FC = () => {
               setData((d) => ({ ...d, dateOfBirth: value }))
             }}
             renderInput={(params) => (
-              <TextField {...params} required variant="outlined" />
+              <TextField
+                {...params}
+                required
+                variant="outlined"
+                helperText={errors.dateOfBirth}
+                error={errors.dateOfBirth !== ''}
+              />
             )}
             InputAdornmentProps={{
               position: 'start',
@@ -260,6 +317,7 @@ const TeacherDetailView: React.FC = () => {
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               helperText={errors.street}
+              error={errors.street !== ''}
               label="Straße"
               fullWidth={true}
               onChange={(event) =>
@@ -276,6 +334,7 @@ const TeacherDetailView: React.FC = () => {
             <TextField
               label="Stadt"
               helperText={errors.city}
+              error={errors.city !== ''}
               fullWidth={true}
               onChange={(event) =>
                 setData((data) => ({
@@ -291,6 +350,7 @@ const TeacherDetailView: React.FC = () => {
             <TextField
               label="Postleitzahl"
               helperText={errors.postalCode}
+              error={errors.postalCode !== ''}
               fullWidth={true}
               onChange={(event) =>
                 setData((data) => ({
@@ -309,6 +369,8 @@ const TeacherDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               label="Kontoinhaber"
+              helperText={errors.bankAccountOwner}
+              error={errors.bankAccountOwner !== ''}
               onChange={(event) =>
                 setData((data) => ({
                   ...data,
@@ -321,6 +383,8 @@ const TeacherDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               label="Kreditinstitut"
+              helperText={errors.bankInstitution}
+              error={errors.bankInstitution !== ''}
               onChange={(event) =>
                 setData((data) => ({
                   ...data,
@@ -334,6 +398,8 @@ const TeacherDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               label="IBAN"
+              helperText={errors.iban}
+              error={errors.iban !== ''}
               onChange={(event) =>
                 setData((data) => ({
                   ...data,
@@ -346,6 +412,8 @@ const TeacherDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               label="BIC"
+              helperText={errors.bic}
+              error={errors.bic !== ''}
               onChange={(event) =>
                 setData((data) => ({
                   ...data,
@@ -360,6 +428,7 @@ const TeacherDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               helperText={errors.email}
+              error={errors.email !== ''}
               label="Email"
               disabled={requestedId === 'me'}
               onChange={(event) =>
@@ -377,6 +446,7 @@ const TeacherDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               helperText={errors.phone}
+              error={errors.phone !== ''}
               label="Telefonnummer"
               onChange={(event) =>
                 setData((data) => ({
@@ -393,30 +463,20 @@ const TeacherDetailView: React.FC = () => {
               fullWidth
               multiple
               id="schoolTypes"
-              options={[
-                TeacherSchoolType.GRUNDSCHULE,
-                TeacherSchoolType.OBERSCHULE,
-                TeacherSchoolType.GYMSEK1,
-                TeacherSchoolType.GYMSEK2,
-              ]}
-              getOptionLabel={(option) => {
-                switch (option) {
-                  case TeacherSchoolType.GRUNDSCHULE:
-                    return 'Grundschule'
-                  case TeacherSchoolType.OBERSCHULE:
-                    return 'Oberschule'
-                  case TeacherSchoolType.GYMSEK1:
-                    return 'Gymnasium Sek. 1'
-                  case TeacherSchoolType.GYMSEK2:
-                    return 'Gymnasium Sek. 2'
-                  default:
-                    return ''
-                }
-              }}
+              options={Object.values(TeacherSchoolType)}
+              getOptionLabel={(option: TeacherSchoolType) =>
+                teacherSchoolTypeToString[option]
+              }
               renderInput={(params) => (
-                <TextField {...params} variant="outlined" label="Schularten" />
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Schularten"
+                  helperText={errors.teacherSchoolTypes}
+                  error={errors.teacherSchoolTypes !== ''}
+                />
               )}
-              value={data.teacherSchoolTypes ?? []}
+              value={(data.teacherSchoolTypes as TeacherSchoolType[]) ?? []}
               onChange={(_, value) =>
                 setData((data) => ({ ...data, teacherSchoolTypes: value }))
               }
@@ -428,7 +488,13 @@ const TeacherDetailView: React.FC = () => {
               options={subjects}
               getOptionLabel={(option) => option.name}
               renderInput={(params) => (
-                <TextField {...params} variant="outlined" label="Fächer *" />
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Fächer"
+                  helperText={errors.subjects}
+                  error={errors.subjects !== ''}
+                />
               )}
               value={data.subjects ?? []}
               onChange={(_, value) =>
@@ -471,6 +537,8 @@ const TeacherDetailView: React.FC = () => {
                     fullWidth
                     required
                     variant="outlined"
+                    helperText={errors.dateOfEmploymentStart}
+                    error={errors.dateOfEmploymentStart !== ''}
                   />
                 )}
                 InputAdornmentProps={{
@@ -495,6 +563,8 @@ const TeacherDetailView: React.FC = () => {
                 label="Stundensatz"
                 variant="outlined"
                 disabled={requestedId === 'me'}
+                helperText={errors.fee}
+                error={errors.fee !== ''}
                 value={data.fee ?? ''}
                 onChange={(event) =>
                   setData((data) => ({
@@ -567,79 +637,83 @@ const TeacherDetailView: React.FC = () => {
             >
               Speichern
             </Button>
-            {id && data.state === TeacherState.APPLIED && (
+            {id &&
+              data.state === TeacherState.APPLIED &&
+              data.deleteState === DeleteState.ACTIVE && (
+                <Button
+                  variant="contained"
+                  color="success"
+                  disabled={!data.fee || !data.dateOfEmploymentStart}
+                  onClick={() => {
+                    enqueueSnackbar(
+                      'Arbeitsvertrag wird generiert',
+                      snackbarOptions,
+                    )
+                    submitForm({ state: TeacherState.CONTRACT })
+                  }}
+                >
+                  Arbeitsvertrag senden
+                </Button>
+              )}
+            {id &&
+              data.state === TeacherState.CONTRACT &&
+              data.deleteState === DeleteState.ACTIVE && (
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => submitForm({ state: TeacherState.EMPLOYED })}
+                >
+                  Bewerbung annehmen
+                </Button>
+              )}
+            {id && data.deleteState === DeleteState.DELETED && (
               <Button
-                variant="contained"
-                color="success"
-                disabled={!data.fee || !data.dateOfEmploymentStart}
-                onClick={() => {
-                  enqueueSnackbar(
-                    'Arbeitsvertrag wird generiert',
-                    snackbarOptions,
-                  )
-                  submitForm({ state: TeacherState.CONTRACT })
-                }}
+                variant="outlined"
+                color="primary"
+                onClick={() => unarchiveUser()}
               >
-                Arbeitsvertrag senden
-              </Button>
-            )}
-            {id && data.state === TeacherState.CONTRACT && (
-              <Button
-                variant="contained"
-                color="success"
-                onClick={() => submitForm({ state: TeacherState.EMPLOYED })}
-              >
-                Bewerbung annehmen
+                Entarchivieren
               </Button>
             )}
             {id && (
               <Button
                 variant="outlined"
-                onClick={() => setDialogOpen(true)}
+                onClick={() => deleteUser()}
                 sx={{ marginLeft: 'auto' }}
                 color="error"
               >
-                Entfernen
+                {data.deleteState === DeleteState.ACTIVE
+                  ? 'Archivieren'
+                  : 'Löschen'}
               </Button>
             )}
           </Stack>
-          {requestedId === 'me' && data.state === TeacherState.APPLIED && (
-            <Stack direction="row" alignItems="center" gap={1}>
-              <CheckIcon color="success" />
-              <Typography variant="subtitle1">
-                Alle benötigten Daten wurden hinterlegt und werden nun geprüft.
-              </Typography>
-            </Stack>
-          )}
-
-          {requestedId !== 'me' && data.state === TeacherState.EMPLOYED && (
-            <>
-              <Typography variant="h6">Abrechnung:</Typography>
-              <InvoiceDataSelect
-                generateInvoice={generateInvoice}
-                type={Role.TEACHER}
-              />
-            </>
-          )}
+          {requestedId === 'me' &&
+            data.state === TeacherState.APPLIED &&
+            data.deleteState === DeleteState.ACTIVE && (
+              <Stack direction="row" alignItems="center" gap={1}>
+                <CheckIcon color="success" />
+                <Typography variant="subtitle1">
+                  Alle benötigten Daten wurden hinterlegt und werden nun
+                  geprüft.
+                </Typography>
+              </Stack>
+            )}
+          {requestedId !== 'me' &&
+            data.state === TeacherState.EMPLOYED &&
+            data.deleteState === DeleteState.ACTIVE && (
+              <>
+                <Typography variant="h6">Abrechnung:</Typography>
+                <InvoiceDataSelect
+                  generateInvoice={generateInvoice}
+                  type={Role.TEACHER}
+                />
+              </>
+            )}
         </Stack>
       </Box>
-      <Dialog
-        open={dialogOpen}
-        keepMounted
-        aria-describedby="alert-dialog-slide-description"
-      >
-        <DialogTitle>{'Lehrkraft wirklich löschen?'}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
-            Lehrkräfte können nur gelöscht werden, wenn sie in keinen laufenden
-            oder zukünftigen Verträgen mehr eingeplant sind.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Abbrechen</Button>
-          <Button onClick={deleteUser}>Löschen</Button>
-        </DialogActions>
-      </Dialog>
+
+      <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
     </div>
   )
 }

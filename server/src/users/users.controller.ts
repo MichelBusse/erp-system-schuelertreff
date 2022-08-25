@@ -85,6 +85,11 @@ export class UsersController {
     return this.usersService.findTeachers()
   }
 
+  @Get('teacher/deleted')
+  findDeletedTeachers(): Promise<Teacher[]> {
+    return this.usersService.findDeletedTeachers()
+  }
+
   @Get('school/:id')
   @Roles(Role.ADMIN)
   findOneSchool(@Param('id') id: number): Promise<School> {
@@ -117,6 +122,12 @@ export class UsersController {
   @Roles(Role.ADMIN)
   findOneTeacher(@Param('id') id: number): Promise<Teacher> {
     return this.usersService.findOneTeacher(id)
+  }
+
+  @Get('teacher/unarchive/:id')
+  @Roles(Role.ADMIN)
+  unarchiveTeacher(@Param('id') id: number): Promise<Teacher> {
+    return this.usersService.unarchiveTeacher(id)
   }
 
   @Post('privateCustomer')

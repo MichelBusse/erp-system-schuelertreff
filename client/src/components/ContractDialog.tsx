@@ -62,7 +62,7 @@ const ContractDialog: React.FC<Props> = ({
     subject: null,
     interval: 1,
     startDate: dayjs().add(1, 'day'),
-    endDate: dayjs().add(1, 'day').add(1, 'year'),
+    endDate: null,
     customerType: CustomerType.PRIVATE,
     contractType: ContractType.STANDARD,
   })
@@ -88,7 +88,6 @@ const ContractDialog: React.FC<Props> = ({
     form0.subject &&
     form0.interval &&
     form0.startDate &&
-    form0.endDate &&
     ((form0.customerType === CustomerType.PRIVATE &&
       form0.privateCustomers.length > 0) ||
       (form0.customerType === CustomerType.SCHOOL &&
@@ -178,7 +177,9 @@ const ContractDialog: React.FC<Props> = ({
                       const initialForm1Entry: ContractCreationForm = {
                         ...form1,
                         startDate: initialStartDate,
-                        endDate: dayjs(initialContract.endDate, 'YYYY-MM-DD'),
+                        endDate: initialContract.endDate
+                          ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
+                          : null,
                         startTime: initialStartTime,
                         endTime: initialEndTime,
                         teacher: initialContract.teacher.id.toString(),
