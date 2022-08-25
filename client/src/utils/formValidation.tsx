@@ -194,10 +194,7 @@ export function schoolFormValidation(form: schoolForm): schoolFormErrorTexts {
     errorTexts.valid = false
   }
 
-  if (
-    form.dateOfStart !== null &&
-    !dayjs(form.dateOfStart).isValid()
-  ) {
+  if (form.dateOfStart !== null && !dayjs(form.dateOfStart).isValid()) {
     errorTexts.dateOfStart = 'Kein korrektes Datum'
     errorTexts.valid = false
   }

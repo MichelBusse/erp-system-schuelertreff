@@ -1,5 +1,5 @@
-import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { Clear as ClearIcon } from '@mui/icons-material'
+import AddCircleIcon from '@mui/icons-material/AddCircle'
 import DeleteIcon from '@mui/icons-material/Delete'
 import {
   Accordion,
@@ -21,6 +21,7 @@ import {
   Typography,
 } from '@mui/material'
 import Box from '@mui/material/Box'
+import { DatePicker } from '@mui/x-date-pickers'
 import dayjs from 'dayjs'
 import { nanoid } from 'nanoid'
 import { useSnackbar } from 'notistack'
@@ -55,7 +56,6 @@ import {
   defaultSchoolFormErrorTexts,
   schoolFormValidation,
 } from '../utils/formValidation'
-import { DatePicker } from '@mui/x-date-pickers'
 
 const SchoolDetailView: React.FC = () => {
   const { API } = useAuth()
@@ -141,7 +141,7 @@ const SchoolDetailView: React.FC = () => {
         ...school,
         firstName: school.firstName !== '' ? school.firstName : undefined,
         lastName: school.lastName !== '' ? school.lastName : undefined,
-        dateOfStart: school.dateOfStart?.format()
+        dateOfStart: school.dateOfStart?.format(),
       })
         .then(() => {
           enqueueSnackbar(school.schoolName + ' gespeichert')
