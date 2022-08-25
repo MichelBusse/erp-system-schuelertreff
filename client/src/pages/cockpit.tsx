@@ -1,35 +1,34 @@
-import { Box, Grid } from '@mui/material'
+import { Box, Grid, Stack } from '@mui/material'
 
 import { useAuth } from '../components/AuthProvider'
 import CockpitLeaves from '../components/cockpit/CockpitLeaves'
 import PendingContracts from '../components/cockpit/PendingContracts'
 import SchoolStarts from '../components/cockpit/SchoolStarts'
 import { LeaveState } from '../types/enums'
-import { Role } from '../types/user'
 
 const Cockpit: React.FC = () => {
   const { hasRole } = useAuth()
 
   return (
-    <Box sx={{ p: 4 }}>
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          <PendingContracts />
-        </Grid>
-        {hasRole(Role.ADMIN) && (
-          <Grid item xs={6}>
+    <Box sx={{ p: 4, pb: 10 }}>
+      <Stack direction={'column'} spacing={2} width="100%">
+        <Stack direction={{xs: 'column', sm: 'column', md: 'column', lg: 'row', xl: 'row'}} spacing={2} width={"100%"}>
+          <Box width={{xs: '100%', sm: '100%', md: '100%', lg: '50%', xl: '50%'}}>
+            <PendingContracts />
+          </Box>
+          <Box width={{xs: '100%', sm: '100%', md: '100%', lg: '50%', xl: '50%'}}>
+            <SchoolStarts />
+          </Box>
+        </Stack>
+        <Stack direction={{xs: 'column', sm: 'column', md: 'column', lg: 'row', xl: 'row'}} spacing={2} width="100%">
+          <Box width={{xs: '100%', sm: '100%', md: '100%', lg: '50%', xl: '50%'}}>
             <CockpitLeaves state={LeaveState.PENDING} />
-          </Grid>
-        )}
-        {hasRole(Role.ADMIN) && (
-          <Grid item xs={6}>
+          </Box>
+          <Box width={{xs: '100%', sm: '100%', md: '100%', lg: '50%', xl: '50%'}}>
             <CockpitLeaves state={LeaveState.ACCEPTED} />
-          </Grid>
-        )}
-        <Grid item xs={6}>
-          <SchoolStarts />
-        </Grid>
-      </Grid>
+          </Box>
+        </Stack>
+      </Stack>
     </Box>
   )
 }
