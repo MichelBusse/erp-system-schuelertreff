@@ -113,6 +113,9 @@ const TeacherDetailView: React.FC = () => {
       fee: newData.fee,
       timesAvailable: newTimesAvailable,
       dateOfBirth: newData.dateOfBirth ? dayjs(newData.dateOfBirth) : null,
+      dateOfApplication: newData.dateOfApplication
+        ? dayjs(newData.dateOfApplication)
+        : null,
       dateOfEmploymentStart: newData.dateOfEmploymentStart
         ? dayjs(newData.dateOfEmploymentStart)
         : null,
@@ -129,15 +132,30 @@ const TeacherDetailView: React.FC = () => {
   const submitForm = (override: Partial<teacherForm> = {}) => {
     const errorTexts = teacherFormValidation(data)
 
-    if (errorTexts.valid) {
-      if (id) navigate('/teachers')
+    setErrors(errorTexts)
 
-      API.post('users/teacher/' + requestedId, {
+    if (errorTexts.valid) {
+      const formData: Partial<teacherForm> = {
         ...data,
         ...override,
-        dateOfBirth: data.dateOfBirth?.format(),
-        dateOfEmploymentStart: data.dateOfEmploymentStart?.format(),
-        timesAvailable: data.timesAvailable.map((time) => ({
+      }
+
+      // admin may omit fields
+      if (requestedId !== 'me') {
+        formData.phone = formData.phone || undefined
+        formData.dateOfBirth = formData.dateOfBirth || undefined
+        formData.dateOfApplication = formData.dateOfApplication || undefined
+        formData.dateOfEmploymentStart =
+          formData.dateOfEmploymentStart || undefined
+      }
+
+      API.post('users/teacher/' + requestedId, {
+        ...formData,
+        dateOfBirth: formData.dateOfBirth?.format('YYYY-MM-DD'),
+        dateOfApplication: formData.dateOfBirth?.format('YYYY-MM-DD'),
+        dateOfEmploymentStart:
+          formData.dateOfEmploymentStart?.format('YYYY-MM-DD'),
+        timesAvailable: formData.timesAvailable?.map((time) => ({
           dow: time.dow,
           start: time.start?.format('HH:mm'),
           end: time.end?.format('HH:mm'),
@@ -150,12 +168,12 @@ const TeacherDetailView: React.FC = () => {
           )
 
           updateData(res.data)
+          if (id) navigate('/teachers')
         })
         .catch(() => {
           enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
         })
     } else {
-      setErrors(errorTexts)
       enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
     }
   }
@@ -294,7 +312,6 @@ const TeacherDetailView: React.FC = () => {
             renderInput={(params) => (
               <TextField
                 {...params}
-                required
                 variant="outlined"
                 helperText={errors.dateOfBirth}
                 error={errors.dateOfBirth !== ''}
@@ -523,6 +540,57 @@ const TeacherDetailView: React.FC = () => {
                 </Select>
                 <FormHelperText>{errors.degree}</FormHelperText>
               </FormControl>
+              <TextField
+                type="number"
+                fullWidth
+                id="fee"
+                label="Stundensatz"
+                variant="outlined"
+                disabled={requestedId === 'me'}
+                helperText={errors.fee}
+                error={errors.fee !== ''}
+                value={data.fee ?? ''}
+                onChange={(event) =>
+                  setData((data) => ({
+                    ...data,
+                    fee: Number(event.target.value),
+                  }))
+                }
+              />
+            </Stack>
+            <Stack direction={'row'} columnGap={2}>
+              <DatePicker
+                label="Bewerbungsdatum"
+                mask="__.__.____"
+                value={data.dateOfApplication}
+                disabled={requestedId === 'me'}
+                onChange={(value) => {
+                  setData((d) => ({ ...d, dateOfApplication: value }))
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    variant="outlined"
+                    helperText={errors.dateOfApplication}
+                    error={errors.dateOfApplication !== ''}
+                  />
+                )}
+                InputAdornmentProps={{
+                  position: 'start',
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <IconButtonAdornment
+                      icon={ClearIcon}
+                      hidden={data.dateOfApplication === null}
+                      onClick={() =>
+                        setData((d) => ({ ...d, dateOfApplication: null }))
+                      }
+                    />
+                  ),
+                }}
+              />
               <DatePicker
                 label="Beginn Arbeitsvertrag"
                 mask="__.__.____"
@@ -535,7 +603,6 @@ const TeacherDetailView: React.FC = () => {
                   <TextField
                     {...params}
                     fullWidth
-                    required
                     variant="outlined"
                     helperText={errors.dateOfEmploymentStart}
                     error={errors.dateOfEmploymentStart !== ''}
@@ -556,24 +623,8 @@ const TeacherDetailView: React.FC = () => {
                   ),
                 }}
               />
-              <TextField
-                type="number"
-                fullWidth
-                id="fee"
-                label="Stundensatz"
-                variant="outlined"
-                disabled={requestedId === 'me'}
-                helperText={errors.fee}
-                error={errors.fee !== ''}
-                value={data.fee ?? ''}
-                onChange={(event) =>
-                  setData((data) => ({
-                    ...data,
-                    fee: Number(event.target.value),
-                  }))
-                }
-              />
             </Stack>
+
             {requestedId !== 'me' && (
               <Typography>
                 Status: {teacherStateToString[data.state]}

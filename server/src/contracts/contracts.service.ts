@@ -457,7 +457,7 @@ export class ContractsService {
 
     qb.andWhere(
       new Brackets((qb) => {
-        qb.where('con.endDate IS NULL')
+        qb.where('c."endDate" IS NULL')
         qb.orWhere(`c."endDate" >= :start::date`, { start: startDate })
       }),
     )

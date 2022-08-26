@@ -66,6 +66,7 @@ export interface teacher extends user {
   bankAccountOwner: string
   bankInstitution: string
   dateOfBirth: string | null
+  dateOfApplication: string | null
   dateOfEmploymentStart: string | null
 }
 

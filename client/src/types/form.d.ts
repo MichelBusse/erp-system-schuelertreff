@@ -41,6 +41,7 @@ export interface teacherForm extends userForm {
   bankAccountOwner: string
   bankInstitution: string
   dateOfBirth: Dayjs | null
+  dateOfApplication: Dayjs | null
   dateOfEmploymentStart: Dayjs | null
 }
 export interface teacherFormErrorTexts extends userFormErrorTexts {
@@ -54,6 +55,7 @@ export interface teacherFormErrorTexts extends userFormErrorTexts {
   bankAccountOwner: string
   bankInstitution: string
   dateOfBirth: string
+  dateOfApplication: string
   dateOfEmploymentStart: string
 }
 

@@ -32,6 +32,7 @@ export const defaultTeacherFormErrorTexts: teacherFormErrorTexts = {
   bankAccountOwner: '',
   bankInstitution: '',
   dateOfBirth: '',
+  dateOfApplication: '',
   dateOfEmploymentStart: '',
   valid: true,
 }
@@ -51,12 +52,12 @@ export function teacherFormValidation(
     errorTexts.valid = false
   }
 
-  if (form.postalCode !== '' && form.postalCode.length !== 5) {
+  if (form.postalCode !== '' && !form.postalCode.match(/\d{5}/)) {
     errorTexts.postalCode = 'PLZ muss aus 5 Ziffern bestehen'
     errorTexts.valid = false
   }
 
-  if (form.email.match(/\S+@\S+\.\S+/)?.length !== 1) {
+  if (!form.email.match(/\S+@\S+\.\S+/)) {
     errorTexts.email = 'Keine korrekte E-Mail'
     errorTexts.valid = false
   }
@@ -73,6 +74,14 @@ export function teacherFormValidation(
 
   if (form.dateOfBirth !== null && !dayjs(form.dateOfBirth).isValid()) {
     errorTexts.dateOfBirth = 'Kein korrektes Datum'
+    errorTexts.valid = false
+  }
+
+  if (
+    form.dateOfApplication !== null &&
+    !dayjs(form.dateOfApplication).isValid()
+  ) {
+    errorTexts.dateOfApplication = 'Kein korrektes Datum'
     errorTexts.valid = false
   }
 

@@ -7,6 +7,7 @@ import { TeacherSchoolType, User } from './user.entity'
 
 export enum TeacherState {
   CREATED = 'created',
+  INTERVIEW = 'interview',
   APPLIED = 'applied',
   CONTRACT = 'contract',
   EMPLOYED = 'employed',
@@ -55,13 +56,19 @@ export class Teacher extends User {
     type: 'date',
     nullable: true,
   })
-  dateOfBirth: Date
+  dateOfBirth: string
 
   @Column({
     type: 'date',
     nullable: true,
   })
-  dateOfEmploymentStart: Date
+  dateOfApplication: string
+
+  @Column({
+    type: 'date',
+    nullable: true,
+  })
+  dateOfEmploymentStart: string
 
   @Column({
     type: 'text',

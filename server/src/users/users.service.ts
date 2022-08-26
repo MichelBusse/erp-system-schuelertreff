@@ -45,6 +45,7 @@ import { DeleteState, maxTimeRange } from './entities/user.entity'
 
 const allowedStateTransitions: Record<TeacherState, TeacherState[]> = {
   created: [TeacherState.CREATED],
+  interview: [TeacherState.INTERVIEW, TeacherState.APPLIED],
   applied: [TeacherState.APPLIED, TeacherState.CONTRACT],
   contract: [TeacherState.CONTRACT, TeacherState.EMPLOYED],
   employed: [TeacherState.EMPLOYED],
@@ -459,8 +460,12 @@ export class UsersService {
 
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
     const teacher = this.teachersRepository.create({
-      ...dto,
-      state: TeacherState.CREATED,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      email: dto.email,
+      city: dto.city,
+      dateOfApplication: dto.dateOfApplication,
+      state: dto.skip ? TeacherState.EMPLOYED : TeacherState.CREATED,
       mayAuthenticate: true,
     })
 

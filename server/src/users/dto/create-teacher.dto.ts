@@ -1,4 +1,6 @@
-import { IsNotEmpty } from 'class-validator'
+import { IsBoolean, IsNotEmpty } from 'class-validator'
+
+import { IsValidDate } from 'src/IsValidDate.decorator'
 
 export class CreateTeacherDto {
   @IsNotEmpty()
@@ -9,4 +11,13 @@ export class CreateTeacherDto {
 
   @IsNotEmpty()
   email: string
+
+  @IsNotEmpty()
+  city: string
+
+  @IsValidDate()
+  dateOfApplication: string
+
+  @IsBoolean()
+  skip: boolean
 }
