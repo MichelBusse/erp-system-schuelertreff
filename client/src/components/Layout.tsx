@@ -84,6 +84,13 @@ const Layout: React.FC = () => {
           overflow: 'auto',
         }}
       >
+        <ErrorBoundary
+          FallbackComponent={() => (
+            <ErrorPage code="" message="Ein Fehler ist aufgetreten" />
+          )}
+        >
+          <Outlet />
+        </ErrorBoundary>
         {
           // hide menu for non-employed teachers
           !(
@@ -92,13 +99,6 @@ const Layout: React.FC = () => {
             decodeToken().state !== TeacherState.EMPLOYED
           ) && <BottomMenu items={menuItems} />
         }
-        <ErrorBoundary
-          FallbackComponent={() => (
-            <ErrorPage code="" message="Ein Fehler ist aufgetreten" />
-          )}
-        >
-          <Outlet />
-        </ErrorBoundary>
       </Box>
     </Box>
   )
