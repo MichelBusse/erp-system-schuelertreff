@@ -1,4 +1,3 @@
-import CancelRegistration from './cancelRegistration'
 import Cockpit from './cockpit'
 import LessonDetailView from './lessonDetailView'
 import Login from './login'
@@ -25,5 +24,4 @@ export default {
   PrivateCustomerDetailView,
   SchoolDetailView,
   LessonDetailView,
-  CancelRegistration,
 }

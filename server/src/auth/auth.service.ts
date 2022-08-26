@@ -7,9 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import * as argon2 from 'argon2'
-import ejs from 'ejs'
 import nodemailer from 'nodemailer'
-import path from 'path'
 
 import { Teacher, User } from 'src/users/entities'
 import { DeleteState } from 'src/users/entities/user.entity'
@@ -67,53 +65,23 @@ export class AuthService {
     }
   }
 
-  async initReset(user: User, registration = false) {
+  async initReset(user: User) {
     const payload = { sub: user.id, reset: true }
 
-    const passwordLink =
+    const link =
       this.config.get<string>('CLIENT_ORIGIN') +
       '/reset/' +
-      this.jwtService.sign(payload, { expiresIn: '7d' })
-
-    const deleteLink = registration
-      ? this.config.get<string>('CLIENT_ORIGIN') +
-        '/cancelRegistration/' +
-        this.jwtService.sign(payload, { expiresIn: '1y' })
-      : ''
+      this.jwtService.sign(payload)
 
     //TODO: send email to user
-    console.log(`reset link for ${user.email} - ${passwordLink}`)
+    console.log(`reset link for ${user.email} - ${link}`)
 
-    const mailOptions = !registration
-      ? {
-          from: 'noreply@m-to-b.com',
-          to: user.email,
-          subject: 'Schülertreff: Passwort-Reset',
-          text:
-            'Lege unter folgendem Link dein neues Passwort fest: \n' +
-            passwordLink,
-        }
-      : {
-          from: 'noreply@m-to-b.com',
-          to: user.email,
-          subject: 'Schülertreff: Registrierung',
-          html: await ejs.renderFile(
-            path.join(__dirname, '../templates', 'registrationEmail.ejs'),
-            {
-              passwordLink,
-              deleteLink,
-            },
-          ),
-          text:
-            'Bitte schließe die Registrierung ab, indem du unter folgendem Link dein Passwort festlegst ' +
-            'und anschließend alle benötigten Informationen im Profil hinterlegst:\n' +
-            passwordLink +
-            '\n\n' +
-            'Solltest du die Registrierung nicht beauftragt haben oder nicht mehr wünschen, ' +
-            'bestätige dies bitte über den folgenden Link. ' +
-            'Das Konto und sämtliche zugehörigen Daten werden umgehend entfernt.\n' +
-            deleteLink,
-        }
+    const mailOptions = {
+      from: 'noreply@m-to-b.com',
+      to: user.email,
+      subject: 'Schülertreff: Passwort-Reset',
+      text: 'Lege unter folgendem Link dein neues Passwort fest: \n' + link,
+    }
 
     try {
       transporter.sendMail(mailOptions, (error) => {

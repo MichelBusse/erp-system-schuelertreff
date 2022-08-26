@@ -188,7 +188,7 @@ export class UsersController {
 
     const user = await this.usersService.createTeacher(dto)
 
-    this.authService.initReset(user, true)
+    this.authService.initReset(user)
 
     return user
   }

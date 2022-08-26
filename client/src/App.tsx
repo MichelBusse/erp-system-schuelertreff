@@ -201,11 +201,6 @@ const App: React.FC = () => {
               <Route path=":token" element={<Pages.Reset />} />
             </Route>
 
-            <Route path="cancelRegistration">
-              <Route path="" element={<Navigate to="/" replace={true} />} />
-              <Route path=":token" element={<Pages.CancelRegistration />} />
-            </Route>
-
             <Route path="*" element={<Error.NotFound />} />
           </Routes>
         </SnackbarProvider>
