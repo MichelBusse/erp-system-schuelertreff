@@ -31,6 +31,8 @@ export class AuthController {
   async adminReset(@Body() body: { mail: string }) {
     const user = await this.usersService.findByEmailAuth(body.mail)
 
+    if (user === null) return
+
     this.authService.initReset(user)
   }
 
@@ -40,5 +42,13 @@ export class AuthController {
     const payload = await this.authService.validateReset(dto.token)
 
     return this.usersService.setPassword(payload.sub, dto.password)
+  }
+
+  @Public()
+  @Post('cancelRegistration')
+  async cancelRegistration(@Body('token') token: string) {
+    const payload = await this.authService.validateReset(token)
+
+    return this.usersService.remove(payload.sub)
   }
 }
