@@ -124,9 +124,7 @@ export class UsersController {
 
   @Get('teacher/generateWorkContract')
   @Roles(Role.ADMIN)
-  async generateWorkContract(
-    @Query('teacherId') id: number
-  ): Promise<Teacher> {
+  async generateWorkContract(@Query('teacherId') id: number): Promise<Teacher> {
     return this.usersService.generateWorkContract(id)
   }
 
@@ -254,7 +252,6 @@ export class UsersController {
 
     return updatedTeacher
   }
-
 
   @Delete('teacher/:id')
   @Roles(Role.ADMIN)

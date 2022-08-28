@@ -88,7 +88,6 @@ export class Teacher extends User {
   })
   bic: string
 
-
   @Column({
     type: 'date',
     nullable: true,

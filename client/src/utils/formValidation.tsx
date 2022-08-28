@@ -121,10 +121,7 @@ export function workContractFormValidation(
     errorTexts.valid = false
   }
 
-  if (
-    form.dateOfBirth === null ||
-    !dayjs(form.dateOfBirth).isValid()
-  ) {
+  if (form.dateOfBirth === null || !dayjs(form.dateOfBirth).isValid()) {
     errorTexts.dateOfBirth = 'Kein korrektes Datum'
     errorTexts.valid = false
   }
@@ -162,7 +159,7 @@ export function workContractFormValidation(
     errorTexts.valid = false
   }
 
-  if (form.fee === null ||  form.fee <= 0) {
+  if (form.fee === null || form.fee <= 0) {
     errorTexts.fee = 'Muss größer 0 sein'
     errorTexts.valid = false
   }

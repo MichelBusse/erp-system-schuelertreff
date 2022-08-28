@@ -17,9 +17,10 @@ import UploadDialog, { UploadDialogForm } from './UploadDialog'
 
 type Props = {
   userId?: number
+  actions?: React.ReactNode
 }
 
-const UserDocuments: React.FC<React.PropsWithChildren<Props>> = ({ userId, children }) => {
+const UserDocuments: React.FC<Props> = ({ userId, actions }) => {
   const [documents, setDocuments] = useState<document[]>([])
   const [refresh, setRefresh] = useState(0)
   const [file, setFile] = useState<File>(new File([], ''))
@@ -157,7 +158,7 @@ const UserDocuments: React.FC<React.PropsWithChildren<Props>> = ({ userId, child
             />
             {'Hinzufügen'}
           </Button>
-          {children}
+          {actions}
         </ListItem>
         {documents.length === 0 && (
           <ListItem>

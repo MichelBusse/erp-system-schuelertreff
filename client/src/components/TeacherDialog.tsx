@@ -31,7 +31,7 @@ type form = {
   firstName: string
   lastName: string
   email: string
-  city: string
+  applicationLocation: string
   dateOfApplication: Dayjs | null
   skip: boolean
 }
@@ -41,7 +41,7 @@ const TeacherDialog: React.FC<Props> = ({ open, closeDialog, setTeachers }) => {
     firstName: '',
     lastName: '',
     email: '',
-    city: '',
+    applicationLocation: '',
     dateOfApplication: dayjs(),
     skip: false,
   })
@@ -132,9 +132,12 @@ const TeacherDialog: React.FC<Props> = ({ open, closeDialog, setTeachers }) => {
               variant="outlined"
               id="city"
               label="Stadt"
-              value={form.city}
+              value={form.applicationLocation}
               onChange={(event) =>
-                setForm((data) => ({ ...data, city: event.target.value }))
+                setForm((data) => ({
+                  ...data,
+                  applicationLocation: event.target.value,
+                }))
               }
             />
             <DatePicker
@@ -147,7 +150,6 @@ const TeacherDialog: React.FC<Props> = ({ open, closeDialog, setTeachers }) => {
                   dateOfApplication: value,
                 }))
               }}
-              shouldDisableDate={(date) => [0, 6].includes(date.day())}
               renderInput={(params) => (
                 <TextField
                   {...params}

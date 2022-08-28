@@ -13,7 +13,7 @@ export class CreateTeacherDto {
   email: string
 
   @IsNotEmpty()
-  city: string
+  applicationLocation: string
 
   @IsValidDate()
   dateOfApplication: string

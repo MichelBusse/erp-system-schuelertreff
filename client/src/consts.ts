@@ -44,7 +44,9 @@ export const defaultTeacherFormData: teacherForm = {
   bankInstitution: '',
   dateOfBirth: null,
   dateOfApplication: null,
+  dateOfApplicationMeeting: null,
   dateOfEmploymentStart: null,
+  applicationLocation: '',
 }
 
 export const defaultPrivateCustomerFormData: privateCustomerForm = {

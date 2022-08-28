@@ -45,7 +45,6 @@ export interface teacherForm extends userForm {
   dateOfApplication: Dayjs | null
   dateOfApplicationMeeting: Dayjs | null
   applicationLocation: string
-
 }
 export interface teacherFormErrorTexts extends userFormErrorTexts {
   subjects: string

@@ -479,7 +479,7 @@ export class UsersService {
       firstName: dto.firstName,
       lastName: dto.lastName,
       email: dto.email,
-      city: dto.city,
+      applicationLocation: dto.applicationLocation,
       dateOfApplication: dto.dateOfApplication,
       state: dto.skip ? TeacherState.EMPLOYED : TeacherState.CREATED,
       mayAuthenticate: dto.skip,
@@ -562,9 +562,7 @@ export class UsersService {
       .then(transformUser)
   }
 
-  async generateWorkContract(
-    id: number,
-  ): Promise<Teacher> {
+  async generateWorkContract(id: number): Promise<Teacher> {
     const user = await this.findOneTeacher(id)
 
     // generate work contract

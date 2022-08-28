@@ -262,17 +262,19 @@ const TeacherDetailView: React.FC = () => {
     setErrors(errorTexts)
 
     if (errorTexts.valid) {
-      API.get('users/teacher/generateWorkContract' , {
+      API.get('users/teacher/generateWorkContract', {
         params: {
           teacherId: id,
         },
-      }).then((res) => {
-        updateData(res.data)
-        enqueueSnackbar('Arbeitsvertrag generiert', snackbarOptions)
-      }).catch(() => {
-        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
       })
-    }else{
+        .then((res) => {
+          updateData(res.data)
+          enqueueSnackbar('Arbeitsvertrag generiert', snackbarOptions)
+        })
+        .catch(() => {
+          enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        })
+    } else {
       enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
     }
   }
@@ -409,7 +411,7 @@ const TeacherDetailView: React.FC = () => {
                 />
                 <DateTimePicker
                   label="Datum des BG"
-                  mask="__.__.____"
+                  mask="__.__.____ __:__"
                   maxDate={dayjs()}
                   value={data.dateOfApplicationMeeting}
                   onChange={(value) => {
@@ -619,6 +621,7 @@ const TeacherDetailView: React.FC = () => {
               id="subjects"
               options={subjects}
               getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(o, v) => o.id === v.id}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -770,19 +773,19 @@ const TeacherDetailView: React.FC = () => {
           <h3>Dokumente:</h3>
           <UserDocuments
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
-          >
-            {(data.state === TeacherState.APPLIED ||
-              data.state === TeacherState.EMPLOYED) && (
-              <Button
-                variant="text"
-                component="label"
-                endIcon={<DescriptionIcon />}
-                onClick={() => generateWorkContract()}
-              >
-                Arbeitsvertrag generieren
-              </Button>
-            )}
-          </UserDocuments>
+            actions={
+              (data.state === TeacherState.APPLIED ||
+                data.state === TeacherState.EMPLOYED) && (
+                <Button
+                  variant="text"
+                  endIcon={<DescriptionIcon />}
+                  onClick={() => generateWorkContract()}
+                >
+                  Arbeitsvertrag generieren
+                </Button>
+              )
+            }
+          />
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={2}
