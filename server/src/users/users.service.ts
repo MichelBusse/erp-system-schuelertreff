@@ -44,7 +44,7 @@ import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
 
 const allowedStateTransitions: Record<TeacherState, TeacherState[]> = {
-  created: [TeacherState.CREATED],
+  created: [TeacherState.CREATED, TeacherState.INTERVIEW],
   interview: [TeacherState.INTERVIEW, TeacherState.APPLIED],
   applied: [TeacherState.APPLIED, TeacherState.CONTRACT],
   contract: [TeacherState.CONTRACT, TeacherState.EMPLOYED],
@@ -482,7 +482,7 @@ export class UsersService {
       city: dto.city,
       dateOfApplication: dto.dateOfApplication,
       state: dto.skip ? TeacherState.EMPLOYED : TeacherState.CREATED,
-      mayAuthenticate: true,
+      mayAuthenticate: dto.skip,
     })
 
     return this.teachersRepository.save(teacher)
@@ -582,22 +582,14 @@ export class UsersService {
           : user.timesAvailable,
     }
 
-    // check if state can be updated
-    if (
-      updatedTeacher.state === TeacherState.CREATED &&
-      updatedTeacher.street &&
-      updatedTeacher.city &&
-      updatedTeacher.postalCode &&
-      updatedTeacher.phone
-    ) {
-      updatedTeacher.state = TeacherState.APPLIED
-    }
-
     // auto-generate documents
     if (
       user.state !== TeacherState.CONTRACT &&
       updatedTeacher.state === TeacherState.CONTRACT
     ) {
+      // allow authentication
+      updatedTeacher.mayAuthenticate = true
+
       // generate work contract
       const buffer = await renderTemplate(
         'workContract',

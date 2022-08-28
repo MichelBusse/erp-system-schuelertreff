@@ -188,7 +188,7 @@ export class UsersController {
 
     const user = await this.usersService.createTeacher(dto)
 
-    this.authService.initReset(user)
+    if (dto.skip) this.authService.initReset(user)
 
     return user
   }
@@ -237,7 +237,14 @@ export class UsersController {
     @Param('id') id: number,
     @Body() dto: UpdateTeacherDto,
   ): Promise<Teacher> {
-    return this.usersService.updateTeacher(id, dto)
+    const oldTeacher = await this.usersService.findOneTeacher(id)
+    const updatedTeacher = await this.usersService.updateTeacher(id, dto)
+
+    // send password reset email if mayauthenticate changed
+    if (!oldTeacher.mayAuthenticate && updatedTeacher.mayAuthenticate)
+      this.authService.initReset(updatedTeacher)
+
+    return updatedTeacher
   }
 
   @Delete('teacher/:id')
