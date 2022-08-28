@@ -16,11 +16,16 @@ import { useAuth } from './AuthProvider'
 import UploadDialog, { UploadDialogForm } from './UploadDialog'
 
 type Props = {
+  refresh?: number
   userId?: number
   actions?: React.ReactNode
 }
 
-const UserDocuments: React.FC<Props> = ({ userId, actions }) => {
+const UserDocuments: React.FC<Props> = ({
+  userId,
+  actions,
+  refresh: outsideRefresh,
+}) => {
   const [documents, setDocuments] = useState<document[]>([])
   const [refresh, setRefresh] = useState(0)
   const [file, setFile] = useState<File>(new File([], ''))
@@ -37,7 +42,7 @@ const UserDocuments: React.FC<Props> = ({ userId, actions }) => {
         console.error(err)
         enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
       })
-  }, [refresh])
+  }, [refresh, outsideRefresh])
 
   const openDialog = (file: File) => {
     setFile(file)

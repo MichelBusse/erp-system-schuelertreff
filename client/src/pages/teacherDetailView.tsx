@@ -70,6 +70,7 @@ const TeacherDetailView: React.FC = () => {
   const [errors, setErrors] = useState<teacherFormErrorTexts>(
     defaultTeacherFormErrorTexts,
   )
+  const [refreshDocuments, setRefreshDocuments] = useState(0)
 
   const theme = useTheme()
 
@@ -267,8 +268,8 @@ const TeacherDetailView: React.FC = () => {
           teacherId: id,
         },
       })
-        .then((res) => {
-          updateData(res.data)
+        .then(() => {
+          setRefreshDocuments((r) => r + 1)
           enqueueSnackbar('Arbeitsvertrag generiert', snackbarOptions)
         })
         .catch(() => {
@@ -772,6 +773,7 @@ const TeacherDetailView: React.FC = () => {
 
           <h3>Dokumente:</h3>
           <UserDocuments
+            refresh={refreshDocuments}
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
             actions={
               (data.state === TeacherState.APPLIED ||

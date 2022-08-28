@@ -12,6 +12,7 @@ import { DataSource, Not, Repository } from 'typeorm'
 
 import { AuthService } from 'src/auth/auth.service'
 import { Contract } from 'src/contracts/contract.entity'
+import { Document } from 'src/documents/document.entity'
 import {
   DocumentsService,
   renderTemplate,
@@ -562,7 +563,7 @@ export class UsersService {
       .then(transformUser)
   }
 
-  async generateWorkContract(id: number): Promise<Teacher> {
+  async generateWorkContract(id: number): Promise<Document> {
     const user = await this.findOneTeacher(id)
 
     // generate work contract
@@ -596,7 +597,7 @@ export class UsersService {
       },
     )
 
-    await this.documentsService.create({
+    return this.documentsService.create({
       fileName: 'Arbeitsvertrag.pdf',
       fileType: 'application/pdf',
       owner: user.id,
@@ -604,8 +605,6 @@ export class UsersService {
       mayDelete: false,
       content: buffer,
     })
-
-    return this.teachersRepository.save(user).then(transformUser)
   }
 
   async updateTeacher(

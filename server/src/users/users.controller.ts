@@ -18,6 +18,7 @@ import { Response } from 'express'
 import { AuthService } from 'src/auth/auth.service'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
+import { Document } from 'src/documents/document.entity'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
@@ -124,7 +125,9 @@ export class UsersController {
 
   @Get('teacher/generateWorkContract')
   @Roles(Role.ADMIN)
-  async generateWorkContract(@Query('teacherId') id: number): Promise<Teacher> {
+  async generateWorkContract(
+    @Query('teacherId') id: number,
+  ): Promise<Document> {
     return this.usersService.generateWorkContract(id)
   }
 
