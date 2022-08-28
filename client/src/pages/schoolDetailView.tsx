@@ -1,3 +1,4 @@
+import { Clear as ClearIcon } from '@mui/icons-material'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import DeleteIcon from '@mui/icons-material/Delete'
 import {
@@ -20,6 +21,7 @@ import {
   Typography,
 } from '@mui/material'
 import Box from '@mui/material/Box'
+import { DatePicker } from '@mui/x-date-pickers'
 import dayjs from 'dayjs'
 import { nanoid } from 'nanoid'
 import { useSnackbar } from 'notistack'
@@ -32,6 +34,7 @@ import ConfirmationDialog, {
   ConfirmationDialogProps,
   defaultConfirmationDialogProps,
 } from '../components/ConfirmationDialog'
+import IconButtonAdornment from '../components/IconButtonAdornment'
 import InvoiceDataSelect, { InvoiceData } from '../components/InvoiceDateSelect'
 import UserDocuments from '../components/UserDocuments'
 import {
@@ -92,6 +95,7 @@ const SchoolDetailView: React.FC = () => {
         feeStandard: res.data.feeStandard,
         feeOnline: res.data.feeOnline,
         notes: res.data.notes ?? '',
+        dateOfStart: res.data.dateOfStart ? dayjs(res.data.dateOfStart) : null,
       }))
     })
   }, [])
@@ -137,6 +141,7 @@ const SchoolDetailView: React.FC = () => {
         ...school,
         firstName: school.firstName !== '' ? school.firstName : undefined,
         lastName: school.lastName !== '' ? school.lastName : undefined,
+        dateOfStart: school.dateOfStart?.format(),
       })
         .then(() => {
           enqueueSnackbar(school.schoolName + ' gespeichert')
@@ -507,6 +512,38 @@ const SchoolDetailView: React.FC = () => {
                 }))
               }
             />
+            <DatePicker
+              label="Startdatum"
+              mask="__.__.____"
+              value={school.dateOfStart}
+              onChange={(value) => {
+                setSchool((s) => ({ ...s, dateOfStart: value }))
+              }}
+              renderInput={(params) => (
+                <TextField
+                  fullWidth
+                  {...params}
+                  required
+                  variant="outlined"
+                  helperText={schoolErrors.dateOfStart}
+                  error={schoolErrors.dateOfStart !== ''}
+                />
+              )}
+              InputAdornmentProps={{
+                position: 'start',
+              }}
+              InputProps={{
+                endAdornment: (
+                  <IconButtonAdornment
+                    icon={ClearIcon}
+                    hidden={school.dateOfStart === null}
+                    onClick={() =>
+                      setSchool((s) => ({ ...s, dateOfStart: null }))
+                    }
+                  />
+                ),
+              }}
+            />
           </Stack>
           <h3>Kontakt:</h3>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
@@ -552,7 +589,13 @@ const SchoolDetailView: React.FC = () => {
             <h3>Klassen:</h3>
             <IconButton
               sx={{ marginLeft: 'auto' }}
-              onClick={() => setAddClassDialogOpen(true)}
+              onClick={() => {
+                if (school.schoolTypes.length > 0) {
+                  newClassCustomer.schoolType = school
+                    .schoolTypes[0] as SchoolType
+                }
+                setAddClassDialogOpen(true)
+              }}
             >
               <AddCircleIcon fontSize="large" color="primary" />
             </IconButton>

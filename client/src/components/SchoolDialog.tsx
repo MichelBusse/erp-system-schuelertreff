@@ -1,3 +1,4 @@
+import { Clear } from '@mui/icons-material'
 import {
   Autocomplete,
   Button,
@@ -8,6 +9,7 @@ import {
   Stack,
   TextField,
 } from '@mui/material'
+import { DatePicker } from '@mui/x-date-pickers'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 
@@ -20,6 +22,7 @@ import {
   schoolFormValidation,
 } from '../utils/formValidation'
 import { useAuth } from './AuthProvider'
+import IconButtonAdornment from './IconButtonAdornment'
 
 type Props = {
   open: boolean
@@ -39,7 +42,10 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
     const errorTexts = schoolFormValidation(data)
 
     if (errorTexts.valid) {
-      API.post('users/school', data).then((res) => {
+      API.post('users/school', {
+        ...data,
+        dateOfStart: data.dateOfStart?.format(),
+      }).then((res) => {
         setCustomers((s) => [...s, res.data])
         closeForm()
       })
@@ -77,6 +83,21 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
               value={data.schoolName}
               onChange={(event) =>
                 setData((data) => ({ ...data, schoolName: event.target.value }))
+              }
+            />
+          </Stack>
+          <Stack direction={'row'} columnGap={2}>
+            <TextField
+              helperText={errors.email}
+              error={errors.email !== ''}
+              id="email"
+              label="E-Mail Adresse"
+              variant="outlined"
+              required={true}
+              fullWidth={true}
+              value={data.email}
+              onChange={(event) =>
+                setData((data) => ({ ...data, email: event.target.value }))
               }
             />
           </Stack>
@@ -159,19 +180,6 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
           </Stack>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
-              helperText={errors.email}
-              error={errors.email !== ''}
-              id="email"
-              label="E-Mail Adresse"
-              variant="outlined"
-              required={true}
-              fullWidth={true}
-              value={data.email}
-              onChange={(event) =>
-                setData((data) => ({ ...data, email: event.target.value }))
-              }
-            />
-            <TextField
               helperText={errors.phone}
               error={errors.phone !== ''}
               id="phone"
@@ -183,6 +191,38 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
               onChange={(event) =>
                 setData((data) => ({ ...data, phone: event.target.value }))
               }
+            />
+            <DatePicker
+              label="Startdatum"
+              mask="__.__.____"
+              value={data.dateOfStart}
+              onChange={(value) => {
+                setData((d) => ({ ...d, dateOfStart: value }))
+              }}
+              renderInput={(params) => (
+                <TextField
+                  fullWidth
+                  {...params}
+                  required
+                  variant="outlined"
+                  helperText={errors.dateOfStart}
+                  error={errors.dateOfStart !== ''}
+                />
+              )}
+              InputAdornmentProps={{
+                position: 'start',
+              }}
+              InputProps={{
+                endAdornment: (
+                  <IconButtonAdornment
+                    icon={Clear}
+                    hidden={data.dateOfStart === null}
+                    onClick={() =>
+                      setData((d) => ({ ...d, dateOfStart: null }))
+                    }
+                  />
+                ),
+              }}
             />
           </Stack>
         </Stack>

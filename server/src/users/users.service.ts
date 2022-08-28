@@ -336,6 +336,22 @@ export class UsersService {
       .then(transformUsers)
   }
 
+  async findSchoolsWithStartInFuture(date: string): Promise<School[]> {
+    const qb = this.schoolsRepository.createQueryBuilder('s')
+    const week = dayjs(date, 'YYYY-MM-DD')
+
+    qb.select(['s'])
+      .where(`s.dateOfStart >= date_trunc('week', :week::date)`, {
+        week: dayjs(week).format(),
+      })
+      .andWhere(
+        `s.dateOfStart < date_trunc('week', :week::date) + interval '7 day'`,
+      )
+      .orderBy('s.dateOfStart', 'ASC')
+
+    return qb.getMany()
+  }
+
   async findTeachers(): Promise<Teacher[]> {
     return this.teachersRepository
       .find({

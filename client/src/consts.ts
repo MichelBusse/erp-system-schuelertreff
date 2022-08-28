@@ -121,6 +121,7 @@ export const defaultSchoolFormData: schoolForm = {
   feeStandard: 30,
   feeOnline: 20,
   notes: '',
+  dateOfStart: null,
 }
 
 export const defaultClassCustomerFormData: classCustomerForm = {

@@ -88,6 +88,7 @@ export interface school extends Omit<user, 'lastName' | 'firstName'> {
   feeStandard: number
   feeOnline: number
   schoolTypes: string[]
+  dateOfStart: string | null
 }
 
 export interface classCustomer {

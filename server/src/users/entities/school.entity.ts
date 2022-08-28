@@ -27,4 +27,10 @@ export class School extends User {
 
   @Column({ type: 'text', default: '' })
   notes: string
+
+  @Column({
+    type: 'date',
+    nullable: true,
+  })
+  dateOfStart: Date
 }

@@ -58,6 +58,10 @@ const ContractCreation: React.FC<Props> = ({
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
 
+  const getTeacherById = (id: number): teacher | undefined => {
+    return teachers.find((t) => t.id === id)
+  }
+
   useEffect(() => {
     API.get('users/teacher')
       .then((res) => setTeachers(res.data))
@@ -127,7 +131,9 @@ const ContractCreation: React.FC<Props> = ({
         >
           <MenuItem value="">freie Wahl</MenuItem>
           {suggestions.flatMap((t, i) => [
-            <ListSubheader key={t.teacherId}>{t.teacherName}</ListSubheader>,
+            <ListSubheader key={t.teacherId}>
+              {t.teacherName + ` (${getTeacherById(t.teacherId)?.city})`}
+            </ListSubheader>,
             t.suggestions.map((s, j) => {
               let text =
                 `${dayjs().day(s.dow).format('dd')} ` + `${s.start} - ${s.end}`
@@ -184,7 +190,7 @@ const ContractCreation: React.FC<Props> = ({
             .filter((t) => t.subjects.some((s) => s.id === subject?.id))
             .map((t) => (
               <MenuItem key={t.id} value={t.id.toString()}>
-                {`${t.firstName} ${t.lastName}`}
+                {`${t.firstName} ${t.lastName} (${t.city})`}
               </MenuItem>
             ))}
         </Select>
