@@ -343,7 +343,9 @@ export class UsersService {
       .where(`s.dateOfStart >= date_trunc('week', :week::date)`, {
         week: dayjs(week).format(),
       })
-      .andWhere(`s.dateOfStart < date_trunc('week', :week::date) + interval '7 day'`)
+      .andWhere(
+        `s.dateOfStart < date_trunc('week', :week::date) + interval '7 day'`,
+      )
       .orderBy('s.dateOfStart', 'ASC')
 
     return qb.getMany()

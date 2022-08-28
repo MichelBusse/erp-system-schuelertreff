@@ -1,14 +1,11 @@
 import { Box, Stack } from '@mui/material'
 
-import { useAuth } from '../components/AuthProvider'
 import CockpitLeaves from '../components/cockpit/CockpitLeaves'
 import PendingContracts from '../components/cockpit/PendingContracts'
 import SchoolStarts from '../components/cockpit/SchoolStarts'
 import { LeaveState } from '../types/enums'
 
 const Cockpit: React.FC = () => {
-  const { hasRole } = useAuth()
-
   return (
     <Box sx={{ p: 4, pb: 10 }}>
       <Stack direction={'column'} spacing={2} width="100%">
