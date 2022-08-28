@@ -122,6 +122,14 @@ export class UsersController {
     return this.usersService.findOneTeacher(req.user.id)
   }
 
+  @Get('teacher/generateWorkContract')
+  @Roles(Role.ADMIN)
+  async generateWorkContract(
+    @Query('teacherId') id: number
+  ): Promise<Teacher> {
+    return this.usersService.generateWorkContract(id)
+  }
+
   @Get('teacher/:id')
   @Roles(Role.ADMIN)
   findOneTeacher(@Param('id') id: number): Promise<Teacher> {
@@ -246,6 +254,7 @@ export class UsersController {
 
     return updatedTeacher
   }
+
 
   @Delete('teacher/:id')
   @Roles(Role.ADMIN)

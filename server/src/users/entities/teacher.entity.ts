@@ -62,12 +62,6 @@ export class Teacher extends User {
     type: 'date',
     nullable: true,
   })
-  dateOfApplication: string
-
-  @Column({
-    type: 'date',
-    nullable: true,
-  })
   dateOfEmploymentStart: string
 
   @Column({
@@ -93,4 +87,23 @@ export class Teacher extends User {
     default: '',
   })
   bic: string
+
+
+  @Column({
+    type: 'date',
+    nullable: true,
+  })
+  dateOfApplication: string
+
+  @Column({
+    type: 'timestamptz',
+    nullable: true,
+  })
+  dateOfApplicationMeeting: string
+
+  @Column({
+    type: 'text',
+    default: '',
+  })
+  applicationLocation: string
 }

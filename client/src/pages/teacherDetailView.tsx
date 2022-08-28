@@ -1,5 +1,6 @@
 import { Clear as ClearIcon } from '@mui/icons-material'
 import CheckIcon from '@mui/icons-material/Check'
+import DescriptionIcon from '@mui/icons-material/Description'
 import {
   Autocomplete,
   Box,
@@ -14,7 +15,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import { DatePicker } from '@mui/x-date-pickers'
+import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { nanoid } from 'nanoid'
@@ -52,6 +53,7 @@ import { leave, Role, teacher, timesAvailableParsed } from '../types/user'
 import {
   defaultTeacherFormErrorTexts,
   teacherFormValidation,
+  workContractFormValidation,
 } from '../utils/formValidation'
 
 dayjs.extend(customParseFormat)
@@ -113,9 +115,6 @@ const TeacherDetailView: React.FC = () => {
       fee: newData.fee,
       timesAvailable: newTimesAvailable,
       dateOfBirth: newData.dateOfBirth ? dayjs(newData.dateOfBirth) : null,
-      dateOfApplication: newData.dateOfApplication
-        ? dayjs(newData.dateOfApplication)
-        : null,
       dateOfEmploymentStart: newData.dateOfEmploymentStart
         ? dayjs(newData.dateOfEmploymentStart)
         : null,
@@ -124,6 +123,13 @@ const TeacherDetailView: React.FC = () => {
       bankAccountOwner: newData.bankAccountOwner ?? '',
       bankInstitution: newData.bankInstitution ?? '',
       deleteState: newData.deleteState,
+      dateOfApplication: newData.dateOfApplication
+        ? dayjs(newData.dateOfApplication)
+        : null,
+      dateOfApplicationMeeting: newData.dateOfApplicationMeeting
+        ? dayjs(newData.dateOfApplicationMeeting)
+        : null,
+      applicationLocation: newData.applicationLocation,
     })
 
     setLeaveData(newData.leave)
@@ -152,7 +158,8 @@ const TeacherDetailView: React.FC = () => {
       API.post('users/teacher/' + requestedId, {
         ...formData,
         dateOfBirth: formData.dateOfBirth?.format('YYYY-MM-DD'),
-        dateOfApplication: formData.dateOfBirth?.format('YYYY-MM-DD'),
+        dateOfApplication: formData.dateOfApplication?.format('YYYY-MM-DD'),
+        dateOfApplicationMeeting: formData.dateOfApplicationMeeting?.format(),
         dateOfEmploymentStart:
           formData.dateOfEmploymentStart?.format('YYYY-MM-DD'),
         timesAvailable: formData.timesAvailable?.map((time) => ({
@@ -249,6 +256,27 @@ const TeacherDetailView: React.FC = () => {
       })
   }
 
+  const generateWorkContract = () => {
+    const errorTexts = workContractFormValidation(data)
+
+    setErrors(errorTexts)
+
+    if (errorTexts.valid) {
+      API.get('users/teacher/generateWorkContract' , {
+        params: {
+          teacherId: id,
+        },
+      }).then((res) => {
+        updateData(res.data)
+        enqueueSnackbar('Arbeitsvertrag generiert', snackbarOptions)
+      }).catch(() => {
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+      })
+    }else{
+      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+    }
+  }
+
   return (
     <div className={styles.wrapper} style={{ minHeight: '100vh' }}>
       <Box
@@ -330,6 +358,127 @@ const TeacherDetailView: React.FC = () => {
               ),
             }}
           />
+          {id && (
+            <>
+              <Typography variant="h6">Bewerbungsdaten:</Typography>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <DatePicker
+                  label="Datum der Bewerbung"
+                  mask="__.__.____"
+                  maxDate={dayjs()}
+                  value={data.dateOfApplication}
+                  onChange={(value) => {
+                    setData((d) => ({ ...d, dateOfApplication: value }))
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="outlined"
+                      helperText={errors.dateOfApplication}
+                      error={errors.dateOfApplication !== ''}
+                      fullWidth
+                    />
+                  )}
+                  InputAdornmentProps={{
+                    position: 'start',
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButtonAdornment
+                        icon={ClearIcon}
+                        hidden={data.dateOfApplication === null}
+                        onClick={() =>
+                          setData((d) => ({ ...d, dateOfApplication: null }))
+                        }
+                      />
+                    ),
+                  }}
+                />
+                <TextField
+                  fullWidth={true}
+                  helperText={errors.applicationLocation}
+                  error={errors.applicationLocation !== ''}
+                  label="Ort der Bewerbung"
+                  onChange={(event) =>
+                    setData((data) => ({
+                      ...data,
+                      applicationLocation: event.target.value,
+                    }))
+                  }
+                  value={data.applicationLocation ?? ''}
+                />
+                <DateTimePicker
+                  label="Datum des BG"
+                  mask="__.__.____"
+                  maxDate={dayjs()}
+                  value={data.dateOfApplicationMeeting}
+                  onChange={(value) => {
+                    setData((d) => ({ ...d, dateOfApplicationMeeting: value }))
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="outlined"
+                      helperText={errors.dateOfApplicationMeeting}
+                      error={errors.dateOfApplicationMeeting !== ''}
+                      fullWidth
+                    />
+                  )}
+                  InputAdornmentProps={{
+                    position: 'start',
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButtonAdornment
+                        icon={ClearIcon}
+                        hidden={data.dateOfApplicationMeeting === null}
+                        onClick={() =>
+                          setData((d) => ({
+                            ...d,
+                            dateOfApplicationMeeting: null,
+                          }))
+                        }
+                      />
+                    ),
+                  }}
+                />
+              </Stack>
+            </>
+          )}
+          <Typography variant="h6">Kontakt:</Typography>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <TextField
+              fullWidth={true}
+              helperText={errors.email}
+              error={errors.email !== ''}
+              label="Email"
+              disabled={requestedId === 'me'}
+              onChange={(event) =>
+                setData((data) => ({
+                  ...data,
+                  email: event.target.value,
+                }))
+              }
+              value={data.email ?? ''}
+              InputProps={{
+                readOnly: requestedId === 'me',
+              }}
+            />
+
+            <TextField
+              fullWidth={true}
+              helperText={errors.phone}
+              error={errors.phone !== ''}
+              label="Telefonnummer"
+              onChange={(event) =>
+                setData((data) => ({
+                  ...data,
+                  phone: event.target.value,
+                }))
+              }
+              value={data.phone ?? ''}
+            />
+          </Stack>
           <Typography variant="h6">Adresse:</Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
@@ -438,40 +587,6 @@ const TeacherDetailView: React.FC = () => {
                 }))
               }
               value={data.bic ?? ''}
-            />
-          </Stack>
-          <Typography variant="h6">Kontakt:</Typography>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-            <TextField
-              fullWidth={true}
-              helperText={errors.email}
-              error={errors.email !== ''}
-              label="Email"
-              disabled={requestedId === 'me'}
-              onChange={(event) =>
-                setData((data) => ({
-                  ...data,
-                  email: event.target.value,
-                }))
-              }
-              value={data.email ?? ''}
-              InputProps={{
-                readOnly: requestedId === 'me',
-              }}
-            />
-
-            <TextField
-              fullWidth={true}
-              helperText={errors.phone}
-              error={errors.phone !== ''}
-              label="Telefonnummer"
-              onChange={(event) =>
-                setData((data) => ({
-                  ...data,
-                  phone: event.target.value,
-                }))
-              }
-              value={data.phone ?? ''}
             />
           </Stack>
           <Typography variant="h6">Lehrkraftdaten:</Typography>
@@ -655,7 +770,19 @@ const TeacherDetailView: React.FC = () => {
           <h3>Dokumente:</h3>
           <UserDocuments
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
-          />
+          >
+            {(data.state === TeacherState.APPLIED ||
+              data.state === TeacherState.EMPLOYED) && (
+              <Button
+                variant="text"
+                component="label"
+                endIcon={<DescriptionIcon />}
+                onClick={() => generateWorkContract()}
+              >
+                Arbeitsvertrag generieren
+              </Button>
+            )}
+          </UserDocuments>
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={2}

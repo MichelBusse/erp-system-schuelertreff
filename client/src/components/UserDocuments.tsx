@@ -19,7 +19,7 @@ type Props = {
   userId?: number
 }
 
-const UserDocuments: React.FC<Props> = ({ userId }) => {
+const UserDocuments: React.FC<React.PropsWithChildren<Props>> = ({ userId, children }) => {
   const [documents, setDocuments] = useState<document[]>([])
   const [refresh, setRefresh] = useState(0)
   const [file, setFile] = useState<File>(new File([], ''))
@@ -157,6 +157,7 @@ const UserDocuments: React.FC<Props> = ({ userId }) => {
             />
             {'Hinzufügen'}
           </Button>
+          {children}
         </ListItem>
         {documents.length === 0 && (
           <ListItem>

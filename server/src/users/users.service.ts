@@ -562,6 +562,54 @@ export class UsersService {
       .then(transformUser)
   }
 
+  async generateWorkContract(
+    id: number,
+  ): Promise<Teacher> {
+    const user = await this.findOneTeacher(id)
+
+    // generate work contract
+    const buffer = await renderTemplate(
+      'workContract',
+      {
+        customerInfo: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          street: user.street,
+          zip: user.postalCode,
+          city: user.city,
+          dateOfBirth: dayjs(user.dateOfBirth).format('DD.MM.YYYY'),
+          phone: user.phone,
+          email: user.email,
+          fee: Number(user.fee).toFixed(2).replace('.', ','),
+          dateOfEmploymentStart: dayjs(user.dateOfEmploymentStart).format(
+            'DD.MM.YYYY',
+          ),
+          bankAccountOwner: user.bankAccountOwner,
+          bankInstitution: user.bankInstitution,
+          iban: user.iban,
+          bic: user.bic,
+        },
+      },
+      {
+        left: '90px',
+        top: '70px',
+        right: '90px',
+        bottom: '70px',
+      },
+    )
+
+    await this.documentsService.create({
+      fileName: 'Arbeitsvertrag.pdf',
+      fileType: 'application/pdf',
+      owner: user.id,
+      mayRead: true,
+      mayDelete: false,
+      content: buffer,
+    })
+
+    return this.teachersRepository.save(user).then(transformUser)
+  }
+
   async updateTeacher(
     id: number,
     dto: Partial<UpdateTeacherDto>,

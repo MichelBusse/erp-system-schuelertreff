@@ -66,8 +66,10 @@ export interface teacher extends user {
   bankAccountOwner: string
   bankInstitution: string
   dateOfBirth: string | null
-  dateOfApplication: string | null
   dateOfEmploymentStart: string | null
+  dateOfApplication: string | null
+  dateOfApplicationMeeting: string | null
+  applicationLocation: string
 }
 
 export interface admin extends user {

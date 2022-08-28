@@ -32,9 +32,11 @@ export const defaultTeacherFormErrorTexts: teacherFormErrorTexts = {
   bankAccountOwner: '',
   bankInstitution: '',
   dateOfBirth: '',
-  dateOfApplication: '',
   dateOfEmploymentStart: '',
   valid: true,
+  dateOfApplication: '',
+  dateOfApplicationMeeting: '',
+  applicationLocation: '',
 }
 
 export function teacherFormValidation(
@@ -86,10 +88,102 @@ export function teacherFormValidation(
   }
 
   if (
+    form.dateOfApplicationMeeting !== null &&
+    !dayjs(form.dateOfApplicationMeeting).isValid()
+  ) {
+    errorTexts.dateOfApplicationMeeting = 'Kein korrektes Datum'
+    errorTexts.valid = false
+  }
+
+  if (
     form.dateOfEmploymentStart !== null &&
     !dayjs(form.dateOfEmploymentStart).isValid()
   ) {
     errorTexts.dateOfEmploymentStart = 'Kein korrektes Datum'
+    errorTexts.valid = false
+  }
+
+  return errorTexts
+}
+
+export function workContractFormValidation(
+  form: teacherForm,
+): teacherFormErrorTexts {
+  const errorTexts = { ...defaultTeacherFormErrorTexts }
+
+  if (form.firstName.trim() === '') {
+    errorTexts.firstName = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (form.lastName.trim() === '') {
+    errorTexts.lastName = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (
+    form.dateOfBirth === null ||
+    !dayjs(form.dateOfBirth).isValid()
+  ) {
+    errorTexts.dateOfBirth = 'Kein korrektes Datum'
+    errorTexts.valid = false
+  }
+
+  if (
+    form.dateOfEmploymentStart === null ||
+    !dayjs(form.dateOfEmploymentStart).isValid()
+  ) {
+    errorTexts.dateOfEmploymentStart = 'Kein korrektes Datum'
+    errorTexts.valid = false
+  }
+
+  if (!form.postalCode.match(/\d{5}/)) {
+    errorTexts.postalCode = 'PLZ muss aus 5 Ziffern bestehen'
+    errorTexts.valid = false
+  }
+
+  if (form.city.trim() === '') {
+    errorTexts.city = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (form.street.trim() === '') {
+    errorTexts.street = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (!form.email.match(/\S+@\S+\.\S+/)) {
+    errorTexts.email = 'Keine korrekte E-Mail'
+    errorTexts.valid = false
+  }
+
+  if (form.phone.length < 9) {
+    errorTexts.phone = 'Tel. muss mind. 9 Ziffern besitzen'
+    errorTexts.valid = false
+  }
+
+  if (form.fee === null ||  form.fee <= 0) {
+    errorTexts.fee = 'Muss größer 0 sein'
+    errorTexts.valid = false
+  }
+
+  if (form.iban.length !== 22) {
+    errorTexts.iban = 'IBAN muss 22 Zeichen besitzen'
+    errorTexts.valid = false
+  }
+
+  if (form.bic.trim() === '') {
+    errorTexts.bic = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (form.bankAccountOwner.trim() === '') {
+    errorTexts.bankAccountOwner = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (form.bankInstitution.trim() === '') {
+    errorTexts.bankInstitution = 'Fehlt'
     errorTexts.valid = false
   }
 

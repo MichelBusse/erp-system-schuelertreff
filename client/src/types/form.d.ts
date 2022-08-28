@@ -41,8 +41,11 @@ export interface teacherForm extends userForm {
   bankAccountOwner: string
   bankInstitution: string
   dateOfBirth: Dayjs | null
-  dateOfApplication: Dayjs | null
   dateOfEmploymentStart: Dayjs | null
+  dateOfApplication: Dayjs | null
+  dateOfApplicationMeeting: Dayjs | null
+  applicationLocation: string
+
 }
 export interface teacherFormErrorTexts extends userFormErrorTexts {
   subjects: string
@@ -55,8 +58,10 @@ export interface teacherFormErrorTexts extends userFormErrorTexts {
   bankAccountOwner: string
   bankInstitution: string
   dateOfBirth: string
-  dateOfApplication: string
   dateOfEmploymentStart: string
+  dateOfApplication: string
+  dateOfApplicationMeeting: string
+  applicationLocation: string
 }
 
 export interface schoolForm extends Omit<userForm, 'timesAvailable'> {
