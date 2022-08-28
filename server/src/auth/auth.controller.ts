@@ -31,6 +31,8 @@ export class AuthController {
   async adminReset(@Body() body: { mail: string }) {
     const user = await this.usersService.findByEmailAuth(body.mail)
 
+    if (user === null) return
+
     this.authService.initReset(user)
   }
 
