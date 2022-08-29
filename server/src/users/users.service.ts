@@ -5,9 +5,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import * as argon2 from 'argon2'
 import dayjs from 'dayjs'
+import nodemailer from 'nodemailer'
 import { DataSource, Not, Repository } from 'typeorm'
 
 import { AuthService } from 'src/auth/auth.service'
@@ -131,7 +133,17 @@ export class UsersService {
     private authService: AuthService,
 
     private readonly documentsService: DocumentsService,
+
+    private config: ConfigService,
   ) {}
+
+  private transport = nodemailer.createTransport(
+    {
+      host: this.config.get<string>('SMTP_HOST'),
+      port: this.config.get<number>('SMTP_PORT'),
+    },
+    { from: this.config.get<string>('EMAIL_FROM') },
+  )
 
   /**
    * Check if email is already in DB
@@ -489,12 +501,42 @@ export class UsersService {
         'ApplicationMeetingRequest can only be send when in state "created"',
       )
 
+    // TODO: format dates, email template
+
     if (dto.fixedRequest) {
       user.dateOfApplicationMeeting = dto.dates[0]
 
-      //TODO Send ApplicationMeetingRequestMail with fixed date (dto.dates[0]) here
+      // Send ApplicationMeetingRequestMail with fixed date (dto.dates[0])
+      try {
+        this.transport.sendMail(
+          {
+            to: user.email,
+            subject: 'Schülertreff: Termin Bewerbungsgespräch',
+            text: '(PLATZHALTER)\n\nTermin:\n' + dto.dates[0],
+          },
+          (error) => {
+            if (error) console.log(error)
+          },
+        )
+      } catch {
+        console.log('Failed to send meeting email to ' + user.email)
+      }
     } else {
-      //TODO Send alternative ApplicationMeetingRequestMail with proposed dates (dto.dates) here
+      // Send alternative ApplicationMeetingRequestMail with proposed dates (dto.dates)
+      try {
+        this.transport.sendMail(
+          {
+            to: user.email,
+            subject: 'Schülertreff: Terminvorschläge Bewerbungsgespräch',
+            text: '(PLATZHALTER)\n\nTerminvorschläge:\n' + dto.dates.join('\n'),
+          },
+          (error) => {
+            if (error) console.log(error)
+          },
+        )
+      } catch {
+        console.log('Failed to send meeting suggestions email to ' + user.email)
+      }
     }
 
     user.state = TeacherState.INTERVIEW
