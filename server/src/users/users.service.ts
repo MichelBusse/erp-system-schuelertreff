@@ -304,6 +304,26 @@ export class UsersService {
     return qb.getMany()
   }
 
+  async getApplicationMeetings(
+    start: string,
+    end: string,
+  ): Promise<Partial<Teacher>[]> {
+    const qb = this.teachersRepository
+      .createQueryBuilder('t')
+      .select([
+        `t."id"`,
+        `t."firstName"`,
+        `t."lastName"`,
+        `t."dateOfApplicationMeeting"`,
+      ])
+      .where(`t."dateOfApplicationMeeting"::date >= :start::date`, { start })
+      .andWhere(`t."dateOfApplicationMeeting"::date <= :end::date`, { end })
+      // .andWhere(`t."deleteState" = :active`, { active: DeleteState.ACTIVE })
+      .orderBy(`t."dateOfApplicationMeeting"`)
+
+    return qb.getRawMany()
+  }
+
   /**
    *
    * User functions

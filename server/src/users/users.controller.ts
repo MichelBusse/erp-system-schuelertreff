@@ -13,6 +13,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
+import dayjs from 'dayjs'
 import { Response } from 'express'
 
 import { AuthService } from 'src/auth/auth.service'
@@ -193,6 +194,17 @@ export class UsersController {
     @Query('teacherId') id: number,
   ): Promise<Document> {
     return this.usersService.generateWorkContract(id)
+  }
+
+  @Get('teacher/applicationMeetings')
+  @Roles(Role.ADMIN)
+  async getApplicationMeetings(@Query('of') week: string) {
+    if (!dayjs(week).isValid()) throw new BadRequestException()
+
+    return this.usersService.getApplicationMeetings(
+      dayjs(week).day(1).format('YYYY-MM-DD'),
+      dayjs(week).day(7).format('YYYY-MM-DD'),
+    )
   }
 
   @Get('teacher/:id')

@@ -14,21 +14,21 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 
-import { school } from '../../types/user'
+import { teacher } from '../../types/user'
 import { useAuth } from '../AuthProvider'
 
-const SchoolStarts: React.FC = () => {
+const ApplicationMeetings: React.FC = () => {
   const { API } = useAuth()
-  const [schools, setSchools] = useState<Partial<school>[]>([])
+  const [teachers, setTeachers] = useState<Partial<teacher>[]>([])
   const [date, setDate] = useState<Dayjs>(dayjs())
 
   useEffect(() => {
-    API.get('users/school/startInFuture', {
+    API.get('users/teacher/applicationMeetings', {
       params: {
         of: date.format('YYYY-MM-DD'),
       },
     }).then((res) => {
-      setSchools(res.data)
+      setTeachers(res.data)
     })
   }, [date])
 
@@ -36,7 +36,7 @@ const SchoolStarts: React.FC = () => {
     <>
       <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px' }}>
         <Stack direction="column" spacing={2}>
-          <Typography variant="h6">Schulen Startdaten</Typography>
+          <Typography variant="h6">Anstehende Bewerbungsgespräche</Typography>
           <List
             dense={true}
             sx={{
@@ -66,20 +66,22 @@ const SchoolStarts: React.FC = () => {
                 </IconButton>
               </Stack>
             </ListItem>
-            {schools.length === 0 && (
+            {teachers.length === 0 && (
               <ListItem>
                 <ListItemText primary="keine Einträge" />
               </ListItem>
             )}
-            {schools.map((school) => (
+            {teachers.map((teacher) => (
               <ListItemButton
-                key={school.id}
+                key={teacher.id}
                 component={NavLink}
-                to={'/schools/' + school.id}
+                to={'/teachers/' + teacher.id}
               >
                 <ListItemText
-                  primary={`${school.schoolName}`}
-                  secondary={dayjs(school.dateOfStart).format('DD.MM.YYYY')}
+                  primary={`${teacher.firstName} ${teacher.lastName}`}
+                  secondary={dayjs(teacher.dateOfApplicationMeeting).format(
+                    'DD.MM.YYYY HH:mm',
+                  )}
                 />
               </ListItemButton>
             ))}
@@ -90,4 +92,4 @@ const SchoolStarts: React.FC = () => {
   )
 }
 
-export default SchoolStarts
+export default ApplicationMeetings
