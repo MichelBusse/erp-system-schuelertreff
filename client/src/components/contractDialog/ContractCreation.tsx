@@ -161,8 +161,7 @@ const ContractCreation: React.FC<Props> = ({
             setForm((data) => ({
               ...data,
               teacher: e.target.value,
-              teacherConfirmation:
-                e.target.value === 'later' ? false : true,
+              teacherConfirmation: e.target.value === 'later' ? false : true,
             }))
           }}
           endAdornment={

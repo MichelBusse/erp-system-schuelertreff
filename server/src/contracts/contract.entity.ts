@@ -40,7 +40,7 @@ export class Contract {
   @JoinTable()
   customers: Customer[]
 
-  @ManyToOne(() => Teacher,  { nullable: true })
+  @ManyToOne(() => Teacher, { nullable: true })
   teacher: Teacher
 
   @ManyToOne(() => Subject)

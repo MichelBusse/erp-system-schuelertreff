@@ -501,8 +501,8 @@ export class LessonsService {
       .where(`l.state = :state`, { state: LeaveState.ACCEPTED })
       .andWhere(`l."startDate" <= :end::date`, { end: contract.endDate })
       .andWhere(`l."endDate" >= :start::date`, { start: contract.startDate })
-    
-    if(contract.teacher)
+
+    if (contract.teacher)
       qb.andWhere(`l."userId" = :userId`, { userId: contract.teacher.id })
 
     const leaves: Leave[] = await qb.getMany()
