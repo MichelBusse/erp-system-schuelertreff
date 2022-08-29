@@ -188,7 +188,12 @@ const ContractCreation: React.FC<Props> = ({
           }
         >
           {teachers
-            .filter((t) => (t.subjects.some((s) => s.id === subject?.id) && t.state === TeacherState.EMPLOYED || t.state === TeacherState.CONTRACT))
+            .filter(
+              (t) =>
+                (t.subjects.some((s) => s.id === subject?.id) &&
+                  t.state === TeacherState.EMPLOYED) ||
+                t.state === TeacherState.CONTRACT,
+            )
             .map((t) => (
               <MenuItem key={t.id} value={t.id.toString()}>
                 {`${t.firstName} ${t.lastName} (${t.city})`}

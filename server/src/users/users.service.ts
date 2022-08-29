@@ -19,6 +19,7 @@ import {
 } from 'src/documents/documents.service'
 import { LessonsService } from 'src/lessons/lessons.service'
 
+import { ApplicationMeetingRequestDto } from './dto/application-meeting-request.dto'
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
@@ -43,7 +44,6 @@ import {
 import { Leave, LeaveState } from './entities/leave.entity'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
-import { ApplicationMeetingRequestDto } from './dto/application-meeting-request.dto copy'
 
 const allowedStateTransitions: Record<TeacherState, TeacherState[]> = {
   created: [TeacherState.CREATED, TeacherState.INTERVIEW],

@@ -1,6 +1,5 @@
 import { Type } from 'class-transformer'
-import { IsArray, IsMilitaryTime, IsOptional, IsRFC3339, ValidateNested } from 'class-validator'
-import { IsTime24h } from 'src/IsTime24h.decorator'
+import { IsArray, IsOptional, IsRFC3339, ValidateNested } from 'class-validator'
 
 import { IsValidDate } from 'src/IsValidDate.decorator'
 import { Subject } from 'src/subjects/subject.entity'
@@ -42,7 +41,7 @@ export class UpdateTeacherDto extends UpdateUserDto {
 
   @IsOptional()
   bankInstitution: string
-  
+
   @IsOptional()
   iban: string
 

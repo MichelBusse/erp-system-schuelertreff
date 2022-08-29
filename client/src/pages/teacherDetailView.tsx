@@ -165,7 +165,7 @@ const TeacherDetailView: React.FC = () => {
 
         updateData(res.data)
       })
-      .catch((res) => {
+      .catch(() => {
         enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
       })
   }
@@ -181,12 +181,13 @@ const TeacherDetailView: React.FC = () => {
         ...override,
       }
 
-
       const submitForm = {
         ...formData,
         dateOfBirth: formData.dateOfBirth?.format('YYYY-MM-DD') ?? null,
-        dateOfApplication: formData.dateOfApplication?.format('YYYY-MM-DD') ?? null,
-        dateOfApplicationMeeting: formData.dateOfApplicationMeeting?.format() ?? null,
+        dateOfApplication:
+          formData.dateOfApplication?.format('YYYY-MM-DD') ?? null,
+        dateOfApplicationMeeting:
+          formData.dateOfApplicationMeeting?.format() ?? null,
         dateOfEmploymentStart:
           formData.dateOfEmploymentStart?.format('YYYY-MM-DD') ?? null,
         timesAvailable: formData.timesAvailable?.map((time) => ({
@@ -817,7 +818,9 @@ const TeacherDetailView: React.FC = () => {
                 color="error"
               >
                 {data.deleteState === DeleteState.ACTIVE
-                  ? data.state === TeacherState.CREATED || data.state === TeacherState.INTERVIEW || data.state === TeacherState.APPLIED
+                  ? data.state === TeacherState.CREATED ||
+                    data.state === TeacherState.INTERVIEW ||
+                    data.state === TeacherState.APPLIED
                     ? 'Ablehnen'
                     : 'Archivieren'
                   : 'Löschen'}
@@ -827,7 +830,7 @@ const TeacherDetailView: React.FC = () => {
               <Button
                 variant="outlined"
                 color="primary"
-                onClick={() => submitForm({deleteState: DeleteState.ACTIVE})}
+                onClick={() => submitForm({ deleteState: DeleteState.ACTIVE })}
               >
                 Entarchivieren
               </Button>
@@ -852,7 +855,7 @@ const TeacherDetailView: React.FC = () => {
                   variant="contained"
                   color="success"
                   onClick={() => {
-                    submitForm({state: TeacherState.APPLIED})
+                    submitForm({ state: TeacherState.APPLIED })
                   }}
                 >
                   BG gehalten
@@ -941,7 +944,7 @@ const TeacherDetailView: React.FC = () => {
                 }
                 onChange={(value) => {
                   setApplicationMeetingRequestForm((form) => {
-                    let newRequestDates = [...form.dates]
+                    const newRequestDates = [...form.dates]
                     newRequestDates[index] = value
                     return { ...form, dates: newRequestDates }
                   })
@@ -959,7 +962,7 @@ const TeacherDetailView: React.FC = () => {
                       hidden={requestDate === null}
                       onClick={() => {
                         setApplicationMeetingRequestForm((form) => {
-                          let newRequestDates = [...form.dates]
+                          const newRequestDates = [...form.dates]
                           newRequestDates[index] = null
                           return { ...form, dates: newRequestDates }
                         })

@@ -19,8 +19,8 @@ import { AuthService } from 'src/auth/auth.service'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 import { Document } from 'src/documents/document.entity'
-import { ApplicationMeetingRequestDto } from './dto/application-meeting-request.dto copy'
 
+import { ApplicationMeetingRequestDto } from './dto/application-meeting-request.dto'
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
@@ -175,7 +175,6 @@ export class UsersController {
   ): Promise<PrivateCustomer> {
     return this.usersService.updatePrivateCustomerAdmin(id, dto)
   }
-
 
   @Get('teacher/all')
   @Roles(Role.ADMIN)

@@ -1,5 +1,6 @@
 import 'dayjs/locale/de'
 
+import { Clear } from '@mui/icons-material'
 import {
   Button,
   Checkbox,
@@ -13,7 +14,7 @@ import {
 } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import axios from 'axios'
-import dayjs, { Dayjs } from 'dayjs'
+import { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 
@@ -21,7 +22,6 @@ import { snackbarOptionsError } from '../consts'
 import { teacher } from '../types/user'
 import { useAuth } from './AuthProvider'
 import IconButtonAdornment from './IconButtonAdornment'
-import { Clear } from '@mui/icons-material'
 
 type Props = {
   open: boolean
