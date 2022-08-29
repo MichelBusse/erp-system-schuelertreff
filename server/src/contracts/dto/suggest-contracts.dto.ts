@@ -51,4 +51,7 @@ export class SuggestContractsDto {
   @IsOptional()
   @IsInt()
   originalTeacher?: number
+
+  @IsOptional()
+  initialContractId?: number | null
 }

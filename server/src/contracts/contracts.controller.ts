@@ -107,11 +107,22 @@ export class ContractsController {
 
   @Post(':id')
   @Roles(Role.ADMIN)
-  update(@Param('id') id: number, @Body() dto: CreateContractDto): void {
+  async update(
+    @Param('id') id: number,
+    @Body() dto: CreateContractDto,
+  ): Promise<void> {
     this.validateDto(dto)
 
-    if (dayjs(dto.startDate).isAfter(dayjs())) {
-      // If contract starts in future, then update excestingcontract
+    const contract = await this.contractsService.findOne(id)
+
+    if (
+      dayjs(dto.startDate).isAfter(dayjs()) ||
+      (contract.teacher !== null && dto.teacher !== 'later'
+        ? contract.teacher.id !== Number(dto.teacher)
+        : contract.teacher !== null) ||
+      (contract.teacher === null && dto.teacher !== 'later')
+    ) {
+      // If contract starts in future, then update existing contract
 
       this.contractsService.updateContract(id, dto)
     } else if (!dto.endDate || dayjs(dto.endDate).isAfter(dayjs())) {

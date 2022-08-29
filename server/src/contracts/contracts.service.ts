@@ -106,10 +106,11 @@ export class ContractsService {
   }
 
   async endOrDeleteContract(id: number): Promise<void> {
+    console.log("He")
     const contract = await this.contractsRepository.findOneByOrFail({ id })
 
     if (contract.state === ContractState.ACCEPTED) {
-      if (contract.endDate && dayjs().isBefore(contract.endDate)) {
+      if (!contract.endDate || dayjs().isBefore(contract.endDate)) {
         // Cannot delete past contracts
         if (dayjs().isBefore(contract.startDate)) {
           // Delete Future contracts completely
@@ -282,6 +283,9 @@ export class ContractsService {
         ignoreContracts: dto.ignoreContracts,
       })
 
+    if(dto.initialContractId)
+    contractQuery.andWhere('con.id != :initialContractId', {initialContractId: dto.initialContractId})
+
     /* MAIN QUERY */
 
     const mainQuery = qb
@@ -361,7 +365,7 @@ export class ContractsService {
               .map(async (r) => ({
                 ...r,
                 overlap: (
-                  await this.checkOverlap(a.teacherId, dto.customers, r)
+                  await this.checkOverlap(a.teacherId, dto.customers, r, dto.initialContractId)
                 ).map((c) => c.id),
               })),
           ),
@@ -383,6 +387,7 @@ export class ContractsService {
     teacherId: number,
     customers: number[],
     range: timeAvailable,
+    initialContractId: number | null
   ) {
     const qb = this.contractsRepository.createQueryBuilder('c')
 
@@ -403,6 +408,9 @@ export class ContractsService {
       )
       .setParameters(range)
 
+    if(initialContractId)
+        qb.andWhere('c.id != :initialContractId', {initialContractId: initialContractId})
+
     return qb.getMany()
   }
 
@@ -421,7 +429,7 @@ export class ContractsService {
       .andWhere(
         new Brackets((qb) => {
           qb.where('c.endDate IS NULL')
-          qb.orWhere(`c.endDate >= date_trunc('week', :week::date)`)
+          qb.orWhere(`c.endDate >= date_trunc('week', :week::date) + (extract(isodow from "c"."startDate")::text || ' day')::INTERVAL`)
         }),
       )
       .andWhere('c.state = :contractState', {
