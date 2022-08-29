@@ -79,10 +79,10 @@ export const snackbarOptionsError: SnackbarOptions = {
 
 export const teacherStateToString: { [key in TeacherState]: string } = {
   created: 'Registriert',
-  interview: 'BG',
+  interview: 'Beworben',
   applied: 'BG gehalten',
-  contract: 'Arbeitsvertrag',
-  employed: 'Angestellt',
+  contract: 'Angenommen',
+  employed: 'Eingestellt',
 }
 
 export const leaveTypeToString: { [key in LeaveType]: string } = {

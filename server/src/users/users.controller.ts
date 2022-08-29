@@ -19,6 +19,7 @@ import { AuthService } from 'src/auth/auth.service'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 import { Document } from 'src/documents/document.entity'
+import { ApplicationMeetingRequestDto } from './dto/application-meeting-request.dto copy'
 
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
@@ -112,6 +113,70 @@ export class UsersController {
     return this.usersService.findOnePrivateCustomer(id)
   }
 
+  @Post('school')
+  @Roles(Role.ADMIN)
+  async createSchool(@Body() dto: CreateSchoolDto): Promise<School> {
+    if (await this.usersService.checkDuplicateEmail(dto.email))
+      throw new BadRequestException('Email ist bereits im System registriert.')
+
+    return this.usersService.createSchool(dto)
+  }
+
+  @Post('school/:id')
+  @Roles(Role.ADMIN)
+  async updateSchoolAdmin(
+    @Param('id') id: number,
+    @Body() dto: UpdateSchoolDto,
+  ): Promise<School> {
+    return this.usersService.updateSchoolAdmin(id, dto)
+  }
+
+  @Post('classCustomer')
+  @Roles(Role.ADMIN)
+  async createClassCustomer(
+    @Body() dto: CreateClassCustomerDto,
+  ): Promise<ClassCustomer> {
+    return this.usersService.createClassCustomer(dto)
+  }
+
+  @Post('classCustomer/:id')
+  @Roles(Role.ADMIN)
+  async updateClassCustomer(
+    @Param('id') id: number,
+    @Body() dto: UpdateClassCustomerDto,
+  ): Promise<ClassCustomer> {
+    return this.usersService.updateClassCustomerAdmin(id, dto)
+  }
+
+  @Post('privateCustomer')
+  @Roles(Role.ADMIN)
+  async createPrivateCustomer(
+    @Body() dto: CreatePrivateCustomerDto,
+  ): Promise<PrivateCustomer> {
+    if (await this.usersService.checkDuplicateEmail(dto.email))
+      throw new BadRequestException('Email ist bereits im System registriert.')
+
+    return this.usersService.createPrivateCustomer(dto)
+  }
+
+  @Post('privateCustomer/me')
+  async updatePrivateCustomer(
+    @Request() req,
+    @Body() dto: UpdatePrivateCustomerDto,
+  ): Promise<PrivateCustomer> {
+    return this.usersService.updatePrivateCustomer(req.user.id, dto)
+  }
+
+  @Post('privateCustomer/:id')
+  @Roles(Role.ADMIN)
+  async updatePrivateCustomerAdmin(
+    @Param('id') id: number,
+    @Body() dto: UpdatePrivateCustomerDto,
+  ): Promise<PrivateCustomer> {
+    return this.usersService.updatePrivateCustomerAdmin(id, dto)
+  }
+
+
   @Get('teacher/all')
   @Roles(Role.ADMIN)
   getAllTeachers() {
@@ -137,88 +202,6 @@ export class UsersController {
     return this.usersService.findOneTeacher(id)
   }
 
-  @Get('teacher/unarchive/:id')
-  @Roles(Role.ADMIN)
-  unarchiveTeacher(@Param('id') id: number): Promise<Teacher> {
-    return this.usersService.unarchiveTeacher(id)
-  }
-
-  @Post('privateCustomer')
-  @Roles(Role.ADMIN)
-  async createPrivateCustomer(
-    @Body() dto: CreatePrivateCustomerDto,
-  ): Promise<PrivateCustomer> {
-    if (await this.usersService.checkDuplicateEmail(dto.email))
-      throw new BadRequestException('Email ist bereits im System registriert.')
-
-    return this.usersService.createPrivateCustomer(dto)
-  }
-
-  @Post('classCustomer')
-  @Roles(Role.ADMIN)
-  async createClassCustomer(
-    @Body() dto: CreateClassCustomerDto,
-  ): Promise<ClassCustomer> {
-    return this.usersService.createClassCustomer(dto)
-  }
-
-  @Post('school')
-  @Roles(Role.ADMIN)
-  async createSchool(@Body() dto: CreateSchoolDto): Promise<School> {
-    if (await this.usersService.checkDuplicateEmail(dto.email))
-      throw new BadRequestException('Email ist bereits im System registriert.')
-
-    return this.usersService.createSchool(dto)
-  }
-
-  @Post('school/:id')
-  @Roles(Role.ADMIN)
-  async updateSchoolAdmin(
-    @Param('id') id: number,
-    @Body() dto: UpdateSchoolDto,
-  ): Promise<School> {
-    return this.usersService.updateSchoolAdmin(id, dto)
-  }
-
-  @Post('classCustomer/:id')
-  @Roles(Role.ADMIN)
-  async updateClassCustomer(
-    @Param('id') id: number,
-    @Body() dto: UpdateClassCustomerDto,
-  ): Promise<ClassCustomer> {
-    return this.usersService.updateClassCustomerAdmin(id, dto)
-  }
-
-  @Post('teacher')
-  @Roles(Role.ADMIN)
-  async createTeacher(@Body() dto: CreateTeacherDto): Promise<Teacher> {
-    if (await this.usersService.checkDuplicateEmail(dto.email))
-      throw new BadRequestException('Email ist bereits im System registriert.')
-
-    const user = await this.usersService.createTeacher(dto)
-
-    if (dto.skip) this.authService.initReset(user)
-
-    return user
-  }
-
-  @Post('privateCustomer/me')
-  async updatePrivateCustomer(
-    @Request() req,
-    @Body() dto: UpdatePrivateCustomerDto,
-  ): Promise<PrivateCustomer> {
-    return this.usersService.updatePrivateCustomer(req.user.id, dto)
-  }
-
-  @Post('privateCustomer/:id')
-  @Roles(Role.ADMIN)
-  async updatePrivateCustomerAdmin(
-    @Param('id') id: number,
-    @Body() dto: UpdatePrivateCustomerDto,
-  ): Promise<PrivateCustomer> {
-    return this.usersService.updatePrivateCustomerAdmin(id, dto)
-  }
-
   @Post('teacher/me')
   async updateTeacher(
     @Request() req,
@@ -240,6 +223,15 @@ export class UsersController {
     })
   }
 
+  @Post('teacher/applicationMeetingRequest/:id')
+  @Roles(Role.ADMIN)
+  async sendApplicationMeetingRequest(
+    @Param('id') id: number,
+    @Body() dto: ApplicationMeetingRequestDto,
+  ): Promise<Teacher> {
+    return this.usersService.sendApplicationMeetingRequest(id, dto)
+  }
+
   @Post('teacher/:id')
   @Roles(Role.ADMIN)
   async updateTeacherAdmin(
@@ -254,6 +246,19 @@ export class UsersController {
       this.authService.initReset(updatedTeacher)
 
     return updatedTeacher
+  }
+
+  @Post('teacher')
+  @Roles(Role.ADMIN)
+  async createTeacher(@Body() dto: CreateTeacherDto): Promise<Teacher> {
+    if (await this.usersService.checkDuplicateEmail(dto.email))
+      throw new BadRequestException('Email ist bereits im System registriert.')
+
+    const user = await this.usersService.createTeacher(dto)
+
+    if (dto.skip) this.authService.initReset(user)
+
+    return user
   }
 
   @Delete('teacher/:id')

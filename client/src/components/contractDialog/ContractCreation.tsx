@@ -14,6 +14,7 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
 import { leaveTypeToString, snackbarOptionsError } from '../../consts'
+import { TeacherState } from '../../types/enums'
 import { ContractCreationForm } from '../../types/form'
 import subject from '../../types/subject'
 import { leave, teacher } from '../../types/user'
@@ -187,7 +188,7 @@ const ContractCreation: React.FC<Props> = ({
           }
         >
           {teachers
-            .filter((t) => t.subjects.some((s) => s.id === subject?.id))
+            .filter((t) => (t.subjects.some((s) => s.id === subject?.id) && t.state === TeacherState.EMPLOYED || t.state === TeacherState.CONTRACT))
             .map((t) => (
               <MenuItem key={t.id} value={t.id.toString()}>
                 {`${t.firstName} ${t.lastName} (${t.city})`}

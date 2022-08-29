@@ -5,7 +5,13 @@ import {
   Autocomplete,
   Box,
   Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
+  FormControlLabel,
   FormHelperText,
   InputLabel,
   MenuItem,
@@ -16,7 +22,8 @@ import {
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
-import dayjs from 'dayjs'
+import axios from 'axios'
+import dayjs, { Dayjs } from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { nanoid } from 'nanoid'
 import { useSnackbar } from 'notistack'
@@ -71,6 +78,16 @@ const TeacherDetailView: React.FC = () => {
     defaultTeacherFormErrorTexts,
   )
   const [refreshDocuments, setRefreshDocuments] = useState(0)
+
+  const [
+    applicationMeetingRequestDialogOpen,
+    setApplicationMeetingRequestDialogOpen,
+  ] = useState<boolean>(false)
+  const [applicationMeetingRequestForm, setApplicationMeetingRequestForm] =
+    useState<{ dates: (Dayjs | null)[]; fixedRequest: boolean }>({
+      dates: [null, null, null],
+      fixedRequest: false,
+    })
 
   const theme = useTheme()
 
@@ -136,6 +153,23 @@ const TeacherDetailView: React.FC = () => {
     setLeaveData(newData.leave)
   }
 
+  const sendApplicationMeetingRequest = () => {
+    setApplicationMeetingRequestDialogOpen(false)
+
+    API.post('users/teacher/applicationMeetingRequest/' + requestedId, {
+      ...applicationMeetingRequestForm,
+      dates: applicationMeetingRequestForm.dates.map((date) => date?.format()),
+    })
+      .then((res) => {
+        enqueueSnackbar('Rückmeldung gesendet', snackbarOptions)
+
+        updateData(res.data)
+      })
+      .catch((res) => {
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+      })
+  }
+
   const submitForm = (override: Partial<teacherForm> = {}) => {
     const errorTexts = teacherFormValidation(data)
 
@@ -147,28 +181,24 @@ const TeacherDetailView: React.FC = () => {
         ...override,
       }
 
-      // admin may omit fields
-      if (requestedId !== 'me') {
-        formData.phone = formData.phone || undefined
-        formData.dateOfBirth = formData.dateOfBirth || undefined
-        formData.dateOfApplication = formData.dateOfApplication || undefined
-        formData.dateOfEmploymentStart =
-          formData.dateOfEmploymentStart || undefined
-      }
 
-      API.post('users/teacher/' + requestedId, {
+      const submitForm = {
         ...formData,
-        dateOfBirth: formData.dateOfBirth?.format('YYYY-MM-DD'),
-        dateOfApplication: formData.dateOfApplication?.format('YYYY-MM-DD'),
-        dateOfApplicationMeeting: formData.dateOfApplicationMeeting?.format(),
+        dateOfBirth: formData.dateOfBirth?.format('YYYY-MM-DD') ?? null,
+        dateOfApplication: formData.dateOfApplication?.format('YYYY-MM-DD') ?? null,
+        dateOfApplicationMeeting: formData.dateOfApplicationMeeting?.format() ?? null,
         dateOfEmploymentStart:
-          formData.dateOfEmploymentStart?.format('YYYY-MM-DD'),
+          formData.dateOfEmploymentStart?.format('YYYY-MM-DD') ?? null,
         timesAvailable: formData.timesAvailable?.map((time) => ({
           dow: time.dow,
           start: time.start?.format('HH:mm'),
           end: time.end?.format('HH:mm'),
         })),
-      })
+      }
+
+      console.log(submitForm)
+
+      API.post('users/teacher/' + requestedId, submitForm)
         .then((res) => {
           enqueueSnackbar(
             data.firstName + ' ' + data.lastName + ' gespeichert',
@@ -178,8 +208,16 @@ const TeacherDetailView: React.FC = () => {
           updateData(res.data)
           if (id) navigate('/teachers')
         })
-        .catch(() => {
-          enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        .catch((error) => {
+          if (axios.isAxiosError(error) && error.response?.status === 400) {
+            enqueueSnackbar(
+              (error.response.data as { message: string }).message,
+              snackbarOptionsError,
+            )
+          } else {
+            console.error(error)
+            enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+          }
         })
     } else {
       enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
@@ -226,19 +264,6 @@ const TeacherDetailView: React.FC = () => {
           })
       },
     })
-  }
-
-  const unarchiveUser = () => {
-    API.get('users/teacher/unarchive/' + id)
-      .then(() => {
-        enqueueSnackbar(
-          `${data.firstName} ${data.lastName} wurde entarchiviert!`,
-        )
-        navigate('/teachers')
-      })
-      .catch(() => {
-        enqueueSnackbar('Ein Fehler ist aufgetreten!')
-      })
   }
 
   const generateInvoice = (year: number, month: number) => {
@@ -413,7 +438,6 @@ const TeacherDetailView: React.FC = () => {
                 <DateTimePicker
                   label="Datum des BG"
                   mask="__.__.____ __:__"
-                  maxDate={dayjs()}
                   value={data.dateOfApplicationMeeting}
                   onChange={(value) => {
                     setData((d) => ({ ...d, dateOfApplicationMeeting: value }))
@@ -679,38 +703,6 @@ const TeacherDetailView: React.FC = () => {
             </Stack>
             <Stack direction={'row'} columnGap={2}>
               <DatePicker
-                label="Bewerbungsdatum"
-                mask="__.__.____"
-                value={data.dateOfApplication}
-                disabled={requestedId === 'me'}
-                onChange={(value) => {
-                  setData((d) => ({ ...d, dateOfApplication: value }))
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    fullWidth
-                    variant="outlined"
-                    helperText={errors.dateOfApplication}
-                    error={errors.dateOfApplication !== ''}
-                  />
-                )}
-                InputAdornmentProps={{
-                  position: 'start',
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <IconButtonAdornment
-                      icon={ClearIcon}
-                      hidden={data.dateOfApplication === null}
-                      onClick={() =>
-                        setData((d) => ({ ...d, dateOfApplication: null }))
-                      }
-                    />
-                  ),
-                }}
-              />
-              <DatePicker
                 label="Beginn Arbeitsvertrag"
                 mask="__.__.____"
                 value={data.dateOfEmploymentStart}
@@ -743,12 +735,6 @@ const TeacherDetailView: React.FC = () => {
                 }}
               />
             </Stack>
-
-            {requestedId !== 'me' && (
-              <Typography>
-                Status: {teacherStateToString[data.state]}
-              </Typography>
-            )}
           </Stack>
 
           <Typography variant="h6">Verfügbarkeit:</Typography>
@@ -788,6 +774,9 @@ const TeacherDetailView: React.FC = () => {
               )
             }
           />
+          {requestedId !== 'me' && (
+            <Typography>Status: {teacherStateToString[data.state]}</Typography>
+          )}
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={2}
@@ -800,7 +789,7 @@ const TeacherDetailView: React.FC = () => {
                 }}
                 variant="outlined"
               >
-                Abbrechen
+                Zurück
               </Button>
             )}
             {requestedId === 'me' && data.state !== TeacherState.EMPLOYED && (
@@ -820,22 +809,66 @@ const TeacherDetailView: React.FC = () => {
             >
               Speichern
             </Button>
+            {id && (
+              <Button
+                variant="outlined"
+                onClick={() => deleteUser()}
+                sx={{ marginLeft: 'auto' }}
+                color="error"
+              >
+                {data.deleteState === DeleteState.ACTIVE
+                  ? data.state === TeacherState.CREATED || data.state === TeacherState.INTERVIEW || data.state === TeacherState.APPLIED
+                    ? 'Ablehnen'
+                    : 'Archivieren'
+                  : 'Löschen'}
+              </Button>
+            )}
+            {id && data.deleteState === DeleteState.DELETED && (
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => submitForm({deleteState: DeleteState.ACTIVE})}
+              >
+                Entarchivieren
+              </Button>
+            )}
+            {id &&
+              data.state === TeacherState.CREATED &&
+              data.deleteState === DeleteState.ACTIVE && (
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => {
+                    setApplicationMeetingRequestDialogOpen(true)
+                  }}
+                >
+                  BG-Terminvoschlag senden
+                </Button>
+              )}
+            {id &&
+              data.state === TeacherState.INTERVIEW &&
+              data.deleteState === DeleteState.ACTIVE && (
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => {
+                    submitForm({state: TeacherState.APPLIED})
+                  }}
+                >
+                  BG gehalten
+                </Button>
+              )}
             {id &&
               data.state === TeacherState.APPLIED &&
               data.deleteState === DeleteState.ACTIVE && (
                 <Button
                   variant="contained"
                   color="success"
-                  disabled={!data.fee || !data.dateOfEmploymentStart}
                   onClick={() => {
-                    enqueueSnackbar(
-                      'Arbeitsvertrag wird generiert',
-                      snackbarOptions,
-                    )
                     submitForm({ state: TeacherState.CONTRACT })
                   }}
                 >
-                  Arbeitsvertrag senden
+                  Bewerbung annehmen
                 </Button>
               )}
             {id &&
@@ -846,30 +879,9 @@ const TeacherDetailView: React.FC = () => {
                   color="success"
                   onClick={() => submitForm({ state: TeacherState.EMPLOYED })}
                 >
-                  Bewerbung annehmen
+                  Einstellen
                 </Button>
               )}
-            {id && data.deleteState === DeleteState.DELETED && (
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={() => unarchiveUser()}
-              >
-                Entarchivieren
-              </Button>
-            )}
-            {id && (
-              <Button
-                variant="outlined"
-                onClick={() => deleteUser()}
-                sx={{ marginLeft: 'auto' }}
-                color="error"
-              >
-                {data.deleteState === DeleteState.ACTIVE
-                  ? 'Archivieren'
-                  : 'Löschen'}
-              </Button>
-            )}
           </Stack>
           {requestedId === 'me' &&
             data.state === TeacherState.APPLIED &&
@@ -897,6 +909,84 @@ const TeacherDetailView: React.FC = () => {
       </Box>
 
       <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
+
+      <Dialog open={applicationMeetingRequestDialogOpen}>
+        <DialogContent>
+          <DialogTitle>Rückmeldung senden</DialogTitle>
+          <Stack direction={'column'} gap={2}>
+            <FormControlLabel
+              label="Fester Termin"
+              control={
+                <Checkbox
+                  checked={applicationMeetingRequestForm.fixedRequest}
+                  onChange={(e) => {
+                    setApplicationMeetingRequestForm((data) => ({
+                      ...data,
+                      fixedRequest: e.target.checked,
+                    }))
+                  }}
+                  inputProps={{ 'aria-label': 'controlled' }}
+                />
+              }
+            />
+            {applicationMeetingRequestForm.dates.map((requestDate, index) => (
+              <DateTimePicker
+                label={`Terminvorschlag ${index + 1}`}
+                minDate={dayjs()}
+                key={index}
+                mask="__.__.____ __:__"
+                value={requestDate}
+                disabled={
+                  index !== 0 && applicationMeetingRequestForm.fixedRequest
+                }
+                onChange={(value) => {
+                  setApplicationMeetingRequestForm((form) => {
+                    let newRequestDates = [...form.dates]
+                    newRequestDates[index] = value
+                    return { ...form, dates: newRequestDates }
+                  })
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} variant="outlined" fullWidth />
+                )}
+                InputAdornmentProps={{
+                  position: 'start',
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <IconButtonAdornment
+                      icon={ClearIcon}
+                      hidden={requestDate === null}
+                      onClick={() => {
+                        setApplicationMeetingRequestForm((form) => {
+                          let newRequestDates = [...form.dates]
+                          newRequestDates[index] = null
+                          return { ...form, dates: newRequestDates }
+                        })
+                      }}
+                    />
+                  ),
+                }}
+              />
+            ))}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            onClick={() => setApplicationMeetingRequestDialogOpen(false)}
+          >
+            Abbrechen
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => sendApplicationMeetingRequest()}
+            disabled={!applicationMeetingRequestForm.dates[0]}
+          >
+            Senden
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }

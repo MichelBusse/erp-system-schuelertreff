@@ -20,6 +20,8 @@ import { useState } from 'react'
 import { snackbarOptionsError } from '../consts'
 import { teacher } from '../types/user'
 import { useAuth } from './AuthProvider'
+import IconButtonAdornment from './IconButtonAdornment'
+import { Clear } from '@mui/icons-material'
 
 type Props = {
   open: boolean
@@ -42,7 +44,7 @@ const TeacherDialog: React.FC<Props> = ({ open, closeDialog, setTeachers }) => {
     lastName: '',
     email: '',
     applicationLocation: '',
-    dateOfApplication: dayjs(),
+    dateOfApplication: null,
     skip: false,
   })
 
@@ -128,10 +130,9 @@ const TeacherDialog: React.FC<Props> = ({ open, closeDialog, setTeachers }) => {
             />
             <TextField
               fullWidth
-              required
               variant="outlined"
-              id="city"
-              label="Stadt"
+              id="applicationLocation"
+              label="Bewerbungsort"
               value={form.applicationLocation}
               onChange={(event) =>
                 setForm((data) => ({
@@ -153,7 +154,6 @@ const TeacherDialog: React.FC<Props> = ({ open, closeDialog, setTeachers }) => {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  required
                   variant="outlined"
                   inputProps={{
                     ...params.inputProps,
@@ -163,6 +163,17 @@ const TeacherDialog: React.FC<Props> = ({ open, closeDialog, setTeachers }) => {
               )}
               InputAdornmentProps={{
                 position: 'start',
+              }}
+              InputProps={{
+                endAdornment: (
+                  <IconButtonAdornment
+                    icon={Clear}
+                    hidden={form.dateOfApplication === null}
+                    onClick={() =>
+                      setForm((f) => ({ ...f, dateOfApplication: null }))
+                    }
+                  />
+                ),
               }}
             />
             <FormControlLabel
