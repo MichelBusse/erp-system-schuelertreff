@@ -261,7 +261,7 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
         <DatePicker
           label="Startdatum"
           mask="__.__.____"
-          minDate={dayjs().add(1, 'd')}
+          minDate={initialContract ? undefined : dayjs().add(1, 'd')}
           value={form.startDate}
           onChange={(value) => {
             setForm((f) => ({

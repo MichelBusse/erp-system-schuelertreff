@@ -140,8 +140,6 @@ const Calendar: React.FC<Props> = ({
       />
     </div>
   )
-
-  return <></>
 }
 
 export default Calendar

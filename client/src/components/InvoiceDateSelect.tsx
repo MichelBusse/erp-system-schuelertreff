@@ -122,12 +122,11 @@ const InvoiceDataSelect: React.FC<Props> = ({ generateInvoice, type }) => {
             }
           >
             {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-              .filter((e) => {
-                if (invoiceDate.year < dayjs().year() || e < dayjs().month()) {
-                  return true
-                }
-                return false
-              })
+              .filter(
+                (e) =>
+                  invoiceDate.year < dayjs().year() ||
+                  e <= dayjs().subtract(27, 'day').month(),
+              )
               .map((e) => (
                 <MenuItem value={e} key={e}>
                   {dayjs().month(e).format('MMMM')}

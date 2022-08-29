@@ -145,7 +145,6 @@ const SchoolDetailView: React.FC = () => {
       })
         .then(() => {
           enqueueSnackbar(school.schoolName + ' gespeichert')
-          if (id) navigate('/schools')
         })
         .catch(() => {
           enqueueSnackbar('Fehler beim Speichern der Schuldaten')
@@ -217,8 +216,8 @@ const SchoolDetailView: React.FC = () => {
       .then(() => {
         enqueueSnackbar(updatedClassCutomer.className + ' gespeichert')
       })
-      .catch((res) => {
-        console.log(res)
+      .catch((err) => {
+        console.error(err)
         enqueueSnackbar('Fehler beim Speichern der Klasse')
       })
   }
@@ -720,13 +719,8 @@ const SchoolDetailView: React.FC = () => {
             sx={{ marginTop: '15px' }}
           >
             {id && (
-              <Button
-                onClick={() => {
-                  navigate('/schools')
-                }}
-                variant="outlined"
-              >
-                Abbrechen
+              <Button onClick={() => navigate(-1)} variant="outlined">
+                Zurück
               </Button>
             )}
             <Button onClick={submitForm} variant="contained">

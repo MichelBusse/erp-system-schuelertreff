@@ -78,8 +78,8 @@ const ContractDialog: React.FC<Props> = ({
     endTime: null,
     minTime: null,
     maxTime: null,
-    teacher: '',
-    teacherConfirmation: true,
+    teacher: 'later',
+    teacherConfirmation: false,
     dow: 1,
     selsuggestion: '',
   })
@@ -133,6 +133,7 @@ const ContractDialog: React.FC<Props> = ({
         interval: form0.interval,
         startDate: form0.startDate?.format('YYYY-MM-DD'),
         endDate: form0.endDate?.format('YYYY-MM-DD'),
+        initialContractId: initialContract?.id,
       },
     })
       .then((res) => {
@@ -146,8 +147,8 @@ const ContractDialog: React.FC<Props> = ({
           endTime: null,
           minTime: null,
           maxTime: null,
-          teacher: '',
-          teacherConfirmation: true,
+          teacher: 'later',
+          teacherConfirmation: false,
           dow: form0.startDate?.day() ?? 1,
           selsuggestion: '',
         })
@@ -297,7 +298,7 @@ const ContractDialog: React.FC<Props> = ({
             loading={loading1}
             disabled={!validForm1}
           >
-            Hinzufügen
+            {initialContract ? 'Speichern' : 'Hinzufügen'}
           </LoadingButton>
         </>
       ),
@@ -306,7 +307,9 @@ const ContractDialog: React.FC<Props> = ({
 
   return (
     <Dialog open={open}>
-      <DialogTitle>Einsatz hinzufügen</DialogTitle>
+      <DialogTitle>
+        Einsatz {initialContract ? 'bearbeiten' : 'hinzufügen'}
+      </DialogTitle>
       <DialogContent
         sx={{
           '& .MuiStepConnector-root': {

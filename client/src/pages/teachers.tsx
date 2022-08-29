@@ -268,6 +268,7 @@ const schoolTypesOperator: GridFilterOperator = {
 
 const Teachers: React.FC = () => {
   const [open, setOpen] = useState(false)
+  const [renderDialog, setRenderDialog] = useState(0)
   const [teachers, setTeachers] = useState<teacher[]>([])
   const navigate = useNavigate()
   const location = useLocation()
@@ -467,7 +468,12 @@ const Teachers: React.FC = () => {
                 >
                   <FolderDeleteIcon fontSize="large" />
                 </IconButton>
-                <IconButton onClick={() => setOpen(true)}>
+                <IconButton
+                  onClick={() => {
+                    setRenderDialog((r) => r + 1)
+                    setOpen(true)
+                  }}
+                >
                   <AddCircleIcon fontSize="large" color="primary" />
                 </IconButton>
               </GridToolbarContainer>
@@ -480,7 +486,12 @@ const Teachers: React.FC = () => {
         />
       </div>
 
-      <TeacherDialog open={open} setOpen={setOpen} setTeachers={setTeachers} />
+      <TeacherDialog
+        key={renderDialog}
+        open={open}
+        closeDialog={() => setOpen(false)}
+        setTeachers={setTeachers}
+      />
     </div>
   )
 }

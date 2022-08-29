@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer'
-import { IsArray, IsOptional, ValidateNested } from 'class-validator'
+import { IsArray, IsOptional, IsRFC3339, ValidateNested } from 'class-validator'
 
+import { IsValidDate } from 'src/IsValidDate.decorator'
 import { Subject } from 'src/subjects/subject.entity'
 
 import { TeacherState } from '../entities/teacher.entity'
@@ -15,6 +16,7 @@ export class UpdateTeacherDto extends UpdateUserDto {
   @IsArray()
   teacherSchoolTypes: TeacherSchoolType[]
 
+  @IsOptional()
   @Type(() => Subject)
   @ValidateNested({ each: true })
   subjects: Subject[]
@@ -22,10 +24,27 @@ export class UpdateTeacherDto extends UpdateUserDto {
   @IsOptional()
   state: TeacherState
 
-  dateOfBirth: Date
+  @IsOptional()
+  @IsValidDate()
+  dateOfApplication: string | null
 
+  @IsOptional()
+  @IsValidDate()
+  dateOfBirth: string | null
+
+  @IsOptional()
+  @IsRFC3339()
+  dateOfApplicationMeeting: string | null
+
+  @IsOptional()
   bankAccountOwner: string
+
+  @IsOptional()
   bankInstitution: string
+
+  @IsOptional()
   iban: string
+
+  @IsOptional()
   bic: string
 }
