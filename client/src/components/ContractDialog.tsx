@@ -78,8 +78,8 @@ const ContractDialog: React.FC<Props> = ({
     endTime: null,
     minTime: null,
     maxTime: null,
-    teacher: '',
-    teacherConfirmation: true,
+    teacher: 'later',
+    teacherConfirmation: false,
     dow: 1,
     selsuggestion: '',
   })
@@ -146,8 +146,8 @@ const ContractDialog: React.FC<Props> = ({
           endTime: null,
           minTime: null,
           maxTime: null,
-          teacher: '',
-          teacherConfirmation: true,
+          teacher:  'later',
+          teacherConfirmation: false,
           dow: form0.startDate?.day() ?? 1,
           selsuggestion: '',
         })

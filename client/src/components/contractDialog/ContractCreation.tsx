@@ -107,8 +107,8 @@ const ContractCreation: React.FC<Props> = ({
         endTime: null,
         minTime: null,
         maxTime: null,
-        teacher: '',
-        teacherConfirmation: true,
+        teacher: 'later',
+        teacherConfirmation: false,
         dow: minStartDate?.day() ?? 1,
         selsuggestion: form.selsuggestion,
       })
@@ -150,7 +150,6 @@ const ContractCreation: React.FC<Props> = ({
           ])}
         </Select>
       </FormControl>
-
       <FormControl variant="outlined" fullWidth required>
         <InputLabel htmlFor="teacher-select">Lehrkraft</InputLabel>
         <Select
@@ -158,9 +157,14 @@ const ContractCreation: React.FC<Props> = ({
           label={'Lehrkraft'}
           disabled={form.selsuggestion !== ''}
           value={form.teacher}
-          onChange={(e) =>
-            setForm((data) => ({ ...data, teacher: e.target.value }))
-          }
+          onChange={(e) => {
+            setForm((data) => ({
+              ...data,
+              teacher: e.target.value,
+              teacherConfirmation:
+                e.target.value === 'later' ? false : true,
+            }))
+          }}
           endAdornment={
             <IconButtonAdornment
               margin="16px"
@@ -187,6 +191,9 @@ const ContractCreation: React.FC<Props> = ({
             />
           }
         >
+          <MenuItem key={-1} value={'later'}>
+            Später auswählen
+          </MenuItem>
           {teachers
             .filter(
               (t) =>
@@ -271,6 +278,7 @@ const ContractCreation: React.FC<Props> = ({
         control={
           <Switch
             checked={form.teacherConfirmation}
+            disabled={form.teacher === 'later'}
             onChange={(event) => {
               setForm((data) => ({
                 ...data,

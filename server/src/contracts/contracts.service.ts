@@ -39,9 +39,9 @@ export class ContractsService {
     const contract = this.contractsRepository.create({
       ...dto,
       subject: { id: dto.subject },
-      teacher: await this.usersService
-        .findOneTeacher(dto.teacher)
-        .then((c) => ({ id: c.id })),
+      teacher: dto.teacher !== 'later' ? await this.usersService
+        .findOneTeacher(Number(dto.teacher))
+        .then((c) => ({ id: c.id })) : null,
       customers: await Promise.all(
         dto.customers.map((id) =>
           this.usersService.findOneCustomer(id).then((c) => ({ id: c.id })),
@@ -136,9 +136,9 @@ export class ContractsService {
       ...contract,
       ...dto,
       subject: { id: dto.subject },
-      teacher: await this.usersService
-        .findOneTeacher(dto.teacher)
-        .then((c) => ({ id: c.id })),
+      teacher: dto.teacher !== 'later' ? await this.usersService
+        .findOneTeacher(Number(dto.teacher))
+        .then((c) => ({ id: c.id })) : null,
       customers: await Promise.all(
         dto.customers.map((id) =>
           this.usersService.findOneCustomer(id).then((c) => ({ id: c.id })),
