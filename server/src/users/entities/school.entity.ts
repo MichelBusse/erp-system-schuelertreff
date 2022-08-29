@@ -33,5 +33,4 @@ export class School extends User {
     nullable: true,
   })
   dateOfStart: Date
-
 }

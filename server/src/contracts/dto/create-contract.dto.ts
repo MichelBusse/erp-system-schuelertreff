@@ -17,8 +17,7 @@ export class CreateContractDto {
   @IsInt({ each: true })
   customers: number[]
 
-  @IsInt()
-  teacher: number
+  teacher: string
 
   @IsInt()
   subject: number

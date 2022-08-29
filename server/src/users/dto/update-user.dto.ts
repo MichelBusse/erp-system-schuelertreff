@@ -22,19 +22,15 @@ export class UpdateUserDto {
   email: string
 
   @IsOptional()
-  @IsNotEmpty()
   street: string
 
   @IsOptional()
-  @IsNotEmpty()
   postalCode: string
 
   @IsOptional()
-  @IsNotEmpty()
   city: string
 
   @IsOptional()
-  @IsNotEmpty()
   phone: string
 
   @IsOptional()

@@ -31,6 +31,9 @@ services:
     - CLIENT_ORIGIN
     - JWT_SECRET
     - ADMIN_USER
+    - SMTP_HOST=smtp
+    - SMTP_PORT=25
+    - EMAIL_FROM
 
   client:
     build:

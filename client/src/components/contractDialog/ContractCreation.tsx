@@ -14,6 +14,7 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
 import { leaveTypeToString, snackbarOptionsError } from '../../consts'
+import { TeacherState } from '../../types/enums'
 import { ContractCreationForm } from '../../types/form'
 import subject from '../../types/subject'
 import { leave, teacher } from '../../types/user'
@@ -57,6 +58,10 @@ const ContractCreation: React.FC<Props> = ({
 
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
+
+  const getTeacherById = (id: number): teacher | undefined => {
+    return teachers.find((t) => t.id === id)
+  }
 
   useEffect(() => {
     API.get('users/teacher')
@@ -102,8 +107,8 @@ const ContractCreation: React.FC<Props> = ({
         endTime: null,
         minTime: null,
         maxTime: null,
-        teacher: '',
-        teacherConfirmation: true,
+        teacher: 'later',
+        teacherConfirmation: false,
         dow: minStartDate?.day() ?? 1,
         selsuggestion: form.selsuggestion,
       })
@@ -127,7 +132,9 @@ const ContractCreation: React.FC<Props> = ({
         >
           <MenuItem value="">freie Wahl</MenuItem>
           {suggestions.flatMap((t, i) => [
-            <ListSubheader key={t.teacherId}>{t.teacherName}</ListSubheader>,
+            <ListSubheader key={t.teacherId}>
+              {t.teacherName + ` (${getTeacherById(t.teacherId)?.city})`}
+            </ListSubheader>,
             t.suggestions.map((s, j) => {
               let text =
                 `${dayjs().day(s.dow).format('dd')} ` + `${s.start} - ${s.end}`
@@ -143,7 +150,6 @@ const ContractCreation: React.FC<Props> = ({
           ])}
         </Select>
       </FormControl>
-
       <FormControl variant="outlined" fullWidth required>
         <InputLabel htmlFor="teacher-select">Lehrkraft</InputLabel>
         <Select
@@ -151,9 +157,13 @@ const ContractCreation: React.FC<Props> = ({
           label={'Lehrkraft'}
           disabled={form.selsuggestion !== ''}
           value={form.teacher}
-          onChange={(e) =>
-            setForm((data) => ({ ...data, teacher: e.target.value }))
-          }
+          onChange={(e) => {
+            setForm((data) => ({
+              ...data,
+              teacher: e.target.value,
+              teacherConfirmation: e.target.value === 'later' ? false : true,
+            }))
+          }}
           endAdornment={
             <IconButtonAdornment
               margin="16px"
@@ -180,11 +190,19 @@ const ContractCreation: React.FC<Props> = ({
             />
           }
         >
+          <MenuItem key={-1} value={'later'}>
+            Später auswählen
+          </MenuItem>
           {teachers
-            .filter((t) => t.subjects.some((s) => s.id === subject?.id))
+            .filter(
+              (t) =>
+                (t.subjects.some((s) => s.id === subject?.id) &&
+                  t.state === TeacherState.EMPLOYED) ||
+                t.state === TeacherState.CONTRACT,
+            )
             .map((t) => (
               <MenuItem key={t.id} value={t.id.toString()}>
-                {`${t.firstName} ${t.lastName}`}
+                {`${t.firstName} ${t.lastName} (${t.city})`}
               </MenuItem>
             ))}
         </Select>
@@ -259,6 +277,7 @@ const ContractCreation: React.FC<Props> = ({
         control={
           <Switch
             checked={form.teacherConfirmation}
+            disabled={form.teacher === 'later'}
             onChange={(event) => {
               setForm((data) => ({
                 ...data,

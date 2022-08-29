@@ -1,62 +1,38 @@
-import { Box, Stack } from '@mui/material'
+import { Box, useTheme } from '@mui/material'
 
-import { useAuth } from '../components/AuthProvider'
+import ApplicationMeetings from '../components/cockpit/ApplicationMeetings'
 import CockpitLeaves from '../components/cockpit/CockpitLeaves'
 import PendingContracts from '../components/cockpit/PendingContracts'
 import SchoolStarts from '../components/cockpit/SchoolStarts'
 import { LeaveState } from '../types/enums'
 
 const Cockpit: React.FC = () => {
-  const { hasRole } = useAuth()
+  const theme = useTheme()
 
   return (
-    <Box sx={{ p: 4, pb: 10 }}>
-      <Stack direction={'column'} spacing={2} width="100%">
-        <Stack
-          direction={{
-            xs: 'column',
-            sm: 'column',
-            md: 'column',
-            lg: 'row',
-            xl: 'row',
-          }}
-          spacing={2}
-          width={'100%'}
-        >
-          <Box
-            width={{ xs: '100%', sm: '100%', md: '100%', lg: '50%', xl: '50%' }}
-          >
-            <PendingContracts />
-          </Box>
-          <Box
-            width={{ xs: '100%', sm: '100%', md: '100%', lg: '50%', xl: '50%' }}
-          >
-            <SchoolStarts />
-          </Box>
-        </Stack>
-        <Stack
-          direction={{
-            xs: 'column',
-            sm: 'column',
-            md: 'column',
-            lg: 'row',
-            xl: 'row',
-          }}
-          spacing={2}
-          width="100%"
-        >
-          <Box
-            width={{ xs: '100%', sm: '100%', md: '100%', lg: '50%', xl: '50%' }}
-          >
-            <CockpitLeaves state={LeaveState.PENDING} />
-          </Box>
-          <Box
-            width={{ xs: '100%', sm: '100%', md: '100%', lg: '50%', xl: '50%' }}
-          >
-            <CockpitLeaves state={LeaveState.ACCEPTED} />
-          </Box>
-        </Stack>
-      </Stack>
+    <Box
+      sx={{
+        p: 4,
+        pb: 10,
+        display: 'grid',
+        gap: 2,
+        [theme.breakpoints.down('md')]: {
+          gridTemplateColumns: 'repeat(1, 1fr)',
+        },
+        [theme.breakpoints.up('md')]: {
+          gridTemplateColumns: 'repeat(2, 1fr)',
+        },
+      }}
+    >
+      <PendingContracts />
+
+      <SchoolStarts />
+
+      <CockpitLeaves state={LeaveState.PENDING} />
+
+      <CockpitLeaves state={LeaveState.ACCEPTED} />
+
+      <ApplicationMeetings />
     </Box>
   )
 }

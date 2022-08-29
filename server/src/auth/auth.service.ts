@@ -15,11 +15,6 @@ import { UsersService } from 'src/users/users.service'
 
 import { Role } from './role.enum'
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp',
-  port: 25,
-})
-
 @Injectable()
 export class AuthService {
   constructor(
@@ -29,6 +24,14 @@ export class AuthService {
     private jwtService: JwtService,
     private config: ConfigService,
   ) {}
+
+  private transport = nodemailer.createTransport(
+    {
+      host: this.config.get<string>('SMTP_HOST'),
+      port: this.config.get<number>('SMTP_PORT'),
+    },
+    { from: this.config.get<string>('EMAIL_FROM') },
+  )
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmailAuth(email)
@@ -77,14 +80,13 @@ export class AuthService {
     console.log(`reset link for ${user.email} - ${link}`)
 
     const mailOptions = {
-      from: 'noreply@m-to-b.com',
       to: user.email,
       subject: 'Schülertreff: Passwort-Reset',
       text: 'Lege unter folgendem Link dein neues Passwort fest: \n' + link,
     }
 
     try {
-      transporter.sendMail(mailOptions, (error) => {
+      this.transport.sendMail(mailOptions, (error) => {
         if (error) console.log(error)
       })
     } catch {

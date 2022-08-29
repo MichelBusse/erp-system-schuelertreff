@@ -13,12 +13,15 @@ import {
   UseInterceptors,
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
+import dayjs from 'dayjs'
 import { Response } from 'express'
 
 import { AuthService } from 'src/auth/auth.service'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
+import { Document } from 'src/documents/document.entity'
 
+import { ApplicationMeetingRequestDto } from './dto/application-meeting-request.dto'
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
@@ -111,48 +114,6 @@ export class UsersController {
     return this.usersService.findOnePrivateCustomer(id)
   }
 
-  @Get('teacher/all')
-  @Roles(Role.ADMIN)
-  getAllTeachers() {
-    return this.usersService.findTeachers()
-  }
-
-  @Get('teacher/me')
-  getMeAsTeacher(@Request() req) {
-    return this.usersService.findOneTeacher(req.user.id)
-  }
-
-  @Get('teacher/:id')
-  @Roles(Role.ADMIN)
-  findOneTeacher(@Param('id') id: number): Promise<Teacher> {
-    return this.usersService.findOneTeacher(id)
-  }
-
-  @Get('teacher/unarchive/:id')
-  @Roles(Role.ADMIN)
-  unarchiveTeacher(@Param('id') id: number): Promise<Teacher> {
-    return this.usersService.unarchiveTeacher(id)
-  }
-
-  @Post('privateCustomer')
-  @Roles(Role.ADMIN)
-  async createPrivateCustomer(
-    @Body() dto: CreatePrivateCustomerDto,
-  ): Promise<PrivateCustomer> {
-    if (await this.usersService.checkDuplicateEmail(dto.email))
-      throw new BadRequestException('Email ist bereits im System registriert.')
-
-    return this.usersService.createPrivateCustomer(dto)
-  }
-
-  @Post('classCustomer')
-  @Roles(Role.ADMIN)
-  async createClassCustomer(
-    @Body() dto: CreateClassCustomerDto,
-  ): Promise<ClassCustomer> {
-    return this.usersService.createClassCustomer(dto)
-  }
-
   @Post('school')
   @Roles(Role.ADMIN)
   async createSchool(@Body() dto: CreateSchoolDto): Promise<School> {
@@ -171,6 +132,14 @@ export class UsersController {
     return this.usersService.updateSchoolAdmin(id, dto)
   }
 
+  @Post('classCustomer')
+  @Roles(Role.ADMIN)
+  async createClassCustomer(
+    @Body() dto: CreateClassCustomerDto,
+  ): Promise<ClassCustomer> {
+    return this.usersService.createClassCustomer(dto)
+  }
+
   @Post('classCustomer/:id')
   @Roles(Role.ADMIN)
   async updateClassCustomer(
@@ -180,17 +149,15 @@ export class UsersController {
     return this.usersService.updateClassCustomerAdmin(id, dto)
   }
 
-  @Post('teacher')
+  @Post('privateCustomer')
   @Roles(Role.ADMIN)
-  async createTeacher(@Body() dto: CreateTeacherDto): Promise<Teacher> {
+  async createPrivateCustomer(
+    @Body() dto: CreatePrivateCustomerDto,
+  ): Promise<PrivateCustomer> {
     if (await this.usersService.checkDuplicateEmail(dto.email))
       throw new BadRequestException('Email ist bereits im System registriert.')
 
-    const user = await this.usersService.createTeacher(dto)
-
-    this.authService.initReset(user)
-
-    return user
+    return this.usersService.createPrivateCustomer(dto)
   }
 
   @Post('privateCustomer/me')
@@ -208,6 +175,42 @@ export class UsersController {
     @Body() dto: UpdatePrivateCustomerDto,
   ): Promise<PrivateCustomer> {
     return this.usersService.updatePrivateCustomerAdmin(id, dto)
+  }
+
+  @Get('teacher/all')
+  @Roles(Role.ADMIN)
+  getAllTeachers() {
+    return this.usersService.findTeachers()
+  }
+
+  @Get('teacher/me')
+  getMeAsTeacher(@Request() req) {
+    return this.usersService.findOneTeacher(req.user.id)
+  }
+
+  @Get('teacher/generateWorkContract')
+  @Roles(Role.ADMIN)
+  async generateWorkContract(
+    @Query('teacherId') id: number,
+  ): Promise<Document> {
+    return this.usersService.generateWorkContract(id)
+  }
+
+  @Get('teacher/applicationMeetings')
+  @Roles(Role.ADMIN)
+  async getApplicationMeetings(@Query('of') week: string) {
+    if (!dayjs(week).isValid()) throw new BadRequestException()
+
+    return this.usersService.getApplicationMeetings(
+      dayjs(week).day(1).format('YYYY-MM-DD'),
+      dayjs(week).day(7).format('YYYY-MM-DD'),
+    )
+  }
+
+  @Get('teacher/:id')
+  @Roles(Role.ADMIN)
+  findOneTeacher(@Param('id') id: number): Promise<Teacher> {
+    return this.usersService.findOneTeacher(id)
   }
 
   @Post('teacher/me')
@@ -231,13 +234,42 @@ export class UsersController {
     })
   }
 
+  @Post('teacher/applicationMeetingRequest/:id')
+  @Roles(Role.ADMIN)
+  async sendApplicationMeetingRequest(
+    @Param('id') id: number,
+    @Body() dto: ApplicationMeetingRequestDto,
+  ): Promise<Teacher> {
+    return this.usersService.sendApplicationMeetingRequest(id, dto)
+  }
+
   @Post('teacher/:id')
   @Roles(Role.ADMIN)
   async updateTeacherAdmin(
     @Param('id') id: number,
     @Body() dto: UpdateTeacherDto,
   ): Promise<Teacher> {
-    return this.usersService.updateTeacher(id, dto)
+    const oldTeacher = await this.usersService.findOneTeacher(id)
+    const updatedTeacher = await this.usersService.updateTeacher(id, dto)
+
+    // send password reset email if mayauthenticate changed
+    if (!oldTeacher.mayAuthenticate && updatedTeacher.mayAuthenticate)
+      this.authService.initReset(updatedTeacher)
+
+    return updatedTeacher
+  }
+
+  @Post('teacher')
+  @Roles(Role.ADMIN)
+  async createTeacher(@Body() dto: CreateTeacherDto): Promise<Teacher> {
+    if (await this.usersService.checkDuplicateEmail(dto.email))
+      throw new BadRequestException('Email ist bereits im System registriert.')
+
+    const user = await this.usersService.createTeacher(dto)
+
+    if (dto.skip) this.authService.initReset(user)
+
+    return user
   }
 
   @Delete('teacher/:id')

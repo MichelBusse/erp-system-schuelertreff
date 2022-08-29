@@ -43,7 +43,10 @@ export const defaultTeacherFormData: teacherForm = {
   bankAccountOwner: '',
   bankInstitution: '',
   dateOfBirth: null,
+  dateOfApplication: null,
+  dateOfApplicationMeeting: null,
   dateOfEmploymentStart: null,
+  applicationLocation: '',
 }
 
 export const defaultPrivateCustomerFormData: privateCustomerForm = {
@@ -76,9 +79,10 @@ export const snackbarOptionsError: SnackbarOptions = {
 
 export const teacherStateToString: { [key in TeacherState]: string } = {
   created: 'Registriert',
-  applied: 'Beworben',
-  contract: 'Arbeitsvertrag',
-  employed: 'Angestellt',
+  interview: 'Beworben',
+  applied: 'BG gehalten',
+  contract: 'Angenommen',
+  employed: 'Eingestellt',
 }
 
 export const leaveTypeToString: { [key in LeaveType]: string } = {

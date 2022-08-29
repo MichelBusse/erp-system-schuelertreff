@@ -109,7 +109,6 @@ const PrivateCustomerDetailView: React.FC = () => {
           data.firstName + ' ' + data.lastName + ' gespeichert',
           snackbarOptions,
         )
-        if (id) navigate('/privateCustomers')
       })
     } else {
       setErrors(errorTexts)
@@ -400,13 +399,8 @@ const PrivateCustomerDetailView: React.FC = () => {
             sx={{ marginTop: '15px' }}
           >
             {id && (
-              <Button
-                onClick={() => {
-                  navigate('/privateCustomers')
-                }}
-                variant="outlined"
-              >
-                Abbrechen
+              <Button onClick={() => navigate(-1)} variant="outlined">
+                Zurück
               </Button>
             )}
             <Button onClick={submitForm} variant="contained">

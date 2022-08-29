@@ -7,6 +7,7 @@ import { TeacherSchoolType, User } from './user.entity'
 
 export enum TeacherState {
   CREATED = 'created',
+  INTERVIEW = 'interview',
   APPLIED = 'applied',
   CONTRACT = 'contract',
   EMPLOYED = 'employed',
@@ -55,13 +56,13 @@ export class Teacher extends User {
     type: 'date',
     nullable: true,
   })
-  dateOfBirth: Date
+  dateOfBirth: string
 
   @Column({
     type: 'date',
     nullable: true,
   })
-  dateOfEmploymentStart: Date
+  dateOfEmploymentStart: string
 
   @Column({
     type: 'text',
@@ -86,4 +87,22 @@ export class Teacher extends User {
     default: '',
   })
   bic: string
+
+  @Column({
+    type: 'date',
+    nullable: true,
+  })
+  dateOfApplication: string
+
+  @Column({
+    type: 'timestamptz',
+    nullable: true,
+  })
+  dateOfApplicationMeeting: string
+
+  @Column({
+    type: 'text',
+    default: '',
+  })
+  applicationLocation: string
 }

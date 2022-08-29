@@ -1,10 +1,17 @@
 import { Clear as ClearIcon } from '@mui/icons-material'
 import CheckIcon from '@mui/icons-material/Check'
+import DescriptionIcon from '@mui/icons-material/Description'
 import {
   Autocomplete,
   Box,
   Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
+  FormControlLabel,
   FormHelperText,
   InputLabel,
   MenuItem,
@@ -14,8 +21,9 @@ import {
   Typography,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import { DatePicker } from '@mui/x-date-pickers'
-import dayjs from 'dayjs'
+import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
+import axios from 'axios'
+import dayjs, { Dayjs } from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { nanoid } from 'nanoid'
 import { useSnackbar } from 'notistack'
@@ -52,6 +60,7 @@ import { leave, Role, teacher, timesAvailableParsed } from '../types/user'
 import {
   defaultTeacherFormErrorTexts,
   teacherFormValidation,
+  workContractFormValidation,
 } from '../utils/formValidation'
 
 dayjs.extend(customParseFormat)
@@ -68,6 +77,17 @@ const TeacherDetailView: React.FC = () => {
   const [errors, setErrors] = useState<teacherFormErrorTexts>(
     defaultTeacherFormErrorTexts,
   )
+  const [refreshDocuments, setRefreshDocuments] = useState(0)
+
+  const [
+    applicationMeetingRequestDialogOpen,
+    setApplicationMeetingRequestDialogOpen,
+  ] = useState<boolean>(false)
+  const [applicationMeetingRequestForm, setApplicationMeetingRequestForm] =
+    useState<{ dates: (Dayjs | null)[]; fixedRequest: boolean }>({
+      dates: [null, null, null],
+      fixedRequest: false,
+    })
 
   const theme = useTheme()
 
@@ -121,28 +141,63 @@ const TeacherDetailView: React.FC = () => {
       bankAccountOwner: newData.bankAccountOwner ?? '',
       bankInstitution: newData.bankInstitution ?? '',
       deleteState: newData.deleteState,
+      dateOfApplication: newData.dateOfApplication
+        ? dayjs(newData.dateOfApplication)
+        : null,
+      dateOfApplicationMeeting: newData.dateOfApplicationMeeting
+        ? dayjs(newData.dateOfApplicationMeeting)
+        : null,
+      applicationLocation: newData.applicationLocation,
     })
 
     setLeaveData(newData.leave)
   }
 
+  const sendApplicationMeetingRequest = () => {
+    setApplicationMeetingRequestDialogOpen(false)
+
+    API.post('users/teacher/applicationMeetingRequest/' + requestedId, {
+      ...applicationMeetingRequestForm,
+      dates: applicationMeetingRequestForm.dates.map((date) => date?.format()),
+    })
+      .then((res) => {
+        enqueueSnackbar('Rückmeldung gesendet', snackbarOptions)
+
+        updateData(res.data)
+      })
+      .catch(() => {
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+      })
+  }
+
   const submitForm = (override: Partial<teacherForm> = {}) => {
     const errorTexts = teacherFormValidation(data)
 
-    if (errorTexts.valid) {
-      if (id) navigate('/teachers')
+    setErrors(errorTexts)
 
-      API.post('users/teacher/' + requestedId, {
+    if (errorTexts.valid) {
+      const formData: Partial<teacherForm> = {
         ...data,
         ...override,
-        dateOfBirth: data.dateOfBirth?.format(),
-        dateOfEmploymentStart: data.dateOfEmploymentStart?.format(),
-        timesAvailable: data.timesAvailable.map((time) => ({
+      }
+
+      const submitForm = {
+        ...formData,
+        dateOfBirth: formData.dateOfBirth?.format('YYYY-MM-DD') ?? null,
+        dateOfApplication:
+          formData.dateOfApplication?.format('YYYY-MM-DD') ?? null,
+        dateOfApplicationMeeting:
+          formData.dateOfApplicationMeeting?.format() ?? null,
+        dateOfEmploymentStart:
+          formData.dateOfEmploymentStart?.format('YYYY-MM-DD') ?? null,
+        timesAvailable: formData.timesAvailable?.map((time) => ({
           dow: time.dow,
           start: time.start?.format('HH:mm'),
           end: time.end?.format('HH:mm'),
         })),
-      })
+      }
+
+      API.post('users/teacher/' + requestedId, submitForm)
         .then((res) => {
           enqueueSnackbar(
             data.firstName + ' ' + data.lastName + ' gespeichert',
@@ -151,11 +206,18 @@ const TeacherDetailView: React.FC = () => {
 
           updateData(res.data)
         })
-        .catch(() => {
-          enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        .catch((error) => {
+          if (axios.isAxiosError(error) && error.response?.status === 400) {
+            enqueueSnackbar(
+              (error.response.data as { message: string }).message,
+              snackbarOptionsError,
+            )
+          } else {
+            console.error(error)
+            enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+          }
         })
     } else {
-      setErrors(errorTexts)
       enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
     }
   }
@@ -202,19 +264,6 @@ const TeacherDetailView: React.FC = () => {
     })
   }
 
-  const unarchiveUser = () => {
-    API.get('users/teacher/unarchive/' + id)
-      .then(() => {
-        enqueueSnackbar(
-          `${data.firstName} ${data.lastName} wurde entarchiviert!`,
-        )
-        navigate('/teachers')
-      })
-      .catch(() => {
-        enqueueSnackbar('Ein Fehler ist aufgetreten!')
-      })
-  }
-
   const generateInvoice = (year: number, month: number) => {
     API.get('lessons/invoice/teacher', {
       params: {
@@ -229,6 +278,29 @@ const TeacherDetailView: React.FC = () => {
       .catch(() => {
         enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
       })
+  }
+
+  const generateWorkContract = () => {
+    const errorTexts = workContractFormValidation(data)
+
+    setErrors(errorTexts)
+
+    if (errorTexts.valid) {
+      API.get('users/teacher/generateWorkContract', {
+        params: {
+          teacherId: id,
+        },
+      })
+        .then(() => {
+          setRefreshDocuments((r) => r + 1)
+          enqueueSnackbar('Arbeitsvertrag generiert', snackbarOptions)
+        })
+        .catch(() => {
+          enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        })
+    } else {
+      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+    }
   }
 
   return (
@@ -294,7 +366,6 @@ const TeacherDetailView: React.FC = () => {
             renderInput={(params) => (
               <TextField
                 {...params}
-                required
                 variant="outlined"
                 helperText={errors.dateOfBirth}
                 error={errors.dateOfBirth !== ''}
@@ -313,6 +384,126 @@ const TeacherDetailView: React.FC = () => {
               ),
             }}
           />
+          {id && (
+            <>
+              <Typography variant="h6">Bewerbungsdaten:</Typography>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <DatePicker
+                  label="Datum der Bewerbung"
+                  mask="__.__.____"
+                  maxDate={dayjs()}
+                  value={data.dateOfApplication}
+                  onChange={(value) => {
+                    setData((d) => ({ ...d, dateOfApplication: value }))
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="outlined"
+                      helperText={errors.dateOfApplication}
+                      error={errors.dateOfApplication !== ''}
+                      fullWidth
+                    />
+                  )}
+                  InputAdornmentProps={{
+                    position: 'start',
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButtonAdornment
+                        icon={ClearIcon}
+                        hidden={data.dateOfApplication === null}
+                        onClick={() =>
+                          setData((d) => ({ ...d, dateOfApplication: null }))
+                        }
+                      />
+                    ),
+                  }}
+                />
+                <TextField
+                  fullWidth={true}
+                  helperText={errors.applicationLocation}
+                  error={errors.applicationLocation !== ''}
+                  label="Ort der Bewerbung"
+                  onChange={(event) =>
+                    setData((data) => ({
+                      ...data,
+                      applicationLocation: event.target.value,
+                    }))
+                  }
+                  value={data.applicationLocation ?? ''}
+                />
+                <DateTimePicker
+                  label="Datum des BG"
+                  mask="__.__.____ __:__"
+                  value={data.dateOfApplicationMeeting}
+                  onChange={(value) => {
+                    setData((d) => ({ ...d, dateOfApplicationMeeting: value }))
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      variant="outlined"
+                      helperText={errors.dateOfApplicationMeeting}
+                      error={errors.dateOfApplicationMeeting !== ''}
+                      fullWidth
+                    />
+                  )}
+                  InputAdornmentProps={{
+                    position: 'start',
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButtonAdornment
+                        icon={ClearIcon}
+                        hidden={data.dateOfApplicationMeeting === null}
+                        onClick={() =>
+                          setData((d) => ({
+                            ...d,
+                            dateOfApplicationMeeting: null,
+                          }))
+                        }
+                      />
+                    ),
+                  }}
+                />
+              </Stack>
+            </>
+          )}
+          <Typography variant="h6">Kontakt:</Typography>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <TextField
+              fullWidth={true}
+              helperText={errors.email}
+              error={errors.email !== ''}
+              label="Email"
+              disabled={requestedId === 'me'}
+              onChange={(event) =>
+                setData((data) => ({
+                  ...data,
+                  email: event.target.value,
+                }))
+              }
+              value={data.email ?? ''}
+              InputProps={{
+                readOnly: requestedId === 'me',
+              }}
+            />
+
+            <TextField
+              fullWidth={true}
+              helperText={errors.phone}
+              error={errors.phone !== ''}
+              label="Telefonnummer"
+              onChange={(event) =>
+                setData((data) => ({
+                  ...data,
+                  phone: event.target.value,
+                }))
+              }
+              value={data.phone ?? ''}
+            />
+          </Stack>
           <Typography variant="h6">Adresse:</Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
@@ -423,40 +614,6 @@ const TeacherDetailView: React.FC = () => {
               value={data.bic ?? ''}
             />
           </Stack>
-          <Typography variant="h6">Kontakt:</Typography>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-            <TextField
-              fullWidth={true}
-              helperText={errors.email}
-              error={errors.email !== ''}
-              label="Email"
-              disabled={requestedId === 'me'}
-              onChange={(event) =>
-                setData((data) => ({
-                  ...data,
-                  email: event.target.value,
-                }))
-              }
-              value={data.email ?? ''}
-              InputProps={{
-                readOnly: requestedId === 'me',
-              }}
-            />
-
-            <TextField
-              fullWidth={true}
-              helperText={errors.phone}
-              error={errors.phone !== ''}
-              label="Telefonnummer"
-              onChange={(event) =>
-                setData((data) => ({
-                  ...data,
-                  phone: event.target.value,
-                }))
-              }
-              value={data.phone ?? ''}
-            />
-          </Stack>
           <Typography variant="h6">Lehrkraftdaten:</Typography>
           <Stack direction={'column'} rowGap={2}>
             <Autocomplete
@@ -487,6 +644,7 @@ const TeacherDetailView: React.FC = () => {
               id="subjects"
               options={subjects}
               getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(o, v) => o.id === v.id}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -523,6 +681,25 @@ const TeacherDetailView: React.FC = () => {
                 </Select>
                 <FormHelperText>{errors.degree}</FormHelperText>
               </FormControl>
+              <TextField
+                type="number"
+                fullWidth
+                id="fee"
+                label="Stundensatz"
+                variant="outlined"
+                disabled={requestedId === 'me'}
+                helperText={errors.fee}
+                error={errors.fee !== ''}
+                value={data.fee ?? ''}
+                onChange={(event) =>
+                  setData((data) => ({
+                    ...data,
+                    fee: Number(event.target.value),
+                  }))
+                }
+              />
+            </Stack>
+            <Stack direction={'row'} columnGap={2}>
               <DatePicker
                 label="Beginn Arbeitsvertrag"
                 mask="__.__.____"
@@ -535,7 +712,6 @@ const TeacherDetailView: React.FC = () => {
                   <TextField
                     {...params}
                     fullWidth
-                    required
                     variant="outlined"
                     helperText={errors.dateOfEmploymentStart}
                     error={errors.dateOfEmploymentStart !== ''}
@@ -556,29 +732,7 @@ const TeacherDetailView: React.FC = () => {
                   ),
                 }}
               />
-              <TextField
-                type="number"
-                fullWidth
-                id="fee"
-                label="Stundensatz"
-                variant="outlined"
-                disabled={requestedId === 'me'}
-                helperText={errors.fee}
-                error={errors.fee !== ''}
-                value={data.fee ?? ''}
-                onChange={(event) =>
-                  setData((data) => ({
-                    ...data,
-                    fee: Number(event.target.value),
-                  }))
-                }
-              />
             </Stack>
-            {requestedId !== 'me' && (
-              <Typography>
-                Status: {teacherStateToString[data.state]}
-              </Typography>
-            )}
           </Stack>
 
           <Typography variant="h6">Verfügbarkeit:</Typography>
@@ -603,21 +757,32 @@ const TeacherDetailView: React.FC = () => {
 
           <h3>Dokumente:</h3>
           <UserDocuments
+            refresh={refreshDocuments}
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
+            actions={
+              (data.state === TeacherState.APPLIED ||
+                data.state === TeacherState.EMPLOYED) && (
+                <Button
+                  variant="text"
+                  endIcon={<DescriptionIcon />}
+                  onClick={() => generateWorkContract()}
+                >
+                  Arbeitsvertrag generieren
+                </Button>
+              )
+            }
           />
+          {requestedId !== 'me' && (
+            <Typography>Status: {teacherStateToString[data.state]}</Typography>
+          )}
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={2}
             sx={{ marginTop: '15px' }}
           >
             {id && (
-              <Button
-                onClick={() => {
-                  navigate('/teachers')
-                }}
-                variant="outlined"
-              >
-                Abbrechen
+              <Button onClick={() => navigate(-1)} variant="outlined">
+                Zurück
               </Button>
             )}
             {requestedId === 'me' && data.state !== TeacherState.EMPLOYED && (
@@ -637,22 +802,68 @@ const TeacherDetailView: React.FC = () => {
             >
               Speichern
             </Button>
+            {id && (
+              <Button
+                variant="outlined"
+                onClick={() => deleteUser()}
+                sx={{ marginLeft: 'auto' }}
+                color="error"
+              >
+                {data.deleteState === DeleteState.ACTIVE
+                  ? data.state === TeacherState.CREATED ||
+                    data.state === TeacherState.INTERVIEW ||
+                    data.state === TeacherState.APPLIED
+                    ? 'Ablehnen'
+                    : 'Archivieren'
+                  : 'Löschen'}
+              </Button>
+            )}
+            {id && data.deleteState === DeleteState.DELETED && (
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => submitForm({ deleteState: DeleteState.ACTIVE })}
+              >
+                Entarchivieren
+              </Button>
+            )}
+            {id &&
+              data.state === TeacherState.CREATED &&
+              data.deleteState === DeleteState.ACTIVE && (
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => {
+                    setApplicationMeetingRequestDialogOpen(true)
+                  }}
+                >
+                  BG-Terminvoschlag senden
+                </Button>
+              )}
+            {id &&
+              data.state === TeacherState.INTERVIEW &&
+              data.deleteState === DeleteState.ACTIVE && (
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => {
+                    submitForm({ state: TeacherState.APPLIED })
+                  }}
+                >
+                  BG gehalten
+                </Button>
+              )}
             {id &&
               data.state === TeacherState.APPLIED &&
               data.deleteState === DeleteState.ACTIVE && (
                 <Button
                   variant="contained"
                   color="success"
-                  disabled={!data.fee || !data.dateOfEmploymentStart}
                   onClick={() => {
-                    enqueueSnackbar(
-                      'Arbeitsvertrag wird generiert',
-                      snackbarOptions,
-                    )
                     submitForm({ state: TeacherState.CONTRACT })
                   }}
                 >
-                  Arbeitsvertrag senden
+                  Bewerbung annehmen
                 </Button>
               )}
             {id &&
@@ -663,30 +874,9 @@ const TeacherDetailView: React.FC = () => {
                   color="success"
                   onClick={() => submitForm({ state: TeacherState.EMPLOYED })}
                 >
-                  Bewerbung annehmen
+                  Einstellen
                 </Button>
               )}
-            {id && data.deleteState === DeleteState.DELETED && (
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={() => unarchiveUser()}
-              >
-                Entarchivieren
-              </Button>
-            )}
-            {id && (
-              <Button
-                variant="outlined"
-                onClick={() => deleteUser()}
-                sx={{ marginLeft: 'auto' }}
-                color="error"
-              >
-                {data.deleteState === DeleteState.ACTIVE
-                  ? 'Archivieren'
-                  : 'Löschen'}
-              </Button>
-            )}
           </Stack>
           {requestedId === 'me' &&
             data.state === TeacherState.APPLIED &&
@@ -714,6 +904,84 @@ const TeacherDetailView: React.FC = () => {
       </Box>
 
       <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
+
+      <Dialog open={applicationMeetingRequestDialogOpen}>
+        <DialogContent>
+          <DialogTitle>Rückmeldung senden</DialogTitle>
+          <Stack direction={'column'} gap={2}>
+            <FormControlLabel
+              label="Fester Termin"
+              control={
+                <Checkbox
+                  checked={applicationMeetingRequestForm.fixedRequest}
+                  onChange={(e) => {
+                    setApplicationMeetingRequestForm((data) => ({
+                      ...data,
+                      fixedRequest: e.target.checked,
+                    }))
+                  }}
+                  inputProps={{ 'aria-label': 'controlled' }}
+                />
+              }
+            />
+            {applicationMeetingRequestForm.dates.map((requestDate, index) => (
+              <DateTimePicker
+                label={`Terminvorschlag ${index + 1}`}
+                minDate={dayjs()}
+                key={index}
+                mask="__.__.____ __:__"
+                value={requestDate}
+                disabled={
+                  index !== 0 && applicationMeetingRequestForm.fixedRequest
+                }
+                onChange={(value) => {
+                  setApplicationMeetingRequestForm((form) => {
+                    const newRequestDates = [...form.dates]
+                    newRequestDates[index] = value
+                    return { ...form, dates: newRequestDates }
+                  })
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} variant="outlined" fullWidth />
+                )}
+                InputAdornmentProps={{
+                  position: 'start',
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <IconButtonAdornment
+                      icon={ClearIcon}
+                      hidden={requestDate === null}
+                      onClick={() => {
+                        setApplicationMeetingRequestForm((form) => {
+                          const newRequestDates = [...form.dates]
+                          newRequestDates[index] = null
+                          return { ...form, dates: newRequestDates }
+                        })
+                      }}
+                    />
+                  ),
+                }}
+              />
+            ))}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="outlined"
+            onClick={() => setApplicationMeetingRequestDialogOpen(false)}
+          >
+            Abbrechen
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => sendApplicationMeetingRequest()}
+            disabled={!applicationMeetingRequestForm.dates[0]}
+          >
+            Senden
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }
