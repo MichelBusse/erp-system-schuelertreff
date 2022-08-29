@@ -197,8 +197,6 @@ const TeacherDetailView: React.FC = () => {
         })),
       }
 
-      console.log(submitForm)
-
       API.post('users/teacher/' + requestedId, submitForm)
         .then((res) => {
           enqueueSnackbar(
@@ -783,12 +781,7 @@ const TeacherDetailView: React.FC = () => {
             sx={{ marginTop: '15px' }}
           >
             {id && (
-              <Button
-                onClick={() => {
-                  navigate('/teachers')
-                }}
-                variant="outlined"
-              >
+              <Button onClick={() => navigate(-1)} variant="outlined">
                 Zurück
               </Button>
             )}

@@ -399,12 +399,7 @@ const PrivateCustomerDetailView: React.FC = () => {
             sx={{ marginTop: '15px' }}
           >
             {id && (
-              <Button
-                onClick={() => {
-                  navigate('/privateCustomers')
-                }}
-                variant="outlined"
-              >
+              <Button onClick={() => navigate(-1)} variant="outlined">
                 Zurück
               </Button>
             )}
