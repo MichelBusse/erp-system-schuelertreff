@@ -145,7 +145,6 @@ const SchoolDetailView: React.FC = () => {
       })
         .then(() => {
           enqueueSnackbar(school.schoolName + ' gespeichert')
-          if (id) navigate('/schools')
         })
         .catch(() => {
           enqueueSnackbar('Fehler beim Speichern der Schuldaten')
@@ -726,7 +725,7 @@ const SchoolDetailView: React.FC = () => {
                 }}
                 variant="outlined"
               >
-                Abbrechen
+                Zurück
               </Button>
             )}
             <Button onClick={submitForm} variant="contained">

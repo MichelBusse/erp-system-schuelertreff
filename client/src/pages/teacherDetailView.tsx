@@ -207,7 +207,6 @@ const TeacherDetailView: React.FC = () => {
           )
 
           updateData(res.data)
-          if (id) navigate('/teachers')
         })
         .catch((error) => {
           if (axios.isAxiosError(error) && error.response?.status === 400) {
