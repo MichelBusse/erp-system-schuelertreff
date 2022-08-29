@@ -51,6 +51,7 @@ const AdminCalendar: React.FC<Props> = ({
             ? 1
             : -1
         })
+        .filter((c: contract) => c.teacher)
         .map((c: contract) => {
           contractsByTeacher[c.teacher.id] = (
             contractsByTeacher[c.teacher.id] ?? []

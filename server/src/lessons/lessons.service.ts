@@ -179,6 +179,7 @@ export class LessonsService {
       dayjs(week),
       teacherId,
     )
+
     const pendingContracts =
       await this.contractsService.findAllPendingForTeacher(teacherId)
 
@@ -497,10 +498,12 @@ export class LessonsService {
 
     qb.select('l')
       .from(Leave, 'l')
-      .where(`l."userId" = :userId`, { userId: contract.teacher.id })
-      .andWhere(`l.state = :state`, { state: LeaveState.ACCEPTED })
+      .where(`l.state = :state`, { state: LeaveState.ACCEPTED })
       .andWhere(`l."startDate" <= :end::date`, { end: contract.endDate })
       .andWhere(`l."endDate" >= :start::date`, { start: contract.startDate })
+    
+    if(contract.teacher)
+      qb.andWhere(`l."userId" = :userId`, { userId: contract.teacher.id })
 
     const leaves: Leave[] = await qb.getMany()
 
