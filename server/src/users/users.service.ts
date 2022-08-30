@@ -600,7 +600,7 @@ export class UsersService {
           {
             to: user.email,
             subject: 'Schülertreff - Termin Bewerbungsgespräch',
-            text: applicationMeetingSetDateMail(user.firstName + " " + user.lastName, 'https://us04web.zoom.us/j/73707078960?pwd=aWFFbThlTVIrTzQ5dWZVYlVzYWNqdz09', dayjs(dto.dates[0]).format('- dddd, den DD.MM.YYYY um HH:mm Uhr')),
+            text: applicationMeetingSetDateMail(user.firstName + " " + user.lastName, 'https://us04web.zoom.us/j/73707078960?pwd=aWFFbThlTVIrTzQ5dWZVYlVzYWNqdz09', `- ${dayjs(dto.dates[0]).format('dddd DD.MM.YYYY')}, den ${dayjs(dto.dates[0]).format('DD.MM.YYYY')} um ${dayjs(dto.dates[0]).format('HH:mm')} Uhr`),
           },
           (error) => {
             if (error) console.log(error)
@@ -617,7 +617,7 @@ export class UsersService {
           {
             to: user.email,
             subject: 'Schülertreff - Terminvorschläge Bewerbungsgespräch',
-            text: applicationMeetingProposalMail(user.firstName + " " + user.lastName, 'https://us04web.zoom.us/j/73707078960?pwd=aWFFbThlTVIrTzQ5dWZVYlVzYWNqdz09', dto.dates.map((date) => dayjs(date).format('- dddd, den DD.MM.YYYY um HH:mm Uhr'))),
+            text: applicationMeetingProposalMail(user.firstName + " " + user.lastName, 'https://us04web.zoom.us/j/73707078960?pwd=aWFFbThlTVIrTzQ5dWZVYlVzYWNqdz09', dto.dates.map((date) => `- ${dayjs(date).format('dddd DD.MM.YYYY')}, den ${dayjs(date).format('DD.MM.YYYY')} um ${dayjs(date).format('HH:mm')} Uhr`)),
           },
           (error) => {
             if (error) console.log(error)
