@@ -46,7 +46,7 @@ import {
 import { Leave, LeaveState } from './entities/leave.entity'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
-import { applicationMeetingProposalMail, applicationMeetingSetDateMail } from 'src/mailTexts'
+import { applicationMeetingProposalMail, applicationMeetingSetDateMail, employmentMail } from 'src/mailTexts'
 
 const allowedStateTransitions: Record<TeacherState, TeacherState[]> = {
   created: [TeacherState.CREATED, TeacherState.INTERVIEW],
@@ -551,6 +551,24 @@ export class UsersService {
       updatedTeacher.mayAuthenticate = true
     }
 
+    if(user.state === TeacherState.CONTRACT && updatedTeacher.state === TeacherState.EMPLOYED){
+      try {
+        this.transport.sendMail(
+          {
+            to: user.email,
+            subject: 'Schülertreff - Willkommen',
+            text: employmentMail(updatedTeacher.firstName + " " + updatedTeacher.lastName),
+          },
+          (error) => {
+            if (error) console.log(error)
+          },
+        )
+        console.log('Employment-Mail successfully sent to ' + user.email)
+      } catch {
+        console.log('Failed to send meeting email to ' + user.email)
+      }
+    }
+
     if (
       (updatedTeacher.state === TeacherState.CONTRACT ||
         updatedTeacher.state === TeacherState.EMPLOYED) &&
@@ -573,8 +591,6 @@ export class UsersService {
         'ApplicationMeetingRequest can only be send when in state "created"',
       )
 
-    // TODO: format dates, email template
-
     if (dto.fixedRequest) {
       user.dateOfApplicationMeeting = dto.dates[0]
 
@@ -583,13 +599,14 @@ export class UsersService {
         this.transport.sendMail(
           {
             to: user.email,
-            subject: 'Schülertreff: Termin Bewerbungsgespräch',
+            subject: 'Schülertreff - Termin Bewerbungsgespräch',
             text: applicationMeetingSetDateMail(user.firstName + " " + user.lastName, 'https://us04web.zoom.us/j/73707078960?pwd=aWFFbThlTVIrTzQ5dWZVYlVzYWNqdz09', dayjs(dto.dates[0]).format('- dddd, den DD.MM.YYYY um HH:mm Uhr')),
           },
           (error) => {
             if (error) console.log(error)
           },
         )
+        console.log('Meeting-Confirmation-Mail successfully sent to ' + user.email)
       } catch {
         console.log('Failed to send meeting email to ' + user.email)
       }
@@ -605,7 +622,8 @@ export class UsersService {
           (error) => {
             if (error) console.log(error)
           },
-        )
+        )        
+        console.log('Meeting-Proposal-Mail successfully sent to ' + user.email)
       } catch {
         console.log('Failed to send meeting suggestions email to ' + user.email)
       }

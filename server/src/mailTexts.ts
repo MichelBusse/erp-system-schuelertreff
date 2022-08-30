@@ -43,6 +43,19 @@ export const applicationMeetingSetDateMail = (name: string, link: string, format
   Bei Fragen stehen wir Ihnen gern unter den angegebenen Kontaktdaten zur Verfügung.\n\n`+ contactSignature
 }
 
+export const employmentMail = (name: string) => {
+  return `Sehr geehrte/r ${name},\n\n
+  wir bedanken uns herzlich für Ihre Bewerbung, den damit verbundenen Mühen sowie Ihrem Interesse an unserem Unternehmen.\n\n
+  Aus unserer Bewerberauswahl haben Sie uns mit Ihren Fähigkeiten und Ihrem Auftreten überzeugt. Wir freuen uns, Ihnen mitteilen zu können, dass wir mit Ihnen gerne zusammenarbeiten möchten.\n\n
+  Wir können Ihnen somit, wie bereits besprochen,  eine Stelle auf Honorarbasis anbieten. Der Stundenumfang ist dabei flexibel anpassbar.\n
+  Ihre Aufgaben werden darin bestehen, Kinder selbst zu unterrichten und Lehrer während der offiziellen Unterrichtszeit zu unterstützen.\n
+  Bitte geben Sie uns in den nächsten Tagen eine Rückmeldung, bezüglich Ihrer Entscheidung.\n\n
+  Herzlich Willkommen in unserem Team!\n\n
+  Bei Interesse können Sie uns auch gerne auf unserer Internetseite www.schuelertreff-nachhilfe.de besuchen.\n\n
+  Wir hoffen auf eine zukünftige Zusammenarbeit, welche im Sinne unserer Schülerinnen und Schüler liegen soll.\n\n
+  Bei Fragen stehen wir Ihnen gern unter den angegebenen Kontaktdaten zur Verfügung.\n\n` + contactSignature
+}
+
 const contactSignature = `Unsere Kontaktdaten:\n\n
 0176/60912238 (Marek Pijala)\n
 0176/22079244 (Nikita Soldatov)\n 
