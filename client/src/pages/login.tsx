@@ -1,10 +1,12 @@
-import { Button, Grid, TextField } from '@mui/material'
+import { Button, Grid, Stack, TextField, Typography } from '@mui/material'
 import axios from 'axios'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 
 import { useAuth } from '../components/AuthProvider'
 import { snackbarOptionsError } from '../consts'
+
+import logo from '../assets/logoLarge.png'
 
 const Login: React.FC = () => {
   const [error, setError] = useState('')
@@ -52,49 +54,55 @@ const Login: React.FC = () => {
         rowGap={1}
         component={'form'}
       >
-        <TextField
-          label="E-Mail"
-          variant="outlined"
-          autoComplete="username"
-          size="small"
-          value={email}
-          style={{ width: '300px', maxWidth: '100%' }}
-          onChange={(e) => setEmail(e.target.value)}
-          error={error !== '' || emailErrorText !== ''}
-          helperText={emailErrorText}
-          fullWidth
-        />
-        <TextField
-          label="Password"
-          type="password"
-          autoComplete="current-password"
-          size="small"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          error={error !== ''}
-          helperText={error}
-          style={{ width: '300px', maxWidth: '100%' }}
-          fullWidth
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleSubmit()
-          }}
-        />
-        <Button
-          variant="contained"
-          style={{ width: '300px', maxWidth: '100%' }}
-          onClick={handleSubmit}
-          fullWidth
-        >
-          Login
-        </Button>
-        <Button
-          variant="text"
-          fullWidth
-          onClick={() => resetPassword()}
-          style={{ width: '300px', maxWidth: '100%' }}
-        >
-          Passwort zurücksetzen
-        </Button>
+        <Stack direction={'column'} sx={{}} alignItems={'center'} gap={1}>
+          <img src={logo} alt="Schülertreff" style={{width: '400px', maxWidth: '90%'}}/>
+          <Typography variant="h4" textAlign={'center'} fontSize={22} mb={4}>
+            Herzlich Willkommen
+          </Typography>
+          <TextField
+            label="E-Mail"
+            variant="outlined"
+            autoComplete="username"
+            size="small"
+            value={email}
+            style={{ width: '300px', maxWidth: '100%' }}
+            onChange={(e) => setEmail(e.target.value)}
+            error={error !== '' || emailErrorText !== ''}
+            helperText={emailErrorText}
+            fullWidth
+          />
+          <TextField
+            label="Password"
+            type="password"
+            autoComplete="current-password"
+            size="small"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            error={error !== ''}
+            helperText={error}
+            style={{ width: '300px', maxWidth: '100%' }}
+            fullWidth
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSubmit()
+            }}
+          />
+          <Button
+            variant="contained"
+            style={{ width: '300px', maxWidth: '100%' }}
+            onClick={handleSubmit}
+            fullWidth
+          >
+            Login
+          </Button>
+          <Button
+            variant="text"
+            fullWidth
+            onClick={() => resetPassword()}
+            style={{ width: '300px', maxWidth: '100%' }}
+          >
+            Passwort zurücksetzen
+          </Button>
+        </Stack>
       </Grid>
     </>
   )

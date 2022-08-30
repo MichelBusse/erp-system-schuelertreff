@@ -6,6 +6,7 @@ import {
   DialogContentText,
   DialogTitle,
   Grid,
+  Stack,
   TextField,
   Typography,
 } from '@mui/material'
@@ -14,6 +15,8 @@ import PasswordChecklist from 'react-password-checklist'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAuth } from '../components/AuthProvider'
+
+import logo from '../assets/logoLarge.png'
 
 const Reset: React.FC = () => {
   const [dialog, setDialog] = useState<'' | 'error' | 'success'>('')
@@ -76,54 +79,62 @@ const Reset: React.FC = () => {
         rowGap={1}
         component={'form'}
       >
-        <Typography variant="h5" gutterBottom>
-          Passwort zurücksetzen
-        </Typography>
-        <TextField
-          label="Neues Passwort"
-          type="password"
-          autoComplete="new-password"
-          size="small"
-          style={{ width: 200 }}
-          onChange={(e) =>
-            setPassword((password) => ({ ...password, pw1: e.target.value }))
-          }
-          onKeyUp={validatePassword}
-        />
-        <TextField
-          label="Passwort wiederholen"
-          type="password"
-          autoComplete="new-password"
-          size="small"
-          style={{ width: 200 }}
-          error={!passwordMatch}
-          onChange={(e) =>
-            setPassword((password) => ({ ...password, pw2: e.target.value }))
-          }
-          onKeyUp={validatePassword}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleSubmit()
-          }}
-        />
-        <PasswordChecklist
-          rules={['minLength', 'number', 'match']}
-          minLength={8}
-          value={password.pw1}
-          valueAgain={password.pw2}
-          messages={{
-            minLength: 'Mindestens 8 Zeichen.',
-            number: 'Enthält eine Ziffer',
-            match: 'Passwörter stimmen überein.',
-          }}
-        />
-        <Button
-          variant="outlined"
-          size="medium"
-          disabled={!(containsN && contains8C && passwordMatch)}
-          onClick={handleSubmit}
-        >
-          Zurücksetzen
-        </Button>
+        <Stack direction={'column'} sx={{}} alignItems={'center'} gap={1}>
+          <img
+            src={logo}
+            alt="Schülertreff"
+            style={{ width: '400px', maxWidth: '90%' }}
+          />
+
+          <Typography variant="h5" gutterBottom>
+            Passwort zurücksetzen
+          </Typography>
+          <TextField
+            label="Neues Passwort"
+            type="password"
+            autoComplete="new-password"
+            size="small"
+            style={{ width: 200 }}
+            onChange={(e) =>
+              setPassword((password) => ({ ...password, pw1: e.target.value }))
+            }
+            onKeyUp={validatePassword}
+          />
+          <TextField
+            label="Passwort wiederholen"
+            type="password"
+            autoComplete="new-password"
+            size="small"
+            style={{ width: 200 }}
+            error={!passwordMatch}
+            onChange={(e) =>
+              setPassword((password) => ({ ...password, pw2: e.target.value }))
+            }
+            onKeyUp={validatePassword}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleSubmit()
+            }}
+          />
+          <PasswordChecklist
+            rules={['minLength', 'number', 'match']}
+            minLength={8}
+            value={password.pw1}
+            valueAgain={password.pw2}
+            messages={{
+              minLength: 'Mindestens 8 Zeichen.',
+              number: 'Enthält eine Ziffer',
+              match: 'Passwörter stimmen überein.',
+            }}
+          />
+          <Button
+            variant="outlined"
+            size="medium"
+            disabled={!(containsN && contains8C && passwordMatch)}
+            onClick={handleSubmit}
+          >
+            Zurücksetzen
+          </Button>
+        </Stack>
       </Grid>
 
       <Dialog

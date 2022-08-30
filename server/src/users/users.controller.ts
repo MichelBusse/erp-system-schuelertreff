@@ -196,6 +196,14 @@ export class UsersController {
     return this.usersService.generateWorkContract(id)
   }
 
+  @Get('teacher/generateEFZ')
+  @Roles(Role.ADMIN)
+  async generateEFZ(
+    @Query('teacherId') id: number,
+  ): Promise<Document> {
+    return this.usersService.generateEFZ(id)
+  }
+
   @Get('teacher/applicationMeetings')
   @Roles(Role.ADMIN)
   async getApplicationMeetings(@Query('of') week: string) {
