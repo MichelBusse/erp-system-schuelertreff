@@ -34,8 +34,8 @@ import ConfirmationDialog, {
   ConfirmationDialogProps,
   defaultConfirmationDialogProps,
 } from '../components/ConfirmationDialog'
+import CustomerInvoiceDataSelect, { CustomerInvoiceData } from '../components/CustomerInvoiceDateSelect'
 import IconButtonAdornment from '../components/IconButtonAdornment'
-import InvoiceDataSelect, { InvoiceData } from '../components/InvoiceDateSelect'
 import UserDocuments from '../components/UserDocuments'
 import {
   defaultClassCustomerFormData,
@@ -308,7 +308,7 @@ const SchoolDetailView: React.FC = () => {
   const generateInvoice = (
     year: number,
     month: number,
-    invoiceData?: InvoiceData,
+    invoiceData: CustomerInvoiceData,
   ) => {
     API.post('lessons/invoice/customer', invoiceData, {
       params: {
@@ -739,7 +739,7 @@ const SchoolDetailView: React.FC = () => {
           </Stack>
 
           <h3>Rechnung generieren:</h3>
-          <InvoiceDataSelect
+          <CustomerInvoiceDataSelect
             generateInvoice={generateInvoice}
             type={Role.SCHOOL}
           />

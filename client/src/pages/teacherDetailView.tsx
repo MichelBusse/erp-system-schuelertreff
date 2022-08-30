@@ -39,6 +39,7 @@ import ConfirmationDialog, {
 import IconButtonAdornment from '../components/IconButtonAdornment'
 import InvoiceDataSelect from '../components/InvoiceDateSelect'
 import Leave from '../components/Leave'
+import TeacherInvoiceDataSelect, { TeacherInvoiceData } from '../components/TeacherInvoiceDateSelect'
 import UserDocuments from '../components/UserDocuments'
 import {
   defaultTeacherFormData,
@@ -265,8 +266,8 @@ const TeacherDetailView: React.FC = () => {
     })
   }
 
-  const generateInvoice = (year: number, month: number) => {
-    API.get('lessons/invoice/teacher', {
+  const generateInvoice = (year: number, month: number, teacherInvoiceData: TeacherInvoiceData) => {
+    API.post('lessons/invoice/teacher', teacherInvoiceData, {
       params: {
         of: dayjs().year(year).month(month).format('YYYY-MM-DD'),
         teacherId: id,
@@ -924,14 +925,13 @@ const TeacherDetailView: React.FC = () => {
                 </Typography>
               </Stack>
             )}
-          {requestedId !== 'me' &&
+          {id &&
             data.state === TeacherState.EMPLOYED &&
             data.deleteState === DeleteState.ACTIVE && (
               <>
                 <Typography variant="h6">Abrechnung:</Typography>
-                <InvoiceDataSelect
+                <TeacherInvoiceDataSelect
                   generateInvoice={generateInvoice}
-                  type={Role.TEACHER}
                 />
               </>
             )}

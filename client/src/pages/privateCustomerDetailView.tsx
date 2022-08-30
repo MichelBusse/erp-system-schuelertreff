@@ -22,7 +22,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
-import InvoiceDataSelect, { InvoiceData } from '../components/InvoiceDateSelect'
+import CustomerInvoiceDataSelect, { CustomerInvoiceData } from '../components/CustomerInvoiceDateSelect'
 import UserDocuments from '../components/UserDocuments'
 import {
   defaultPrivateCustomerFormData,
@@ -141,7 +141,7 @@ const PrivateCustomerDetailView: React.FC = () => {
   const generateInvoice = (
     year: number,
     month: number,
-    invoiceData?: InvoiceData,
+    invoiceData: CustomerInvoiceData,
   ) => {
     API.post(
       'lessons/invoice/customer',
@@ -419,7 +419,7 @@ const PrivateCustomerDetailView: React.FC = () => {
           </Stack>
 
           <h3>Rechnung generieren:</h3>
-          <InvoiceDataSelect
+          <CustomerInvoiceDataSelect
             generateInvoice={generateInvoice}
             type={Role.PRIVATECUSTOMER}
           />
