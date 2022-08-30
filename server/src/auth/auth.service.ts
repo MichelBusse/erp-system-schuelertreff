@@ -86,7 +86,7 @@ export class AuthService {
     }
 
     // Welcome Mail when setting password the first time
-    if(user.passwordHash && user.passwordHash !== ''){
+    if(!user.passwordHash || user.passwordHash === ''){
       mailOptions.subject = 'Willkommen bei Schülertreff'
       mailOptions.text = registrationMailText(link)
     }
