@@ -235,9 +235,14 @@ export class LessonsService {
   async generateInvoiceTeacher({
     invoiceMonth,
     teacherId,
+    teacherInvoiceData,
   }: {
     invoiceMonth: Dayjs
     teacherId: number
+    teacherInvoiceData: {
+      costPerLiter: number
+      consumption: number
+    }
   }): Promise<Buffer> {
     const teacher = await this.usersService.findOneTeacher(teacherId)
 
@@ -249,26 +254,44 @@ export class LessonsService {
     if (!teacher) throw new BadRequestException('The customer does not exist')
 
     const rows = []
+    let totalHours = 0
 
     lessons.forEach((lesson) => {
+      const duration =
+        dayjs(lesson.contract.endTime, 'HH:mm').diff(
+          dayjs(lesson.contract.startTime, 'HH:mm'),
+          'minute',
+        ) / 60
       rows.push({
         subject: lesson.contract.subject.name,
-        duration: (
-          dayjs(lesson.contract.endTime, 'HH:mm').diff(
-            dayjs(lesson.contract.startTime, 'HH:mm'),
-            'minute',
-          ) / 60
-        )
-          .toFixed(2)
-          .replace('.', ','),
+        duration: duration.toFixed(2).replace('.', ','),
         date: dayjs(lesson.date).format('DD.MM.YYYY'),
         notes: lesson.notes,
       })
+      totalHours += duration
     })
 
     const invoiceInfo = {
       date: dayjs().format('DD.MM.YYYY'),
       month: invoiceMonth.locale('de').format('MMMM YYYY'),
+      teacherInvoiceData: {
+        consumption: teacherInvoiceData.consumption.toFixed(2).replace('.', ','),
+        costPerLiter: teacherInvoiceData.costPerLiter.toFixed(2).replace('.', ','),
+        fee: Number(teacher.fee).toFixed(2).replace('.', ','),
+        totalDrivingCosts: (
+          teacherInvoiceData.consumption * teacherInvoiceData.costPerLiter
+        )
+          .toFixed(2)
+          .replace('.', ','),
+        totalHours: totalHours.toFixed(2).replace('.', ','),
+        totalHourCosts: (totalHours * teacher.fee).toFixed(2).replace('.', ','),
+        totalCosts: (
+          totalHours * teacher.fee +
+          teacherInvoiceData.consumption * teacherInvoiceData.costPerLiter
+        )
+          .toFixed(2)
+          .replace('.', ','),
+      },
     }
 
     const filePath = path.join(__dirname, '../templates/teacherList.ejs')
@@ -286,9 +309,24 @@ export class LessonsService {
     const buffer = await page.pdf({
       format: 'A4',
       printBackground: true,
+      displayHeaderFooter: true,
+      headerTemplate: `<header style="width: 100%; padding: 0 30px; font-size: 12px; font-family: Verdana, Geneva, Tahoma, sans-serif;">
+        <h1 style="font-size: 25px;">Abrechnung Mitarbeiter</h1>
+        <table class="headerData" style="width: 100%;">
+          <tr>
+            <td style="width: 50%;">
+              <p>Name: ${teacher.firstName + ' ' + teacher.lastName}</p>
+            </td>
+            <td style="width: 50%;">
+              <p>Monat / Jahr: ${invoiceInfo.month}</p>
+            </td>
+          </tr>
+        </table>
+      </header>`,
+      footerTemplate: `<footer style="text-align: right; width: 100%; padding: 0 30px; font-size: 10px; font-family: Verdana, Geneva, Tahoma, sans-serif;"><span class="pageNumber"></span><span>/</span><span class="totalPages"></span></footer>`,
       margin: {
         left: '40px',
-        top: '40px',
+        top: '190px',
         right: '40px',
         bottom: '40px',
       },

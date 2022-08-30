@@ -368,6 +368,13 @@ export class UsersService {
     return this.adminsRepository.save(admin)
   }
 
+  async unarchiveUser(id: number) {
+    const user = await this.findOne(id)
+    user.deleteState = DeleteState.ACTIVE
+
+    this.usersRepository.save(user)
+  }
+
   /**
    * Password reset
    */
@@ -674,6 +681,7 @@ export class UsersService {
       .where('customer.id = :id', { id: id })
 
     const customersContracs = await contractQuery.getMany()
+    const customer = await this.findOnePrivateCustomer(id)
 
     let allowedToRemove = true
 
@@ -694,7 +702,13 @@ export class UsersService {
         )
       }
     } else {
-      this.customersRepository.delete(id)
+      if(customer.deleteState !== DeleteState.DELETED){
+        this.privateCustomersRepository.update(id, {
+          deleteState: DeleteState.DELETED,
+        })
+      }else{
+        this.customersRepository.delete(id)
+      }
     }
   }
 
@@ -708,6 +722,15 @@ export class UsersService {
     return this.privateCustomersRepository
       .find({
         where: { deleteState: Not(DeleteState.DELETED) },
+        order: { firstName: 'ASC', lastName: 'ASC' },
+      })
+      .then(transformUsers)
+  }
+
+  async findDeletedPrivateCustomers(): Promise<PrivateCustomer[]> {
+    return this.privateCustomersRepository
+      .find({
+        where: { deleteState: DeleteState.DELETED },
         order: { firstName: 'ASC', lastName: 'ASC' },
       })
       .then(transformUsers)
@@ -781,6 +804,15 @@ export class UsersService {
       .then(transformUsers)
   }
 
+  async findDeletedSchools(): Promise<School[]> {
+    return this.schoolsRepository
+      .find({
+        where: { deleteState: DeleteState.DELETED },
+        order: { schoolName: 'ASC' },
+      })
+      .then(transformUsers)
+  }
+
   async findOneSchool(id: number): Promise<School> {
     return this.schoolsRepository.findOneByOrFail({ id }).then(transformUser)
   }
@@ -832,6 +864,8 @@ export class UsersService {
       .where('s.id = :id', { id: id })
 
     const classCustomers = await classCustomerQuery.getMany()
+    const school = await this.findOneSchool(id)
+
     let allowedToRemove = true
 
     if (classCustomers.length > 0) {
@@ -852,7 +886,13 @@ export class UsersService {
         )
       }
     } else {
-      this.schoolsRepository.delete(id)
+      if(school.deleteState !== DeleteState.DELETED){
+        this.schoolsRepository.update(id, {
+          deleteState: DeleteState.DELETED,
+        })
+      }else{
+        this.schoolsRepository.delete(id)
+      }
     }
   }
 

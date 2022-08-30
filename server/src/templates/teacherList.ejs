@@ -16,66 +16,22 @@
       body {
         padding: 1px 0;
       }
-      h1 {
-        font-size: 25px;
-      }
-      header {
-        width: 100%;
-      }
-      .logoWrapper{
-        position: absolute;
-        top: 20px;
-        right: 20px;
-      }
-      .headerData {
-        width: 100%;
-      }
-      .headerData td {
-        width: 50%;
-      }
       .tableSection table {
         border-collapse: collapse;
         width: 100%;
+      }
+      .tableSection table:first-child {
+        margin-bottom: 10px;
       }
       .tableSection table td,
       table th {
         border: 1px solid #000000;
         height: 18px;
       }
-      .signature {
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        width: 200px;
-        text-align: right;
-      }
-      .signature span{
-        text-align: right;
-        font-size: 10px;
-      }
-      .footerSection {
-        font-size: 12px;
-      }
     </style>
   </head>
   <body>
     <div class="greenLine"></div>
-    <header>
-      <h1>Abrechnung Mitarbeiter</h1>
-      <!--<div class="logoWrapper">
-        <img src="" alt="Schülertreff"/>
-      </div>-->
-      <table class="headerData">
-        <tr>
-          <td>
-            <p>Name: <%= teacher.firstName %> <%= teacher.lastName %></p>
-          </td>
-          <td>
-            <p>Monat / Jahr: <%= invoiceInfo.month %></p>
-          </td>
-        </tr>
-      </table>
-    </header>
     <section class="tableSection">
       <table>
         <thead>
@@ -94,7 +50,7 @@
             <td><%= row.subject %></td>
             <td><%= row.notes %></td>
           </tr>
-          <% }); %> <% } %> <% for (var i = 0; i < 31 - rows.length; i++ ) { %>
+          <% }); %> <% } %> <% for (var i = 0; i < (39 - (rows.length % 39) - 15); i++ ) { %>
           <tr>
             <td></td>
             <td></td>
@@ -104,28 +60,21 @@
           <% }; %>
         </tbody>
       </table>
+      <table>
+        <tr><td width="33%">Stunden gesamt</td><td></td><td width="33%"><%= invoiceInfo.teacherInvoiceData.totalHours %></td></tr>
+        <tr><td>Honorar (€)</td><td></td><td><%= invoiceInfo.teacherInvoiceData.fee %></td></tr>
+        <tr><td></td><td></td><td></td></tr>
+        <tr><td>Zahlung (€)</td><td></td><td><%= invoiceInfo.teacherInvoiceData.totalHourCosts %></td></tr>
+        <tr><td></td><td></td><td></td></tr>
+        <tr><td>Fahrgeld (evtl.)</td><td>200 km</td><td></td></tr>
+        <tr><td>X 1/2</td><td>100 km</td><td></td></tr>
+        <tr><td></td><td></td><td></td></tr>
+        <tr><td>Verbrauch ø in l</td><td><%= invoiceInfo.teacherInvoiceData.consumption %></td><td></td></tr>
+        <tr><td>Preis (€/l)</td><td><%= invoiceInfo.teacherInvoiceData.costPerLiter %></td><td></td></tr>
+        <tr><td></td><td></td><td></td></tr>
+        <tr><td>Fahrgeld gesamt (€)</td><td><%= invoiceInfo.teacherInvoiceData.totalDrivingCosts %></td><td></td></tr>
+        <tr><td><b>Auszahlung gesamt (€)</b></td><td></td><td><b><%= invoiceInfo.teacherInvoiceData.totalCosts %></b></td></tr>
+      </table>
     </section>
-    <section class="footerSection">
-      <p>
-        Liebe Mitarbeiter/innen,<br />
-        <br />
-        Wir bitten euch um die Abgabe der Abrechnungen bis spätestens zum 28.
-        des jeweiligen Monats, sonst können wir die rechtzeitige Überweisung
-        nicht garantieren.<br />
-        <br />
-        Beachtet bitte, dass die Einsendung auf folgende E-Mail erfolgen
-        soll:<br />
-        <br />
-        <a href="mailto:abrechnungen@schuelertreff-nachhilfe.de"
-          >abrechnungen@schuelertreff-nachhilfe.de</a
-        ><br />
-        <br />
-        Vielen Dank für eure Unterstützung!
-      </p>
-    </section>
-    <div class="signature">
-      <hr />
-      <span>(Unterschrift Mitarbeiter/in)</span>
-    </div>
   </body>
 </html>

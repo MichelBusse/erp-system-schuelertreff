@@ -61,9 +61,20 @@ export class UsersController {
     return this.usersService.findAllCustomers()
   }
 
+  @Get('unarchive/:id')
+  @Roles(Role.ADMIN)
+  unarchiveUser(@Param('id') id: number): Promise<void> {
+    return this.usersService.unarchiveUser(id)
+  }
+
   @Get('privateCustomer')
   findAppliedPrivateCustomers(): Promise<PrivateCustomer[]> {
     return this.usersService.findPrivateCustomers()
+  }
+
+  @Get('privateCustomer/deleted')
+  findDeletedPrivateCustomers(): Promise<PrivateCustomer[]> {
+    return this.usersService.findDeletedPrivateCustomers()
   }
 
   @Get('classCustomer')
@@ -82,6 +93,11 @@ export class UsersController {
   findAllSchools(): Promise<School[]> {
     return this.usersService.findSchools()
   }
+  @Get('school/deleted')
+  findDeletedSchools(): Promise<School[]> {
+    return this.usersService.findDeletedSchools()
+  }
+
   @Get('school/startInFuture')
   findSchoolsWithStartInFuture(@Query('of') date: string): Promise<School[]> {
     return this.usersService.findSchoolsWithStartInFuture(date)

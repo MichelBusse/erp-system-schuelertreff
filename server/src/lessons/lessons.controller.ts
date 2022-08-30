@@ -48,37 +48,37 @@ export class LessonsController {
     return this.lessonsService.findByWeek(dayjs(date))
   }
 
-  @Get('invoice/teacher')
+  @Post('invoice/teacher')
+  @Roles(Role.ADMIN)
   async getInvoiceTeacher(
-    @Request() req,
     @Res() res: Response,
+    @Body()
+    teacherInvoiceData: {
+      costPerLiter: number
+      consumption: number
+    },
     @Query('of') month: string,
     @Query('teacherId') teacherId: string,
   ): Promise<void> {
-    if (req.user.id === teacherId || req.user.role === Role.ADMIN) {
-      const buffer = await this.lessonsService.generateInvoiceTeacher({
-        invoiceMonth: dayjs(month, 'YYYY-MM-DD'),
-        teacherId: Number(teacherId),
-      })
+    const buffer = await this.lessonsService.generateInvoiceTeacher({
+      invoiceMonth: dayjs(month, 'YYYY-MM-DD'),
+      teacherId: Number(teacherId),
+      teacherInvoiceData
+    })
 
-      res.set({
-        // pdf
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': 'attachment; filename=invoice.pdf',
-        'Content-Length': buffer.length,
+    res.set({
+      // pdf
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename=invoice.pdf',
+      'Content-Length': buffer.length,
 
-        // prevent cache
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        Pragma: 'no-cache',
-        Expires: 0,
-      })
+      // prevent cache
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      Pragma: 'no-cache',
+      Expires: 0,
+    })
 
-      res.end(buffer)
-    } else {
-      throw new BadRequestException(
-        "You don't have permission to generate the invoice of this teacher",
-      )
-    }
+    res.end(buffer)
   }
 
   @Post('invoice/customer')
