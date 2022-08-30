@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        position: relative;
+        box-sizing: border-box;
+        height: 100%;
+        font-size: 11px;
+      }
+      .mainLayout {
+        width: 100%;
+        height: 100%;
+      }
+      .mainLayout tr {
+        height: 100%;
+      }
+      .mainLayout td {
+        height: 100%;
+        vertical-align: top;
+      }
+      .smallText {
+        font-size: 8px;
+      }
+      header {
+        margin-bottom: 100px;
+      }
+      section {
+        margin-bottom: 30px;
+      }
+      aside section {
+        margin-bottom: 20px;
+      }
+      .pageNumber {
+        margin-top: 350px;
+      }
+      aside {
+        margin-bottom: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <table class="mainLayout">
+      <tr>
+        <td width="80%">
+          <header>
+            <div class="smallText">
+              Schülertreff GbR<br />
+              August-Bebel-Straß2 22 | 09217 Burgstädt
+            </div>
+            Zur Vorlage bei der<br />
+            zuständigen Meldebehörde
+          </header>
+          <main>
+            <p><b>Vorlage eines erweiterten Führungszeugnisses</b></p>
+            <section>
+              <p>
+                Frau/Herr &nbsp;&nbsp;&nbsp;&nbsp;
+                <b
+                  ><%= customerInfo.firstName %> <%= customerInfo.lastName %></b
+                >
+                &nbsp;&nbsp;&nbsp;&nbsp; geboren am &nbsp;&nbsp;&nbsp;&nbsp;
+                <b><%= customerInfo.dateOfBirth %></b>
+              </p>
+              <p>
+                wohnhaft in &nbsp;&nbsp;&nbsp;&nbsp;
+                <b
+                  ><%= customerInfo.street %>, <%= customerInfo.city %>, <%=
+                  customerInfo.zip %></b
+                >
+              </p>
+            </section>
+            <section>
+              <p>
+                benötigt für die Ausübung des Nachhilfeunterrichtes und der
+                Betreuung von<br />
+                Minderjährigen die Vorlage eines „Erweiterten
+                Führungszeugnisses“ vorgeschrieben.<br />
+                Ich bestätige, dass die Voraussetzungen für die Beantragung
+                eines<br />
+                „Erweiterten Führungszeugnisses“ nach § 30a Abs.1 Gesetz über
+                das Zentralregister<br />
+                und das Erziehungsregister-Bundeszentralregistergesetz (BZRG)
+                erfüllt sind.
+              </p>
+            </section>
+            <section>
+              <p>
+                Die „Schülertreff GbR“ bittet um Ausstellung eines „Erweiterten
+                Führungszeugnisses“ und Zusendung an die Adresse wie folgt:
+              </p>
+            </section>
+            <section>
+              <ul>
+                <li>
+                  Schülertreff GbR<br />
+                  c/o M. Pijala & N. Soldatov<br />
+                  August-Bebel-Str. 22<br />
+                  09217 Burgstädt
+                </li>
+              </ul>
+            </section>
+            <section>
+              <p>
+                Eine Kostenübernahme durch die „Schülertreff GbR“ erfolgt nicht.
+              </p>
+            </section>
+            <section>
+              <p>
+                Nikita Soldatov<br />
+                Co-Geschäftsführer
+              </p>
+              <div class="smallText">
+                Dieses Schreiben ist maschinell erstellt und deshalb nicht
+                unterschrieben
+              </div>
+            </section>
+            <div class="pageNumber">Seite 1 von 1</div>
+          </main>
+        </td>
+        <td width="20%" style="padding-left: 20px">
+          <aside class="smallText">
+            <section>
+              <b>Ihr Ansprechpartner</b><br />
+              Nikita Soldatov<br /><br />
+              <b>Durchwahl</b><br />
+              Telefon: +49 3724 1299038<br />
+              Mobil: +49 176 22079244<br /><br />
+              nikita.soldatov@schuelertreff- nachhilfe.de<br /><br /><br /><br />
+            </section>
+            <section>
+              <b>Ihr Ansprechpartner</b><br />
+              Marek Pijala<br /><br />
+              <b>Durchwahl</b><br />
+              Telefon: +49 3724 1299038<br />
+              Mobil: +49 176 60912238<br /><br />
+              marek.pijala@schuelertreff- nachhilfe.de
+            </section>
+          </aside>
+          <footer class="smallText">
+            <b>Hausanschrift</b><br />
+            Schülertreff GbR<br />
+            Standort Burgstädt<br />
+            August-Bebel-Straße 22<br />
+            09217 Burgstädt<br /><br />
+            www.schuelertreff-nachhilfe.de<br /><br />
+            <b>DE-Mail-Zugang</b><br />
+            info@schuelertreff-nachhilfe.de<br /><br />
+            <b>Öffnungszeiten</b><br />
+            Siehe Homepage
+          </footer>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

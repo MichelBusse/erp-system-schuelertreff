@@ -473,6 +473,50 @@ export class UsersService {
     })
   }
 
+  async generateEFZ(id: number): Promise<Document> {
+    const user = await this.findOneTeacher(id)
+
+    // generate work contract
+    const buffer = await renderTemplate(
+      'efzForm',
+      {
+        customerInfo: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          street: user.street,
+          zip: user.postalCode,
+          city: user.city,
+          dateOfBirth: dayjs(user.dateOfBirth).format('DD.MM.YYYY'),
+          phone: user.phone,
+          email: user.email,
+          fee: Number(user.fee).toFixed(2).replace('.', ','),
+          dateOfEmploymentStart: dayjs(user.dateOfEmploymentStart).format(
+            'DD.MM.YYYY',
+          ),
+          bankAccountOwner: user.bankAccountOwner,
+          bankInstitution: user.bankInstitution,
+          iban: user.iban,
+          bic: user.bic,
+        },
+      },
+      {
+        left: '90px',
+        top: '70px',
+        right: '90px',
+        bottom: '70px',
+      },
+    )
+
+    return this.documentsService.create({
+      fileName: 'Führungszeugnis Antrag.pdf',
+      fileType: 'application/pdf',
+      owner: user.id,
+      mayRead: true,
+      mayDelete: false,
+      content: buffer,
+    })
+  }
+
   async updateTeacher(
     id: number,
     dto: Partial<UpdateTeacherDto>,
@@ -533,7 +577,7 @@ export class UsersService {
           {
             to: user.email,
             subject: 'Schülertreff: Termin Bewerbungsgespräch',
-            text: applicationMeetingSetDateMail(user.firstName + " " + user.lastName, 'https://us04web.zoom.us/j/73707078960?pwd=aWFFbThlTVIrTzQ5dWZVYlVzYWNqdz09', dto.dates[0] && dayjs(dto.dates[0]).format('dddd, den DD.MM.YYYY um HH:mm Uhr')),
+            text: applicationMeetingSetDateMail(user.firstName + " " + user.lastName, 'https://us04web.zoom.us/j/73707078960?pwd=aWFFbThlTVIrTzQ5dWZVYlVzYWNqdz09', dayjs(dto.dates[0]).format('- dddd, den DD.MM.YYYY um HH:mm Uhr')),
           },
           (error) => {
             if (error) console.log(error)
@@ -549,7 +593,7 @@ export class UsersService {
           {
             to: user.email,
             subject: 'Schülertreff - Terminvorschläge Bewerbungsgespräch',
-            text: applicationMeetingProposalMail(user.firstName + " " + user.lastName, 'https://us04web.zoom.us/j/73707078960?pwd=aWFFbThlTVIrTzQ5dWZVYlVzYWNqdz09', dto.dates.map((date) => date && dayjs(date).format('dddd, den DD.MM.YYYY um HH:mm Uhr'))),
+            text: applicationMeetingProposalMail(user.firstName + " " + user.lastName, 'https://us04web.zoom.us/j/73707078960?pwd=aWFFbThlTVIrTzQ5dWZVYlVzYWNqdz09', dto.dates.map((date) => dayjs(date).format('- dddd, den DD.MM.YYYY um HH:mm Uhr'))),
           },
           (error) => {
             if (error) console.log(error)

@@ -59,6 +59,7 @@ import subject from '../types/subject'
 import { leave, Role, teacher, timesAvailableParsed } from '../types/user'
 import {
   defaultTeacherFormErrorTexts,
+  efzFormValidation,
   teacherFormValidation,
   workContractFormValidation,
 } from '../utils/formValidation'
@@ -286,6 +287,7 @@ const TeacherDetailView: React.FC = () => {
     setErrors(errorTexts)
 
     if (errorTexts.valid) {
+      enqueueSnackbar('Arbeitsvertrag wird generiert...', snackbarOptions)
       API.get('users/teacher/generateWorkContract', {
         params: {
           teacherId: id,
@@ -294,6 +296,30 @@ const TeacherDetailView: React.FC = () => {
         .then(() => {
           setRefreshDocuments((r) => r + 1)
           enqueueSnackbar('Arbeitsvertrag generiert', snackbarOptions)
+        })
+        .catch(() => {
+          enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        })
+    } else {
+      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+    }
+  }
+
+  const generateEFZ = () => {
+    const errorTexts = efzFormValidation(data)
+
+    setErrors(errorTexts)
+
+    if (errorTexts.valid) {
+      enqueueSnackbar('Antrag EFZ wird generiert...', snackbarOptions)
+      API.get('users/teacher/generateEFZ', {
+        params: {
+          teacherId: id,
+        },
+      })
+        .then(() => {
+          setRefreshDocuments((r) => r + 1)
+          enqueueSnackbar('Antrag EFZ generiert', snackbarOptions)
         })
         .catch(() => {
           enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
@@ -760,15 +786,24 @@ const TeacherDetailView: React.FC = () => {
             refresh={refreshDocuments}
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
             actions={
-              (data.state === TeacherState.APPLIED ||
-                data.state === TeacherState.EMPLOYED) && (
-                <Button
-                  variant="text"
-                  endIcon={<DescriptionIcon />}
-                  onClick={() => generateWorkContract()}
-                >
-                  Arbeitsvertrag generieren
-                </Button>
+              (id && (data.state === TeacherState.CONTRACT ||
+                data.state === TeacherState.EMPLOYED)) && (
+                <>
+                  <Button
+                    variant="text"
+                    endIcon={<DescriptionIcon />}
+                    onClick={() => generateWorkContract()}
+                  >
+                    Arbeitsvertrag generieren
+                  </Button>
+                  <Button
+                    variant="text"
+                    endIcon={<DescriptionIcon />}
+                    onClick={() => generateEFZ()}
+                  >
+                    Antrag EFZ generieren
+                  </Button>
+                </>
               )
             }
           />

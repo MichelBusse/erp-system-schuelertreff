@@ -187,6 +187,45 @@ export function workContractFormValidation(
   return errorTexts
 }
 
+export function efzFormValidation(
+  form: teacherForm,
+): teacherFormErrorTexts {
+  const errorTexts = { ...defaultTeacherFormErrorTexts }
+
+  if (form.firstName.trim() === '') {
+    errorTexts.firstName = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (form.lastName.trim() === '') {
+    errorTexts.lastName = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (form.dateOfBirth === null || !dayjs(form.dateOfBirth).isValid()) {
+    errorTexts.dateOfBirth = 'Kein korrektes Datum'
+    errorTexts.valid = false
+  }
+
+  if (!form.postalCode.match(/\d{5}/)) {
+    errorTexts.postalCode = 'PLZ muss aus 5 Ziffern bestehen'
+    errorTexts.valid = false
+  }
+
+  if (form.city.trim() === '') {
+    errorTexts.city = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  if (form.street.trim() === '') {
+    errorTexts.street = 'Fehlt'
+    errorTexts.valid = false
+  }
+
+  return errorTexts
+}
+
+
 export const defaultPrivateCustomerFormErrorTexts: privateCustomerFormErrorTexts =
   {
     firstName: '',
