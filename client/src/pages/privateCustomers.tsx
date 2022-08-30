@@ -1,3 +1,4 @@
+import { FolderDelete } from '@mui/icons-material'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { IconButton } from '@mui/material'
 import {
@@ -25,6 +26,8 @@ const PrivateCustomers: React.FC = () => {
   const [customers, setCustomers] = useState<privateCustomer[]>([])
   const navigate = useNavigate()
   const location = useLocation()
+  const [deletedCustomersToggle, setDeletedCustomersToggle] =
+    useState<boolean>(false)
 
   const { API } = useAuth()
 
@@ -40,8 +43,14 @@ const PrivateCustomers: React.FC = () => {
 
   //Get subjects, teachers from DB
   useEffect(() => {
-    API.get(`users/privateCustomer`).then((res) => setCustomers(res.data))
-  }, [location])
+    if (!deletedCustomersToggle) {
+      API.get(`users/privateCustomer`).then((res) => setCustomers(res.data))
+    } else {
+      API.get(`users/privateCustomer/deleted`).then((res) =>
+        setCustomers(res.data),
+      )
+    }
+  }, [location, deletedCustomersToggle])
 
   useEffect(() => {
     if (small) {
@@ -147,6 +156,13 @@ const PrivateCustomers: React.FC = () => {
                 className={styles.customGridToolbarContainer}
               >
                 <GridToolbarFilterButton />
+                <IconButton
+                  color={deletedCustomersToggle ? 'secondary' : 'default'}
+                  onClick={() => setDeletedCustomersToggle((data) => !data)}
+                  sx={{ marginLeft: 'auto' }}
+                >
+                  <FolderDelete fontSize="large" />
+                </IconButton>
                 <IconButton onClick={() => setOpen(true)}>
                   <AddCircleIcon fontSize="large" color="primary" />
                 </IconButton>

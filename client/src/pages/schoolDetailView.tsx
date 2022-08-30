@@ -34,7 +34,9 @@ import ConfirmationDialog, {
   ConfirmationDialogProps,
   defaultConfirmationDialogProps,
 } from '../components/ConfirmationDialog'
-import CustomerInvoiceDataSelect, { CustomerInvoiceData } from '../components/CustomerInvoiceDateSelect'
+import CustomerInvoiceDataSelect, {
+  CustomerInvoiceData,
+} from '../components/CustomerInvoiceDateSelect'
 import IconButtonAdornment from '../components/IconButtonAdornment'
 import UserDocuments from '../components/UserDocuments'
 import {
@@ -44,7 +46,7 @@ import {
   snackbarOptionsError,
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
-import { SchoolType } from '../types/enums'
+import { DeleteState, SchoolType } from '../types/enums'
 import {
   classCustomerForm,
   schoolForm,
@@ -96,6 +98,7 @@ const SchoolDetailView: React.FC = () => {
         feeOnline: res.data.feeOnline,
         notes: res.data.notes ?? '',
         dateOfStart: res.data.dateOfStart ? dayjs(res.data.dateOfStart) : null,
+        deleteState: res.data.deleteState as DeleteState,
       }))
     })
   }, [])
@@ -159,8 +162,14 @@ const SchoolDetailView: React.FC = () => {
     setConfirmationDialogProps({
       open: true,
       setProps: setConfirmationDialogProps,
-      title: `${school.schoolName} wirklich löschen?`,
-      text: `Möchtest du die Schule '${school.schoolName}' wirklich löschen? Wenn noch laufende Verträge mit einigen Klassen existieren, kann die Schule nicht gelöscht werden.`,
+      title:
+        school.deleteState === DeleteState.ACTIVE
+          ? `${school.schoolName} wirklich archivieren?`
+          : `${school.schoolName} wirklich löschen?`,
+      text:
+        school.deleteState === DeleteState.ACTIVE
+          ? `Möchtest du die Schule '${school.schoolName}' wirklich archivieren? Wenn die Schule noch Klassen besitzt, kann sie nicht archiviert werden.`
+          : `Möchtest du die Schule '${school.schoolName}' wirklich löschen?`,
       action: () => {
         API.delete('users/school/' + requestedId)
           .then(() => {
@@ -323,6 +332,15 @@ const SchoolDetailView: React.FC = () => {
       .catch(() => {
         enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
       })
+  }
+
+  const unarchive = () => {
+    API.get('users/unarchive/' + id).then(() => {
+      enqueueSnackbar(`${school.schoolName} ist entarchiviert`, snackbarOptions)
+      navigate('/schools')
+    }).catch(() => {
+      enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+    })
   }
 
   return (
@@ -586,18 +604,20 @@ const SchoolDetailView: React.FC = () => {
           />
           <Stack direction={'row'} columnGap={2}>
             <h3>Klassen:</h3>
-            <IconButton
-              sx={{ marginLeft: 'auto' }}
-              onClick={() => {
-                if (school.schoolTypes.length > 0) {
-                  newClassCustomer.schoolType = school
-                    .schoolTypes[0] as SchoolType
-                }
-                setAddClassDialogOpen(true)
-              }}
-            >
-              <AddCircleIcon fontSize="large" color="primary" />
-            </IconButton>
+            {school.deleteState !== DeleteState.DELETED && (
+              <IconButton
+                sx={{ marginLeft: 'auto' }}
+                onClick={() => {
+                  if (school.schoolTypes.length > 0) {
+                    newClassCustomer.schoolType = school
+                      .schoolTypes[0] as SchoolType
+                  }
+                  setAddClassDialogOpen(true)
+                }}
+              >
+                <AddCircleIcon fontSize="large" color="primary" />
+              </IconButton>
+            )}
           </Stack>
           {classCustomers.map((classCustomer, index) => (
             <Accordion
@@ -726,6 +746,15 @@ const SchoolDetailView: React.FC = () => {
             <Button onClick={submitForm} variant="contained">
               Schule Speichern
             </Button>
+            {id && school.deleteState === DeleteState.DELETED && (
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => unarchive()}
+              >
+                Entarchivieren
+              </Button>
+            )}
             {id && (
               <Button
                 variant="outlined"
@@ -733,7 +762,7 @@ const SchoolDetailView: React.FC = () => {
                 sx={{ marginLeft: 'auto' }}
                 color="error"
               >
-                Schule entfernen
+                {school.deleteState === DeleteState.DELETED ? 'Schule löschen' : 'Schule archivieren'}
               </Button>
             )}
           </Stack>

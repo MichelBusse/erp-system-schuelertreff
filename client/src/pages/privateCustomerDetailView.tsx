@@ -1,3 +1,4 @@
+import { Unarchive } from '@mui/icons-material'
 import {
   Button,
   Dialog,
@@ -22,7 +23,13 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import AddTimes from '../components/AddTimes'
 import { useAuth } from '../components/AuthProvider'
-import CustomerInvoiceDataSelect, { CustomerInvoiceData } from '../components/CustomerInvoiceDateSelect'
+import ConfirmationDialog, {
+  ConfirmationDialogProps,
+  defaultConfirmationDialogProps,
+} from '../components/ConfirmationDialog'
+import CustomerInvoiceDataSelect, {
+  CustomerInvoiceData,
+} from '../components/CustomerInvoiceDateSelect'
 import UserDocuments from '../components/UserDocuments'
 import {
   defaultPrivateCustomerFormData,
@@ -30,7 +37,7 @@ import {
   snackbarOptionsError,
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
-import { SchoolType } from '../types/enums'
+import { DeleteState, SchoolType } from '../types/enums'
 import {
   privateCustomerForm,
   privateCustomerFormErrorTexts,
@@ -48,7 +55,8 @@ const PrivateCustomerDetailView: React.FC = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
-  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+  const [confirmationDialogProps, setConfirmationDialogProps] =
+    useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
 
   const requestedId = id ? id : 'me'
 
@@ -89,6 +97,7 @@ const PrivateCustomerDetailView: React.FC = () => {
         feeStandard: res.data.feeStandard,
         feeOnline: res.data.feeOnline,
         notes: res.data.notes ?? '',
+        deleteState: res.data.deleteState as DeleteState
       }))
     })
   }, [])
@@ -117,25 +126,41 @@ const PrivateCustomerDetailView: React.FC = () => {
   }
 
   const deleteUser = () => {
-    setDialogOpen(false)
-
-    API.delete('users/privateCustomer/' + requestedId)
-      .then(() => {
-        enqueueSnackbar(
-          data.firstName + ' ' + data.lastName + ' gelöscht',
-          snackbarOptions,
-        )
-        navigate('/privateCustomers')
-      })
-      .catch(() => {
-        enqueueSnackbar(
-          data.firstName +
-            ' ' +
-            data.lastName +
-            ' kann nicht gelöscht werden, da noch laufende Verträge existieren.',
-          snackbarOptionsError,
-        )
-      })
+    setConfirmationDialogProps({
+      open: true,
+      setProps: setConfirmationDialogProps,
+      title:
+        data.deleteState === DeleteState.ACTIVE
+          ? `${data.firstName + ' ' + data.lastName} wirklich archivieren?`
+          : `${data.firstName + ' ' + data.lastName} wirklich löschen?`,
+      text:
+        data.deleteState === DeleteState.ACTIVE
+          ? `Möchtest du '${
+              data.firstName + ' ' + data.lastName
+            }' wirklich archivieren? Schüler können nur archiviert werden, wenn sie an keinen laufenden Verträgen beteiligt sind.`
+          : `Möchtest du '${
+              data.firstName + ' ' + data.lastName
+            }' wirklich löschen? Schüler können nur gelöscht werden, wenn sie an keinen Verträgen beteiligt waren.`,
+      action: () => {
+        API.delete('users/privateCustomer/' + requestedId)
+          .then(() => {
+            enqueueSnackbar(
+              data.firstName + ' ' + data.lastName + ' gelöscht',
+              snackbarOptions,
+            )
+            navigate('/privateCustomers')
+          })
+          .catch(() => {
+            enqueueSnackbar(
+              data.firstName +
+                ' ' +
+                data.lastName +
+                ' kann nicht gelöscht werden, da noch laufende Verträge existieren.',
+              snackbarOptionsError,
+            )
+          })
+      },
+    })
   }
 
   const generateInvoice = (
@@ -163,6 +188,15 @@ const PrivateCustomerDetailView: React.FC = () => {
       .catch(() => {
         enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
       })
+  }
+
+  const unarchive = () => {
+    API.get('users/unarchive/' + id).then(() => {
+      enqueueSnackbar(`${data.firstName + " " + data.lastName} ist entarchiviert`, snackbarOptions)
+      navigate('/privateCustomers')
+    }).catch(() => {
+      enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+    })
   }
 
   return (
@@ -406,14 +440,23 @@ const PrivateCustomerDetailView: React.FC = () => {
             <Button onClick={submitForm} variant="contained">
               Speichern
             </Button>
+            {id && data.deleteState === DeleteState.DELETED && (
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => unarchive()}
+              >
+                Entarchivieren
+              </Button>
+            )}
             {id && (
               <Button
                 variant="outlined"
-                onClick={() => setDialogOpen(true)}
+                onClick={() => deleteUser()}
                 sx={{ marginLeft: 'auto' }}
                 color="error"
               >
-                Entfernen
+                {data.deleteState === DeleteState.DELETED ? 'Löschen' : 'Archivieren'}
               </Button>
             )}
           </Stack>
@@ -425,23 +468,7 @@ const PrivateCustomerDetailView: React.FC = () => {
           />
         </Stack>
       </Box>
-      <Dialog
-        open={dialogOpen}
-        keepMounted
-        aria-describedby="alert-dialog-slide-description"
-      >
-        <DialogTitle>{'Schüler:in wirklich löschen?'}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
-            Schüler:innen können nur gelöscht werden, wenn sie in keinen
-            laufenden oder zukünftigen Verträgen mehr eingeplant sind.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Abbrechen</Button>
-          <Button onClick={deleteUser}>Löschen</Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
     </div>
   )
 }

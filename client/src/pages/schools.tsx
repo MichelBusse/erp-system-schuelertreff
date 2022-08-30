@@ -1,3 +1,4 @@
+import { FolderDelete } from '@mui/icons-material'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { Autocomplete, IconButton, TextField } from '@mui/material'
 import { Box } from '@mui/system'
@@ -103,6 +104,9 @@ const Schools: React.FC = () => {
   const [customers, setCustomers] = useState<school[]>([])
   const navigate = useNavigate()
   const location = useLocation()
+  const [deletedSchoolsToggle, setDeletedSchoolsToggle] =
+  useState<boolean>(false)
+
 
   const { API } = useAuth()
 
@@ -118,8 +122,12 @@ const Schools: React.FC = () => {
 
   //Get subjects, teachers from DB
   useEffect(() => {
-    API.get(`users/school`).then((res) => setCustomers(res.data))
-  }, [location])
+    if (!deletedSchoolsToggle) {
+      API.get(`users/school`).then((res) => setCustomers(res.data))
+    } else {
+      API.get(`users/school/deleted`).then((res) => setCustomers(res.data))
+    }
+  }, [location, deletedSchoolsToggle])
 
   useEffect(() => {
     if (small) {
@@ -243,6 +251,13 @@ const Schools: React.FC = () => {
                 className={styles.customGridToolbarContainer}
               >
                 <GridToolbarFilterButton />
+                <IconButton
+                  color={deletedSchoolsToggle ? 'secondary' : 'default'}
+                  onClick={() => setDeletedSchoolsToggle((data) => !data)}
+                  sx={{ marginLeft: 'auto' }}
+                >
+                  <FolderDelete fontSize="large" />
+                </IconButton>
                 <IconButton onClick={() => setOpen(true)}>
                   <AddCircleIcon fontSize="large" color="primary" />
                 </IconButton>
