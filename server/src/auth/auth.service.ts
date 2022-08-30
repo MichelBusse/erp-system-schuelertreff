@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import * as argon2 from 'argon2'
 import nodemailer from 'nodemailer'
+import { passwordResetMail, registrationMailText } from 'src/mailTexts'
 
 import { Teacher, User } from 'src/users/entities'
 import { DeleteState } from 'src/users/entities/user.entity'
@@ -76,13 +77,18 @@ export class AuthService {
       '/reset/' +
       this.jwtService.sign(payload)
 
-    //TODO: send email to user
     console.log(`reset link for ${user.email} - ${link}`)
 
     const mailOptions = {
       to: user.email,
-      subject: 'Schülertreff: Passwort-Reset',
-      text: 'Lege unter folgendem Link dein neues Passwort fest: \n' + link,
+      subject: 'Schülertreff - Passwort-Reset',
+      text: passwordResetMail(link),
+    }
+
+    // Welcome Mail when setting password the first time
+    if(user.passwordHash && user.passwordHash !== ''){
+      mailOptions.subject = 'Willkommen bei Schülertreff'
+      mailOptions.text = registrationMailText(link)
     }
 
     try {
