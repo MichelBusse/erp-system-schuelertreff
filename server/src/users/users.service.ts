@@ -563,6 +563,7 @@ export class UsersService {
             if (error) console.log(error)
           },
         )
+        console.log('Employment-Mail successfully sent to ' + user.email)
       } catch {
         console.log('Failed to send meeting email to ' + user.email)
       }
@@ -605,6 +606,7 @@ export class UsersService {
             if (error) console.log(error)
           },
         )
+        console.log('Meeting-Confirmation-Mail successfully sent to ' + user.email)
       } catch {
         console.log('Failed to send meeting email to ' + user.email)
       }
@@ -620,7 +622,8 @@ export class UsersService {
           (error) => {
             if (error) console.log(error)
           },
-        )
+        )        
+        console.log('Meeting-Proposal-Mail successfully sent to ' + user.email)
       } catch {
         console.log('Failed to send meeting suggestions email to ' + user.email)
       }
