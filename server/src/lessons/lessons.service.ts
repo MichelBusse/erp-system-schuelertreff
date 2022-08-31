@@ -302,7 +302,7 @@ export class LessonsService {
       invoiceInfo,
     })
 
-    const browser = await puppeteer.launch({ headless: true, executablePath: process.env.CHROMIUM_PATH, args: ['--no-sandbox'],})
+    const browser = await puppeteer.launch({ headless: true, executablePath: 'google-chrome-stable', args: ['--no-sandbox'],})
     const page = await browser.newPage()
     await page.setContent(content)
 
