@@ -308,7 +308,7 @@ export class LessonsService {
 
     const browser = await puppeteer.launch({
       headless: true,
-      executablePath: '/usr/bin/chromium-browserm',
+      executablePath: "/usr/bin/chromium-browser",
       args: [
         '--no-sandbox',
         '--headless',
@@ -464,7 +464,7 @@ export class LessonsService {
 
     const browser = await puppeteer.launch({
       headless: true,
-      executablePath: '/usr/bin/chromium-browser',
+      executablePath: "/usr/bin/chromium-browser",
       args: [
         '--no-sandbox',
         '--headless',
