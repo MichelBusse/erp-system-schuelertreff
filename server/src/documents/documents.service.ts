@@ -28,7 +28,16 @@ export async function renderTemplate(
 
   const content = await ejs.renderFile(filePath, data)
 
-  const browser = await puppeteer.launch({ headless: true })
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: '/usr/bin/chromium-browserm',
+    args: [
+      '--no-sandbox',
+      '--headless',
+      '--disable-gpu',
+      '--disable-dev-shm-usage',
+    ],
+  })
   const page = await browser.newPage()
   await page.setContent(content)
 
