@@ -394,8 +394,7 @@ export class UsersService {
    * Teacher functions
    *
    **/
-
-  async findTeachers(): Promise<Teacher[]> {
+   async findTeachers(): Promise<Teacher[]> {
     return this.teachersRepository
       .find({
         relations: ['subjects'],
@@ -405,11 +404,41 @@ export class UsersService {
       .then(transformUsers)
   }
 
-  async findDeletedTeachers(): Promise<Teacher[]> {
+  async findAppliedTeachers(): Promise<Teacher[]> {
     return this.teachersRepository
       .find({
         relations: ['subjects'],
-        where: { deleteState: DeleteState.DELETED },
+        where: { deleteState: Not(DeleteState.DELETED), state: Not(TeacherState.EMPLOYED) },
+        order: { firstName: 'ASC', lastName: 'ASC' },
+      })
+      .then(transformUsers)
+  }
+
+  async findEmployedTeachers(): Promise<Teacher[]> {
+    return this.teachersRepository
+      .find({
+        relations: ['subjects'],
+        where: { deleteState: Not(DeleteState.DELETED), state: TeacherState.EMPLOYED },
+        order: { firstName: 'ASC', lastName: 'ASC' },
+      })
+      .then(transformUsers)
+  }
+
+  async findEmployedDeletedTeachers(): Promise<Teacher[]> {
+    return this.teachersRepository
+      .find({
+        relations: ['subjects'],
+        where: { deleteState: DeleteState.DELETED, state: TeacherState.EMPLOYED },
+        order: { firstName: 'ASC', lastName: 'ASC' },
+      })
+      .then(transformUsers)
+  }
+
+  async findAppliedDeletedTeachers(): Promise<Teacher[]> {
+    return this.teachersRepository
+      .find({
+        relations: ['subjects'],
+        where: { deleteState: DeleteState.DELETED, state: Not(TeacherState.EMPLOYED) },
         order: { firstName: 'ASC', lastName: 'ASC' },
       })
       .then(transformUsers)

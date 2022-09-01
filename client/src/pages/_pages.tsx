@@ -10,6 +10,7 @@ import Subjects from './subjects'
 import TeacherDetailView from './teacherDetailView'
 import Teachers from './teachers'
 import Timetable from './timetable'
+import Applicants from './applicants'
 
 export default {
   Cockpit,
@@ -19,6 +20,7 @@ export default {
   Reset,
   Subjects,
   Teachers,
+  Applicants,
   Timetable,
   TeacherDetailView,
   PrivateCustomerDetailView,
