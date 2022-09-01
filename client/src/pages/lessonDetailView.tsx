@@ -19,7 +19,7 @@ import ContractDialog from '../components/ContractDialog'
 import { snackbarOptions, snackbarOptionsError } from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { contractWithTeacher } from '../types/contract'
-import { contractForm, lessonForm } from '../types/form'
+import { lessonForm } from '../types/form'
 import { LessonState } from '../types/lesson'
 
 const LessonDetailView: React.FC = () => {

@@ -27,7 +27,7 @@ const PendingContracts: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false)
   const [render, setRender] = useState<number>(0)
   const [initialContract, setInitialContract] =
-    useState<contractWithTeacher | null>(null)
+    useState<contractWithTeacher | undefined>(undefined)
 
   useEffect(() => {
     API.get('contracts/pending').then((res) => {
