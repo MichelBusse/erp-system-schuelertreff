@@ -443,7 +443,7 @@ export class ContractsService {
       .leftJoin('c.customers', 'customer')
       .leftJoin('customer.school', 'school')
       .leftJoin('c.teacher', 'teacher')
-      .select(['c', 'subject', 'customer', 'school', 'teacher.id'])
+      .select(['c', 'subject', 'customer', 'school', 'teacher'])
       .where(
         `c.startDate <= date_trunc('week', :week::date) + interval '4 day'`,
         { week: week.format() },

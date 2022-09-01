@@ -32,8 +32,11 @@ const LessonDetailView: React.FC = () => {
 
   const { enqueueSnackbar } = useSnackbar()
   const [contractDialogOpen, setContractDialogOpen] = useState<boolean>(false)
+  const [render, setRender] = useState(0)
 
-  const [contract, setContract] = useState<contractWithTeacher | undefined>(undefined)
+  const [contract, setContract] = useState<contractWithTeacher | undefined>(
+    undefined,
+  )
   const [data, setData] = useState<lessonForm>({
     state: LessonState.IDLE,
     notes: '',
@@ -42,14 +45,13 @@ const LessonDetailView: React.FC = () => {
 
   useEffect(() => {
     API.get('lessons/' + contractId + '/' + date).then((res) => {
-
       setContract(res.data.contract)
 
       setBlocked(res.data.blocked)
 
       const lesson = {
         state: res.data.lesson ? res.data.lesson.state : LessonState.IDLE,
-        notes: res.data.lesson.notes,
+        notes: res.data.lesson ? res.data.lesson.notes : '',
       }
       setId(res.data?.id)
       setData(lesson)
@@ -90,7 +92,7 @@ const LessonDetailView: React.FC = () => {
               variant="outlined"
               fullWidth={true}
               label="Fach"
-              value={(contract && contract.subject) ? contract.subject.name : ''}
+              value={contract && contract.subject ? contract.subject.name : ''}
               InputProps={{
                 readOnly: true,
               }}
@@ -112,14 +114,20 @@ const LessonDetailView: React.FC = () => {
               label="Startzeit"
               fullWidth
               value={
-                (contract && contract.startTime) ? dayjs(contract.startTime, 'HH:mm').format('HH:mm') : ''
+                contract && contract.startTime
+                  ? dayjs(contract.startTime, 'HH:mm').format('HH:mm')
+                  : ''
               }
               InputProps={{ readOnly: true }}
             />
             <TextField
               label="Endzeit"
               fullWidth
-              value={(contract && contract.endTime) ? dayjs(contract.endTime, 'HH:mm').format('HH:mm') : ''}
+              value={
+                contract && contract.endTime
+                  ? dayjs(contract.endTime, 'HH:mm').format('HH:mm')
+                  : ''
+              }
               InputProps={{ readOnly: true }}
             />
           </Stack>
@@ -128,13 +136,15 @@ const LessonDetailView: React.FC = () => {
             fullWidth={true}
             label="Kunde(n)"
             value={
-              contract ? contract.customers
-                .map((c) => {
-                  return c.role === 'privateCustomer'
-                    ? c.firstName + ' ' + c.lastName
-                    : c.school.schoolName + ': ' + c.className
-                })
-                .join(', ') : ''
+              contract
+                ? contract.customers
+                    .map((c) => {
+                      return c.role === 'privateCustomer'
+                        ? c.firstName + ' ' + c.lastName
+                        : c.school.schoolName + ': ' + c.className
+                    })
+                    .join(', ')
+                : ''
             }
             InputProps={{
               readOnly: true,
@@ -193,7 +203,7 @@ const LessonDetailView: React.FC = () => {
               label="Startdatum"
               fullWidth
               value={
-                (contract && contract.startDate)
+                contract && contract.startDate
                   ? dayjs(contract.startDate).format('DD.MM.YYYY')
                   : ''
               }
@@ -203,20 +213,23 @@ const LessonDetailView: React.FC = () => {
               label="Enddatum"
               fullWidth
               value={
-                (contract && contract.endDate) ? dayjs(contract.endDate).format('DD.MM.YYYY') : ''
+                contract && contract.endDate
+                  ? dayjs(contract.endDate).format('DD.MM.YYYY')
+                  : ''
               }
               InputProps={{ readOnly: true }}
             />
           </Stack>
           <Stack direction={'row'} columnGap={2}>
             {decodeToken().role === 'admin' &&
-              (contract && (!contract.endDate ||
-                dayjs(contract.endDate).isAfter(dayjs()))) && (
+              contract &&
+              (!contract.endDate ||
+                dayjs(contract.endDate).isAfter(dayjs())) && (
                 <Button
                   variant="contained"
-                  onClick={() =>
-                    setContractDialogOpen(true)
-                  }
+                  onClick={() => {
+                    setRender(render + 1)
+                    setContractDialogOpen(true)}}
                 >
                   Einsatz bearbeiten
                 </Button>
@@ -225,10 +238,13 @@ const LessonDetailView: React.FC = () => {
         </Stack>
       </Box>
       <ContractDialog
+        key={render}
         open={contractDialogOpen}
         setOpen={setContractDialogOpen}
         initialContract={contract}
-        onSuccess={() => navigate('/timetable')}
+        onSuccess={() => {
+          navigate('/timetable')
+        }}
       />
     </div>
   )

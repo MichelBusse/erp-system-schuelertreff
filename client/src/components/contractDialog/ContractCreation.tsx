@@ -108,23 +108,25 @@ const ContractCreation: React.FC<Props> = ({
         const initialStartTime = dayjs(initialContract.startTime, 'HH:mm')
         const initialEndTime = dayjs(initialContract.endTime, 'HH:mm')
 
-        if (teacher.teacherId === initialContract.teacher.id) {
-          if (
-            suggestion.dow === initialStartDate.day() &&
-            !dayjs(suggestion.start, 'HH:mm').isAfter(initialStartTime) &&
-            !dayjs(suggestion.end, 'HH:mm').isBefore(initialEndTime)
-          ) {
-            setForm((f) => ({
-              ...f,
-              startDate: getNextDow(suggestion.dow, f.startDate ?? undefined),
-              endDate: initialContract.endDate
-                ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
-                : null,
-              startTime: dayjs(initialContract.startTime, 'HH:mm'),
-              endTime: initialEndTime,
-              teacher: initialContract.teacher.id.toString(),
-              dow: suggestion.dow,
-            }))
+        if (initialContract.teacher) {
+          if (teacher.teacherId === initialContract.teacher.id) {
+            if (
+              suggestion.dow === initialStartDate.day() &&
+              !dayjs(suggestion.start, 'HH:mm').isAfter(initialStartTime) &&
+              !dayjs(suggestion.end, 'HH:mm').isBefore(initialEndTime)
+            ) {
+              setForm((f) => ({
+                ...f,
+                startDate: getNextDow(suggestion.dow, f.startDate ?? undefined),
+                endDate: initialContract.endDate
+                  ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
+                  : null,
+                startTime: initialStartTime,
+                endTime: initialEndTime,
+                teacher: initialContract.teacher.id.toString(),
+                dow: suggestion.dow,
+              }))
+            }
           }
         }
       }
@@ -141,6 +143,14 @@ const ContractCreation: React.FC<Props> = ({
         dow: minStartDate?.day() ?? 1,
         selsuggestion: form.selsuggestion,
       })
+
+      if (initialContract && !initialContract.teacher) {
+        setForm((f) => ({
+          ...f,
+          startTime: dayjs(initialContract.startTime, 'HH:mm'),
+          endTime: dayjs(initialContract.endTime, 'HH:mm'),
+        }))
+      }
     }
   }, [form.selsuggestion])
 

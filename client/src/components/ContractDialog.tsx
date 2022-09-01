@@ -171,23 +171,33 @@ const ContractDialog: React.FC<Props> = ({
           const resSuggestions = res.data as suggestion[]
 
           resSuggestions.forEach((teacherSuggestion, teacherIndex) => {
-            if (teacherSuggestion.teacherId === initialContract.teacher.id) {
-              teacherSuggestion.suggestions.forEach(
-                (timeSuggestion, timeIndex) => {
-                  if (
-                    timeSuggestion.dow === initialStartDate.day() &&
-                    !dayjs(timeSuggestion.start, 'HH:mm').isAfter(
-                      initialStartTime,
-                    ) &&
-                    !dayjs(timeSuggestion.end, 'HH:mm').isBefore(initialEndTime)
-                  ) {
-                    setForm1((form1) => ({
-                      ...form1,
-                      selsuggestion: teacherIndex + ',' + timeIndex,
-                    }))
-                  }
-                },
-              )
+            if (initialContract.teacher) {
+              if (teacherSuggestion.teacherId === initialContract.teacher.id) {
+                teacherSuggestion.suggestions.forEach(
+                  (timeSuggestion, timeIndex) => {
+                    if (
+                      timeSuggestion.dow === initialStartDate.day() &&
+                      !dayjs(timeSuggestion.start, 'HH:mm').isAfter(
+                        initialStartTime,
+                      ) &&
+                      !dayjs(timeSuggestion.end, 'HH:mm').isBefore(
+                        initialEndTime,
+                      )
+                    ) {
+                      setForm1((form1) => ({
+                        ...form1,
+                        selsuggestion: teacherIndex + ',' + timeIndex,
+                      }))
+                    }
+                  },
+                )
+              }
+            } else {
+              setForm1((form1) => ({
+                ...form1,
+                startTime: dayjs(initialContract.startTime, 'HH:mm'),
+                endTime: initialEndTime,
+              }))
             }
           })
         }
