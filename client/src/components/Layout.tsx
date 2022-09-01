@@ -6,6 +6,7 @@ import {
   School as SchoolIcon,
   TableChart as TableChartIcon,
 } from '@mui/icons-material'
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ExploreIcon from '@mui/icons-material/Explore'
 import { Box, useTheme } from '@mui/material'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -33,6 +34,12 @@ const menuItems = [
     icon: SchoolIcon,
     text: 'Lehrkräfte',
     href: '/teachers',
+    roles: ['admin'],
+  },
+  {
+    icon: PersonAddIcon,
+    text: 'Bewerber',
+    href: '/applicants',
     roles: ['admin'],
   },
   {

@@ -1,16 +1,26 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import FolderDeleteIcon from '@mui/icons-material/FolderDelete'
 import {
+  Autocomplete,
+  Box,
   Chip,
+  FormControl,
   IconButton,
+  InputLabel,
+  NativeSelect,
   Stack,
+  TextField,
 } from '@mui/material'
 import {
   DataGrid,
   getGridStringOperators,
+  GridCellParams,
   GridColumns,
   GridColumnVisibilityModel,
   GridEventListener,
+  GridFilterInputValueProps,
+  GridFilterItem,
+  GridFilterOperator,
   GridRowSpacingParams,
   GridToolbarContainer,
   GridToolbarFilterButton,
@@ -23,16 +33,17 @@ import { useAuth } from '../components/AuthProvider'
 import TeacherDialog from '../components/TeacherDialog'
 import {
   dataGridLocaleText,
+  teacherSchoolTypeToString,
   teacherStateToString,
 } from '../consts'
-import { TeacherState } from '../types/enums'
+import { Degree, TeacherSchoolType, TeacherState } from '../types/enums'
 import subject from '../types/subject'
 import { teacher } from '../types/user'
 import { degreeOperator, schoolTypesOperator, stateOperator, subjectOperator } from '../utils/teacherFilterData'
 import styles from './gridList.module.scss'
 
 
-const Teachers: React.FC = () => {
+const Applicants: React.FC = () => {
   const [open, setOpen] = useState(false)
   const [renderDialog, setRenderDialog] = useState(0)
   const [teachers, setTeachers] = useState<teacher[]>([])
@@ -80,11 +91,11 @@ const Teachers: React.FC = () => {
   //Get subjects, teachers from DB
   useEffect(() => {
     if (!deletedTeacherToggle) {
-      API.get(`users/teacher/employed`).then((res) => {
+      API.get(`users/teacher/applied`).then((res) => {
         setTeachers(res.data)
       })
     } else {
-      API.get(`users/teacher/employed/deleted`).then((res) => {
+      API.get(`users/teacher/applied/deleted`).then((res) => {
         setTeachers(res.data)
       })
     }
@@ -155,7 +166,7 @@ const Teachers: React.FC = () => {
       headerName: 'Status',
       minWidth: 150,
       flex: 0,
-      filterable: false,
+      filterOperators: [stateOperator],
       renderCell: (params) => (
         <div
           style={{
@@ -202,7 +213,7 @@ const Teachers: React.FC = () => {
 
   //Row click event
   const onRowClick: GridEventListener<'rowClick'> = (params) => {
-    navigate('/teachers/' + params.id)
+    navigate('/applicants/' + params.id)
   }
 
   return (
@@ -262,4 +273,4 @@ const Teachers: React.FC = () => {
   )
 }
 
-export default Teachers
+export default Applicants

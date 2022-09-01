@@ -168,6 +168,7 @@ const PrivateCustomerDetailView: React.FC = () => {
     month: number,
     invoiceData: CustomerInvoiceData,
   ) => {
+    enqueueSnackbar('Rechnung wird generiert...', snackbarOptions)
     API.post(
       'lessons/invoice/customer',
       {

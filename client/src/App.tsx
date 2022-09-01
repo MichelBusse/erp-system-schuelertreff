@@ -167,6 +167,24 @@ const App: React.FC = () => {
                   }
                 />
               </Route>
+              <Route path="applicants">
+                <Route
+                  path=""
+                  element={
+                    <ProtectedRoute>
+                      <Pages.Applicants />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path=":id"
+                  element={
+                    <ProtectedRoute>
+                      <Pages.TeacherDetailView />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
               <Route
                 path="subjects"
                 element={

@@ -267,6 +267,7 @@ const TeacherDetailView: React.FC = () => {
   }
 
   const generateInvoice = (year: number, month: number, teacherInvoiceData: TeacherInvoiceData) => {
+    enqueueSnackbar('Abrechnung wird generiert...', snackbarOptions)
     API.post('lessons/invoice/teacher', teacherInvoiceData, {
       params: {
         of: dayjs().year(year).month(month).format('YYYY-MM-DD'),

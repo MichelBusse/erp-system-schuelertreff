@@ -104,13 +104,28 @@ export class UsersController {
   }
 
   @Get('teacher')
-  findAppliedTeachers(): Promise<Teacher[]> {
+  findTeachers(): Promise<Teacher[]> {
     return this.usersService.findTeachers()
   }
 
-  @Get('teacher/deleted')
-  findDeletedTeachers(): Promise<Teacher[]> {
-    return this.usersService.findDeletedTeachers()
+  @Get('teacher/employed')
+  findEmployedTeachers(): Promise<Teacher[]> {
+    return this.usersService.findEmployedTeachers()
+  }
+
+  @Get('teacher/applied')
+  findAppliedTeachers(): Promise<Teacher[]> {
+    return this.usersService.findAppliedTeachers()
+  }
+
+  @Get('teacher/employed/deleted')
+  findEmployedDeletedTeachers(): Promise<Teacher[]> {
+    return this.usersService.findEmployedDeletedTeachers()
+  }
+
+  @Get('teacher/applied/deleted')
+  findAppliedDeletedTeachers(): Promise<Teacher[]> {
+    return this.usersService.findAppliedDeletedTeachers()
   }
 
   @Get('school/:id')
