@@ -14,6 +14,7 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
 import { leaveTypeToString, snackbarOptionsError } from '../../consts'
+import { contractWithTeacher } from '../../types/contract'
 import { TeacherState } from '../../types/enums'
 import { ContractCreationForm } from '../../types/form'
 import subject from '../../types/subject'
@@ -43,6 +44,7 @@ type Props = {
   subject: subject | null
   minStartDate: Dayjs | null
   maxEndDate: Dayjs | null
+  initialContract?: contractWithTeacher
 }
 
 const ContractCreation: React.FC<Props> = ({
@@ -53,6 +55,7 @@ const ContractCreation: React.FC<Props> = ({
   subject,
   minStartDate,
   maxEndDate,
+  initialContract,
 }) => {
   const [teachers, setTeachers] = useState<teacher[]>([])
 
@@ -99,6 +102,32 @@ const ContractCreation: React.FC<Props> = ({
         dow: suggestion.dow,
         selsuggestion: form.selsuggestion,
       })
+
+      if (initialContract) {
+        const initialStartDate = dayjs(initialContract.startDate, 'YYYY-MM-DD')
+        const initialStartTime = dayjs(initialContract.startTime, 'HH:mm')
+        const initialEndTime = dayjs(initialContract.endTime, 'HH:mm')
+
+        if (teacher.teacherId === initialContract.teacher.id) {
+          if (
+            suggestion.dow === initialStartDate.day() &&
+            !dayjs(suggestion.start, 'HH:mm').isAfter(initialStartTime) &&
+            !dayjs(suggestion.end, 'HH:mm').isBefore(initialEndTime)
+          ) {
+            setForm((f) => ({
+              ...f,
+              startDate: getNextDow(suggestion.dow, f.startDate ?? undefined),
+              endDate: initialContract.endDate
+                ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
+                : null,
+              startTime: dayjs(initialContract.startTime, 'HH:mm'),
+              endTime: initialEndTime,
+              teacher: initialContract.teacher.id.toString(),
+              dow: suggestion.dow,
+            }))
+          }
+        }
+      }
     } else {
       setForm({
         startDate: minStartDate,

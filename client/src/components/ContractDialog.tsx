@@ -18,7 +18,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useSnackbar } from 'notistack'
 import React, { useState } from 'react'
 
-import { snackbarOptionsError } from '../consts'
+import { snackbarOptions, snackbarOptionsError } from '../consts'
 import { ContractState, contractWithTeacher } from '../types/contract'
 import { ContractType } from '../types/enums'
 import { ContractCreationForm, ContractFilterForm } from '../types/form'
@@ -26,6 +26,10 @@ import { leave } from '../types/user'
 import { useAuth } from './AuthProvider'
 import ContractCreation, { suggestion } from './contractDialog/ContractCreation'
 import Filter from './contractDialog/Filter'
+import ConfirmationDialog, {
+  ConfirmationDialogProps,
+  defaultConfirmationDialogProps,
+} from './ConfirmationDialog'
 
 dayjs.extend(customParseFormat)
 
@@ -38,7 +42,7 @@ type Props = {
   open: boolean
   setOpen: (open: boolean) => void
   onSuccess?: () => void
-  initialContract?: contractWithTeacher | null
+  initialContract?: contractWithTeacher
 }
 
 const ContractDialog: React.FC<Props> = ({
@@ -52,6 +56,8 @@ const ContractDialog: React.FC<Props> = ({
 
   const [activeStep, setActiveStep] = useState(0)
   const theme = useTheme()
+  const [confirmationDialogProps, setConfirmationDialogProps] =
+    useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
 
   // step 0
   const [loading0, setLoading0] = useState(false)
@@ -88,6 +94,7 @@ const ContractDialog: React.FC<Props> = ({
     form0.subject &&
     form0.interval &&
     form0.startDate &&
+    form0.startDate.isAfter(dayjs()) &&
     ((form0.customerType === CustomerType.PRIVATE &&
       form0.privateCustomers.length > 0) ||
       (form0.customerType === CustomerType.SCHOOL &&
@@ -133,7 +140,7 @@ const ContractDialog: React.FC<Props> = ({
         interval: form0.interval,
         startDate: form0.startDate?.format('YYYY-MM-DD'),
         endDate: form0.endDate?.format('YYYY-MM-DD'),
-        initialContractId: initialContract?.id,
+        ignoreContracts: initialContract ? initialContract.id : undefined,
       },
     })
       .then((res) => {
@@ -158,8 +165,8 @@ const ContractDialog: React.FC<Props> = ({
             initialContract.startDate,
             'YYYY-MM-DD',
           )
-          const initialStartTime = dayjs(initialContract.startTime, 'hh:mm')
-          const initialEndTime = dayjs(initialContract.endTime, 'hh:mm')
+          const initialStartTime = dayjs(initialContract.startTime, 'HH:mm')
+          const initialEndTime = dayjs(initialContract.endTime, 'HH:mm')
 
           const resSuggestions = res.data as suggestion[]
 
@@ -169,27 +176,15 @@ const ContractDialog: React.FC<Props> = ({
                 (timeSuggestion, timeIndex) => {
                   if (
                     timeSuggestion.dow === initialStartDate.day() &&
-                    !dayjs(timeSuggestion.start, 'hh:mm').isAfter(
+                    !dayjs(timeSuggestion.start, 'HH:mm').isAfter(
                       initialStartTime,
                     ) &&
-                    !dayjs(timeSuggestion.end, 'hh:mm').isBefore(initialEndTime)
+                    !dayjs(timeSuggestion.end, 'HH:mm').isBefore(initialEndTime)
                   ) {
-                    setForm1((form1) => {
-                      const initialForm1Entry: ContractCreationForm = {
-                        ...form1,
-                        startDate: initialStartDate,
-                        endDate: initialContract.endDate
-                          ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
-                          : null,
-                        startTime: initialStartTime,
-                        endTime: initialEndTime,
-                        teacher: initialContract.teacher.id.toString(),
-                        dow: initialStartDate.day(),
-                        selsuggestion: teacherIndex + ',' + timeIndex,
-                      }
-
-                      return initialForm1Entry
-                    })
+                    setForm1((form1) => ({
+                      ...form1,
+                      selsuggestion: teacherIndex + ',' + timeIndex,
+                    }))
                   }
                 },
               )
@@ -230,13 +225,10 @@ const ContractDialog: React.FC<Props> = ({
         ? ContractState.PENDING
         : ContractState.ACCEPTED,
       contractType: form0.contractType,
+      initialContractId: initialContract?.id,
     })
       .then(() => {
         onSuccess()
-
-        if (initialContract) {
-          API.delete('contracts/' + initialContract.id)
-        }
 
         setOpen(false)
       })
@@ -245,6 +237,23 @@ const ContractDialog: React.FC<Props> = ({
         enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
       })
       .finally(() => setLoading1(false))
+  }
+
+  const deleteContract = () => {
+    if (initialContract) {
+      setConfirmationDialogProps({
+        open: true,
+        setProps: setConfirmationDialogProps,
+        title: 'Einsatz wirklich löschen?',
+        text: 'Möchtest du den Einsatz wirklich löschen?',
+        action: () => {
+          API.delete('contracts/' + initialContract?.id).then(() => {
+            enqueueSnackbar('Einsatz gelöscht', snackbarOptions)
+            onSuccess()
+          })
+        },
+      })
+    }
   }
 
   const steps: {
@@ -286,6 +295,7 @@ const ContractDialog: React.FC<Props> = ({
           subject={form0.subject}
           minStartDate={form0.startDate}
           maxEndDate={form0.endDate}
+          initialContract={initialContract}
         />
       ),
       actions: (
@@ -306,43 +316,53 @@ const ContractDialog: React.FC<Props> = ({
   ]
 
   return (
-    <Dialog open={open}>
-      <DialogTitle>
-        Einsatz {initialContract ? 'bearbeiten' : 'hinzufügen'}
-      </DialogTitle>
-      <DialogContent
-        sx={{
-          '& .MuiStepConnector-root': {
-            maxWidth: '100px',
-          },
-          [theme.breakpoints.down('sm')]: {
-            width: '82vw',
-          },
-        }}
-      >
-        <Stepper activeStep={activeStep}>
-          {steps.map((step) => (
-            <Step key={step.label}>
-              <StepLabel>
-                <Box
-                  sx={{
-                    [theme.breakpoints.down('sm')]: {
-                      display: 'none',
-                    },
-                  }}
-                >
-                  {step.label}
-                </Box>
-              </StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-        <Box sx={{ overflow: 'auto', padding: 0.5, height: '345px' }}>
-          {steps[activeStep].content}
-        </Box>
-      </DialogContent>
-      <DialogActions>{steps[activeStep].actions}</DialogActions>
-    </Dialog>
+    <>
+      <Dialog open={open}>
+        <DialogTitle>
+          Einsatz {initialContract ? 'bearbeiten' : 'hinzufügen'}
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            '& .MuiStepConnector-root': {
+              maxWidth: '100px',
+            },
+            [theme.breakpoints.down('sm')]: {
+              width: '82vw',
+            },
+          }}
+        >
+          <Stepper activeStep={activeStep}>
+            {steps.map((step) => (
+              <Step key={step.label}>
+                <StepLabel>
+                  <Box
+                    sx={{
+                      [theme.breakpoints.down('sm')]: {
+                        display: 'none',
+                      },
+                    }}
+                  >
+                    {step.label}
+                  </Box>
+                </StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+          <Box sx={{ overflow: 'auto', padding: 0.5, height: '345px' }}>
+            {steps[activeStep].content}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          {steps[activeStep].actions}
+          {initialContract && (
+            <Button onClick={deleteContract} color="error">
+              Löschen
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
+      <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
+    </>
   )
 }
 

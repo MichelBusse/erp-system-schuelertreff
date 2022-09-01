@@ -15,9 +15,10 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAuth } from '../components/AuthProvider'
-import ContractEditDialog from '../components/ContractEditDialog'
+import ContractDialog from '../components/ContractDialog'
 import { snackbarOptions, snackbarOptionsError } from '../consts'
 import styles from '../pages/gridList.module.scss'
+import { contractWithTeacher } from '../types/contract'
 import { contractForm, lessonForm } from '../types/form'
 import { LessonState } from '../types/lesson'
 
@@ -30,22 +31,9 @@ const LessonDetailView: React.FC = () => {
   const [refresh, setRefresh] = useState(0)
 
   const { enqueueSnackbar } = useSnackbar()
-  const [contractDetailsDialog, setContractDetailsDialog] = useState<{
-    open: boolean
-    id: number
-  }>({ open: false, id: -1 })
+  const [contractDialogOpen, setContractDialogOpen] = useState<boolean>(false)
 
-  const [contract, setContract] = useState<contractForm>({
-    startTime: null,
-    endTime: null,
-    startDate: null,
-    endDate: null,
-    interval: 0,
-    subject: null,
-    customers: [],
-    teacher: null,
-    dow: null,
-  })
+  const [contract, setContract] = useState<contractWithTeacher | undefined>(undefined)
   const [data, setData] = useState<lessonForm>({
     state: LessonState.IDLE,
     notes: '',
@@ -54,21 +42,8 @@ const LessonDetailView: React.FC = () => {
 
   useEffect(() => {
     API.get('lessons/' + contractId + '/' + date).then((res) => {
-      const contract = {
-        startDate: dayjs(res.data.contract.startDate),
-        endDate: res.data.contract.endDate
-          ? dayjs(res.data.contract.endDate)
-          : null,
-        startTime: dayjs(res.data.contract.startTime, 'HH:mm'),
-        endTime: dayjs(res.data.contract.endTime, 'HH:mm'),
-        teacher: res.data.contract.teacher,
-        dow: res.data.contract.dow,
-        interval: res.data.contract.interval,
-        customers: res.data.contract.customers,
-        subject: res.data.contract.subject,
-      }
 
-      setContract(contract)
+      setContract(res.data.contract)
 
       setBlocked(res.data.blocked)
 
@@ -115,7 +90,7 @@ const LessonDetailView: React.FC = () => {
               variant="outlined"
               fullWidth={true}
               label="Fach"
-              value={contract.subject ? contract.subject.name : ''}
+              value={(contract && contract.subject) ? contract.subject.name : ''}
               InputProps={{
                 readOnly: true,
               }}
@@ -137,14 +112,14 @@ const LessonDetailView: React.FC = () => {
               label="Startzeit"
               fullWidth
               value={
-                contract.startTime ? contract.startTime.format('HH:mm') : ''
+                (contract && contract.startTime) ? dayjs(contract.startTime, 'HH:mm').format('HH:mm') : ''
               }
               InputProps={{ readOnly: true }}
             />
             <TextField
               label="Endzeit"
               fullWidth
-              value={contract.endTime ? contract.endTime.format('HH:mm') : ''}
+              value={(contract && contract.endTime) ? dayjs(contract.endTime, 'HH:mm').format('HH:mm') : ''}
               InputProps={{ readOnly: true }}
             />
           </Stack>
@@ -153,13 +128,13 @@ const LessonDetailView: React.FC = () => {
             fullWidth={true}
             label="Kunde(n)"
             value={
-              contract.customers
+              contract ? contract.customers
                 .map((c) => {
                   return c.role === 'privateCustomer'
                     ? c.firstName + ' ' + c.lastName
                     : c.school.schoolName + ': ' + c.className
                 })
-                .join(', ') ?? ''
+                .join(', ') : ''
             }
             InputProps={{
               readOnly: true,
@@ -218,8 +193,8 @@ const LessonDetailView: React.FC = () => {
               label="Startdatum"
               fullWidth
               value={
-                contract.startDate
-                  ? contract.startDate.format('DD.MM.YYYY')
+                (contract && contract.startDate)
+                  ? dayjs(contract.startDate).format('DD.MM.YYYY')
                   : ''
               }
               InputProps={{ readOnly: true }}
@@ -228,22 +203,19 @@ const LessonDetailView: React.FC = () => {
               label="Enddatum"
               fullWidth
               value={
-                contract.endDate ? contract.endDate.format('DD.MM.YYYY') : ''
+                (contract && contract.endDate) ? dayjs(contract.endDate).format('DD.MM.YYYY') : ''
               }
               InputProps={{ readOnly: true }}
             />
           </Stack>
           <Stack direction={'row'} columnGap={2}>
             {decodeToken().role === 'admin' &&
-              (!contract.endDate ||
-                dayjs(contract.endDate).isAfter(dayjs())) && (
+              (contract && (!contract.endDate ||
+                dayjs(contract.endDate).isAfter(dayjs()))) && (
                 <Button
                   variant="contained"
                   onClick={() =>
-                    setContractDetailsDialog({
-                      open: true,
-                      id: contractId as unknown as number,
-                    })
+                    setContractDialogOpen(true)
                   }
                 >
                   Einsatz bearbeiten
@@ -252,14 +224,11 @@ const LessonDetailView: React.FC = () => {
           </Stack>
         </Stack>
       </Box>
-      <ContractEditDialog
-        dialogInfo={contractDetailsDialog}
-        setDialogInfo={(open: boolean, id: number) =>
-          setContractDetailsDialog({ open: open, id: id })
-        }
-        onSuccess={() => {
-          setRefresh((re) => ++re)
-        }}
+      <ContractDialog
+        open={contractDialogOpen}
+        setOpen={setContractDialogOpen}
+        initialContract={contract}
+        onSuccess={() => navigate('/timetable')}
       />
     </div>
   )

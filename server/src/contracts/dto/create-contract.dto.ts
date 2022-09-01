@@ -47,4 +47,8 @@ export class CreateContractDto {
   @IsOptional()
   @IsEnum(ContractState)
   state?: ContractState
+
+  @IsOptional()
+  @IsInt()
+  initialContractId?: number 
 }
