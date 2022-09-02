@@ -41,7 +41,7 @@ export class Contract {
   customers: Customer[]
 
   @ManyToOne(() => Teacher, { nullable: true })
-  teacher: Teacher
+  teacher: Teacher | null
 
   @ManyToOne(() => Subject)
   subject: Subject

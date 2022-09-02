@@ -1,4 +1,4 @@
-import { Unarchive } from '@mui/icons-material'
+import { AddCircle, Unarchive } from '@mui/icons-material'
 import {
   Button,
   Dialog,
@@ -7,6 +7,7 @@ import {
   DialogContentText,
   DialogTitle,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
@@ -27,6 +28,8 @@ import ConfirmationDialog, {
   ConfirmationDialogProps,
   defaultConfirmationDialogProps,
 } from '../components/ConfirmationDialog'
+import ContractDialog, { CustomerType } from '../components/ContractDialog'
+import ContractList from '../components/ContractList'
 import CustomerInvoiceDataSelect, {
   CustomerInvoiceData,
 } from '../components/CustomerInvoiceDateSelect'
@@ -37,6 +40,7 @@ import {
   snackbarOptionsError,
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
+import { contractWithTeacher } from '../types/contract'
 import { DeleteState, SchoolType } from '../types/enums'
 import {
   privateCustomerForm,
@@ -66,6 +70,18 @@ const PrivateCustomerDetailView: React.FC = () => {
   const [errors, setErrors] = useState<privateCustomerFormErrorTexts>(
     defaultPrivateCustomerFormErrorTexts,
   )
+  
+  const [render, setRender] = useState<number>(0)
+  const [contractDialogOpen, setContractDialogOpen] = useState<boolean>(false)
+
+  const [contracts, setContracts] = useState<contractWithTeacher[]>([])
+  const [refreshContracts, setRefreshContracts] = useState<number>(0)
+
+  useEffect(() => {
+    API.get('contracts/privateCustomer/' + requestedId).then((res) => {
+      setContracts(res.data)
+    })
+  }, [refreshContracts])
 
   useEffect(() => {
     API.get('users/privateCustomer/' + requestedId).then((res) => {
@@ -97,7 +113,7 @@ const PrivateCustomerDetailView: React.FC = () => {
         feeStandard: res.data.feeStandard,
         feeOnline: res.data.feeOnline,
         notes: res.data.notes ?? '',
-        deleteState: res.data.deleteState as DeleteState
+        deleteState: res.data.deleteState as DeleteState,
       }))
     })
   }, [])
@@ -188,7 +204,10 @@ const PrivateCustomerDetailView: React.FC = () => {
 
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', 'Rechnung-' + invoiceData.invoiceNumber + '.pdf')
+        link.setAttribute(
+          'download',
+          'Rechnung-' + invoiceData.invoiceNumber + '.pdf',
+        )
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
@@ -200,12 +219,17 @@ const PrivateCustomerDetailView: React.FC = () => {
   }
 
   const unarchive = () => {
-    API.get('users/unarchive/' + id).then(() => {
-      enqueueSnackbar(`${data.firstName + " " + data.lastName} ist entarchiviert`, snackbarOptions)
-      navigate('/privateCustomers')
-    }).catch(() => {
-      enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
-    })
+    API.get('users/unarchive/' + id)
+      .then(() => {
+        enqueueSnackbar(
+          `${data.firstName + ' ' + data.lastName} ist entarchiviert`,
+          snackbarOptions,
+        )
+        navigate('/privateCustomers')
+      })
+      .catch(() => {
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+      })
   }
 
   return (
@@ -421,7 +445,7 @@ const PrivateCustomerDetailView: React.FC = () => {
               }
             />
           </Box>
-          <h3>Notizen</h3>
+          <h3>Notizen:</h3>
           <TextField
             multiline
             value={data.notes ?? ''}
@@ -432,6 +456,25 @@ const PrivateCustomerDetailView: React.FC = () => {
             rows={5}
           />
 
+          <Stack direction={'row'} columnGap={2}>
+            <h3>Einsätze:</h3>
+            {data.deleteState !== DeleteState.DELETED && (
+              <IconButton
+                sx={{ marginLeft: 'auto' }}
+                onClick={() => {
+                  setRender((r) => ++r)
+                  setContractDialogOpen(true)
+                }}
+              >
+                <AddCircle fontSize="large" color="primary" />
+              </IconButton>
+            )}
+          </Stack>
+          <ContractList
+            contracts={contracts}
+            setContracts={setContracts}
+            onSuccess={() => setRefreshContracts((r) => r + 1)}
+          />
           <h3>Dokumente:</h3>
           <UserDocuments
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
@@ -465,7 +508,9 @@ const PrivateCustomerDetailView: React.FC = () => {
                 sx={{ marginLeft: 'auto' }}
                 color="error"
               >
-                {data.deleteState === DeleteState.DELETED ? 'Löschen' : 'Archivieren'}
+                {data.deleteState === DeleteState.DELETED
+                  ? 'Löschen'
+                  : 'Archivieren'}
               </Button>
             )}
           </Stack>
@@ -478,6 +523,19 @@ const PrivateCustomerDetailView: React.FC = () => {
         </Stack>
       </Box>
       <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
+      <ContractDialog
+        key={render}
+        open={contractDialogOpen}
+        setOpen={setContractDialogOpen}
+        onSuccess={() => setRefreshContracts((r) => (++r))}
+        initialForm0Props={
+          id
+            ? {
+                customerType: CustomerType.PRIVATE,
+              }
+            : undefined
+        }
+      />
     </div>
   )
 }

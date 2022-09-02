@@ -278,7 +278,6 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
               endDate: value ? value.add(1, 'year') : null,
             }))
           }}
-          shouldDisableDate={(date) => [0, 6].includes(date.day())}
           renderInput={(params) => (
             <TextField {...params} required variant="outlined" />
           )}

@@ -20,7 +20,7 @@ import { Box } from '@mui/system'
 import React, { useState } from 'react'
 import { NavLink as NavLinkBase, NavLinkProps } from 'react-router-dom'
 
-import logo from '../assets/logo.png'
+import logo from '../assets/logoLarge.png'
 import { useAuth } from './AuthProvider'
 
 const drawerWidth = 240

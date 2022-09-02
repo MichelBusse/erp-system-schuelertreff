@@ -98,7 +98,7 @@ const ContractCreation: React.FC<Props> = ({
         minTime: startTime,
         maxTime: endTime,
         teacher: teacher.teacherId.toString(),
-        teacherConfirmation: true,
+        teacherConfirmation: false,
         dow: suggestion.dow,
         selsuggestion: form.selsuggestion,
       })
@@ -200,7 +200,7 @@ const ContractCreation: React.FC<Props> = ({
             setForm((data) => ({
               ...data,
               teacher: e.target.value,
-              teacherConfirmation: e.target.value === 'later' ? false : true,
+              teacherConfirmation: false,
             }))
           }}
           endAdornment={

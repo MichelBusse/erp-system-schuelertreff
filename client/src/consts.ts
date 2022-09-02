@@ -3,6 +3,7 @@ import { OptionsObject as SnackbarOptions } from 'notistack'
 
 import { ContractState } from './types/contract'
 import {
+  ContractType,
   LeaveState,
   LeaveType,
   SchoolType,
@@ -100,6 +101,11 @@ export const contractStateToString: { [key in ContractState]: string } = {
   pending: 'ausstehend',
   accepted: 'bestätigt',
   declined: 'abgelehnt',
+}
+
+export const contractTypeToString: { [key in ContractType]: string } = {
+  online: 'Online',
+  standard: 'Präsenz',
 }
 
 export const teacherSchoolTypeToString: { [key in TeacherSchoolType]: string } =
