@@ -12,6 +12,7 @@ import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 
 import { contract, ContractState } from '../types/contract'
+import { ContractType } from '../types/enums'
 import { useAuth } from './AuthProvider'
 
 type Props = {
@@ -83,7 +84,11 @@ const AcceptContractsDialog: React.FC<Props> = ({
                     justifyContent={'space-between'}
                   >
                     <Typography>
-                      <b>{c.customers[0]?.role === 'privateCustomer' ? 'Schüler:' : 'Klassen:'}</b>
+                      <b>
+                        {c.customers[0]?.role === 'privateCustomer'
+                          ? 'Schüler:'
+                          : 'Klassen:'}
+                      </b>
                     </Typography>
                     <Typography>
                       {c.customers
@@ -126,7 +131,12 @@ const AcceptContractsDialog: React.FC<Props> = ({
                       <Typography>
                         <b>Fach:</b>
                       </Typography>
-                      <Typography>{c.subject.name}</Typography>
+                      <Typography>
+                        {c.subject.name +
+                          (c.contractType === ContractType.STANDARD
+                            ? ' (Präsenz)'
+                            : ' (Online)')}
+                      </Typography>
                     </Stack>
                     <Stack
                       direction={'row'}
