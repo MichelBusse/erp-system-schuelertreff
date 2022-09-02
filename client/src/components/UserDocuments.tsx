@@ -10,7 +10,7 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
 import { snackbarOptions, snackbarOptionsError } from '../consts'
-import document from '../types/document'
+import documentType from '../types/document'
 import { formatDate } from '../utils/date'
 import { useAuth } from './AuthProvider'
 import UploadDialog, { UploadDialogForm } from './UploadDialog'
@@ -26,7 +26,7 @@ const UserDocuments: React.FC<Props> = ({
   actions,
   refresh: outsideRefresh,
 }) => {
-  const [documents, setDocuments] = useState<document[]>([])
+  const [documents, setDocuments] = useState<documentType[]>([])
   const [refresh, setRefresh] = useState(0)
   const [file, setFile] = useState<File>(new File([], ''))
   const [open, setOpen] = useState(false)
@@ -74,11 +74,18 @@ const UserDocuments: React.FC<Props> = ({
       .finally(() => setLoading(false))
   }
 
-  const downloadDoc = (id: number) => {
-    API.get(`documents/${id}/file`, { responseType: 'blob', timeout: 30000 })
+  const downloadDoc = (doc: documentType) => {
+    API.get(`documents/${doc.id}/file`, { responseType: 'blob', timeout: 30000 })
       .then((res) => {
         const url = URL.createObjectURL(res.data)
-        window.open(url, '_blank', 'noopener,noreferrer')
+
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', doc.fileName)
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
       })
       .catch((err) => {
         console.error(err)
@@ -99,7 +106,7 @@ const UserDocuments: React.FC<Props> = ({
       })
   }
 
-  const ListItemDoc: React.FC<{ doc: document }> = ({ doc }) => {
+  const ListItemDoc: React.FC<{ doc: documentType }> = ({ doc }) => {
     const [confirm, setConfirm] = useState(false)
 
     return (
@@ -107,7 +114,7 @@ const UserDocuments: React.FC<Props> = ({
         secondaryAction={
           !confirm ? (
             <>
-              <IconButton onClick={() => downloadDoc(doc.id)}>
+              <IconButton onClick={() => downloadDoc(doc)}>
                 <DownloadIcon />
               </IconButton>
               <IconButton

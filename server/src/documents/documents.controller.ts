@@ -76,7 +76,7 @@ export class DocumentsController {
 
     res.set({
       'Content-Type': document.fileType,
-      'Content-Disposition': `Content-Disposition: inline; filename="${document.fileName}"`,
+      'Content-Disposition': `inline; filename="${document.fileName}"`,
       'Content-Length': document.content.length,
     })
 
