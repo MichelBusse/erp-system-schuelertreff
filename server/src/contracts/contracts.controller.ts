@@ -109,6 +109,18 @@ export class ContractsController {
     return this.contractsService.findAllByTeacher(id)
   }
 
+  @Get('day')
+  @Roles(Role.ADMIN)
+  findByDay(@Query('date') date: string): Promise<Contract[]> {
+    return this.contractsService.findByDay(date)
+  }
+
+  @Get('missingTeacher')
+  @Roles(Role.ADMIN)
+  findByMissingTeacher(): Promise<Contract[]> {
+    return this.contractsService.findByMissingTeacher()
+  }
+
   @Get(':id')
   @Roles(Role.ADMIN)
   findOne(@Param('id') id: number): Promise<Contract> {

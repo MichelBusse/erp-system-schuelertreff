@@ -2,6 +2,8 @@ import { Box, useTheme } from '@mui/material'
 
 import ApplicationMeetings from '../components/cockpit/ApplicationMeetings'
 import CockpitLeaves from '../components/cockpit/CockpitLeaves'
+import ContractsWithoutTeacher from '../components/cockpit/ContractsWithoutTeacher'
+import DailyContracts from '../components/cockpit/DailyContracts'
 import PendingContracts from '../components/cockpit/PendingContracts'
 import SchoolStarts from '../components/cockpit/SchoolStarts'
 import { LeaveState } from '../types/enums'
@@ -24,6 +26,10 @@ const Cockpit: React.FC = () => {
         },
       }}
     >
+      <DailyContracts />
+
+      <ContractsWithoutTeacher />
+
       <PendingContracts />
 
       <SchoolStarts />

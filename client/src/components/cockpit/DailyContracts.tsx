@@ -13,37 +13,37 @@ import {
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import { contractWithTeacher } from '../../types/contract'
 
 import { school } from '../../types/user'
 import { useAuth } from '../AuthProvider'
+import ContractList from '../ContractList'
 
-const SchoolStarts: React.FC = () => {
+const DailyContracts: React.FC = () => {
   const { API } = useAuth()
-  const [schools, setSchools] = useState<Partial<school>[]>([])
+  const [contracts, setContracts] = useState<contractWithTeacher[]>([])
   const [date, setDate] = useState<Dayjs>(dayjs())
+  const [refreshContracts, setRefreshContracts] = useState<number>(0)
 
   useEffect(() => {
-    API.get('users/school/startInFuture', {
+    API.get('contracts/day', {
       params: {
-        of: date.format('YYYY-MM-DD'),
+        date: date.format('YYYY-MM-DD'),
       },
     }).then((res) => {
-      setSchools(res.data)
+      setContracts(res.data)
     })
-  }, [date])
+  }, [date, refreshContracts])
 
   return (
     <>
       <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px' }}>
         <Stack direction="column" spacing={2} height={'100%'}>
-          <Typography variant="h6">Schulen Startdaten</Typography>
-          <List
-            dense={true}
-            sx={{
-              backgroundColor: '#f5f5f5',
-              borderRadius: '4px',
-              margin: '5px 0',
-            }}
+          <Typography variant="h6">Einsätze</Typography>
+          <ContractList
+            contracts={contracts}
+            setContracts={setContracts}
+            onSuccess={() => setRefreshContracts((r) => ++r)}
           >
             <ListItem>
               <Stack
@@ -54,40 +54,23 @@ const SchoolStarts: React.FC = () => {
                 width={'100%'}
               >
                 <IconButton
-                  onClick={() => setDate((d) => d.subtract(1, 'week'))}
+                  onClick={() => setDate((d) => d.subtract(1, 'day'))}
                 >
                   <ArrowBackIcon fontSize="small" />
                 </IconButton>
                 <Typography variant="body1">
-                  {`Kalenderwoche ${date.week()}`}
+                  {`${date.format('DD.MM.YYYY')}`}
                 </Typography>
-                <IconButton onClick={() => setDate((d) => d.add(1, 'week'))}>
+                <IconButton onClick={() => setDate((d) => d.add(1, 'day'))}>
                   <ArrowForwardIcon fontSize="small" />
                 </IconButton>
               </Stack>
             </ListItem>
-            {schools.length === 0 && (
-              <ListItem>
-                <ListItemText primary="keine Einträge" />
-              </ListItem>
-            )}
-            {schools.map((school) => (
-              <ListItemButton
-                key={school.id}
-                component={NavLink}
-                to={'/schools/' + school.id}
-              >
-                <ListItemText
-                  primary={`${school.schoolName}`}
-                  secondary={dayjs(school.dateOfStart).format('DD.MM.YYYY')}
-                />
-              </ListItemButton>
-            ))}
-          </List>
+          </ContractList>
         </Stack>
       </Box>
     </>
   )
 }
 
-export default SchoolStarts
+export default DailyContracts

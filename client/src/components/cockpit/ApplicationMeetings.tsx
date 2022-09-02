@@ -35,7 +35,7 @@ const ApplicationMeetings: React.FC = () => {
   return (
     <>
       <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px' }}>
-        <Stack direction="column" spacing={2}>
+        <Stack direction="column" spacing={2} height={'100%'}>
           <Typography variant="h6">Anstehende Bewerbungsgespräche</Typography>
           <List
             dense={true}
@@ -43,6 +43,7 @@ const ApplicationMeetings: React.FC = () => {
               backgroundColor: '#f5f5f5',
               borderRadius: '4px',
               margin: '5px 0',
+              maxHeight: '500px'
             }}
           >
             <ListItem>

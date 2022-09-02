@@ -9,7 +9,7 @@ import {
   snackbarOptions,
   snackbarOptionsError,
 } from '../consts'
-import { contract, contractWithTeacher } from '../types/contract'
+import { contract, ContractState, contractWithTeacher } from '../types/contract'
 import { useAuth } from './AuthProvider'
 import ConfirmationDialog, {
   ConfirmationDialogProps,
@@ -23,10 +23,11 @@ type Props = {
   onSuccess?: () => void
 }
 
-const ContractList: React.FC<Props> = ({
+const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
   contracts,
   setContracts,
   onSuccess,
+  children
 }) => {
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
@@ -78,8 +79,10 @@ const ContractList: React.FC<Props> = ({
           backgroundColor: '#f5f5f5',
           borderRadius: '4px',
           margin: '5px 0',
+          height: '100%'
         }}
       >
+        {children}
         {contracts.length === 0 && (
           <ListItem>
             <ListItemText primary="Keine Einträge" />
@@ -108,7 +111,7 @@ const ContractList: React.FC<Props> = ({
                       contractTypeToString[contract.contractType] +
                       ')'}
                   </span>{' '}
-                  <span>{`(${contractStateToString[contract.state]})`}</span>
+                  <span>{contract.state !== ContractState.ACCEPTED && `(${contractStateToString[contract.state]})`}</span>
                 </>
               }
               secondary={
@@ -123,8 +126,7 @@ const ContractList: React.FC<Props> = ({
                   <br />
                   <span>
                     {contract.customers[0]?.role === 'classCustomer' &&
-                      contract.customers[0].school.schoolName}
-                    {': '}
+                      contract.customers[0].school.schoolName + ': '}
                     {contract.customers
                       .map((customer) => {
                         return customer.role === 'privateCustomer'
