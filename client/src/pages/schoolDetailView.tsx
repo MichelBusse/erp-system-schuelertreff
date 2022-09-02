@@ -34,6 +34,8 @@ import ConfirmationDialog, {
   ConfirmationDialogProps,
   defaultConfirmationDialogProps,
 } from '../components/ConfirmationDialog'
+import ContractDialog, { CustomerType } from '../components/ContractDialog'
+import ContractList from '../components/ContractList'
 import CustomerInvoiceDataSelect, {
   CustomerInvoiceData,
 } from '../components/CustomerInvoiceDateSelect'
@@ -46,6 +48,7 @@ import {
   snackbarOptionsError,
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
+import { contractWithTeacher } from '../types/contract'
 import { DeleteState, SchoolType } from '../types/enums'
 import {
   classCustomerForm,
@@ -80,6 +83,18 @@ const SchoolDetailView: React.FC = () => {
   const [schoolErrors, setSchoolErrors] = useState<schoolFormErrorTexts>(
     defaultSchoolFormErrorTexts,
   )
+
+  const [render, setRender] = useState<number>(0)
+  const [contractDialogOpen, setContractDialogOpen] = useState<boolean>(false)
+
+  const [contracts, setContracts] = useState<contractWithTeacher[]>([])
+  const [refreshContracts, setRefreshContracts] = useState<number>(0)
+
+  useEffect(() => {
+    API.get('contracts/school/' + requestedId).then((res) => {
+      setContracts(res.data)
+    })
+  }, [refreshContracts])
 
   useEffect(() => {
     API.get('users/school/' + requestedId).then((res) => {
@@ -332,7 +347,10 @@ const SchoolDetailView: React.FC = () => {
 
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', 'Rechnung-' + invoiceData.invoiceNumber + '.pdf')
+        link.setAttribute(
+          'download',
+          'Rechnung-' + invoiceData.invoiceNumber + '.pdf',
+        )
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
@@ -344,12 +362,17 @@ const SchoolDetailView: React.FC = () => {
   }
 
   const unarchive = () => {
-    API.get('users/unarchive/' + id).then(() => {
-      enqueueSnackbar(`${school.schoolName} ist entarchiviert`, snackbarOptions)
-      navigate('/schools')
-    }).catch(() => {
-      enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
-    })
+    API.get('users/unarchive/' + id)
+      .then(() => {
+        enqueueSnackbar(
+          `${school.schoolName} ist entarchiviert`,
+          snackbarOptions,
+        )
+        navigate('/schools')
+      })
+      .catch(() => {
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+      })
   }
 
   return (
@@ -737,7 +760,25 @@ const SchoolDetailView: React.FC = () => {
               </AccordionDetails>
             </Accordion>
           ))}
-
+          <Stack direction={'row'} columnGap={2}>
+            <h3>Einsätze:</h3>
+            {school.deleteState !== DeleteState.DELETED && (
+              <IconButton
+                sx={{ marginLeft: 'auto' }}
+                onClick={() => {
+                  setRender((r) => ++r)
+                  setContractDialogOpen(true)
+                }}
+              >
+                <AddCircleIcon fontSize="large" color="primary" />
+              </IconButton>
+            )}
+          </Stack>
+          <ContractList
+            contracts={contracts}
+            setContracts={setContracts}
+            onSuccess={() => setRefreshContracts((r) => r + 1)}
+          />
           <h3>Dokumente:</h3>
           <UserDocuments
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
@@ -771,7 +812,9 @@ const SchoolDetailView: React.FC = () => {
                 sx={{ marginLeft: 'auto' }}
                 color="error"
               >
-                {school.deleteState === DeleteState.DELETED ? 'Schule löschen' : 'Schule archivieren'}
+                {school.deleteState === DeleteState.DELETED
+                  ? 'Schule löschen'
+                  : 'Schule archivieren'}
               </Button>
             )}
           </Stack>
@@ -860,6 +903,20 @@ const SchoolDetailView: React.FC = () => {
         </DialogActions>
       </Dialog>
       <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
+      <ContractDialog
+        key={render}
+        open={contractDialogOpen}
+        setOpen={setContractDialogOpen}
+        onSuccess={() => setRefreshContracts((r) => (++r))}
+        initialForm0Props={
+          id
+            ? {
+                school: { id: Number(id), schoolName: school.schoolName },
+                customerType: CustomerType.SCHOOL,
+              }
+            : undefined
+        }
+      />
     </div>
   )
 }

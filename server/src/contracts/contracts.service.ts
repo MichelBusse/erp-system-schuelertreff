@@ -97,10 +97,11 @@ export class ContractsService {
   async findAllPendingForTeacher(teacherId): Promise<Contract[]> {
     const contracts = this.contractsRepository
       .createQueryBuilder('c')
-      .select(['c', 's', 'customers', 'school'])
+      .select(['c', 's', 't', 'customers', 'school'])
       .leftJoin('c.subject', 's')
       .leftJoin('c.customers', 'customers')
       .leftJoin('customers.school', 'school')
+      .leftJoin('c.teacher', 't')
       .where('c.state = :contractState', {
         contractState: ContractState.PENDING,
       })
@@ -120,6 +121,54 @@ export class ContractsService {
     } else {
       return null
     }
+  }
+
+  async findAllBySchool(schoolId): Promise<Contract[]> {
+    const contracts = this.contractsRepository
+      .createQueryBuilder('c')
+      .select(['c', 's', 'customer', 'school'])
+      .leftJoin('c.subject', 's')
+      .leftJoin('c.customers', 'customer')
+      .leftJoin('customer.school', 'school')
+      .leftJoinAndSelect('c.teacher', 't')
+      .where('customer.school IS NOT NULL AND customer.school.id = :schoolId', {schoolId: schoolId})
+      .andWhere('c.endDate IS NULL OR c.endDate > now()')
+      .orderBy('c.startDate', 'ASC')
+      .addOrderBy('c.startTime', 'ASC')
+    
+    return contracts.getMany()
+  }
+
+  async findAllByPrivateCustomer(privateCustomerId): Promise<Contract[]> {
+    const contracts = this.contractsRepository
+      .createQueryBuilder('c')
+      .select(['c', 's', 'customer', 'school'])
+      .leftJoin('c.subject', 's')
+      .leftJoin('c.customers', 'customer')
+      .leftJoin('customer.school', 'school')
+      .leftJoinAndSelect('c.teacher', 't')
+      .where('customer.id = :privateCustomerId', {privateCustomerId: privateCustomerId})
+      .andWhere('c.endDate IS NULL OR c.endDate > now()')
+      .orderBy('c.startDate', 'ASC')
+      .addOrderBy('c.startTime', 'ASC')
+    
+    return contracts.getMany()
+  }
+
+  async findAllByTeacher(teacherId): Promise<Contract[]> {
+    const contracts = this.contractsRepository
+      .createQueryBuilder('c')
+      .select(['c', 's', 'customer', 'school'])
+      .leftJoin('c.subject', 's')
+      .leftJoin('c.customers', 'customer')
+      .leftJoin('customer.school', 'school')
+      .leftJoinAndSelect('c.teacher', 't')
+      .where('id IS NOT NULL AND t.id = :teacherId', {teacherId: teacherId})
+      .andWhere('c.endDate IS NULL OR c.endDate > now()')
+      .orderBy('c.startDate', 'ASC')
+      .addOrderBy('c.startTime', 'ASC')
+    
+    return contracts.getMany()
   }
 
   async endOrDeleteContract(id: number): Promise<void> {

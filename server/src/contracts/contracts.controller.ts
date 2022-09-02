@@ -91,6 +91,24 @@ export class ContractsController {
     return this.contractsService.findAllPending()
   }
 
+  @Get('school/:id')
+  @Roles(Role.ADMIN)
+  findAllBySchool(@Param('id') id: number): Promise<Contract[]> {
+    return this.contractsService.findAllBySchool(id)
+  }
+
+  @Get('privateCustomer/:id')
+  @Roles(Role.ADMIN)
+  findAllByPrivateCustomer(@Param('id') id: number): Promise<Contract[]> {
+    return this.contractsService.findAllByPrivateCustomer(id)
+  }
+
+  @Get('teacher/:id')
+  @Roles(Role.ADMIN)
+  findAllByTeacher(@Param('id') id: number): Promise<Contract[]> {
+    return this.contractsService.findAllByTeacher(id)
+  }
+
   @Get(':id')
   @Roles(Role.ADMIN)
   findOne(@Param('id') id: number): Promise<Contract> {

@@ -37,4 +37,5 @@ export type contractWithTeacher = {
   customers: customer[]
   teacher: teacher
   state: ContractState
+  contractType: ContractType
 }

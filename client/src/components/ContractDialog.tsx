@@ -43,6 +43,7 @@ type Props = {
   setOpen: (open: boolean) => void
   onSuccess?: () => void
   initialContract?: contractWithTeacher
+  initialForm0Props?: Partial<ContractFilterForm>
 }
 
 const ContractDialog: React.FC<Props> = ({
@@ -50,6 +51,7 @@ const ContractDialog: React.FC<Props> = ({
   setOpen,
   onSuccess = () => {},
   initialContract,
+  initialForm0Props,
 }) => {
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
@@ -71,6 +73,7 @@ const ContractDialog: React.FC<Props> = ({
     endDate: null,
     customerType: CustomerType.PRIVATE,
     contractType: ContractType.STANDARD,
+    ...initialForm0Props
   })
 
   // step 1

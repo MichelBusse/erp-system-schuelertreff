@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add'
-import { Fab, Paper } from '@mui/material'
+import { Fab, Paper, useTheme } from '@mui/material'
 import { Box } from '@mui/system'
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
@@ -34,6 +34,7 @@ const AdminCalendar: React.FC<Props> = ({
 
   const [contracts, setContracts] = useState<Record<number, contract[]>>([])
   const [lessons, setLessons] = useState<lesson[]>([])
+  const theme = useTheme()
 
   useEffect(() => {
     API.get('lessons/week', {
@@ -90,7 +91,10 @@ const AdminCalendar: React.FC<Props> = ({
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              boxShadow: `0 0 2px ${c.subject.color} inset`,
+              boxShadow: c.teacher ? `0 0 2px ${c.subject.color} inset` : undefined,
+              borderWidth: !c.teacher ? '2px' : undefined,
+              borderStyle: !c.teacher ? 'solid' : undefined,
+              borderColor: !c.teacher ? theme.palette.error.main : undefined
             }}
           >
             {c.subject.shortForm}

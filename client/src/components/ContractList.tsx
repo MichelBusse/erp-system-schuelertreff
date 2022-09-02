@@ -1,0 +1,172 @@
+import { Delete, Edit } from '@mui/icons-material'
+import { IconButton, List, ListItem, ListItemText, useTheme } from '@mui/material'
+import dayjs from 'dayjs'
+import { useSnackbar } from 'notistack'
+import { useState } from 'react'
+import {
+  contractStateToString,
+  contractTypeToString,
+  snackbarOptions,
+  snackbarOptionsError,
+} from '../consts'
+import { contract, contractWithTeacher } from '../types/contract'
+import { useAuth } from './AuthProvider'
+import ConfirmationDialog, {
+  ConfirmationDialogProps,
+  defaultConfirmationDialogProps,
+} from './ConfirmationDialog'
+import ContractDialog from './ContractDialog'
+
+type Props = {
+  contracts: contractWithTeacher[] | contract[]
+  setContracts: React.Dispatch<React.SetStateAction<contractWithTeacher[]>>
+  onSuccess?: () => void
+}
+
+const ContractList: React.FC<Props> = ({
+  contracts,
+  setContracts,
+  onSuccess,
+}) => {
+  const { API } = useAuth()
+  const { enqueueSnackbar } = useSnackbar()
+  const [render, setRender] = useState<number>(0)
+  const [initialContract, setInitialContract] = useState<
+    contractWithTeacher | undefined
+  >(undefined)
+  const [open, setOpen] = useState<boolean>(false)
+  const [confirmationDialogProps, setConfirmationDialogProps] =
+    useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
+  const theme = useTheme()
+
+  const deleteContract = (contractId: number) => {
+    setConfirmationDialogProps({
+      open: true,
+      setProps: setConfirmationDialogProps,
+      title: 'Einsatz wirklich löschen?',
+      text: 'Möchtest du den Einsatz wirklich löschen?',
+      action: () => {
+        API.delete('contracts/' + contractId)
+          .then(() => {
+            setContracts((prevContracts: contractWithTeacher[]) => {
+              const newContracts: contractWithTeacher[] = []
+              for (const c of prevContracts) {
+                if (c.id !== contractId) newContracts.push(c)
+              }
+              return newContracts
+            })
+            enqueueSnackbar('Einsatz gelöscht', snackbarOptions)
+          })
+          .catch(() => {
+            enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+          })
+      },
+    })
+  }
+
+  const editContract = (contract: contractWithTeacher) => {
+    setInitialContract(contract)
+    setRender((r) => ++r)
+    setOpen(true)
+  }
+
+  return (
+    <>
+      <List
+        dense={true}
+        sx={{
+          backgroundColor: '#f5f5f5',
+          borderRadius: '4px',
+          margin: '5px 0',
+        }}
+      >
+        {contracts.length === 0 && (
+          <ListItem>
+            <ListItemText primary="Keine Einträge" />
+          </ListItem>
+        )}
+        {contracts.map((contract) => (
+          <ListItem
+            key={contract.id}
+            secondaryAction={
+              <>
+                <IconButton onClick={() => editContract(contract)}>
+                  <Edit />
+                </IconButton>
+                <IconButton onClick={() => deleteContract(contract.id)}>
+                  <Delete />
+                </IconButton>
+              </>
+            }
+          >
+            <ListItemText
+              primary={
+                <>
+                  <span>
+                    {contract.subject.name +
+                      ' (' +
+                      contractTypeToString[contract.contractType] +
+                      ')'}
+                  </span>{' '}
+                  <span>{`(${contractStateToString[contract.state]})`}</span>
+                </>
+              }
+              secondary={
+                <>
+                  <span>
+                    {contract.teacher ? (
+                      `${contract.teacher.firstName} ${contract.teacher.lastName}`
+                    ) : (
+                      <span style={{color: theme.palette.error.main}}>Keine Lehrkraft zugewiesen</span>
+                    )}
+                  </span>
+                  <br />
+                  <span>
+                    {contract.customers[0]?.role === 'classCustomer' &&
+                      contract.customers[0].school.schoolName}
+                    {': '}
+                    {contract.customers
+                      .map((customer) => {
+                        return customer.role === 'privateCustomer'
+                          ? customer.firstName + ' ' + customer.lastName
+                          : customer.className
+                      })
+                      .join(', ')}
+                  </span>
+                  <br />
+                  <span>
+                    {dayjs(contract.startDate).format('dddd') +
+                      's ' +
+                      dayjs(contract.startTime, 'HH:mm').format('HH:mm') +
+                      ' - ' +
+                      dayjs(contract.endTime, 'HH:mm').format('HH:mm')}
+                  </span>
+                  <br />
+                  <span>
+                    {dayjs(contract.startDate).format('DD.MM.YYYY') +
+                      ' - ' +
+                      (contract.endDate
+                        ? dayjs(contract.endDate).format('DD.MM.YYYY')
+                        : 'unbegrenzt')}
+                  </span>
+                </>
+              }
+            />
+          </ListItem>
+        ))}
+      </List>
+      <ContractDialog
+        key={render}
+        open={open}
+        setOpen={setOpen}
+        onSuccess={() => {
+          onSuccess && onSuccess()
+        }}
+        initialContract={initialContract}
+      />
+      <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
+    </>
+  )
+}
+
+export default ContractList
