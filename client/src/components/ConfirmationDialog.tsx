@@ -31,6 +31,7 @@ const ConfirmationDialog: React.FC<{
     open={confirmationDialogProps.open}
     keepMounted
     aria-describedby="alert-dialog-slide-description"
+    sx={{zIndex: 2000}}
   >
     <DialogTitle>{confirmationDialogProps.title}</DialogTitle>
     <DialogContent>

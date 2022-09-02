@@ -55,10 +55,18 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
     setForm((f) => {
       const initialForm0Entry: ContractFilterForm = {
         ...f,
-        startDate: dayjs(initialContract.startDate, 'YYYY-MM-DD'),
-        endDate: initialContract.endDate
-          ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
-          : null,
+        startDate: dayjs(initialContract.startDate, 'YYYY-MM-DD').isAfter(
+          dayjs(),
+        )
+          ? dayjs(initialContract.startDate, 'YYYY-MM-DD')
+          : dayjs().add(1, 'day'),
+        endDate:
+          initialContract.endDate &&
+          dayjs(initialContract.endDate, 'YYYY-MM-DD').isAfter(
+            dayjs().add(1, 'day'),
+          )
+            ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
+            : null,
         subject: initialContract.subject,
         interval: initialContract.interval,
       }

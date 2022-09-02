@@ -51,11 +51,14 @@ const AdminCalendar: React.FC<Props> = ({
             ? 1
             : -1
         })
-        .filter((c: contract) => c.teacher)
         .map((c: contract) => {
-          contractsByTeacher[c.teacher.id] = (
-            contractsByTeacher[c.teacher.id] ?? []
-          ).concat(c)
+          if (c.teacher) {
+            contractsByTeacher[c.teacher.id] = (
+              contractsByTeacher[c.teacher.id] ?? []
+            ).concat(c)
+          } else {
+            contractsByTeacher[-1] = (contractsByTeacher[-1] ?? []).concat(c)
+          }
         })
 
       setContracts(contractsByTeacher)
@@ -112,10 +115,12 @@ const AdminCalendar: React.FC<Props> = ({
     ),
   ]
 
-  const rows: GridRowsProp = teachers.map((t) => ({
-    id: t.id,
-    teacher: `${t.firstName} ${t.lastName}`,
-  }))
+  const rows: GridRowsProp = teachers
+    .map((t) => ({
+      id: t.id,
+      teacher: `${t.firstName} ${t.lastName}`,
+    }))
+    .concat([{ id: -1, teacher: `Ausstehend` }])
 
   return (
     <Paper

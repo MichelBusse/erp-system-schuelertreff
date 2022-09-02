@@ -37,7 +37,6 @@ import ConfirmationDialog, {
   defaultConfirmationDialogProps,
 } from '../components/ConfirmationDialog'
 import IconButtonAdornment from '../components/IconButtonAdornment'
-import InvoiceDataSelect from '../components/InvoiceDateSelect'
 import Leave from '../components/Leave'
 import TeacherInvoiceDataSelect, { TeacherInvoiceData } from '../components/TeacherInvoiceDateSelect'
 import UserDocuments from '../components/UserDocuments'
@@ -276,7 +275,15 @@ const TeacherDetailView: React.FC = () => {
       responseType: 'blob',
     })
       .then((res) => {
-        window.open(URL.createObjectURL(res.data))
+        const url = URL.createObjectURL(res.data)
+
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'Abrechnung-' + year + '-' + month + '.pdf')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
       })
       .catch(() => {
         enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
@@ -350,6 +357,7 @@ const TeacherDetailView: React.FC = () => {
           <Stack direction="row" columnGap={2}>
             <TextField
               helperText={errors.firstName}
+              required
               error={errors.firstName !== ''}
               fullWidth={true}
               label="Vorname"
@@ -367,6 +375,7 @@ const TeacherDetailView: React.FC = () => {
             />
             <TextField
               helperText={errors.lastName}
+              required
               error={errors.lastName !== ''}
               fullWidth={true}
               label="Nachname"
@@ -394,6 +403,7 @@ const TeacherDetailView: React.FC = () => {
             renderInput={(params) => (
               <TextField
                 {...params}
+                required
                 variant="outlined"
                 helperText={errors.dateOfBirth}
                 error={errors.dateOfBirth !== ''}
@@ -505,6 +515,7 @@ const TeacherDetailView: React.FC = () => {
               helperText={errors.email}
               error={errors.email !== ''}
               label="Email"
+              required
               disabled={requestedId === 'me'}
               onChange={(event) =>
                 setData((data) => ({
@@ -521,6 +532,7 @@ const TeacherDetailView: React.FC = () => {
             <TextField
               fullWidth={true}
               helperText={errors.phone}
+              required
               error={errors.phone !== ''}
               label="Telefonnummer"
               onChange={(event) =>
@@ -537,6 +549,7 @@ const TeacherDetailView: React.FC = () => {
             <TextField
               helperText={errors.street}
               error={errors.street !== ''}
+              required
               label="Straße"
               fullWidth={true}
               onChange={(event) =>
@@ -553,6 +566,7 @@ const TeacherDetailView: React.FC = () => {
             <TextField
               label="Stadt"
               helperText={errors.city}
+              required
               error={errors.city !== ''}
               fullWidth={true}
               onChange={(event) =>
@@ -569,6 +583,7 @@ const TeacherDetailView: React.FC = () => {
             <TextField
               label="Postleitzahl"
               helperText={errors.postalCode}
+              required
               error={errors.postalCode !== ''}
               fullWidth={true}
               onChange={(event) =>
@@ -589,6 +604,7 @@ const TeacherDetailView: React.FC = () => {
               fullWidth={true}
               label="Kontoinhaber"
               helperText={errors.bankAccountOwner}
+              required
               error={errors.bankAccountOwner !== ''}
               onChange={(event) =>
                 setData((data) => ({
@@ -603,6 +619,7 @@ const TeacherDetailView: React.FC = () => {
               fullWidth={true}
               label="Kreditinstitut"
               helperText={errors.bankInstitution}
+              required
               error={errors.bankInstitution !== ''}
               onChange={(event) =>
                 setData((data) => ({
@@ -618,6 +635,7 @@ const TeacherDetailView: React.FC = () => {
               fullWidth={true}
               label="IBAN"
               helperText={errors.iban}
+              required
               error={errors.iban !== ''}
               onChange={(event) =>
                 setData((data) => ({
@@ -632,6 +650,7 @@ const TeacherDetailView: React.FC = () => {
               fullWidth={true}
               label="BIC"
               helperText={errors.bic}
+              required
               error={errors.bic !== ''}
               onChange={(event) =>
                 setData((data) => ({
@@ -714,6 +733,7 @@ const TeacherDetailView: React.FC = () => {
                 fullWidth
                 id="fee"
                 label="Stundensatz"
+                required
                 variant="outlined"
                 disabled={requestedId === 'me'}
                 helperText={errors.fee}
@@ -739,6 +759,7 @@ const TeacherDetailView: React.FC = () => {
                 renderInput={(params) => (
                   <TextField
                     {...params}
+                    required
                     fullWidth
                     variant="outlined"
                     helperText={errors.dateOfEmploymentStart}

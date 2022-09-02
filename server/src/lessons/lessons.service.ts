@@ -80,27 +80,27 @@ export class LessonsService {
       teacherId,
     )
 
-    // check for intersecting leaves
-    if ((await this.checkLeave(dto.date, contract.teacher.id)) > 0)
-      throw new BadRequestException('Lesson is blocked')
+      // check for intersecting leaves
+      if (contract.teacher ? ((await this.checkLeave(dto.date, contract.teacher.id)) > 0) : false)
+        throw new BadRequestException('Lesson is blocked')
 
-    if (contract) {
-      if (contract.state !== ContractState.ACCEPTED)
+      if (contract) {
+        if (contract.state !== ContractState.ACCEPTED)
+          throw new BadRequestException(
+            'You cannot create lessons of unaccepted contracts',
+          )
+
+        lesson.date = dto.date
+        lesson.state = dto.state
+        lesson.notes = dto.notes
+        lesson.contract = contract
+
+        return this.lessonsRepository.save(lesson)
+      } else {
         throw new BadRequestException(
-          'You cannot create lessons of unaccepted contracts',
+          'You do not have permission to create this lesson',
         )
-
-      lesson.date = dto.date
-      lesson.state = dto.state
-      lesson.notes = dto.notes
-      lesson.contract = contract
-
-      return this.lessonsRepository.save(lesson)
-    } else {
-      throw new BadRequestException(
-        'You do not have permission to create this lesson',
-      )
-    }
+      }
   }
 
   async update(
@@ -153,7 +153,9 @@ export class LessonsService {
 
     const lesson = await lessonQuery.getOne()
     const contract = await this.contractsService.findOne(contractId, teacherId)
-    const blocked = (await this.checkLeave(date, contract.teacher.id)) > 0
+    let blocked = false
+    if (contract.teacher)
+      blocked = (await this.checkLeave(date, contract.teacher.id)) > 0
     return { contract, lesson, blocked }
   }
 
@@ -308,7 +310,7 @@ export class LessonsService {
 
     const browser = await puppeteer.launch({
       headless: true,
-      executablePath: "/usr/bin/chromium-browser",
+      executablePath: '/usr/bin/chromium-browser',
       args: [
         '--no-sandbox',
         '--headless',
@@ -464,7 +466,7 @@ export class LessonsService {
 
     const browser = await puppeteer.launch({
       headless: true,
-      executablePath: "/usr/bin/chromium-browser",
+      executablePath: '/usr/bin/chromium-browser',
       args: [
         '--no-sandbox',
         '--headless',

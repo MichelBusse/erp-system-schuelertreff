@@ -58,6 +58,18 @@ export class ContractsService {
     if (savedContract.state === ContractState.ACCEPTED)
       await this.lessonsService.cancelByContract(savedContract)
 
+    if(dto.initialContractId){
+      const initialContract = await this.contractsRepository.findOneByOrFail({ id: dto.initialContractId })
+
+      if(dayjs(initialContract.startDate).isAfter(dayjs())){
+        this.contractsRepository.delete({id: dto.initialContractId})
+      }else{
+        initialContract.endDate = dayjs().format('YYYY-MM-DD')
+      }
+
+      await this.contractsRepository.save(initialContract)
+    }
+
     return savedContract
   }
 
@@ -85,8 +97,10 @@ export class ContractsService {
   async findAllPendingForTeacher(teacherId): Promise<Contract[]> {
     const contracts = this.contractsRepository
       .createQueryBuilder('c')
-      .select(['c', 's'])
+      .select(['c', 's', 'customers', 'school'])
       .leftJoin('c.subject', 's')
+      .leftJoin('c.customers', 'customers')
+      .leftJoin('customers.school', 'school')
       .where('c.state = :contractState', {
         contractState: ContractState.PENDING,
       })
@@ -109,7 +123,6 @@ export class ContractsService {
   }
 
   async endOrDeleteContract(id: number): Promise<void> {
-    console.log('He')
     const contract = await this.contractsRepository.findOneByOrFail({ id })
 
     if (contract.state === ContractState.ACCEPTED) {
@@ -289,11 +302,6 @@ export class ContractsService {
         ignoreContracts: dto.ignoreContracts,
       })
 
-    if (dto.initialContractId)
-      contractQuery.andWhere('con.id != :initialContractId', {
-        initialContractId: dto.initialContractId,
-      })
-
     /* MAIN QUERY */
 
     const mainQuery = qb
@@ -315,6 +323,7 @@ export class ContractsService {
           .leftJoin('t.subjects', 'subject')
           .where('t.type = :tt', { tt: 'Teacher' })
           .andWhere(`t.state = 'employed'`)
+          .andWhere(`t.deleteState = 'active'`)
           .andWhere('subject.id = :subjectId', { subjectId: dto.subjectId })
           .andWhere(
             new Brackets((qb) => {
@@ -377,7 +386,7 @@ export class ContractsService {
                     a.teacherId,
                     dto.customers,
                     r,
-                    dto.initialContractId,
+                    dto.ignoreContracts,
                   )
                 ).map((c) => c.id),
               })),
@@ -400,7 +409,7 @@ export class ContractsService {
     teacherId: number,
     customers: number[],
     range: timeAvailable,
-    initialContractId: number | null,
+    ignoreContracts: number[],
   ) {
     const qb = this.contractsRepository.createQueryBuilder('c')
 
@@ -421,9 +430,9 @@ export class ContractsService {
       )
       .setParameters(range)
 
-    if (initialContractId)
-      qb.andWhere('c.id != :initialContractId', {
-        initialContractId: initialContractId,
+    if (ignoreContracts.length)
+      qb.andWhere('c.id NOT IN (:...ignoreContracts)', {
+        ignoreContracts
       })
 
     return qb.getMany()
@@ -436,7 +445,7 @@ export class ContractsService {
       .leftJoin('c.customers', 'customer')
       .leftJoin('customer.school', 'school')
       .leftJoin('c.teacher', 'teacher')
-      .select(['c', 'subject', 'customer', 'school', 'teacher.id'])
+      .select(['c', 'subject', 'customer', 'school', 'teacher'])
       .where(
         `c.startDate <= date_trunc('week', :week::date) + interval '4 day'`,
         { week: week.format() },
