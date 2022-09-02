@@ -184,7 +184,15 @@ const PrivateCustomerDetailView: React.FC = () => {
       },
     )
       .then((res) => {
-        window.open(URL.createObjectURL(res.data))
+        const url = URL.createObjectURL(res.data)
+
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'Rechnung-' + invoiceData.invoiceNumber + '.pdf')
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
       })
       .catch(() => {
         enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
