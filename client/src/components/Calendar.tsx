@@ -99,7 +99,10 @@ const Calendar: React.FC<Props> = ({
     ...[1, 2, 3, 4, 5].map(
       (n): GridColDef => ({
         field: n.toString(),
-        headerName: date.day(n).format('dddd\nDD.MM.YYYY'),
+        headerAlign: 'left',
+        renderHeader: (params) => (
+          <div style={{whiteSpace: 'pre-wrap', lineHeight: '1.2'}}><span><b>{date.day(n).format('dddd')}</b></span><br/><span>{date.day(n).format('DD.MM.YYYY')}</span></div>
+        ),
         width: 180,
         sortable: false,
         valueGetter: getCellValue,

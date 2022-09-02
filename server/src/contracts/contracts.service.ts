@@ -97,8 +97,10 @@ export class ContractsService {
   async findAllPendingForTeacher(teacherId): Promise<Contract[]> {
     const contracts = this.contractsRepository
       .createQueryBuilder('c')
-      .select(['c', 's'])
+      .select(['c', 's', 'customers', 'school'])
       .leftJoin('c.subject', 's')
+      .leftJoin('c.customers', 'customers')
+      .leftJoin('customers.school', 'school')
       .where('c.state = :contractState', {
         contractState: ContractState.PENDING,
       })
