@@ -907,7 +907,7 @@ const SchoolDetailView: React.FC = () => {
         key={render}
         open={contractDialogOpen}
         setOpen={setContractDialogOpen}
-        onSuccess={() => setRefreshContracts((r) => (++r))}
+        onSuccess={() => setRefreshContracts((r) => ++r)}
         initialForm0Props={
           id
             ? {

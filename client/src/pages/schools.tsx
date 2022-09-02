@@ -105,8 +105,7 @@ const Schools: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [deletedSchoolsToggle, setDeletedSchoolsToggle] =
-  useState<boolean>(false)
-
+    useState<boolean>(false)
 
   const { API } = useAuth()
 

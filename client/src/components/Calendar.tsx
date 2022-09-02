@@ -100,8 +100,14 @@ const Calendar: React.FC<Props> = ({
       (n): GridColDef => ({
         field: n.toString(),
         headerAlign: 'left',
-        renderHeader: (params) => (
-          <div style={{whiteSpace: 'pre-wrap', lineHeight: '1.2'}}><span><b>{date.day(n).format('dddd')}</b></span><br/><span>{date.day(n).format('DD.MM.YYYY')}</span></div>
+        renderHeader: () => (
+          <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.2' }}>
+            <span>
+              <b>{date.day(n).format('dddd')}</b>
+            </span>
+            <br />
+            <span>{date.day(n).format('DD.MM.YYYY')}</span>
+          </div>
         ),
         width: 180,
         sortable: false,

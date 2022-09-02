@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom'
 import { contract } from '../types/contract'
 import { ContractType } from '../types/enums'
 import { lesson, LessonState } from '../types/lesson'
-import styles from './Calendar.module.scss'
 
 type Props = {
   contract: contract

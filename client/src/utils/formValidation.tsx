@@ -187,9 +187,7 @@ export function workContractFormValidation(
   return errorTexts
 }
 
-export function efzFormValidation(
-  form: teacherForm,
-): teacherFormErrorTexts {
+export function efzFormValidation(form: teacherForm): teacherFormErrorTexts {
   const errorTexts = { ...defaultTeacherFormErrorTexts }
 
   if (form.firstName.trim() === '') {
@@ -224,7 +222,6 @@ export function efzFormValidation(
 
   return errorTexts
 }
-
 
 export const defaultPrivateCustomerFormErrorTexts: privateCustomerFormErrorTexts =
   {

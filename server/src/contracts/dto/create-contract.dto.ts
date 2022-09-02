@@ -50,5 +50,5 @@ export class CreateContractDto {
 
   @IsOptional()
   @IsInt()
-  initialContractId?: number 
+  initialContractId?: number
 }

@@ -6,8 +6,8 @@ import {
   School as SchoolIcon,
   TableChart as TableChartIcon,
 } from '@mui/icons-material'
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ExploreIcon from '@mui/icons-material/Explore'
+import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import { Box, useTheme } from '@mui/material'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Outlet } from 'react-router-dom'

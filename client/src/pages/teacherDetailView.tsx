@@ -38,7 +38,9 @@ import ConfirmationDialog, {
 } from '../components/ConfirmationDialog'
 import IconButtonAdornment from '../components/IconButtonAdornment'
 import Leave from '../components/Leave'
-import TeacherInvoiceDataSelect, { TeacherInvoiceData } from '../components/TeacherInvoiceDateSelect'
+import TeacherInvoiceDataSelect, {
+  TeacherInvoiceData,
+} from '../components/TeacherInvoiceDateSelect'
 import UserDocuments from '../components/UserDocuments'
 import {
   defaultTeacherFormData,
@@ -56,7 +58,7 @@ import {
 } from '../types/enums'
 import { teacherForm, teacherFormErrorTexts } from '../types/form'
 import subject from '../types/subject'
-import { leave, Role, teacher, timesAvailableParsed } from '../types/user'
+import { leave, teacher, timesAvailableParsed } from '../types/user'
 import {
   defaultTeacherFormErrorTexts,
   efzFormValidation,
@@ -265,7 +267,11 @@ const TeacherDetailView: React.FC = () => {
     })
   }
 
-  const generateInvoice = (year: number, month: number, teacherInvoiceData: TeacherInvoiceData) => {
+  const generateInvoice = (
+    year: number,
+    month: number,
+    teacherInvoiceData: TeacherInvoiceData,
+  ) => {
     enqueueSnackbar('Abrechnung wird generiert...', snackbarOptions)
     API.post('lessons/invoice/teacher', teacherInvoiceData, {
       params: {
@@ -279,7 +285,10 @@ const TeacherDetailView: React.FC = () => {
 
         const link = document.createElement('a')
         link.href = url
-        link.setAttribute('download', 'Abrechnung-' + year + '-' + month + '.pdf')
+        link.setAttribute(
+          'download',
+          'Abrechnung-' + year + '-' + month + '.pdf',
+        )
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
@@ -809,8 +818,9 @@ const TeacherDetailView: React.FC = () => {
             refresh={refreshDocuments}
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
             actions={
-              (id && (data.state === TeacherState.CONTRACT ||
-                data.state === TeacherState.EMPLOYED)) && (
+              id &&
+              (data.state === TeacherState.CONTRACT ||
+                data.state === TeacherState.EMPLOYED) && (
                 <>
                   <Button
                     variant="text"
@@ -952,9 +962,7 @@ const TeacherDetailView: React.FC = () => {
             data.deleteState === DeleteState.ACTIVE && (
               <>
                 <Typography variant="h6">Abrechnung:</Typography>
-                <TeacherInvoiceDataSelect
-                  generateInvoice={generateInvoice}
-                />
+                <TeacherInvoiceDataSelect generateInvoice={generateInvoice} />
               </>
             )}
         </Stack>

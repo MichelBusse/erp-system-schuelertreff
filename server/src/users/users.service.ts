@@ -20,6 +20,11 @@ import {
   renderTemplate,
 } from 'src/documents/documents.service'
 import { LessonsService } from 'src/lessons/lessons.service'
+import {
+  applicationMeetingProposalMail,
+  applicationMeetingSetDateMail,
+  employmentMail,
+} from 'src/mailTexts'
 
 import { ApplicationMeetingRequestDto } from './dto/application-meeting-request.dto'
 import { CreateAdminDto } from './dto/create-admin.dto'
@@ -46,7 +51,6 @@ import {
 import { Leave, LeaveState } from './entities/leave.entity'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
-import { applicationMeetingProposalMail, applicationMeetingSetDateMail, employmentMail } from 'src/mailTexts'
 
 require('dayjs/locale/de')
 
@@ -394,7 +398,7 @@ export class UsersService {
    * Teacher functions
    *
    **/
-   async findTeachers(): Promise<Teacher[]> {
+  async findTeachers(): Promise<Teacher[]> {
     return this.teachersRepository
       .find({
         relations: ['subjects'],
@@ -408,7 +412,10 @@ export class UsersService {
     return this.teachersRepository
       .find({
         relations: ['subjects'],
-        where: { deleteState: Not(DeleteState.DELETED), state: Not(TeacherState.EMPLOYED) },
+        where: {
+          deleteState: Not(DeleteState.DELETED),
+          state: Not(TeacherState.EMPLOYED),
+        },
         order: { firstName: 'ASC', lastName: 'ASC' },
       })
       .then(transformUsers)
@@ -418,7 +425,10 @@ export class UsersService {
     return this.teachersRepository
       .find({
         relations: ['subjects'],
-        where: { deleteState: Not(DeleteState.DELETED), state: TeacherState.EMPLOYED },
+        where: {
+          deleteState: Not(DeleteState.DELETED),
+          state: TeacherState.EMPLOYED,
+        },
         order: { firstName: 'ASC', lastName: 'ASC' },
       })
       .then(transformUsers)
@@ -428,7 +438,10 @@ export class UsersService {
     return this.teachersRepository
       .find({
         relations: ['subjects'],
-        where: { deleteState: DeleteState.DELETED, state: TeacherState.EMPLOYED },
+        where: {
+          deleteState: DeleteState.DELETED,
+          state: TeacherState.EMPLOYED,
+        },
         order: { firstName: 'ASC', lastName: 'ASC' },
       })
       .then(transformUsers)
@@ -438,7 +451,10 @@ export class UsersService {
     return this.teachersRepository
       .find({
         relations: ['subjects'],
-        where: { deleteState: DeleteState.DELETED, state: Not(TeacherState.EMPLOYED) },
+        where: {
+          deleteState: DeleteState.DELETED,
+          state: Not(TeacherState.EMPLOYED),
+        },
         order: { firstName: 'ASC', lastName: 'ASC' },
       })
       .then(transformUsers)
@@ -582,13 +598,18 @@ export class UsersService {
       updatedTeacher.mayAuthenticate = true
     }
 
-    if(user.state === TeacherState.CONTRACT && updatedTeacher.state === TeacherState.EMPLOYED){
+    if (
+      user.state === TeacherState.CONTRACT &&
+      updatedTeacher.state === TeacherState.EMPLOYED
+    ) {
       try {
         this.transport.sendMail(
           {
             to: user.email,
             subject: 'Schülertreff - Willkommen',
-            text: employmentMail(updatedTeacher.firstName + " " + updatedTeacher.lastName),
+            text: employmentMail(
+              updatedTeacher.firstName + ' ' + updatedTeacher.lastName,
+            ),
           },
           (error) => {
             if (error) console.log(error)
@@ -631,13 +652,23 @@ export class UsersService {
           {
             to: user.email,
             subject: 'Schülertreff - Termin Bewerbungsgespräch',
-            text: applicationMeetingSetDateMail(user.firstName + " " + user.lastName, 'https://us04web.zoom.us/j/73707078960?pwd=aWFFbThlTVIrTzQ5dWZVYlVzYWNqdz09', `- ${dayjs(dto.dates[0]).locale('de').format('dddd')}, den ${dayjs(dto.dates[0]).format('DD.MM.YYYY')} um ${dayjs(dto.dates[0]).format('HH:mm')} Uhr`),
+            text: applicationMeetingSetDateMail(
+              user.firstName + ' ' + user.lastName,
+              'https://us04web.zoom.us/j/73707078960?pwd=aWFFbThlTVIrTzQ5dWZVYlVzYWNqdz09',
+              `- ${dayjs(dto.dates[0])
+                .locale('de')
+                .format('dddd')}, den ${dayjs(dto.dates[0]).format(
+                'DD.MM.YYYY',
+              )} um ${dayjs(dto.dates[0]).format('HH:mm')} Uhr`,
+            ),
           },
           (error) => {
             if (error) console.log(error)
           },
         )
-        console.log('Meeting-Confirmation-Mail successfully sent to ' + user.email)
+        console.log(
+          'Meeting-Confirmation-Mail successfully sent to ' + user.email,
+        )
       } catch {
         console.log('Failed to send meeting email to ' + user.email)
       }
@@ -648,12 +679,23 @@ export class UsersService {
           {
             to: user.email,
             subject: 'Schülertreff - Terminvorschläge Bewerbungsgespräch',
-            text: applicationMeetingProposalMail(user.firstName + " " + user.lastName, 'https://us04web.zoom.us/j/73707078960?pwd=aWFFbThlTVIrTzQ5dWZVYlVzYWNqdz09', dto.dates.map((date) => `- ${dayjs(date).locale('de').format('dddd')}, den ${dayjs(date).format('DD.MM.YYYY')} um ${dayjs(date).format('HH:mm')} Uhr`)),
+            text: applicationMeetingProposalMail(
+              user.firstName + ' ' + user.lastName,
+              'https://us04web.zoom.us/j/73707078960?pwd=aWFFbThlTVIrTzQ5dWZVYlVzYWNqdz09',
+              dto.dates.map(
+                (date) =>
+                  `- ${dayjs(date).locale('de').format('dddd')}, den ${dayjs(
+                    date,
+                  ).format('DD.MM.YYYY')} um ${dayjs(date).format(
+                    'HH:mm',
+                  )} Uhr`,
+              ),
+            ),
           },
           (error) => {
             if (error) console.log(error)
           },
-        )        
+        )
         console.log('Meeting-Proposal-Mail successfully sent to ' + user.email)
       } catch {
         console.log('Failed to send meeting suggestions email to ' + user.email)
@@ -751,11 +793,11 @@ export class UsersService {
         )
       }
     } else {
-      if(customer.deleteState !== DeleteState.DELETED){
+      if (customer.deleteState !== DeleteState.DELETED) {
         this.privateCustomersRepository.update(id, {
           deleteState: DeleteState.DELETED,
         })
-      }else{
+      } else {
         this.customersRepository.delete(id)
       }
     }
@@ -935,11 +977,11 @@ export class UsersService {
         )
       }
     } else {
-      if(school.deleteState !== DeleteState.DELETED){
+      if (school.deleteState !== DeleteState.DELETED) {
         this.schoolsRepository.update(id, {
           deleteState: DeleteState.DELETED,
         })
-      }else{
+      } else {
         this.schoolsRepository.delete(id)
       }
     }

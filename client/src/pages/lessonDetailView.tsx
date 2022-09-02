@@ -28,7 +28,6 @@ const LessonDetailView: React.FC = () => {
   const { initialDate, contractId, date } = useParams()
   const [id, setId] = useState<number | null>(null)
   const { decodeToken } = useAuth()
-  const [refresh, setRefresh] = useState(0)
 
   const { enqueueSnackbar } = useSnackbar()
   const [contractDialogOpen, setContractDialogOpen] = useState<boolean>(false)
@@ -56,7 +55,7 @@ const LessonDetailView: React.FC = () => {
       setId(res.data?.id)
       setData(lesson)
     })
-  }, [refresh])
+  }, [])
 
   const submitForm = () => {
     API.post('lessons/' + (id ?? ''), {
@@ -229,7 +228,8 @@ const LessonDetailView: React.FC = () => {
                   variant="contained"
                   onClick={() => {
                     setRender(render + 1)
-                    setContractDialogOpen(true)}}
+                    setContractDialogOpen(true)
+                  }}
                 >
                   Einsatz bearbeiten
                 </Button>

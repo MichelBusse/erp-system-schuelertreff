@@ -1,21 +1,10 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBackIosNew'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos'
-import {
-  Box,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Stack,
-  Typography,
-} from '@mui/material'
+import { Box, IconButton, ListItem, Stack, Typography } from '@mui/material'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
-import { NavLink } from 'react-router-dom'
-import { contractWithTeacher } from '../../types/contract'
 
-import { school } from '../../types/user'
+import { contractWithTeacher } from '../../types/contract'
 import { useAuth } from '../AuthProvider'
 import ContractList from '../ContractList'
 

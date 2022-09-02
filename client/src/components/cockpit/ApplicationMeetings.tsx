@@ -43,7 +43,7 @@ const ApplicationMeetings: React.FC = () => {
               backgroundColor: '#f5f5f5',
               borderRadius: '4px',
               margin: '5px 0',
-              maxHeight: '500px'
+              maxHeight: '500px',
             }}
           >
             <ListItem>

@@ -229,9 +229,7 @@ export class UsersController {
 
   @Get('teacher/generateEFZ')
   @Roles(Role.ADMIN)
-  async generateEFZ(
-    @Query('teacherId') id: number,
-  ): Promise<Document> {
+  async generateEFZ(@Query('teacherId') id: number): Promise<Document> {
     return this.usersService.generateEFZ(id)
   }
 

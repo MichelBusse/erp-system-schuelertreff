@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -63,7 +62,7 @@ export class LessonsController {
     const buffer = await this.lessonsService.generateInvoiceTeacher({
       invoiceMonth: dayjs(month, 'YYYY-MM-DD'),
       teacherId: Number(teacherId),
-      teacherInvoiceData
+      teacherInvoiceData,
     })
 
     res.set({

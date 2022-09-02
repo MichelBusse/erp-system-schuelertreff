@@ -58,12 +58,14 @@ export class ContractsService {
     if (savedContract.state === ContractState.ACCEPTED)
       await this.lessonsService.cancelByContract(savedContract)
 
-    if(dto.initialContractId){
-      const initialContract = await this.contractsRepository.findOneByOrFail({ id: dto.initialContractId })
+    if (dto.initialContractId) {
+      const initialContract = await this.contractsRepository.findOneByOrFail({
+        id: dto.initialContractId,
+      })
 
-      if(dayjs(initialContract.startDate).isAfter(dayjs())){
-        this.contractsRepository.delete({id: dto.initialContractId})
-      }else{
+      if (dayjs(initialContract.startDate).isAfter(dayjs())) {
+        this.contractsRepository.delete({ id: dto.initialContractId })
+      } else {
         initialContract.endDate = dayjs().format('YYYY-MM-DD')
       }
 
@@ -131,11 +133,13 @@ export class ContractsService {
       .leftJoin('c.customers', 'customer')
       .leftJoin('customer.school', 'school')
       .leftJoinAndSelect('c.teacher', 't')
-      .where('customer.school IS NOT NULL AND customer.school.id = :schoolId', {schoolId: schoolId})
+      .where('customer.school IS NOT NULL AND customer.school.id = :schoolId', {
+        schoolId: schoolId,
+      })
       .andWhere('(c.endDate IS NULL OR c.endDate > now())')
       .orderBy('c.startDate', 'ASC')
       .addOrderBy('c.startTime', 'ASC')
-    
+
     return contracts.getMany()
   }
 
@@ -147,11 +151,13 @@ export class ContractsService {
       .leftJoin('c.customers', 'customer')
       .leftJoin('customer.school', 'school')
       .leftJoinAndSelect('c.teacher', 't')
-      .where('customer.id = :privateCustomerId', {privateCustomerId: privateCustomerId})
+      .where('customer.id = :privateCustomerId', {
+        privateCustomerId: privateCustomerId,
+      })
       .andWhere('(c.endDate IS NULL OR c.endDate > now())')
       .orderBy('c.startDate', 'ASC')
       .addOrderBy('c.startTime', 'ASC')
-    
+
     return contracts.getMany()
   }
 
@@ -163,11 +169,11 @@ export class ContractsService {
       .leftJoin('c.customers', 'customer')
       .leftJoin('customer.school', 'school')
       .leftJoinAndSelect('c.teacher', 't')
-      .where('id IS NOT NULL AND t.id = :teacherId', {teacherId: teacherId})
+      .where('id IS NOT NULL AND t.id = :teacherId', { teacherId: teacherId })
       .andWhere('(c.endDate IS NULL OR c.endDate > now())')
       .orderBy('c.startDate', 'ASC')
       .addOrderBy('c.startTime', 'ASC')
-    
+
     return contracts.getMany()
   }
 
@@ -179,15 +185,23 @@ export class ContractsService {
       .leftJoin('c.customers', 'customer')
       .leftJoin('customer.school', 'school')
       .leftJoinAndSelect('c.teacher', 't')
-      .where('extract(isodow from c.startDate) = :dow', {dow: dayjs(date, 'YYYY-MM-DD').day()})
-      .andWhere('c.startDate <= :inputDate', {inputDate: dayjs(date, 'YYYY-MM-DD').format('YYYY-MM-DD')})
-      .andWhere(new Brackets((qb) => {
-        qb.where('c.endDate IS NULL')
-        qb.orWhere('c.endDate >= :inputDate', {inputDate: dayjs(date, 'YYYY-MM-DD').format('YYYY-MM-DD')})
-      }))
+      .where('extract(isodow from c.startDate) = :dow', {
+        dow: dayjs(date, 'YYYY-MM-DD').day(),
+      })
+      .andWhere('c.startDate <= :inputDate', {
+        inputDate: dayjs(date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+      })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('c.endDate IS NULL')
+          qb.orWhere('c.endDate >= :inputDate', {
+            inputDate: dayjs(date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+          })
+        }),
+      )
       .orderBy('c.startDate', 'ASC')
       .addOrderBy('c.startTime', 'ASC')
-    
+
     return contracts.getMany()
   }
 
@@ -199,10 +213,10 @@ export class ContractsService {
       .leftJoin('c.customers', 'customer')
       .leftJoin('customer.school', 'school')
       .leftJoinAndSelect('c.teacher', 't')
-      .where("c.teacher IS NULL")
+      .where('c.teacher IS NULL')
       .orderBy('c.startDate', 'ASC')
       .addOrderBy('c.startTime', 'ASC')
-    
+
     return contracts.getMany()
   }
 
@@ -516,7 +530,7 @@ export class ContractsService {
 
     if (ignoreContracts.length)
       qb.andWhere('c.id NOT IN (:...ignoreContracts)', {
-        ignoreContracts
+        ignoreContracts,
       })
 
     return qb.getMany()

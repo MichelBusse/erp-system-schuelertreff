@@ -75,7 +75,10 @@ const UserDocuments: React.FC<Props> = ({
   }
 
   const downloadDoc = (doc: documentType) => {
-    API.get(`documents/${doc.id}/file`, { responseType: 'blob', timeout: 30000 })
+    API.get(`documents/${doc.id}/file`, {
+      responseType: 'blob',
+      timeout: 30000,
+    })
       .then((res) => {
         const url = URL.createObjectURL(res.data)
 

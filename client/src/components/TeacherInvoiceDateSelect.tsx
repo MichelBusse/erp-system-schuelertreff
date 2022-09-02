@@ -4,17 +4,12 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TextField,
 } from '@mui/material'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 
-import { useAuth } from './AuthProvider'
 import InvoiceDataSelect from './InvoiceDateSelect'
 
 export type TeacherInvoiceData = {
@@ -40,7 +35,7 @@ const TeacherInvoiceDataSelect: React.FC<Props> = ({ generateInvoice }) => {
   })
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState<boolean>(false)
 
-  let defaultTeacherInvoiceData: TeacherInvoiceData = {
+  const defaultTeacherInvoiceData: TeacherInvoiceData = {
     costPerLiter: 1.9,
     consumption: 8,
   }
@@ -48,11 +43,13 @@ const TeacherInvoiceDataSelect: React.FC<Props> = ({ generateInvoice }) => {
   const [teacherInvoiceData, setTeacherInvoiceData] =
     useState<TeacherInvoiceData>(defaultTeacherInvoiceData)
 
-  const { API } = useAuth()
-
   return (
     <>
-      <InvoiceDataSelect invoiceDate={invoiceDate} setInvoiceDate={setInvoiceDate} setInvoiceDialogOpen={setInvoiceDialogOpen}/>
+      <InvoiceDataSelect
+        invoiceDate={invoiceDate}
+        setInvoiceDate={setInvoiceDate}
+        setInvoiceDialogOpen={setInvoiceDialogOpen}
+      />
       <Dialog open={invoiceDialogOpen}>
         <DialogTitle>Abrechnungsdaten</DialogTitle>
         <DialogContent>
@@ -92,7 +89,11 @@ const TeacherInvoiceDataSelect: React.FC<Props> = ({ generateInvoice }) => {
           </Button>
           <Button
             onClick={() => {
-              generateInvoice(invoiceDate.year, invoiceDate.month, teacherInvoiceData)
+              generateInvoice(
+                invoiceDate.year,
+                invoiceDate.month,
+                teacherInvoiceData,
+              )
               setInvoiceDialogOpen(false)
               setTeacherInvoiceData(defaultTeacherInvoiceData)
             }}
