@@ -133,22 +133,48 @@ const LessonDetailView: React.FC = () => {
           <TextField
             variant="outlined"
             fullWidth={true}
-            label="Kunde(n)"
-            value={
-              contract
-                ? contract.customers
-                    .map((c) => {
-                      return c.role === 'privateCustomer'
-                        ? c.firstName + ' ' + c.lastName
-                        : c.school.schoolName + ': ' + c.className
-                    })
-                    .join(', ')
-                : ''
-            }
+            label="Lehrkraft"
+            value={contract?.teacher ? contract.teacher.firstName + ' ' + contract.teacher.lastName : 'Ausstehend'}
             InputProps={{
               readOnly: true,
             }}
           />
+          <Stack direction={'row'} columnGap={2}>
+            {contract?.customers[0]?.role === 'classCustomer' && (
+              <TextField
+                variant="outlined"
+                fullWidth={true}
+                label="Schule"
+                value={contract.customers[0].school.schoolName}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+            )}
+            <TextField
+              variant="outlined"
+              fullWidth={true}
+              label={
+                contract?.customers[0]?.role === 'classCustomer'
+                  ? 'Klasse(n)'
+                  : 'Kunde(n)'
+              }
+              value={
+                contract
+                  ? contract.customers
+                      .map((c) => {
+                        return c.role === 'privateCustomer'
+                          ? c.firstName + ' ' + c.lastName
+                          : c.className
+                      })
+                      .join(', ')
+                  : ''
+              }
+              InputProps={{
+                readOnly: true,
+              }}
+            />
+          </Stack>
           <Stack direction={'row'} columnGap={2}>
             <FormControl fullWidth disabled={blocked}>
               <InputLabel>Status</InputLabel>

@@ -485,6 +485,8 @@ export class ContractsService {
                     dto.customers,
                     r,
                     dto.ignoreContracts,
+                    dto.startDate,
+                    dto.endDate
                   )
                 ).map((c) => c.id),
               })),
@@ -508,6 +510,8 @@ export class ContractsService {
     customers: number[],
     range: timeAvailable,
     ignoreContracts: number[],
+    startDate?: string,
+    endDate?: string | null,
   ) {
     const qb = this.contractsRepository.createQueryBuilder('c')
 
@@ -520,6 +524,7 @@ export class ContractsService {
       })
       .andWhere('c.startTime < :end::time')
       .andWhere('c.endTime > :start::time')
+      .andWhere('c.endDate > :startDate::date', { startDate })
       .andWhere(
         new Brackets((qb) => {
           qb.where('teacher.id = :tid', { tid: teacherId }) //
@@ -527,6 +532,8 @@ export class ContractsService {
         }),
       )
       .setParameters(range)
+
+    if (endDate) qb.andWhere('c.startDate < :endDate::date', { endDate })
 
     if (ignoreContracts.length)
       qb.andWhere('c.id NOT IN (:...ignoreContracts)', {
