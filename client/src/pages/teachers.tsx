@@ -241,7 +241,6 @@ const Teachers: React.FC = () => {
               </GridToolbarContainer>
             ),
           }}
-          hideFooter={true}
           rows={rows}
           columns={cols}
           getRowSpacing={getRowSpacing}

@@ -23,6 +23,8 @@ export const dataGridLocaleText: Partial<GridLocaleText> = {
   filterPanelInputLabel: 'Wert',
   filterOperatorContains: 'enthält',
   filterPanelInputPlaceholder: 'Eingabe',
+  noRowsLabel: 'Keine Einträge',
+  MuiTablePagination: { labelRowsPerPage: 'Einträge pro Seite:' },
 }
 
 export const defaultTeacherFormData: teacherForm = {
