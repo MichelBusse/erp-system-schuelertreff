@@ -344,13 +344,14 @@ export class ContractsService {
 
     // begin actual query
 
-    const qb = this.connection.createQueryBuilder()
-
     /* CUSTOMER QUERY */
 
-    const cTimes = qb
-      .subQuery()
-      .select('intersection(c."timesAvailable") * :filter::tstzmultirange')
+    const customerTimes = this.connection
+      .createQueryBuilder()
+      .select(
+        'intersection(c."timesAvailable") * :filter::tstzmultirange',
+        'customerTimes',
+      )
       .from(Customer, 'c')
       .where('c.id IN (:...cid)', { cid: dto.customers })
       .having('count(c) = :cc', { cc: dto.customers.length })
@@ -358,51 +359,57 @@ export class ContractsService {
 
     /* CONTRACT QUERY */
 
-    const contractQuery = qb
-      .subQuery()
-      .select(
-        `union_multirange((
+    const contractTimes = (withTeacher: boolean) => {
+      const qb = this.connection
+        .createQueryBuilder()
+        .select(
+          `union_multirange((
           '{[2001-01-0' || extract(dow from "con"."startDate") || ' ' || "con"."startTime" ||
           ', 2001-01-0' || extract(dow from "con"."startDate") || ' ' || "con"."endTime" || ')}'
         )::tstzmultirange)`,
-        'contractTimes',
-      )
-      .from(Contract, 'con')
-      .leftJoin('con.customers', 'customer')
-      .where(
-        new Brackets((contractQuery) => {
-          contractQuery
-            .where('t.id = con.teacherId')
-            .orWhere(`customer.id IN (:...cid)`, { cid: dto.customers })
-        }),
-      )
-      .andWhere('con.state = :contractState', {
-        contractState: ContractState.ACCEPTED,
-      })
-      .andWhere(
-        new Brackets((qb) => {
-          qb.where('con.endDate IS NULL')
-          qb.orWhere('con.endDate > :startDate', {
-            startDate: dto.startDate ?? dayjs().format('YYYY-MM-DD'),
-          })
-        }),
-      )
+          'contractTimes',
+        )
+        .from(Contract, 'con')
+        .leftJoin('con.customers', 'customer')
+        .where(
+          new Brackets((qb) => {
+            qb.where(`customer.id IN (:...cid)`, {
+              cid: dto.customers,
+            })
+            if (withTeacher) qb.orWhere('t.id = con.teacherId')
+          }),
+        )
+        .andWhere('con.state = :contractState', {
+          contractState: ContractState.ACCEPTED,
+        })
+        .andWhere(
+          new Brackets((qb) => {
+            qb.where('con.endDate IS NULL')
+            qb.orWhere('con.endDate > :startDate', {
+              startDate: dto.startDate ?? dayjs().format('YYYY-MM-DD'),
+            })
+          }),
+        )
 
-    if (typeof dto.endDate !== 'undefined')
-      contractQuery.andWhere('con.startDate < :endDate', {
-        endDate: dto.endDate,
-      })
+      if (typeof dto.endDate !== 'undefined')
+        qb.andWhere('con.startDate < :endDate', {
+          endDate: dto.endDate,
+        })
 
-    if (dto.interval !== 1) contractQuery.andWhere('con.interval = 1')
+      if (dto.interval !== 1) qb.andWhere('con.interval = 1')
 
-    if (dto.ignoreContracts.length)
-      contractQuery.andWhere('con.id NOT IN (:...ignoreContracts)', {
-        ignoreContracts: dto.ignoreContracts,
-      })
+      if (dto.ignoreContracts.length)
+        qb.andWhere('con.id NOT IN (:...ignoreContracts)', {
+          ignoreContracts: dto.ignoreContracts,
+        })
+
+      return qb
+    }
 
     /* MAIN QUERY */
 
-    const mainQuery = qb
+    const mainQuery = this.connection
+      .createQueryBuilder()
       .select('*')
       .from((subq) => {
         const sq = subq
@@ -412,8 +419,8 @@ export class ContractsService {
           .addSelect(
             `
               t."timesAvailable"
-              * ${cTimes.getQuery()}
-              - ${contractQuery.getQuery()}
+              * (${customerTimes.getQuery()})
+              - (${contractTimes(true).getQuery()})
             `,
             'possibleTimes',
           )
@@ -440,14 +447,44 @@ export class ContractsService {
 
         sq.groupBy('t.id')
 
-        sq.setParameters(cTimes.getParameters())
+        sq.setParameters(customerTimes.getParameters())
+        sq.setParameters(contractTimes(true).getParameters())
 
         return sq
       }, 's')
       .where(`s."possibleTimes" <> '{}'::tstzmultirange`)
 
     ;[1, 2, 3, 4, 5].map((n) => {
-      qb.addSelect(
+      mainQuery.addSelect(
+        's."possibleTimes" * ' +
+          `'{[2001-01-0${n}, 2001-01-0${n + 1})}'::tstzmultirange`,
+        n.toString(),
+      )
+    })
+
+    /* TIMES WITHOUT TEACHER QUERY */
+
+    const availableTimesWithoutTeacherQuery = this.connection
+      .createQueryBuilder()
+      .select('*')
+      .from((subq) => {
+        const sq = subq
+          .select('-1', 'teacherId')
+          .addSelect('', 'firstName')
+          .addSelect('', 'lastName')
+          .addSelect(`("customerTimes") - ("contractTimes")`, 'possibleTimes')
+          .from('(' + customerTimes.getQuery() + ')', 'customerTimes')
+          .addFrom('(' + contractTimes(false).getQuery() + ')', 'contractTimes')
+
+        sq.setParameters(customerTimes.getParameters())
+        sq.setParameters(contractTimes(false).getParameters())
+
+        return sq
+      }, 's')
+      .where(`s."possibleTimes" <> '{}'::tstzmultirange`)
+
+    ;[1, 2, 3, 4, 5].map((n) => {
+      availableTimesWithoutTeacherQuery.addSelect(
         's."possibleTimes" * ' +
           `'{[2001-01-0${n}, 2001-01-0${n + 1})}'::tstzmultirange`,
         n.toString(),
@@ -467,7 +504,11 @@ export class ContractsService {
       possibleTimes: string
     }
 
-    const availableTeachers = await mainQuery.getRawMany<at>()
+    let availableTeachers = await mainQuery.getRawMany<at>()
+    const availableTimesWithoutTeacher =
+      await availableTimesWithoutTeacherQuery.getRawMany<at>()
+
+    availableTeachers = availableTimesWithoutTeacher.concat(availableTeachers)
 
     const suggestions = await Promise.all(
       availableTeachers.map(async (a) => ({
@@ -486,7 +527,7 @@ export class ContractsService {
                     r,
                     dto.ignoreContracts,
                     dto.startDate,
-                    dto.endDate
+                    dto.endDate,
                   )
                 ).map((c) => c.id),
               })),

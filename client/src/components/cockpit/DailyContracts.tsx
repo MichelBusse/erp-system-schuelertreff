@@ -28,7 +28,7 @@ const DailyContracts: React.FC = () => {
     <>
       <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px' }}>
         <Stack direction="column" spacing={2} height={'100%'}>
-          <Typography variant="h6">Einsätze</Typography>
+          <Typography variant="h6">Tagesaktuelle Einsätze</Typography>
           <ContractList
             contracts={contracts}
             setContracts={setContracts}

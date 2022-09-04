@@ -52,7 +52,7 @@ const LessonOverview: React.FC<Props> = ({
           <Typography>
             <b>Lehrkraft:</b>
           </Typography>
-          <Typography>{contract.teacher.firstName + " " + contract.teacher.lastName}</Typography>
+          <Typography>{contract.teacher ? contract.teacher.firstName + " " + contract.teacher.lastName : 'Ausstehend'}</Typography>
         </Stack>
       {contract.customers && contract.customers[0].role === 'classCustomer' && (
         <Stack

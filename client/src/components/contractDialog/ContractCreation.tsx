@@ -97,7 +97,8 @@ const ContractCreation: React.FC<Props> = ({
         endTime: endTime,
         minTime: startTime,
         maxTime: endTime,
-        teacher: teacher.teacherId.toString(),
+        teacher:
+          teacher.teacherId === -1 ? 'later' : teacher.teacherId.toString(),
         teacherConfirmation: false,
         dow: suggestion.dow,
         selsuggestion: form.selsuggestion,
@@ -108,25 +109,25 @@ const ContractCreation: React.FC<Props> = ({
         const initialStartTime = dayjs(initialContract.startTime, 'HH:mm')
         const initialEndTime = dayjs(initialContract.endTime, 'HH:mm')
 
-        if (initialContract.teacher) {
-          if (teacher.teacherId === initialContract.teacher.id) {
-            if (
-              suggestion.dow === initialStartDate.day() &&
-              !dayjs(suggestion.start, 'HH:mm').isAfter(initialStartTime) &&
-              !dayjs(suggestion.end, 'HH:mm').isBefore(initialEndTime)
-            ) {
-              setForm((f) => ({
-                ...f,
-                startDate: getNextDow(suggestion.dow, f.startDate ?? undefined),
-                endDate: initialContract.endDate
-                  ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
-                  : null,
-                startTime: initialStartTime,
-                endTime: initialEndTime,
-                teacher: initialContract.teacher.id.toString(),
-                dow: suggestion.dow,
-              }))
-            }
+        if (
+          (initialContract.teacher &&
+            teacher.teacherId === initialContract.teacher.id) ||
+          (!initialContract.teacher && teacher.teacherId === -1)
+        ) {
+          if (
+            suggestion.dow === initialStartDate.day() &&
+            !dayjs(suggestion.start, 'HH:mm').isAfter(initialStartTime) &&
+            !dayjs(suggestion.end, 'HH:mm').isBefore(initialEndTime)
+          ) {
+            setForm((f) => ({
+              ...f,
+              startDate: getNextDow(suggestion.dow, f.startDate ?? undefined),
+              endDate: initialContract.endDate
+                ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
+                : null,
+              startTime: initialStartTime,
+              endTime: initialEndTime,
+            }))
           }
         }
       }
@@ -172,7 +173,9 @@ const ContractCreation: React.FC<Props> = ({
           <MenuItem value="">freie Wahl</MenuItem>
           {suggestions.flatMap((t, i) => [
             <ListSubheader key={t.teacherId}>
-              {t.teacherName + ` (${getTeacherById(t.teacherId)?.city})`}
+              {t.teacherId === -1
+                ? 'Ohne Lehrer'
+                : t.teacherName + ` (${getTeacherById(t.teacherId)?.city})`}
             </ListSubheader>,
             t.suggestions.map((s, j) => {
               let text =
