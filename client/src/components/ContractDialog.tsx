@@ -30,8 +30,10 @@ import ConfirmationDialog, {
 } from './ConfirmationDialog'
 import ContractCreation, { suggestion } from './contractDialog/ContractCreation'
 import Filter from './contractDialog/Filter'
+import * as isoWeek from 'dayjs/plugin/isoWeek'
 
 dayjs.extend(customParseFormat)
+dayjs.extend(isoWeek)
 
 export enum CustomerType {
   PRIVATE = 'privateCustomer',
@@ -174,33 +176,31 @@ const ContractDialog: React.FC<Props> = ({
           const resSuggestions = res.data as suggestion[]
 
           resSuggestions.forEach((teacherSuggestion, teacherIndex) => {
-            if (initialContract.teacher) {
-              if (teacherSuggestion.teacherId === initialContract.teacher.id) {
-                teacherSuggestion.suggestions.forEach(
-                  (timeSuggestion, timeIndex) => {
-                    if (
-                      timeSuggestion.dow === initialStartDate.day() &&
-                      !dayjs(timeSuggestion.start, 'HH:mm').isAfter(
-                        initialStartTime,
-                      ) &&
+            if (
+              (initialContract.teacher &&
+                teacherSuggestion.teacherId === initialContract.teacher.id) ||
+              (!initialContract.teacher && teacherSuggestion.teacherId === -1)
+            ) {
+              console.log(teacherSuggestion.suggestions)
+              teacherSuggestion.suggestions.forEach(
+                (timeSuggestion, timeIndex) => {
+                  if (
+                    timeSuggestion.dow === (initialStartDate.day()) &&
+                    !dayjs(timeSuggestion.start, 'HH:mm').isAfter(
+                      initialStartTime,
+                    ) &&
+                    (!timeSuggestion.end ||
                       !dayjs(timeSuggestion.end, 'HH:mm').isBefore(
                         initialEndTime,
-                      )
-                    ) {
-                      setForm1((form1) => ({
-                        ...form1,
-                        selsuggestion: teacherIndex + ',' + timeIndex,
-                      }))
-                    }
-                  },
-                )
-              }
-            } else {
-              setForm1((form1) => ({
-                ...form1,
-                startTime: dayjs(initialContract.startTime, 'HH:mm'),
-                endTime: initialEndTime,
-              }))
+                      ))
+                  ) {
+                    setForm1((form1) => ({
+                      ...form1,
+                      selsuggestion: teacherIndex + ',' + timeIndex,
+                    }))
+                  }
+                },
+              )
             }
           })
         }
