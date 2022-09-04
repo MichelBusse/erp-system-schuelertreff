@@ -127,7 +127,7 @@ const SubjectDialog: React.FC<Props> = ({
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
           spacing={2}
-          sx={{ marginBottom: '20px' }}
+          sx={{ marginBottom: '20px', paddingTop: '10px' }}
         >
           <TextField
             helperText={errors.name}
