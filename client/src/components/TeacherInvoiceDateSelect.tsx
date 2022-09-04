@@ -15,6 +15,7 @@ import InvoiceDataSelect from './InvoiceDateSelect'
 export type TeacherInvoiceData = {
   costPerLiter: number
   consumption: number
+  kilometers: number
 }
 
 type Props = {
@@ -36,6 +37,7 @@ const TeacherInvoiceDataSelect: React.FC<Props> = ({ generateInvoice }) => {
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState<boolean>(false)
 
   const defaultTeacherInvoiceData: TeacherInvoiceData = {
+    kilometers: 0,
     costPerLiter: 1.9,
     consumption: 8,
   }
@@ -54,6 +56,17 @@ const TeacherInvoiceDataSelect: React.FC<Props> = ({ generateInvoice }) => {
         <DialogTitle>Abrechnungsdaten</DialogTitle>
         <DialogContent>
           <Stack direction={'column'} rowGap={2} sx={{ marginTop: '5px' }}>
+            <TextField
+              label={'Gefahrene Kilometer'}
+              type={'number'}
+              value={teacherInvoiceData.kilometers}
+              onChange={(e) => {
+                setTeacherInvoiceData((data) => ({
+                  ...data,
+                  kilometers: Number(e.target.value),
+                }))
+              }}
+            />
             <TextField
               label={'Verbrauch ø in l'}
               type={'number'}

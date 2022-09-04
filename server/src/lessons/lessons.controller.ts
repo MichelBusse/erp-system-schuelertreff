@@ -53,6 +53,7 @@ export class LessonsController {
     @Res() res: Response,
     @Body()
     teacherInvoiceData: {
+      kilometers: number
       costPerLiter: number
       consumption: number
     },
