@@ -113,6 +113,15 @@ const AdminCalendar: React.FC<Props> = ({
       (n): GridColDef => ({
         field: n.toString(),
         headerName: date.day(n).format('dddd\nDD.MM.YYYY'),
+        renderHeader: () => (
+          <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.2' }}>
+            <span>
+              <b>{date.day(n).format('dddd')}</b>
+            </span>
+            <br />
+            <span>{date.day(n).format('DD.MM.YYYY')}</span>
+          </div>
+        ),
         width: 150,
         sortable: false,
         valueGetter: getCellValue,

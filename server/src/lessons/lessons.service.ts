@@ -283,7 +283,9 @@ export class LessonsService {
       month: invoiceMonth.locale('de').format('MMMM YYYY'),
       teacherInvoiceData: {
         kilometers: teacherInvoiceData.kilometers.toFixed(2).replace('.', ','),
-        kilometersHalf: (teacherInvoiceData.kilometers / 2).toFixed(2).replace('.', ','),
+        kilometersHalf: (teacherInvoiceData.kilometers / 2)
+          .toFixed(2)
+          .replace('.', ','),
         consumption: teacherInvoiceData.consumption
           .toFixed(2)
           .replace('.', ','),
@@ -292,7 +294,10 @@ export class LessonsService {
           .replace('.', ','),
         fee: Number(teacher.fee).toFixed(2).replace('.', ','),
         totalDrivingCosts: (
-          teacherInvoiceData.consumption * teacherInvoiceData.costPerLiter * teacherInvoiceData.kilometers * 0.005
+          teacherInvoiceData.consumption *
+          teacherInvoiceData.costPerLiter *
+          teacherInvoiceData.kilometers *
+          0.005
         )
           .toFixed(2)
           .replace('.', ','),
@@ -300,7 +305,10 @@ export class LessonsService {
         totalHourCosts: (totalHours * teacher.fee).toFixed(2).replace('.', ','),
         totalCosts: (
           totalHours * teacher.fee +
-          teacherInvoiceData.consumption * teacherInvoiceData.costPerLiter * teacherInvoiceData.kilometers * 0.005
+          teacherInvoiceData.consumption *
+            teacherInvoiceData.costPerLiter *
+            teacherInvoiceData.kilometers *
+            0.005
         )
           .toFixed(2)
           .replace('.', ','),

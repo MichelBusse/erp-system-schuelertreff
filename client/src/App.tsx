@@ -52,7 +52,6 @@ const theme = createTheme({
   },
 })
 
-
 const App: React.FC = () => {
   const { isAuthed } = useAuth()
 

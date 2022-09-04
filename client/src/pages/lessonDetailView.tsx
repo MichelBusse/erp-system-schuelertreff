@@ -134,7 +134,11 @@ const LessonDetailView: React.FC = () => {
             variant="outlined"
             fullWidth={true}
             label="Lehrkraft"
-            value={contract?.teacher ? contract.teacher.firstName + ' ' + contract.teacher.lastName : 'Ausstehend'}
+            value={
+              contract?.teacher
+                ? contract.teacher.firstName + ' ' + contract.teacher.lastName
+                : 'Ausstehend'
+            }
             InputProps={{
               readOnly: true,
             }}
@@ -175,6 +179,37 @@ const LessonDetailView: React.FC = () => {
               }}
             />
           </Stack>
+          {contract?.customers[0]?.role === 'classCustomer' && (
+            <Stack direction={'row'} columnGap={2}>
+              <TextField
+                variant="outlined"
+                fullWidth={true}
+                label="Straße"
+                value={contract.customers[0].school.street}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <TextField
+                variant="outlined"
+                fullWidth={true}
+                label="Stadt"
+                value={contract.customers[0].school.city}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <TextField
+                variant="outlined"
+                fullWidth={true}
+                label="Potleitzahl"
+                value={contract.customers[0].school.postalCode}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+            </Stack>
+          )}
           <Stack direction={'row'} columnGap={2}>
             <FormControl fullWidth disabled={blocked}>
               <InputLabel>Status</InputLabel>
