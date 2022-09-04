@@ -134,7 +134,11 @@ const LessonDetailView: React.FC = () => {
             variant="outlined"
             fullWidth={true}
             label="Lehrkraft"
-            value={contract?.teacher ? contract.teacher.firstName + ' ' + contract.teacher.lastName : 'Ausstehend'}
+            value={
+              contract?.teacher
+                ? contract.teacher.firstName + ' ' + contract.teacher.lastName
+                : 'Ausstehend'
+            }
             InputProps={{
               readOnly: true,
             }}

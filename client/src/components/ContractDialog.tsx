@@ -15,6 +15,7 @@ import {
 import { useTheme } from '@mui/material/styles'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import * as isoWeek from 'dayjs/plugin/isoWeek'
 import { useSnackbar } from 'notistack'
 import React, { useState } from 'react'
 
@@ -30,7 +31,6 @@ import ConfirmationDialog, {
 } from './ConfirmationDialog'
 import ContractCreation, { suggestion } from './contractDialog/ContractCreation'
 import Filter from './contractDialog/Filter'
-import * as isoWeek from 'dayjs/plugin/isoWeek'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(isoWeek)
@@ -185,7 +185,7 @@ const ContractDialog: React.FC<Props> = ({
               teacherSuggestion.suggestions.forEach(
                 (timeSuggestion, timeIndex) => {
                   if (
-                    timeSuggestion.dow === (initialStartDate.day()) &&
+                    timeSuggestion.dow === initialStartDate.day() &&
                     !dayjs(timeSuggestion.start, 'HH:mm').isAfter(
                       initialStartTime,
                     ) &&

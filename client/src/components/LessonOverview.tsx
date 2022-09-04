@@ -44,16 +44,20 @@ const LessonOverview: React.FC<Props> = ({
           contract.endTime.substring(0, 5)}
       </span>
       <Stack
-          direction={'row'}
-          columnGap={2}
-          alignItems={'center'}
-          justifyContent={'space-between'}
-        >
-          <Typography>
-            <b>Lehrkraft:</b>
-          </Typography>
-          <Typography>{contract.teacher ? contract.teacher.firstName + " " + contract.teacher.lastName : 'Ausstehend'}</Typography>
-        </Stack>
+        direction={'row'}
+        columnGap={2}
+        alignItems={'center'}
+        justifyContent={'space-between'}
+      >
+        <Typography>
+          <b>Lehrkraft:</b>
+        </Typography>
+        <Typography>
+          {contract.teacher
+            ? contract.teacher.firstName + ' ' + contract.teacher.lastName
+            : 'Ausstehend'}
+        </Typography>
+      </Stack>
       {contract.customers && contract.customers[0].role === 'classCustomer' && (
         <Stack
           direction={'row'}
