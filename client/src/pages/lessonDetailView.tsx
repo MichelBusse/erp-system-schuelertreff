@@ -179,6 +179,37 @@ const LessonDetailView: React.FC = () => {
               }}
             />
           </Stack>
+          {contract?.customers[0]?.role === 'classCustomer' && (
+            <Stack direction={'row'} columnGap={2}>
+              <TextField
+                variant="outlined"
+                fullWidth={true}
+                label="Straße"
+                value={contract.customers[0].school.street}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <TextField
+                variant="outlined"
+                fullWidth={true}
+                label="Stadt"
+                value={contract.customers[0].school.city}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+              <TextField
+                variant="outlined"
+                fullWidth={true}
+                label="Potleitzahl"
+                value={contract.customers[0].school.postalCode}
+                InputProps={{
+                  readOnly: true,
+                }}
+              />
+            </Stack>
+          )}
           <Stack direction={'row'} columnGap={2}>
             <FormControl fullWidth disabled={blocked}>
               <InputLabel>Status</InputLabel>
