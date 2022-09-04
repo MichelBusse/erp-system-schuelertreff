@@ -1,21 +1,8 @@
-import DeleteIcon from '@mui/icons-material/Delete'
-import EditIcon from '@mui/icons-material/Edit'
-import {
-  Box,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  Stack,
-  Typography,
-} from '@mui/material'
-import dayjs from 'dayjs'
-import { useSnackbar } from 'notistack'
+import { Box, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 
-import { ContractState, contractWithTeacher } from '../../types/contract'
+import { contractWithTeacher } from '../../types/contract'
 import { useAuth } from '../AuthProvider'
-import ContractDialog from '../ContractDialog'
 import ContractList from '../ContractList'
 
 const PendingContracts: React.FC = () => {

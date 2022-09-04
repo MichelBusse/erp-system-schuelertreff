@@ -4,22 +4,18 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TextField,
 } from '@mui/material'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 
-import { useAuth } from './AuthProvider'
 import InvoiceDataSelect from './InvoiceDateSelect'
 
 export type TeacherInvoiceData = {
   costPerLiter: number
   consumption: number
+  kilometers: number
 }
 
 type Props = {
@@ -40,7 +36,8 @@ const TeacherInvoiceDataSelect: React.FC<Props> = ({ generateInvoice }) => {
   })
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState<boolean>(false)
 
-  let defaultTeacherInvoiceData: TeacherInvoiceData = {
+  const defaultTeacherInvoiceData: TeacherInvoiceData = {
+    kilometers: 0,
     costPerLiter: 1.9,
     consumption: 8,
   }
@@ -48,15 +45,28 @@ const TeacherInvoiceDataSelect: React.FC<Props> = ({ generateInvoice }) => {
   const [teacherInvoiceData, setTeacherInvoiceData] =
     useState<TeacherInvoiceData>(defaultTeacherInvoiceData)
 
-  const { API } = useAuth()
-
   return (
     <>
-      <InvoiceDataSelect invoiceDate={invoiceDate} setInvoiceDate={setInvoiceDate} setInvoiceDialogOpen={setInvoiceDialogOpen}/>
+      <InvoiceDataSelect
+        invoiceDate={invoiceDate}
+        setInvoiceDate={setInvoiceDate}
+        setInvoiceDialogOpen={setInvoiceDialogOpen}
+      />
       <Dialog open={invoiceDialogOpen}>
         <DialogTitle>Abrechnungsdaten</DialogTitle>
         <DialogContent>
           <Stack direction={'column'} rowGap={2} sx={{ marginTop: '5px' }}>
+            <TextField
+              label={'Gefahrene Kilometer'}
+              type={'number'}
+              value={teacherInvoiceData.kilometers}
+              onChange={(e) => {
+                setTeacherInvoiceData((data) => ({
+                  ...data,
+                  kilometers: Number(e.target.value),
+                }))
+              }}
+            />
             <TextField
               label={'Verbrauch ø in l'}
               type={'number'}
@@ -92,7 +102,11 @@ const TeacherInvoiceDataSelect: React.FC<Props> = ({ generateInvoice }) => {
           </Button>
           <Button
             onClick={() => {
-              generateInvoice(invoiceDate.year, invoiceDate.month, teacherInvoiceData)
+              generateInvoice(
+                invoiceDate.year,
+                invoiceDate.month,
+                teacherInvoiceData,
+              )
               setInvoiceDialogOpen(false)
               setTeacherInvoiceData(defaultTeacherInvoiceData)
             }}

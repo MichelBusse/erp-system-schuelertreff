@@ -80,27 +80,31 @@ export class LessonsService {
       teacherId,
     )
 
-      // check for intersecting leaves
-      if (contract.teacher ? ((await this.checkLeave(dto.date, contract.teacher.id)) > 0) : false)
-        throw new BadRequestException('Lesson is blocked')
+    // check for intersecting leaves
+    if (
+      contract.teacher
+        ? (await this.checkLeave(dto.date, contract.teacher.id)) > 0
+        : false
+    )
+      throw new BadRequestException('Lesson is blocked')
 
-      if (contract) {
-        if (contract.state !== ContractState.ACCEPTED)
-          throw new BadRequestException(
-            'You cannot create lessons of unaccepted contracts',
-          )
-
-        lesson.date = dto.date
-        lesson.state = dto.state
-        lesson.notes = dto.notes
-        lesson.contract = contract
-
-        return this.lessonsRepository.save(lesson)
-      } else {
+    if (contract) {
+      if (contract.state !== ContractState.ACCEPTED)
         throw new BadRequestException(
-          'You do not have permission to create this lesson',
+          'You cannot create lessons of unaccepted contracts',
         )
-      }
+
+      lesson.date = dto.date
+      lesson.state = dto.state
+      lesson.notes = dto.notes
+      lesson.contract = contract
+
+      return this.lessonsRepository.save(lesson)
+    } else {
+      throw new BadRequestException(
+        'You do not have permission to create this lesson',
+      )
+    }
   }
 
   async update(
@@ -242,6 +246,7 @@ export class LessonsService {
     invoiceMonth: Dayjs
     teacherId: number
     teacherInvoiceData: {
+      kilometers: number
       costPerLiter: number
       consumption: number
     }
@@ -277,6 +282,8 @@ export class LessonsService {
       date: dayjs().format('DD.MM.YYYY'),
       month: invoiceMonth.locale('de').format('MMMM YYYY'),
       teacherInvoiceData: {
+        kilometers: teacherInvoiceData.kilometers.toFixed(2).replace('.', ','),
+        kilometersHalf: (teacherInvoiceData.kilometers / 2).toFixed(2).replace('.', ','),
         consumption: teacherInvoiceData.consumption
           .toFixed(2)
           .replace('.', ','),
@@ -285,7 +292,7 @@ export class LessonsService {
           .replace('.', ','),
         fee: Number(teacher.fee).toFixed(2).replace('.', ','),
         totalDrivingCosts: (
-          teacherInvoiceData.consumption * teacherInvoiceData.costPerLiter
+          teacherInvoiceData.consumption * teacherInvoiceData.costPerLiter * teacherInvoiceData.kilometers * 0.005
         )
           .toFixed(2)
           .replace('.', ','),
@@ -293,7 +300,7 @@ export class LessonsService {
         totalHourCosts: (totalHours * teacher.fee).toFixed(2).replace('.', ','),
         totalCosts: (
           totalHours * teacher.fee +
-          teacherInvoiceData.consumption * teacherInvoiceData.costPerLiter
+          teacherInvoiceData.consumption * teacherInvoiceData.costPerLiter * teacherInvoiceData.kilometers * 0.005
         )
           .toFixed(2)
           .replace('.', ','),

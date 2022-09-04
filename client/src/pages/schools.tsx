@@ -105,8 +105,7 @@ const Schools: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [deletedSchoolsToggle, setDeletedSchoolsToggle] =
-  useState<boolean>(false)
-
+    useState<boolean>(false)
 
   const { API } = useAuth()
 
@@ -264,7 +263,6 @@ const Schools: React.FC = () => {
               </GridToolbarContainer>
             ),
           }}
-          hideFooter={true}
           rows={rows}
           columns={cols}
           getRowSpacing={getRowSpacing}

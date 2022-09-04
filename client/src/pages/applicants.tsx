@@ -1,26 +1,12 @@
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import FolderDeleteIcon from '@mui/icons-material/FolderDelete'
-import {
-  Autocomplete,
-  Box,
-  Chip,
-  FormControl,
-  IconButton,
-  InputLabel,
-  NativeSelect,
-  Stack,
-  TextField,
-} from '@mui/material'
+import { Chip, IconButton, Stack } from '@mui/material'
 import {
   DataGrid,
   getGridStringOperators,
-  GridCellParams,
   GridColumns,
   GridColumnVisibilityModel,
   GridEventListener,
-  GridFilterInputValueProps,
-  GridFilterItem,
-  GridFilterOperator,
   GridRowSpacingParams,
   GridToolbarContainer,
   GridToolbarFilterButton,
@@ -31,17 +17,17 @@ import useMeasure from 'react-use-measure'
 
 import { useAuth } from '../components/AuthProvider'
 import TeacherDialog from '../components/TeacherDialog'
-import {
-  dataGridLocaleText,
-  teacherSchoolTypeToString,
-  teacherStateToString,
-} from '../consts'
-import { Degree, TeacherSchoolType, TeacherState } from '../types/enums'
+import { dataGridLocaleText, teacherStateToString } from '../consts'
+import { TeacherState } from '../types/enums'
 import subject from '../types/subject'
 import { teacher } from '../types/user'
-import { degreeOperator, schoolTypesOperator, stateOperator, subjectOperator } from '../utils/teacherFilterData'
+import {
+  degreeOperator,
+  schoolTypesOperator,
+  stateOperator,
+  subjectOperator,
+} from '../utils/teacherFilterData'
 import styles from './gridList.module.scss'
-
 
 const Applicants: React.FC = () => {
   const [open, setOpen] = useState(false)
@@ -256,7 +242,6 @@ const Applicants: React.FC = () => {
               </GridToolbarContainer>
             ),
           }}
-          hideFooter={true}
           rows={rows}
           columns={cols}
           getRowSpacing={getRowSpacing}

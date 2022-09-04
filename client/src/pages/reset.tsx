@@ -14,9 +14,8 @@ import { useState } from 'react'
 import PasswordChecklist from 'react-password-checklist'
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { useAuth } from '../components/AuthProvider'
-
 import logo from '../assets/logoLarge.png'
+import { useAuth } from '../components/AuthProvider'
 
 const Reset: React.FC = () => {
   const [dialog, setDialog] = useState<'' | 'error' | 'success'>('')

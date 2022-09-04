@@ -4,10 +4,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
   TextField,
 } from '@mui/material'
@@ -26,7 +22,6 @@ export type CustomerInvoiceData = {
   invoiceDate: Dayjs
 }
 
-
 type Props = {
   generateInvoice: (
     year: number,
@@ -36,7 +31,10 @@ type Props = {
   type: Role
 }
 
-const CustomerInvoiceDataSelect: React.FC<Props> = ({ generateInvoice, type }) => {
+const CustomerInvoiceDataSelect: React.FC<Props> = ({
+  generateInvoice,
+  type,
+}) => {
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState<boolean>(false)
   const [invoiceDate, setInvoiceDate] = useState<{
     month: number
@@ -46,14 +44,12 @@ const CustomerInvoiceDataSelect: React.FC<Props> = ({ generateInvoice, type }) =
     year: dayjs().subtract(27, 'day').year(),
   })
 
-
   let defaultInvoiceData: CustomerInvoiceData = {
     invoiceNumber: 1,
     invoiceType: 'Nachhilfe',
     invoicePreparationTime: 0,
     invoiceDate: dayjs(),
   }
-
 
   if (type === Role.SCHOOL)
     defaultInvoiceData = {
@@ -75,7 +71,11 @@ const CustomerInvoiceDataSelect: React.FC<Props> = ({ generateInvoice, type }) =
 
   return (
     <>
-      <InvoiceDataSelect invoiceDate={invoiceDate} setInvoiceDate={setInvoiceDate} setInvoiceDialogOpen={setInvoiceDialogOpen}/>
+      <InvoiceDataSelect
+        invoiceDate={invoiceDate}
+        setInvoiceDate={setInvoiceDate}
+        setInvoiceDialogOpen={setInvoiceDialogOpen}
+      />
       <Dialog open={invoiceDialogOpen}>
         <DialogTitle>Rechnungsdaten</DialogTitle>
         <DialogContent>

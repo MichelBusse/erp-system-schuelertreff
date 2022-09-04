@@ -66,8 +66,8 @@
         <tr><td></td><td></td><td></td></tr>
         <tr><td>Zahlung (€)</td><td></td><td><%= invoiceInfo.teacherInvoiceData.totalHourCosts %></td></tr>
         <tr><td></td><td></td><td></td></tr>
-        <tr><td>Fahrgeld (evtl.)</td><td>200 km</td><td></td></tr>
-        <tr><td>X 1/2</td><td>100 km</td><td></td></tr>
+        <tr><td>Fahrgeld (evtl.)</td><td><%= invoiceInfo.teacherInvoiceData.kilometers %> km</td><td></td></tr>
+        <tr><td>X 1/2</td><td><%= invoiceInfo.teacherInvoiceData.kilometersHalf %> km</td><td></td></tr>
         <tr><td></td><td></td><td></td></tr>
         <tr><td>Verbrauch ø in l</td><td><%= invoiceInfo.teacherInvoiceData.consumption %></td><td></td></tr>
         <tr><td>Preis (€/l)</td><td><%= invoiceInfo.teacherInvoiceData.costPerLiter %></td><td></td></tr>

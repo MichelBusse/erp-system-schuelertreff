@@ -8,8 +8,8 @@ import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
 import * as argon2 from 'argon2'
 import nodemailer from 'nodemailer'
-import { passwordResetMail, registrationMailText } from 'src/mailTexts'
 
+import { passwordResetMail, registrationMailText } from 'src/mailTexts'
 import { Teacher, User } from 'src/users/entities'
 import { DeleteState } from 'src/users/entities/user.entity'
 import { UsersService } from 'src/users/users.service'
@@ -86,7 +86,7 @@ export class AuthService {
     }
 
     // Welcome Mail when setting password the first time
-    if(!user.passwordHash || user.passwordHash === ''){
+    if (!user.passwordHash || user.passwordHash === '') {
       mailOptions.subject = 'Willkommen bei Schülertreff'
       mailOptions.text = registrationMailText(link)
     }

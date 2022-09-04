@@ -1,3 +1,4 @@
+import Applicants from './applicants'
 import Cockpit from './cockpit'
 import LessonDetailView from './lessonDetailView'
 import Login from './login'
@@ -10,7 +11,6 @@ import Subjects from './subjects'
 import TeacherDetailView from './teacherDetailView'
 import Teachers from './teachers'
 import Timetable from './timetable'
-import Applicants from './applicants'
 
 export default {
   Cockpit,

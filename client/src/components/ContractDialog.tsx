@@ -24,12 +24,12 @@ import { ContractType } from '../types/enums'
 import { ContractCreationForm, ContractFilterForm } from '../types/form'
 import { leave } from '../types/user'
 import { useAuth } from './AuthProvider'
-import ContractCreation, { suggestion } from './contractDialog/ContractCreation'
-import Filter from './contractDialog/Filter'
 import ConfirmationDialog, {
   ConfirmationDialogProps,
   defaultConfirmationDialogProps,
 } from './ConfirmationDialog'
+import ContractCreation, { suggestion } from './contractDialog/ContractCreation'
+import Filter from './contractDialog/Filter'
 
 dayjs.extend(customParseFormat)
 
@@ -73,7 +73,7 @@ const ContractDialog: React.FC<Props> = ({
     endDate: null,
     customerType: CustomerType.PRIVATE,
     contractType: ContractType.STANDARD,
-    ...initialForm0Props
+    ...initialForm0Props,
   })
 
   // step 1

@@ -1,16 +1,7 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBackIosNew'
-import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos'
-import {
-  Box,
-  IconButton,
-  ListItem,
-  Stack,
-  Typography,
-} from '@mui/material'
-import dayjs, { Dayjs } from 'dayjs'
+import { Box, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { contractWithTeacher } from '../../types/contract'
 
+import { contractWithTeacher } from '../../types/contract'
 import { useAuth } from '../AuthProvider'
 import ContractList from '../ContractList'
 
@@ -20,15 +11,17 @@ const ContractsWithoutTeacher: React.FC = () => {
   const [refreshContracts, setRefreshContracts] = useState<number>(0)
 
   useEffect(() => {
-    API.get('contracts/missingTeacher', {
-    }).then((res) => {
+    API.get('contracts/missingTeacher', {}).then((res) => {
       setContracts(res.data)
     })
   }, [refreshContracts])
 
   return (
     <>
-      <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px', height: '100%' }}>
+      <Box
+        p={4}
+        sx={{ backgroundColor: '#ffffff', borderRadius: '4px', height: '100%' }}
+      >
         <Stack direction="column" spacing={2} height={'100%'}>
           <Typography variant="h6">Lehrer zuweisen</Typography>
           <ContractList

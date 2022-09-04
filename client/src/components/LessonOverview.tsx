@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom'
 import { contract } from '../types/contract'
 import { ContractType } from '../types/enums'
 import { lesson, LessonState } from '../types/lesson'
-import styles from './Calendar.module.scss'
 
 type Props = {
   contract: contract
@@ -44,7 +43,17 @@ const LessonOverview: React.FC<Props> = ({
           ' - ' +
           contract.endTime.substring(0, 5)}
       </span>
-
+      <Stack
+          direction={'row'}
+          columnGap={2}
+          alignItems={'center'}
+          justifyContent={'space-between'}
+        >
+          <Typography>
+            <b>Lehrkraft:</b>
+          </Typography>
+          <Typography>{contract.teacher.firstName + " " + contract.teacher.lastName}</Typography>
+        </Stack>
       {contract.customers && contract.customers[0].role === 'classCustomer' && (
         <Stack
           direction={'row'}

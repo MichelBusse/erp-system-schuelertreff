@@ -6,7 +6,7 @@ import {
   Select,
   Stack,
 } from '@mui/material'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 
 type Props = {
   invoiceDate: {

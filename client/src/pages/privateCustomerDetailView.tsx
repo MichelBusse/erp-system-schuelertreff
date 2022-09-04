@@ -1,11 +1,6 @@
-import { AddCircle, Unarchive } from '@mui/icons-material'
+import { AddCircle } from '@mui/icons-material'
 import {
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   FormControl,
   IconButton,
   InputLabel,
@@ -70,7 +65,7 @@ const PrivateCustomerDetailView: React.FC = () => {
   const [errors, setErrors] = useState<privateCustomerFormErrorTexts>(
     defaultPrivateCustomerFormErrorTexts,
   )
-  
+
   const [render, setRender] = useState<number>(0)
   const [contractDialogOpen, setContractDialogOpen] = useState<boolean>(false)
 
@@ -527,7 +522,7 @@ const PrivateCustomerDetailView: React.FC = () => {
         key={render}
         open={contractDialogOpen}
         setOpen={setContractDialogOpen}
-        onSuccess={() => setRefreshContracts((r) => (++r))}
+        onSuccess={() => setRefreshContracts((r) => ++r)}
         initialForm0Props={
           id
             ? {

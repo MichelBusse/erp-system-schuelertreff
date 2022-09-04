@@ -1,8 +1,15 @@
 import { Delete, Edit } from '@mui/icons-material'
-import { IconButton, List, ListItem, ListItemText, useTheme } from '@mui/material'
+import {
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  useTheme,
+} from '@mui/material'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
+
 import {
   contractStateToString,
   contractTypeToString,
@@ -27,7 +34,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
   contracts,
   setContracts,
   onSuccess,
-  children
+  children,
 }) => {
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
@@ -79,7 +86,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
           backgroundColor: '#f5f5f5',
           borderRadius: '4px',
           margin: '5px 0',
-          height: '100%'
+          height: '100%',
         }}
       >
         {children}
@@ -111,7 +118,10 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
                       contractTypeToString[contract.contractType] +
                       ')'}
                   </span>{' '}
-                  <span>{contract.state !== ContractState.ACCEPTED && `(${contractStateToString[contract.state]})`}</span>
+                  <span>
+                    {contract.state !== ContractState.ACCEPTED &&
+                      `(${contractStateToString[contract.state]})`}
+                  </span>
                 </>
               }
               secondary={
@@ -120,7 +130,9 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
                     {contract.teacher ? (
                       `${contract.teacher.firstName} ${contract.teacher.lastName}`
                     ) : (
-                      <span style={{color: theme.palette.error.main}}>Keine Lehrkraft zugewiesen</span>
+                      <span style={{ color: theme.palette.error.main }}>
+                        Keine Lehrkraft zugewiesen
+                      </span>
                     )}
                   </span>
                   <br />

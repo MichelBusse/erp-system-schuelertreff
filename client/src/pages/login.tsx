@@ -3,10 +3,9 @@ import axios from 'axios'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 
+import logo from '../assets/logoLarge.png'
 import { useAuth } from '../components/AuthProvider'
 import { snackbarOptionsError } from '../consts'
-
-import logo from '../assets/logoLarge.png'
 
 const Login: React.FC = () => {
   const [error, setError] = useState('')
@@ -55,7 +54,11 @@ const Login: React.FC = () => {
         component={'form'}
       >
         <Stack direction={'column'} sx={{}} alignItems={'center'} gap={1}>
-          <img src={logo} alt="Schülertreff" style={{width: '400px', maxWidth: '90%'}}/>
+          <img
+            src={logo}
+            alt="Schülertreff"
+            style={{ width: '400px', maxWidth: '90%' }}
+          />
           <Typography variant="h4" textAlign={'center'} fontSize={22} mb={4}>
             Herzlich Willkommen
           </Typography>

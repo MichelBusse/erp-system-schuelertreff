@@ -91,10 +91,12 @@ const AdminCalendar: React.FC<Props> = ({
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              boxShadow: c.teacher ? `0 0 2px ${c.subject.color} inset` : undefined,
+              boxShadow: c.teacher
+                ? `0 0 2px ${c.subject.color} inset`
+                : undefined,
               borderWidth: !c.teacher ? '2px' : undefined,
               borderStyle: !c.teacher ? 'solid' : undefined,
-              borderColor: !c.teacher ? theme.palette.error.main : undefined
+              borderColor: !c.teacher ? theme.palette.error.main : undefined,
             }}
           >
             {c.subject.shortForm}
