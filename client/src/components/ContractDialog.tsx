@@ -15,7 +15,6 @@ import {
 import { useTheme } from '@mui/material/styles'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
-import * as isoWeek from 'dayjs/plugin/isoWeek'
 import { useSnackbar } from 'notistack'
 import React, { useState } from 'react'
 
@@ -33,7 +32,6 @@ import ContractCreation, { suggestion } from './contractDialog/ContractCreation'
 import Filter from './contractDialog/Filter'
 
 dayjs.extend(customParseFormat)
-dayjs.extend(isoWeek)
 
 export enum CustomerType {
   PRIVATE = 'privateCustomer',
