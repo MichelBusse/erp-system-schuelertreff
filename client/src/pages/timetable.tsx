@@ -51,7 +51,7 @@ const Timetable: React.FC = () => {
   const theme = useTheme()
 
   useEffect(() => {
-    API.get('users/teacher').then((res) => setTeachers(res.data))
+    API.get('users/teacher/employed').then((res) => setTeachers(res.data))
   }, [refreshCalendar])
 
   return (

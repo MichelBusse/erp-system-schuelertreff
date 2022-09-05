@@ -252,6 +252,7 @@ const Teachers: React.FC = () => {
         open={open}
         closeDialog={() => setOpen(false)}
         setTeachers={setTeachers}
+        teacherType={'employed'}
       />
     </div>
   )

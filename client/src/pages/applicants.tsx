@@ -253,6 +253,7 @@ const Applicants: React.FC = () => {
         open={open}
         closeDialog={() => setOpen(false)}
         setTeachers={setTeachers}
+        teacherType={'applied'}
       />
     </div>
   )

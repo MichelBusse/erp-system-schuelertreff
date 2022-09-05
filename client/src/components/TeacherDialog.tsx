@@ -27,6 +27,7 @@ type Props = {
   open: boolean
   closeDialog: () => void
   setTeachers: React.Dispatch<React.SetStateAction<teacher[]>>
+  teacherType?: 'employed' | 'applied'
 }
 
 type form = {
@@ -38,14 +39,14 @@ type form = {
   skip: boolean
 }
 
-const TeacherDialog: React.FC<Props> = ({ open, closeDialog, setTeachers }) => {
+const TeacherDialog: React.FC<Props> = ({ open, closeDialog, setTeachers, teacherType }) => {
   const [form, setForm] = useState<form>({
     firstName: '',
     lastName: '',
     email: '',
     applicationLocation: '',
     dateOfApplication: null,
-    skip: false,
+    skip: teacherType === 'employed',
   })
 
   const { API } = useAuth()
@@ -57,7 +58,9 @@ const TeacherDialog: React.FC<Props> = ({ open, closeDialog, setTeachers }) => {
       dateOfApplication: form.dateOfApplication?.format('YYYY-MM-DD'),
     })
       .then((res) => {
-        setTeachers((s) => [...s, res.data])
+        if((teacherType === 'applied' && form.skip === false) || (teacherType === 'employed' && form.skip === true)){
+          setTeachers((s) => [...s, res.data])
+        }
         closeDialog()
       })
       .catch((error) => {
