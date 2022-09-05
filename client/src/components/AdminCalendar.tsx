@@ -145,7 +145,6 @@ const AdminCalendar: React.FC<Props> = ({
       }}
     >
       <CalendarControl date={date} setDate={setDate} />
-
       <DataGrid
         style={{
           flexGrow: 1,
