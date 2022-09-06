@@ -1,5 +1,6 @@
 import { Delete, Edit } from '@mui/icons-material'
 import {
+  Box,
   IconButton,
   List,
   ListItem,
@@ -99,17 +100,18 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
           <ListItem
             key={contract.id}
             secondaryAction={
-              <>
+              <Box>
                 <IconButton onClick={() => editContract(contract)}>
                   <Edit />
                 </IconButton>
                 <IconButton onClick={() => deleteContract(contract.id)}>
                   <Delete />
                 </IconButton>
-              </>
+              </Box>
             }
           >
             <ListItemText
+              sx={{marginRight:'50px'}}
               primary={
                 <>
                   <span>
