@@ -19,6 +19,7 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
+import { PrevIdProps } from '../App'
 
 import { useAuth } from '../components/AuthProvider'
 import SchoolDialog from '../components/SchoolDialog'
@@ -99,7 +100,7 @@ const schoolTypesOperator: GridFilterOperator = {
   InputComponentProps: { type: 'string' },
 }
 
-const Schools: React.FC = () => {
+const Schools: React.FC<PrevIdProps> = ({prevId, setPrevId}) => {
   const [open, setOpen] = useState(false)
   const [customers, setCustomers] = useState<school[]>([])
   const navigate = useNavigate()
@@ -225,6 +226,7 @@ const Schools: React.FC = () => {
 
   //Row click event
   const onRowClick: GridEventListener<'rowClick'> = (params) => {
+    setPrevId && setPrevId(Number(params.id))
     navigate('' + params.id)
   }
 
@@ -242,6 +244,9 @@ const Schools: React.FC = () => {
           columnVisibilityModel={columnVisibilityModel}
           onColumnVisibilityModelChange={(newModel) =>
             setColumnVisibilityModel(newModel)
+          }
+          getRowClassName={(params) =>
+            params.row.id === prevId ? `lastVisited` : ''
           }
           ref={ref}
           components={{

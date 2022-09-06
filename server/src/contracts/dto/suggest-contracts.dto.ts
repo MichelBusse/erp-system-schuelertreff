@@ -9,9 +9,7 @@ export class SuggestContractsDto {
   subjectId: number
 
   @Type(() => String)
-  @Transform(({ value }) => value.split(',').map(parseFloat))
-  @ArrayNotEmpty()
-  @IsInt({ each: true })
+  @Transform(({ value }) => value === '' ? [] : value.split(',').map(parseFloat))
   customers: number[]
 
   @IsOptional()

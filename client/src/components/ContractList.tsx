@@ -6,6 +6,7 @@ import {
   ListItemText,
   useTheme,
 } from '@mui/material'
+import axios from 'axios'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
@@ -51,8 +52,8 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
     setConfirmationDialogProps({
       open: true,
       setProps: setConfirmationDialogProps,
-      title: 'Einsatz wirklich löschen?',
-      text: 'Möchtest du den Einsatz wirklich löschen?',
+      title: 'Einsatz wirklich beenden?',
+      text: 'Möchtest du den Einsatz wirklich beenden?',
       action: () => {
         API.delete('contracts/' + contractId)
           .then(() => {
@@ -63,10 +64,21 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
               }
               return newContracts
             })
-            enqueueSnackbar('Einsatz gelöscht', snackbarOptions)
+            enqueueSnackbar('Einsatz beendet', snackbarOptions)
           })
-          .catch(() => {
-            enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+          .catch((error) => {
+            if (axios.isAxiosError(error) && error.response?.status === 400) {
+              enqueueSnackbar(
+                (error.response.data as { message: string }).message,
+                snackbarOptionsError,
+              )
+            } else {
+              console.error(error)
+              enqueueSnackbar(
+                'Ein Fehler ist aufgetreten.',
+                snackbarOptionsError,
+              )
+            }
           })
       },
     })
@@ -103,9 +115,11 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
                 <IconButton onClick={() => editContract(contract)}>
                   <Edit />
                 </IconButton>
-                <IconButton onClick={() => deleteContract(contract.id)}>
-                  <Delete />
-                </IconButton>
+                {(!contract.endDate || dayjs(contract.endDate).isAfter(dayjs())) && (
+                  <IconButton onClick={() => deleteContract(contract.id)}>
+                    <Delete />
+                  </IconButton>
+                )}
               </>
             }
           >
@@ -122,6 +136,12 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
                     {contract.state !== ContractState.ACCEPTED &&
                       `(${contractStateToString[contract.state]})`}
                   </span>
+                  {contract.endDate && !dayjs(contract.endDate, 'YYYY-MM-DD').isAfter(dayjs()) && (
+                    <span style={{ color: theme.palette.error.main }}>
+                      {' '}
+                      (Beendet)
+                    </span>
+                  )}
                 </>
               }
               secondary={

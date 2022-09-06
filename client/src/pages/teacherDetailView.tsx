@@ -174,7 +174,7 @@ const TeacherDetailView: React.FC = () => {
   }
 
   const submitForm = (override: Partial<teacherForm> = {}) => {
-    const errorTexts = teacherFormValidation(data)
+    const errorTexts = teacherFormValidation(data, id !== undefined)
 
     setErrors(errorTexts)
 
@@ -346,6 +346,7 @@ const TeacherDetailView: React.FC = () => {
       enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
     }
   }
+
 
   return (
     <div className={styles.wrapper} style={{ minHeight: '100vh' }}>

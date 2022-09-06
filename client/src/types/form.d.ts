@@ -167,8 +167,12 @@ export type ContractFilterForm = {
   privateCustomers: privateCustomer[]
   subject: subject | null
   interval: number
+  minStartDate: Dayjs | null
   startDate: Dayjs | null
   endDate: Dayjs | null
+  dow: number | undefined
+  startTime: Dayjs | null
+  endTime: Dayjs | null
   customerType: CustomerType
   contractType: ContractType
 }

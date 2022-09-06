@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { TeacherState } from '../types/enums'
 
 import {
   privateCustomerForm,
@@ -41,8 +42,9 @@ export const defaultTeacherFormErrorTexts: teacherFormErrorTexts = {
 
 export function teacherFormValidation(
   form: teacherForm,
+  admin?: boolean
 ): teacherFormErrorTexts {
-  const errorTexts = { ...defaultTeacherFormErrorTexts }
+  let errorTexts = { ...defaultTeacherFormErrorTexts }
 
   if (form.firstName.trim() === '') {
     errorTexts.firstName = 'Fehlt'
@@ -101,6 +103,13 @@ export function teacherFormValidation(
   ) {
     errorTexts.dateOfEmploymentStart = 'Kein korrektes Datum'
     errorTexts.valid = false
+  }
+
+  if (
+    !admin
+  ) {
+    const workContractErrorTexts = workContractFormValidation(form)
+    errorTexts = { ...errorTexts, ...workContractErrorTexts }
   }
 
   return errorTexts

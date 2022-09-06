@@ -1006,9 +1006,47 @@ export class UsersService {
       .where('c.schoolId = :schoolId', {
         schoolId: schoolId,
       })
+      .andWhere('c.defaultClassCustomer = FALSE', {
+        schoolId: schoolId,
+      })
       .orderBy('c.className', 'ASC')
 
     return q.getMany().then(transformUsers)
+  }
+
+  async findOrCreateDefaultClassCustomer(
+    schoolId?: number,
+  ): Promise<ClassCustomer> {
+    const q = this.classCustomersRepository
+      .createQueryBuilder('c')
+      .leftJoin('c.school', 'school')
+      .select(['c', 'school'])
+      .where('c.schoolId = :schoolId', {
+        schoolId: schoolId,
+      })
+      .andWhere('c.defaultClassCustomer = TRUE')
+      .orderBy('c.className', 'ASC')
+
+    const defaultClassCustomers = await q.getMany()
+
+    if (defaultClassCustomers.length === 0){
+      const newDefaultClassCustomer = this.classCustomersRepository.create({
+        mayAuthenticate: false,
+        street: null,
+        city: null,
+        postalCode: null,
+        email: null,
+        phone: null,
+        school: { id: schoolId },
+        defaultClassCustomer: true,
+      })
+
+      const savedClassCustomer = await this.classCustomersRepository.save(newDefaultClassCustomer)
+
+      defaultClassCustomers.push(savedClassCustomer)
+    }
+
+    return defaultClassCustomers[0]
   }
 
   /**
