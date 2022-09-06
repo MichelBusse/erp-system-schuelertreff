@@ -14,6 +14,7 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
+import { PrevIdProps } from '../App'
 
 import { useAuth } from '../components/AuthProvider'
 import TeacherDialog from '../components/TeacherDialog'
@@ -29,7 +30,7 @@ import {
 } from '../utils/teacherFilterData'
 import styles from './gridList.module.scss'
 
-const Applicants: React.FC = () => {
+const Applicants: React.FC<PrevIdProps> = ({prevId, setPrevId}) => {
   const [open, setOpen] = useState(false)
   const [renderDialog, setRenderDialog] = useState(0)
   const [teachers, setTeachers] = useState<teacher[]>([])
@@ -199,6 +200,7 @@ const Applicants: React.FC = () => {
 
   //Row click event
   const onRowClick: GridEventListener<'rowClick'> = (params) => {
+    setPrevId && setPrevId(Number(params.id))
     navigate('/applicants/' + params.id)
   }
 
@@ -218,6 +220,9 @@ const Applicants: React.FC = () => {
           headerHeight={0}
           disableSelectionOnClick={true}
           onRowClick={onRowClick}
+          getRowClassName={(params) =>
+            params.row.id === prevId ? `lastVisited` : ''
+          }
           components={{
             Toolbar: () => (
               <GridToolbarContainer

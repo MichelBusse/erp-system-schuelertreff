@@ -30,6 +30,7 @@ import ConfirmationDialog, {
 } from './ConfirmationDialog'
 import ContractCreation, { suggestion } from './contractDialog/ContractCreation'
 import Filter from './contractDialog/Filter'
+import axios from 'axios'
 
 dayjs.extend(customParseFormat)
 
@@ -69,11 +70,15 @@ const ContractDialog: React.FC<Props> = ({
     privateCustomers: [],
     subject: null,
     interval: 1,
+    minStartDate: dayjs().add(1, 'day'),
     startDate: dayjs().add(1, 'day'),
     endDate: null,
     customerType: CustomerType.PRIVATE,
     contractType: ContractType.STANDARD,
     ...initialForm0Props,
+    startTime: null,
+    endTime: null,
+    dow: undefined,
   })
 
   // step 1
@@ -97,12 +102,9 @@ const ContractDialog: React.FC<Props> = ({
     form0.subject &&
     form0.interval &&
     form0.startDate &&
-    form0.startDate.isAfter(dayjs()) &&
     ((form0.customerType === CustomerType.PRIVATE &&
       form0.privateCustomers.length > 0) ||
-      (form0.customerType === CustomerType.SCHOOL &&
-        form0.school !== null &&
-        form0.classCustomers.length > 0))
+      (form0.customerType === CustomerType.SCHOOL && form0.school !== null))
   )
 
   const handleSubmit0 = () => {
@@ -143,6 +145,9 @@ const ContractDialog: React.FC<Props> = ({
         interval: form0.interval,
         startDate: form0.startDate?.format('YYYY-MM-DD'),
         endDate: form0.endDate?.format('YYYY-MM-DD'),
+        startTime: form0.startTime?.format('HH:mm'),
+        dow: form0.dow,
+        endTime: form0.endTime?.format('HH:mm'),
         ignoreContracts: initialContract ? initialContract.id : undefined,
       },
     })
@@ -153,8 +158,8 @@ const ContractDialog: React.FC<Props> = ({
         setForm1({
           startDate: form0.startDate,
           endDate: form0.endDate,
-          startTime: null,
-          endTime: null,
+          startTime: form0.startTime,
+          endTime: form0.endTime,
           minTime: null,
           maxTime: null,
           teacher: 'later',
@@ -179,7 +184,6 @@ const ContractDialog: React.FC<Props> = ({
                 teacherSuggestion.teacherId === initialContract.teacher.id) ||
               (!initialContract.teacher && teacherSuggestion.teacherId === -1)
             ) {
-              console.log(teacherSuggestion.suggestions)
               teacherSuggestion.suggestions.forEach(
                 (timeSuggestion, timeIndex) => {
                   if (
@@ -237,6 +241,7 @@ const ContractDialog: React.FC<Props> = ({
         : ContractState.ACCEPTED,
       contractType: form0.contractType,
       initialContractId: initialContract?.id,
+      schoolId: form0.school?.id ?? undefined
     })
       .then(() => {
         onSuccess()
@@ -255,12 +260,26 @@ const ContractDialog: React.FC<Props> = ({
       setConfirmationDialogProps({
         open: true,
         setProps: setConfirmationDialogProps,
-        title: 'Einsatz wirklich löschen?',
-        text: 'Möchtest du den Einsatz wirklich löschen?',
+        title: 'Einsatz wirklich beenden?',
+        text: 'Möchtest du den Einsatz wirklich beenden?',
         action: () => {
           API.delete('contracts/' + initialContract?.id).then(() => {
-            enqueueSnackbar('Einsatz gelöscht', snackbarOptions)
+            enqueueSnackbar('Einsatz beendet', snackbarOptions)
             onSuccess()
+          }).catch((error) => {
+            if (axios.isAxiosError(error) && error.response?.status === 400) {
+              enqueueSnackbar(
+                (error.response.data as { message: string }).message,
+                snackbarOptionsError,
+              )
+              onSuccess()
+            } else {
+              console.error(error)
+              enqueueSnackbar(
+                'Ein Fehler ist aufgetreten.',
+                snackbarOptionsError,
+              )
+            }
           })
         },
       })
@@ -365,9 +384,9 @@ const ContractDialog: React.FC<Props> = ({
         </DialogContent>
         <DialogActions>
           {steps[activeStep].actions}
-          {initialContract && (
+          {initialContract && (!initialContract.endDate || dayjs(initialContract.endDate).isAfter(dayjs())) && (
             <Button onClick={deleteContract} color="error">
-              Löschen
+              Beenden
             </Button>
           )}
         </DialogActions>

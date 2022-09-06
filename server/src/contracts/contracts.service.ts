@@ -36,6 +36,17 @@ export class ContractsService {
   ) {}
 
   async create(dto: CreateContractDto): Promise<Contract> {
+    if (dto.customers.length === 0 && !dto.schoolId)
+      throw new BadRequestException('Customers should not be empty')
+
+    // Case of default ClassCustomer
+    if (dto.customers.length === 0 && dto.schoolId) {
+      dto.customers.push(
+        (await this.usersService.findOrCreateDefaultClassCustomer(dto.schoolId))
+          .id,
+      )
+    }
+
     const contract = this.contractsRepository.create({
       ...dto,
       subject: { id: dto.subject },
@@ -67,9 +78,8 @@ export class ContractsService {
         this.contractsRepository.delete({ id: dto.initialContractId })
       } else {
         initialContract.endDate = dayjs().format('YYYY-MM-DD')
+        await this.contractsRepository.save(initialContract)
       }
-
-      await this.contractsRepository.save(initialContract)
     }
 
     return savedContract
@@ -191,6 +201,9 @@ export class ContractsService {
       .andWhere('c.startDate <= :inputDate', {
         inputDate: dayjs(date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
       })
+      .andWhere('(c.endDate IS NULL OR c.endDate >= :inputDate)', {
+        inputDate: dayjs(date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+      })
       .andWhere(
         new Brackets((qb) => {
           qb.where('c.endDate IS NULL')
@@ -214,6 +227,7 @@ export class ContractsService {
       .leftJoin('customer.school', 'school')
       .leftJoinAndSelect('c.teacher', 't')
       .where('c.teacher IS NULL')
+      .andWhere('c.endDate > now()')
       .orderBy('c.startDate', 'ASC')
       .addOrderBy('c.startTime', 'ASC')
 
@@ -236,7 +250,7 @@ export class ContractsService {
           })
         }
       } else {
-        throw new BadRequestException('Past contracts cannot be deleted')
+        throw new BadRequestException('Vergangene Verträge (oder Verträge, die heute enden) können nicht beendet werden')
       }
     } else {
       // Delete unaccepted contracts completely
@@ -308,13 +322,15 @@ export class ContractsService {
     const dowTimeFilter = `{${dowTime.join(', ')}}`
 
     // get schoolTypes from customers
+    let customers = []
 
-    const customers = await this.connection
-      .createQueryBuilder()
-      .select('c')
-      .from(Customer, 'c')
-      .where('c.id IN (:...cid)', { cid: dto.customers })
-      .getMany()
+    if (dto.customers.length > 0)
+      customers = await this.connection
+        .createQueryBuilder()
+        .select('c')
+        .from(Customer, 'c')
+        .andWhere('c.id IN (:...cid)', { cid: dto.customers })
+        .getMany()
 
     const requestedSchoolTypes: TeacherSchoolType[] = []
 
@@ -353,9 +369,13 @@ export class ContractsService {
         'customerTimes',
       )
       .from(Customer, 'c')
-      .where('c.id IN (:...cid)', { cid: dto.customers })
-      .having('count(c) = :cc', { cc: dto.customers.length })
-      .setParameter('filter', dowTimeFilter)
+    if (dto.customers.length > 0) {
+      customerTimes.where('c.id IN (:...cid)', { cid: dto.customers })
+    } else {
+      customerTimes.where('1 = 0')
+    }
+    customerTimes.having('count(c) = :cc', { cc: dto.customers.length })
+    customerTimes.setParameter('filter', dowTimeFilter)
 
     /* CONTRACT QUERY */
 
@@ -373,9 +393,14 @@ export class ContractsService {
         .leftJoin('con.customers', 'customer')
         .where(
           new Brackets((qb) => {
-            qb.where(`customer.id IN (:...cid)`, {
-              cid: dto.customers,
-            })
+            if(dto.customers.length > 0){
+              qb.where(`customer.id IN (:...cid)`, {
+                cid: dto.customers,
+              })
+            }else{
+              qb.where('1 = 0')
+            }
+            
             if (withTeacher) qb.orWhere('t.id = con.teacherId')
           }),
         )
@@ -406,6 +431,19 @@ export class ContractsService {
       return qb
     }
 
+    // Preset time resetrictions
+
+    let optionalTimeFilter = ``
+    if(dto.dow){
+      `* '{[2001-01-0${dto.dow} ${dto.startTime ?? ''}, 2001-01-0${dto.dow + 1} ${dto.endTime ?? ''})}'::tstzmultirange`
+    }else{
+      if(dto.startTime && dto.endTime){
+        `* ${[1,2,3,4,5].map((d) => {
+          `[2001-01-0${d} ${dto.startTime}, 2001-01-0${d+1} ${dto.endTime})`
+        }).join(',')}}'::tstzmultirange`
+      }
+    }
+
     /* MAIN QUERY */
 
     const mainQuery = this.connection
@@ -420,6 +458,7 @@ export class ContractsService {
             `
               t."timesAvailable"
               * (${customerTimes.getQuery()})
+              ${optionalTimeFilter}
               - (${contractTimes(true).getQuery()})
             `,
             'possibleTimes',
@@ -568,8 +607,11 @@ export class ContractsService {
       .andWhere('c.endDate > :startDate::date', { startDate })
       .andWhere(
         new Brackets((qb) => {
-          qb.where('teacher.id = :tid', { tid: teacherId }) //
-            .orWhere('customer.id IN (:...cid)', { cid: customers })
+          qb.where('teacher.id = :tid', { tid: teacherId })
+
+          if(customers.length > 0){
+            qb.orWhere('customer.id IN (:...cid)', { cid: customers })
+          }
         }),
       )
       .setParameters(range)

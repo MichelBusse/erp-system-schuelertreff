@@ -14,4 +14,7 @@ export class ClassCustomer extends Customer {
 
   @ManyToOne(() => School)
   school: School
+
+  @Column({ default: 'FALSE' })
+  defaultClassCustomer: boolean
 }

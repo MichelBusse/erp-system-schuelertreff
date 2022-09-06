@@ -13,8 +13,6 @@ import { IsValidDate } from 'src/IsValidDate.decorator'
 import { ContractState } from '../contract.entity'
 
 export class CreateContractDto {
-  @ArrayNotEmpty()
-  @IsInt({ each: true })
   customers: number[]
 
   teacher: string
@@ -51,4 +49,8 @@ export class CreateContractDto {
   @IsOptional()
   @IsInt()
   initialContractId?: number
+  
+  @IsOptional()
+  @IsInt()
+  schoolId?: number
 }

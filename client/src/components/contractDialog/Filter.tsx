@@ -1,8 +1,10 @@
 import { Clear as ClearIcon } from '@mui/icons-material'
 import {
   Autocomplete,
+  Divider,
   FormControl,
   FormControlLabel,
+  InputLabel,
   MenuItem,
   Radio,
   RadioGroup,
@@ -22,7 +24,9 @@ import { ContractType } from '../../types/enums'
 import { ContractFilterForm } from '../../types/form'
 import subject from '../../types/subject'
 import { classCustomer, privateCustomer, school } from '../../types/user'
+import { getNextDow } from '../../utils/date'
 import { useAuth } from '../AuthProvider'
+import BetterTimePicker from '../BetterTimePicker'
 import { CustomerType } from '../ContractDialog'
 import IconButtonAdornment from '../IconButtonAdornment'
 
@@ -186,7 +190,6 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
           renderInput={(params) => (
             <TextField
               {...params}
-              required
               size="medium"
               variant="standard"
               label="Klasse(n)"
@@ -269,13 +272,12 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
         <DatePicker
           label="Startdatum"
           mask="__.__.____"
-          minDate={initialContract ? undefined : dayjs().add(1, 'd')}
-          value={form.startDate}
+          value={form.minStartDate}
           onChange={(value) => {
             setForm((f) => ({
               ...f,
+              minStartDate: value,
               startDate: value,
-              endDate: value ? value.add(1, 'year') : null,
             }))
           }}
           renderInput={(params) => (
@@ -288,10 +290,11 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
             endAdornment: (
               <IconButtonAdornment
                 icon={ClearIcon}
-                hidden={form.startDate === null}
+                hidden={form.minStartDate === null}
                 onClick={() =>
                   setForm((f) => ({
                     ...f,
+                    minStartDate: null,
                     startDate: null,
                   }))
                 }
@@ -336,6 +339,91 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
         <MenuItem value={ContractType.STANDARD}>Präsenz</MenuItem>
         <MenuItem value={ContractType.ONLINE}>Online</MenuItem>
       </Select>
+      <Divider />
+      <FormControl variant="outlined" fullWidth>
+        <InputLabel htmlFor="weekday-select">Wochentag</InputLabel>
+        <Select
+          id="weekday-select"
+          label={'Wochentag'}
+          value={form.dow ?? ''}
+          onChange={(e) => {
+            setForm((data) => {
+              if (e.target.value !== '') {
+                return {
+                  ...data,
+                  dow:
+                    (form.minStartDate &&
+                    getNextDow(
+                      e.target.value as number,
+                      form.minStartDate,
+                    ).day()) ?? undefined,
+                  startDate:
+                    form.minStartDate &&
+                    getNextDow(e.target.value as number, form.minStartDate),
+                }
+              } else {
+                return {
+                  ...data,
+                  dow: undefined,
+                  startDate: form.minStartDate,
+                }
+              }
+            })
+          }}
+        >
+          <MenuItem value={''}>Später wählen</MenuItem>
+          <MenuItem value={1}>{`Montag (Start: ${
+            form.minStartDate
+              ? getNextDow(1, form.minStartDate).format('DD.MM.YYYY')
+              : ''
+          })`}</MenuItem>
+          <MenuItem value={2}>{`Dienstag (Start: ${
+            form.minStartDate
+              ? getNextDow(2, form.minStartDate).format('DD.MM.YYYY')
+              : ''
+          })`}</MenuItem>
+          <MenuItem value={3}>{`Mittwoch (Start: ${
+            form.minStartDate
+              ? getNextDow(3, form.minStartDate).format('DD.MM.YYYY')
+              : ''
+          })`}</MenuItem>
+          <MenuItem value={4}>{`Donnerstag (Start: ${
+            form.minStartDate
+              ? getNextDow(4, form.minStartDate).format('DD.MM.YYYY')
+              : ''
+          })`}</MenuItem>
+          <MenuItem value={5}>{`Freitag (Start: ${
+            form.minStartDate
+              ? getNextDow(5, form.minStartDate).format('DD.MM.YYYY')
+              : ''
+          })`}</MenuItem>
+        </Select>
+      </FormControl>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+        <BetterTimePicker
+          label="Startzeit"
+          minutesStep={5}
+          value={form.startTime}
+          onChange={(value) => {
+            setForm((data) => ({ ...data, startTime: value }))
+          }}
+          clearValue={() => {
+            setForm((data) => ({ ...data, startTime: null }))
+          }}
+        />
+        <BetterTimePicker
+          label="Endzeit"
+          minutesStep={5}
+          value={form.endTime}
+          minTime={form.startTime?.add(45, 'm')}
+          onChange={(value) => {
+            setForm((data) => ({ ...data, endTime: value }))
+          }}
+          clearValue={() => {
+            setForm((data) => ({ ...data, endTime: null }))
+          }}
+        />
+      </Stack>
     </Stack>
   )
 }

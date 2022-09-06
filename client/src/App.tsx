@@ -13,6 +13,7 @@ import Pages from './pages/_pages'
 import * as Error from './pages/error'
 import { TeacherState } from './types/enums'
 import { Role } from './types/user'
+import { useEffect, useState } from 'react'
 
 export type NavigateState = { from: Location }
 
@@ -52,8 +53,14 @@ const theme = createTheme({
   },
 })
 
+export type PrevIdProps = {
+  prevId?: number
+  setPrevId?: React.Dispatch<React.SetStateAction<number | undefined>>
+}
+
 const App: React.FC = () => {
   const { isAuthed } = useAuth()
+  const [prevId, setPrevId] = useState<number>()
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'de'}>
@@ -118,7 +125,7 @@ const App: React.FC = () => {
                   path=""
                   element={
                     <ProtectedRoute>
-                      <Pages.PrivateCustomers />
+                      <Pages.PrivateCustomers prevId={prevId} setPrevId={setPrevId}/>
                     </ProtectedRoute>
                   }
                 />
@@ -136,7 +143,7 @@ const App: React.FC = () => {
                   path=""
                   element={
                     <ProtectedRoute>
-                      <Pages.Schools />
+                      <Pages.Schools prevId={prevId} setPrevId={setPrevId}/>
                     </ProtectedRoute>
                   }
                 />
@@ -154,7 +161,7 @@ const App: React.FC = () => {
                   path=""
                   element={
                     <ProtectedRoute>
-                      <Pages.Teachers />
+                      <Pages.Teachers prevId={prevId} setPrevId={setPrevId}/>
                     </ProtectedRoute>
                   }
                 />
@@ -172,7 +179,7 @@ const App: React.FC = () => {
                   path=""
                   element={
                     <ProtectedRoute>
-                      <Pages.Applicants />
+                      <Pages.Applicants prevId={prevId} setPrevId={setPrevId}/>
                     </ProtectedRoute>
                   }
                 />

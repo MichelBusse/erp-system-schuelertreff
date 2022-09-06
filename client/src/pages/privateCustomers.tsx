@@ -14,6 +14,7 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
+import { PrevIdProps } from '../App'
 
 import { useAuth } from '../components/AuthProvider'
 import PrivateCustomerDialog from '../components/PrivateCustomerDialog'
@@ -21,7 +22,7 @@ import { dataGridLocaleText } from '../consts'
 import { privateCustomer } from '../types/user'
 import styles from './gridList.module.scss'
 
-const PrivateCustomers: React.FC = () => {
+const PrivateCustomers: React.FC<PrevIdProps> = ({prevId, setPrevId}) => {
   const [open, setOpen] = useState(false)
   const [customers, setCustomers] = useState<privateCustomer[]>([])
   const navigate = useNavigate()
@@ -131,6 +132,7 @@ const PrivateCustomers: React.FC = () => {
 
   //Row click event
   const onRowClick: GridEventListener<'rowClick'> = (params) => {
+    setPrevId && setPrevId(Number(params.id))
     navigate('' + params.id)
   }
 
@@ -150,6 +152,9 @@ const PrivateCustomers: React.FC = () => {
           headerHeight={0}
           disableSelectionOnClick={true}
           onRowClick={onRowClick}
+          getRowClassName={(params) =>
+            params.row.id === prevId ? `lastVisited` : ''
+          }
           components={{
             Toolbar: () => (
               <GridToolbarContainer

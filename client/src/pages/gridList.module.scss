@@ -13,6 +13,7 @@
     border: none !important;
   }
 
+
   :global(.MuiDataGrid-columnHeaders) {
     border-bottom: none !important;
     display: none;
@@ -27,6 +28,10 @@
     padding-bottom: 20px;
   }
 
+  :global(.lastVisited) {
+    background-color: #d4f6ff !important
+  }
+  
   .customGridToolbarContainer {
     border-radius: 50px;
     height: 52px;
