@@ -76,6 +76,7 @@ const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
       variant="permanent"
       open={open}
       sx={{
+        height: "100vh",
         [theme.breakpoints.down('md')]: {
           display: 'none',
         },
@@ -97,7 +98,9 @@ const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
         src={logo}
         alt="Schülertreff"
         style={{
-          margin: '10%',
+          marginLeft: '25%',
+          marginRight: '25%',
+          marginBottom: '10%',
           userSelect: 'none',
         }}
       />
