@@ -75,7 +75,7 @@ export class AuthService {
     const link =
       this.config.get<string>('CLIENT_ORIGIN') +
       '/reset/' +
-      this.jwtService.sign(payload)
+      this.jwtService.sign(payload, { expiresIn: '7d' })
 
     console.log(`reset link for ${user.email} - ${link}`)
 
