@@ -6,12 +6,16 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import { Dayjs } from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
+import { useSnackbar } from 'notistack'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { snackbarOptions, snackbarOptionsError } from '../consts'
 
 import { contract } from '../types/contract'
 import { ContractType } from '../types/enums'
 import { lesson, LessonState } from '../types/lesson'
+import { useAuth } from './AuthProvider'
 
 type Props = {
   contract: contract
@@ -27,6 +31,25 @@ const LessonOverview: React.FC<Props> = ({
   calendarDate,
 }) => {
   const navigate = useNavigate()
+  const { API } = useAuth()
+  const [held, setHeld] = useState(existingLesson?.state === LessonState.HELD)
+  const { enqueueSnackbar } = useSnackbar()
+
+  const toggleLessonHeld = (held: boolean) => {
+    setHeld(held)
+    API.post('lessons/' + (existingLesson?.id ?? ''), {
+      date: dayjs(date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+      contractId: contract.id,
+      state: held ? LessonState.HELD : LessonState.IDLE,
+    })
+      .then(() => {
+        enqueueSnackbar('Stunde gespeichert', snackbarOptions)
+      })
+      .catch((err) => {
+        console.error(err)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+      })
+  }
 
   return (
     <Stack
@@ -116,12 +139,10 @@ const LessonOverview: React.FC<Props> = ({
         <FormControlLabel
           control={
             <Checkbox
-              checked={
-                existingLesson
-                  ? existingLesson.state === LessonState.HELD
-                  : false
-              }
-              disabled
+              checked={held}
+              onChange={(e) => {
+                toggleLessonHeld(e.target.checked)
+              }}
             />
           }
           label="Gehalten"
