@@ -8,6 +8,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Stack,
   Step,
   StepLabel,
   Stepper,
@@ -283,8 +284,9 @@ const ContractDialog: React.FC<Props> = ({
       ),
       actions: (
         <>
-          <Button onClick={() => setOpen(false)}>Abbrechen</Button>
+          <Button onClick={() => setOpen(false)} size="small">Abbrechen</Button>
           <LoadingButton
+            size="small"
             variant="contained"
             onClick={handleSubmit0}
             loading={loading0}
@@ -311,9 +313,10 @@ const ContractDialog: React.FC<Props> = ({
       ),
       actions: (
         <>
-          <Button onClick={() => setOpen(false)}>Abbrechen</Button>
-          <Button onClick={() => setActiveStep(0)}>Zurück</Button>
+          <Button onClick={() => setOpen(false)} size="small">Abbrechen</Button>
+          <Button onClick={() => setActiveStep(0)} size="small">Zurück</Button>
           <LoadingButton
+            size="small"
             variant="contained"
             onClick={handleSubmit1}
             loading={loading1}
@@ -364,12 +367,12 @@ const ContractDialog: React.FC<Props> = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          {steps[activeStep].actions}
-          {initialContract && (
-            <Button onClick={deleteContract} color="error">
-              Löschen
-            </Button>
-          )}
+            {steps[activeStep].actions}
+            {initialContract && (
+              <Button onClick={deleteContract} color="error" size="small">
+                Löschen
+              </Button>
+            )}
         </DialogActions>
       </Dialog>
       <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
