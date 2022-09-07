@@ -121,7 +121,7 @@ export class LessonsService {
     })
 
     // check for intersecting leaves
-    if ((await this.checkLeave(dto.date, lesson.contract.teacher.id)) > 0)
+    if (lesson.contract.teacher && (await this.checkLeave(dto.date, lesson.contract.teacher.id)) > 0)
       throw new BadRequestException('Lesson is blocked')
 
     if (

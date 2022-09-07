@@ -1,6 +1,6 @@
 import 'dayjs/locale/de'
 
-import { Box, Button, Drawer, Stack, Typography } from '@mui/material'
+import { Box, Button, Drawer, setRef, Stack, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import { GridCellParams } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
@@ -96,6 +96,8 @@ const Timetable: React.FC = () => {
             date={date}
             setDrawer={setDrawer}
             setDate={setDate}
+            refresh={refreshCalendar}
+            setRefresh={setRefreshCalendar}
           />
         ) : null}
       </Box>
@@ -128,7 +130,7 @@ const Timetable: React.FC = () => {
                       dayjs(lesson.date).format('DD/MM/YYYY') ===
                         dayjs(
                           drawer.params?.colDef.headerName,
-                          'dddd\nDD.MM.YYYY',
+                          'YYYY-MM-DD',
                         ).format('DD/MM/YYYY')
                     ) {
                       existingLesson = lesson
@@ -140,10 +142,13 @@ const Timetable: React.FC = () => {
                       key={c.id}
                       contract={c}
                       existingLesson={existingLesson}
+                      refresh={() => {
+                        setRefreshCalendar((n) => (++n))
+                      }}
                       calendarDate={date}
                       date={dayjs(
                         drawer.params?.colDef.headerName,
-                        'dddd\nDD.MM.YYYY',
+                        'YYYY-MM-DD',
                       )}
                     />
                   )
