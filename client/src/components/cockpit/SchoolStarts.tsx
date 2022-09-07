@@ -34,9 +34,8 @@ const SchoolStarts: React.FC = () => {
 
   return (
     <>
-      <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px' }}>
+      <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px', paddingTop: "0px", paddingBottom: "0px" }}>
         <Stack direction="column" spacing={2} height={'100%'}>
-          <Typography variant="h6">Schulen Startdaten</Typography>
           <List
             dense={true}
             sx={{
@@ -58,7 +57,7 @@ const SchoolStarts: React.FC = () => {
                 >
                   <ArrowBackIcon fontSize="small" />
                 </IconButton>
-                <Typography variant="body1">
+                <Typography variant="body2">
                   {`Kalenderwoche ${date.week()}`}
                 </Typography>
                 <IconButton onClick={() => setDate((d) => d.add(1, 'week'))}>

@@ -26,23 +26,48 @@ const Cockpit: React.FC = () => {
         },
       }}
     >
-      <Box>
+      <Box sx={{ height: "300px", backgroundColor: "white", overflowY: "scroll", borderRadius: '4px' }}>
+        <Typography variant="h6" sx={{ position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white" }}>Tagesaktuelle Einsätze</Typography>
         <DailyContracts />
+        <Box sx={{ height: "20px", backgroundColor: "white", position: "sticky", bottom: "0px" }} />
       </Box>
-      <Box sx={{height: "300px" , backgroundColor: "white", overflowY: "scroll", borderRadius: '4px'}}>
-        <Typography variant="h6" sx={{position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white"}}>Lehrer zuweisen</Typography>
+
+      <Box sx={{ height: "300px", backgroundColor: "white", overflowY: "scroll", borderRadius: '4px' }}>
+        <Typography variant="h6" sx={{ position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white" }}>Lehrer zuweisen</Typography>
         <ContractsWithoutTeacher />
-        <Box sx={{height: "20px", backgroundColor: "white", position:"sticky", bottom: "0px"}}></Box>
+        <Box sx={{ height: "20px", backgroundColor: "white", position: "sticky", bottom: "0px" }}></Box>
       </Box>
-      <PendingContracts />
 
-      <SchoolStarts />
+      <Box sx={{ height: "300px", backgroundColor: "white", overflowY: "scroll", borderRadius: '4px' }}>
+        <Typography variant="h6" sx={{ position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white" }}>Ausstehende Bestätigungen</Typography>
+        <PendingContracts />
+        <Box sx={{ height: "20px", backgroundColor: "white", position: "sticky", bottom: "0px" }}></Box>
+      </Box>
 
-      <CockpitLeaves state={LeaveState.PENDING} />
+      <Box sx={{ height: "300px", backgroundColor: "white", overflowY: "scroll", borderRadius: '4px' }}>
+        <Typography variant="h6" sx={{ position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white" }}>Schulen Startdaten</Typography>
+        <SchoolStarts />
+        <Box sx={{ height: "20px", backgroundColor: "white", position: "sticky", bottom: "0px" }}></Box>
+      </Box>
 
-      <CockpitLeaves state={LeaveState.ACCEPTED} />
+      <Box sx={{ height: "300px", backgroundColor: "white", overflowY: "scroll", borderRadius: '4px' }}>
+        <Typography variant="h6" sx={{ position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white" }}>Ausstehende Urlaube/Krankmeldungen</Typography>
+        <CockpitLeaves state={LeaveState.PENDING} />
+        <Box sx={{ height: "20px", backgroundColor: "white", position: "sticky", bottom: "0px" }}></Box>
+      </Box>
 
-      <ApplicationMeetings />
+      <Box sx={{ height: "300px", backgroundColor: "white", overflowY: "scroll", borderRadius: '4px' }}>
+        <Typography variant="h6" sx={{ position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white" }}>Bestätigte Urlaube/Krankmeldungen</Typography>
+        <CockpitLeaves state={LeaveState.ACCEPTED} />
+        <Box sx={{ height: "20px", backgroundColor: "white", position: "sticky", bottom: "0px" }}></Box>
+      </Box>
+
+      <Box sx={{ height: "300px", backgroundColor: "white", overflowY: "scroll", borderRadius: '4px' }}>
+        <Typography variant="h6" sx={{ position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white" }}>Anstehende Bewerbungsgespräche</Typography>
+        <ApplicationMeetings />
+        <Box sx={{ height: "20px", backgroundColor: "white", position: "sticky", bottom: "0px" }}></Box>
+      </Box>
+
     </Box>
   )
 }

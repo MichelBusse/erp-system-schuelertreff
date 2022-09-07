@@ -26,9 +26,8 @@ const DailyContracts: React.FC = () => {
 
   return (
     <>
-      <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px' }}>
+      <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px', paddingTop: "0px", paddingBottom: "0px" }}>
         <Stack direction="column" spacing={2} height={'100%'}>
-          <Typography variant="h6">Tagesaktuelle Einsätze</Typography>
           <ContractList
             contracts={contracts}
             setContracts={setContracts}
@@ -47,7 +46,7 @@ const DailyContracts: React.FC = () => {
                 >
                   <ArrowBackIcon fontSize="small" />
                 </IconButton>
-                <Typography variant="body1">
+                <Typography variant="body2">
                   {`${date.format('DD.MM.YYYY')}`}
                 </Typography>
                 <IconButton onClick={() => setDate((d) => d.add(1, 'day'))}>

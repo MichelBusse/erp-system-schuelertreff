@@ -60,9 +60,8 @@ const CockpitLeaves: React.FC<Props> = ({ state }) => {
         setValue={setForm}
         onSuccess={() => setRefresh((r) => r + 1)}
       />
-      <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px' }}>
+      <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px', paddingTop: "0px", paddingBottom: "0px" }}>
         <Stack direction="column" spacing={2} height={'100%'}>
-          <Typography variant="h6">{leaveStateToHeading[state]}</Typography>
           <List
             dense={true}
             sx={{
