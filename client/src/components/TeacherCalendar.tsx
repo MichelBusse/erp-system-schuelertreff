@@ -20,7 +20,13 @@ type Props = {
   setRefresh?: React.Dispatch<React.SetStateAction<number>>
 }
 
-const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate, refresh, setRefresh }) => {
+const TeacherCalendar: React.FC<Props> = ({
+  date,
+  setDrawer,
+  setDate,
+  refresh,
+  setRefresh,
+}) => {
   const { API } = useAuth()
   const [contracts, setContracts] = useState<contract[]>([])
   const [pendingContracts, setPendingContracts] = useState<contract[]>([])

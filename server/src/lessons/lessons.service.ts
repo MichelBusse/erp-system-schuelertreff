@@ -72,7 +72,6 @@ export class LessonsService {
     private readonly dataSource: DataSource,
   ) {}
 
-
   // Creates lesson if corresponding contract is accepted
   async create(dto: CreateLessonDto, teacherId?: number): Promise<Lesson> {
     const lesson = new Lesson()
@@ -121,7 +120,10 @@ export class LessonsService {
     })
 
     // check for intersecting leaves
-    if (lesson.contract.teacher && (await this.checkLeave(dto.date, lesson.contract.teacher.id)) > 0)
+    if (
+      lesson.contract.teacher &&
+      (await this.checkLeave(dto.date, lesson.contract.teacher.id)) > 0
+    )
       throw new BadRequestException('Lesson is blocked')
 
     if (
@@ -172,7 +174,7 @@ export class LessonsService {
   }
 
   /**
-   * 
+   *
    * @param week // Date of the required week
    * @param teacherId // Optional TeacherId if only results of one teacher should be send
    * @returns // Lessons of the specified week
@@ -209,7 +211,7 @@ export class LessonsService {
   }
 
   /**
-   * 
+   *
    * @param invoiceMonth // Date of the month of the required invoice
    * @param customerId // Optional: id of the privateCustomer of the invoice
    * @param schoolId // Optional: id of the school of the invoice

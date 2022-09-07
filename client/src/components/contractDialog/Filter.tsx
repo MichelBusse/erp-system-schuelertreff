@@ -59,6 +59,11 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
     setForm((f) => {
       const initialForm0Entry: ContractFilterForm = {
         ...f,
+        minStartDate: dayjs(initialContract.startDate, 'YYYY-MM-DD').isAfter(
+          dayjs(),
+        )
+          ? dayjs(initialContract.startDate, 'YYYY-MM-DD')
+          : dayjs().add(1, 'day'),
         startDate: dayjs(initialContract.startDate, 'YYYY-MM-DD').isAfter(
           dayjs(),
         )
@@ -73,6 +78,9 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
             : null,
         subject: initialContract.subject,
         interval: initialContract.interval,
+        startTime: dayjs(initialContract.startTime, 'HH:mm'),
+        endTime: dayjs(initialContract.endTime, 'HH:mm'),
+        dow: dayjs(initialContract.startDate, 'YYYY-MM-DD').day(),
       }
       if (initialContract.customers[0].role === CustomerType.PRIVATE) {
         initialForm0Entry.privateCustomers =
@@ -270,7 +278,7 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
       </Stack>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
         <DatePicker
-          label="Startdatum"
+          label={initialContract ? 'Änderungsdatum' : 'Startdatum'}
           mask="__.__.____"
           value={form.minStartDate}
           onChange={(value) => {

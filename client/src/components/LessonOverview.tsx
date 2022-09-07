@@ -10,8 +10,8 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { snackbarOptions, snackbarOptionsError } from '../consts'
 
+import { snackbarOptions, snackbarOptionsError } from '../consts'
 import { contract } from '../types/contract'
 import { ContractType } from '../types/enums'
 import { lesson, LessonState } from '../types/lesson'
@@ -30,7 +30,7 @@ const LessonOverview: React.FC<Props> = ({
   existingLesson,
   date,
   calendarDate,
-  refresh
+  refresh,
 }) => {
   const navigate = useNavigate()
   const { API } = useAuth()
