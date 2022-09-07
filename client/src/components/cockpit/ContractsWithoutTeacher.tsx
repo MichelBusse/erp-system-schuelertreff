@@ -20,10 +20,9 @@ const ContractsWithoutTeacher: React.FC = () => {
     <>
       <Box
         p={4}
-        sx={{ backgroundColor: '#ffffff', borderRadius: '4px', height: '100%' }}
+        sx={{ backgroundColor: '#ffffff', borderRadius: '4px', paddingTop: "0px", paddingBottom: "0px" }}
       >
         <Stack direction="column" spacing={2} height={'100%'}>
-          <Typography variant="h6">Lehrer zuweisen</Typography>
           <ContractList
             contracts={contracts}
             setContracts={setContracts}

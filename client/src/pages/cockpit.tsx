@@ -1,4 +1,4 @@
-import { Box, useTheme } from '@mui/material'
+import { Box, Typography, useTheme } from '@mui/material'
 
 import ApplicationMeetings from '../components/cockpit/ApplicationMeetings'
 import CockpitLeaves from '../components/cockpit/CockpitLeaves'
@@ -26,10 +26,14 @@ const Cockpit: React.FC = () => {
         },
       }}
     >
-      <DailyContracts />
-
-      <ContractsWithoutTeacher />
-
+      <Box>
+        <DailyContracts />
+      </Box>
+      <Box sx={{height: "300px" , backgroundColor: "white", overflowY: "scroll", borderRadius: '4px'}}>
+        <Typography variant="h6" sx={{position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white"}}>Lehrer zuweisen</Typography>
+        <ContractsWithoutTeacher />
+        <Box sx={{height: "20px", backgroundColor: "white", position:"sticky", bottom: "0px"}}></Box>
+      </Box>
       <PendingContracts />
 
       <SchoolStarts />
