@@ -75,12 +75,12 @@ export class ContractsService {
         id: dto.initialContractId,
       })
 
-      if (dayjs(initialContract.startDate).isAfter(dayjs())) {
-        // If initialContract has not started yet, delete it completely
+      if(dayjs(initialContract.startDate).isAfter(dayjs(dto.startDate))){
+        //if initialContract starts after editedContract -> delete initial contract completely
         this.contractsRepository.delete({ id: dto.initialContractId })
-      } else if (dayjs().isBefore(dayjs(initialContract.endDate))) {
-        // If initialContract has not ended yet, end it now
-        initialContract.endDate = dayjs().format('YYYY-MM-DD')
+      }else if(dayjs().isBefore(dayjs(initialContract.endDate)) && dayjs(dto.startDate).isBefore(dayjs(initialContract.startDate))){
+        // If initialContract has not ended yet and ends after the editedContracts startDate, end it one day before the startDate of the editedContract
+        initialContract.endDate = dayjs(dto.startDate).subtract(1,'day').format('YYYY-MM-DD')
         await this.contractsRepository.save(initialContract)
       }
     }
