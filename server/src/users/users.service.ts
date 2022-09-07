@@ -1029,7 +1029,7 @@ export class UsersService {
 
     const defaultClassCustomers = await q.getMany()
 
-    if (defaultClassCustomers.length === 0){
+    if (defaultClassCustomers.length === 0) {
       const newDefaultClassCustomer = this.classCustomersRepository.create({
         mayAuthenticate: false,
         street: null,
@@ -1041,7 +1041,9 @@ export class UsersService {
         defaultClassCustomer: true,
       })
 
-      const savedClassCustomer = await this.classCustomersRepository.save(newDefaultClassCustomer)
+      const savedClassCustomer = await this.classCustomersRepository.save(
+        newDefaultClassCustomer,
+      )
 
       defaultClassCustomers.push(savedClassCustomer)
     }

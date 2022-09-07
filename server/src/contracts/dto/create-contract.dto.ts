@@ -1,11 +1,4 @@
-import {
-  ArrayNotEmpty,
-  IsEnum,
-  IsInt,
-  IsOptional,
-  Max,
-  Min,
-} from 'class-validator'
+import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator'
 
 import { IsTime24h } from 'src/IsTime24h.decorator'
 import { IsValidDate } from 'src/IsValidDate.decorator'
@@ -49,7 +42,7 @@ export class CreateContractDto {
   @IsOptional()
   @IsInt()
   initialContractId?: number
-  
+
   @IsOptional()
   @IsInt()
   schoolId?: number

@@ -39,7 +39,12 @@ type form = {
   skip: boolean
 }
 
-const TeacherDialog: React.FC<Props> = ({ open, closeDialog, setTeachers, teacherType }) => {
+const TeacherDialog: React.FC<Props> = ({
+  open,
+  closeDialog,
+  setTeachers,
+  teacherType,
+}) => {
   const [form, setForm] = useState<form>({
     firstName: '',
     lastName: '',
@@ -58,7 +63,10 @@ const TeacherDialog: React.FC<Props> = ({ open, closeDialog, setTeachers, teache
       dateOfApplication: form.dateOfApplication?.format('YYYY-MM-DD'),
     })
       .then((res) => {
-        if((teacherType === 'applied' && form.skip === false) || (teacherType === 'employed' && form.skip === true)){
+        if (
+          (teacherType === 'applied' && form.skip === false) ||
+          (teacherType === 'employed' && form.skip === true)
+        ) {
           setTeachers((s) => [...s, res.data])
         }
         closeDialog()

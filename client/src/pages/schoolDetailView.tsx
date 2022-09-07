@@ -913,7 +913,11 @@ const SchoolDetailView: React.FC = () => {
             ? {
                 school: { id: Number(id), schoolName: school.schoolName },
                 customerType: CustomerType.SCHOOL,
-                startDate: school.dateOfStart && dayjs(school.dateOfStart).isAfter(dayjs()) ? school.dateOfStart : dayjs().add(1,'day')
+                startDate:
+                  school.dateOfStart &&
+                  dayjs(school.dateOfStart).isAfter(dayjs())
+                    ? school.dateOfStart
+                    : dayjs().add(1, 'day'),
               }
             : undefined
         }

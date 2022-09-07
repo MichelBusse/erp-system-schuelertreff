@@ -14,15 +14,15 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
-import { PrevIdProps } from '../App'
 
+import { PrevIdProps } from '../App'
 import { useAuth } from '../components/AuthProvider'
 import PrivateCustomerDialog from '../components/PrivateCustomerDialog'
 import { dataGridLocaleText } from '../consts'
 import { privateCustomer } from '../types/user'
 import styles from './gridList.module.scss'
 
-const PrivateCustomers: React.FC<PrevIdProps> = ({prevId, setPrevId}) => {
+const PrivateCustomers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
   const [open, setOpen] = useState(false)
   const [customers, setCustomers] = useState<privateCustomer[]>([])
   const navigate = useNavigate()

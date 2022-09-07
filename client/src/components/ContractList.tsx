@@ -115,7 +115,8 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
                 <IconButton onClick={() => editContract(contract)}>
                   <Edit />
                 </IconButton>
-                {(!contract.endDate || dayjs(contract.endDate).isAfter(dayjs())) && (
+                {(!contract.endDate ||
+                  dayjs(contract.endDate).isAfter(dayjs())) && (
                   <IconButton onClick={() => deleteContract(contract.id)}>
                     <Delete />
                   </IconButton>
@@ -136,12 +137,13 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
                     {contract.state !== ContractState.ACCEPTED &&
                       `(${contractStateToString[contract.state]})`}
                   </span>
-                  {contract.endDate && !dayjs(contract.endDate, 'YYYY-MM-DD').isAfter(dayjs()) && (
-                    <span style={{ color: theme.palette.error.main }}>
-                      {' '}
-                      (Beendet)
-                    </span>
-                  )}
+                  {contract.endDate &&
+                    !dayjs(contract.endDate, 'YYYY-MM-DD').isAfter(dayjs()) && (
+                      <span style={{ color: theme.palette.error.main }}>
+                        {' '}
+                        (Beendet)
+                      </span>
+                    )}
                 </>
               }
               secondary={

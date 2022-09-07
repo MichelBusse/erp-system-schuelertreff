@@ -353,10 +353,11 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
                   ...data,
                   dow:
                     (form.minStartDate &&
-                    getNextDow(
-                      e.target.value as number,
-                      form.minStartDate,
-                    ).day()) ?? undefined,
+                      getNextDow(
+                        e.target.value as number,
+                        form.minStartDate,
+                      ).day()) ??
+                    undefined,
                   startDate:
                     form.minStartDate &&
                     getNextDow(e.target.value as number, form.minStartDate),

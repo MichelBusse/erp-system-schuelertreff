@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { TeacherState } from '../types/enums'
 
 import {
   privateCustomerForm,
@@ -42,7 +41,7 @@ export const defaultTeacherFormErrorTexts: teacherFormErrorTexts = {
 
 export function teacherFormValidation(
   form: teacherForm,
-  admin?: boolean
+  admin?: boolean,
 ): teacherFormErrorTexts {
   let errorTexts = { ...defaultTeacherFormErrorTexts }
 
@@ -105,9 +104,7 @@ export function teacherFormValidation(
     errorTexts.valid = false
   }
 
-  if (
-    !admin
-  ) {
+  if (!admin) {
     const workContractErrorTexts = workContractFormValidation(form)
     errorTexts = { ...errorTexts, ...workContractErrorTexts }
   }

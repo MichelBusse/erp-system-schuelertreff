@@ -1,5 +1,5 @@
 import { Transform, Type } from 'class-transformer'
-import { ArrayNotEmpty, IsInt, IsOptional, Max, Min } from 'class-validator'
+import { IsInt, IsOptional, Max, Min } from 'class-validator'
 
 import { IsTime24h } from 'src/IsTime24h.decorator'
 import { IsValidDate } from 'src/IsValidDate.decorator'
@@ -9,7 +9,9 @@ export class SuggestContractsDto {
   subjectId: number
 
   @Type(() => String)
-  @Transform(({ value }) => value === '' ? [] : value.split(',').map(parseFloat))
+  @Transform(({ value }) =>
+    value === '' ? [] : value.split(',').map(parseFloat),
+  )
   customers: number[]
 
   @IsOptional()

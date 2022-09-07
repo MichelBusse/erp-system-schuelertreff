@@ -19,8 +19,8 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
-import { PrevIdProps } from '../App'
 
+import { PrevIdProps } from '../App'
 import { useAuth } from '../components/AuthProvider'
 import SchoolDialog from '../components/SchoolDialog'
 import { dataGridLocaleText } from '../consts'
@@ -100,7 +100,7 @@ const schoolTypesOperator: GridFilterOperator = {
   InputComponentProps: { type: 'string' },
 }
 
-const Schools: React.FC<PrevIdProps> = ({prevId, setPrevId}) => {
+const Schools: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
   const [open, setOpen] = useState(false)
   const [customers, setCustomers] = useState<school[]>([])
   const navigate = useNavigate()

@@ -5,6 +5,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { SnackbarProvider } from 'notistack'
+import { useState } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
 import { useAuth } from './components/AuthProvider'
@@ -13,7 +14,6 @@ import Pages from './pages/_pages'
 import * as Error from './pages/error'
 import { TeacherState } from './types/enums'
 import { Role } from './types/user'
-import { useEffect, useState } from 'react'
 
 export type NavigateState = { from: Location }
 
@@ -125,7 +125,10 @@ const App: React.FC = () => {
                   path=""
                   element={
                     <ProtectedRoute>
-                      <Pages.PrivateCustomers prevId={prevId} setPrevId={setPrevId}/>
+                      <Pages.PrivateCustomers
+                        prevId={prevId}
+                        setPrevId={setPrevId}
+                      />
                     </ProtectedRoute>
                   }
                 />
@@ -143,7 +146,7 @@ const App: React.FC = () => {
                   path=""
                   element={
                     <ProtectedRoute>
-                      <Pages.Schools prevId={prevId} setPrevId={setPrevId}/>
+                      <Pages.Schools prevId={prevId} setPrevId={setPrevId} />
                     </ProtectedRoute>
                   }
                 />
@@ -161,7 +164,7 @@ const App: React.FC = () => {
                   path=""
                   element={
                     <ProtectedRoute>
-                      <Pages.Teachers prevId={prevId} setPrevId={setPrevId}/>
+                      <Pages.Teachers prevId={prevId} setPrevId={setPrevId} />
                     </ProtectedRoute>
                   }
                 />
@@ -179,7 +182,7 @@ const App: React.FC = () => {
                   path=""
                   element={
                     <ProtectedRoute>
-                      <Pages.Applicants prevId={prevId} setPrevId={setPrevId}/>
+                      <Pages.Applicants prevId={prevId} setPrevId={setPrevId} />
                     </ProtectedRoute>
                   }
                 />
