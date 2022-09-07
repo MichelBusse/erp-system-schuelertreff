@@ -44,7 +44,6 @@ const AcceptContractsDialog: React.FC<Props> = ({
       })
   }
 
-
   return (
     <Dialog open={open} keepMounted>
       <DialogTitle>{'Ausstehende Einsätze'}</DialogTitle>

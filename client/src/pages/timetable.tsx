@@ -1,6 +1,6 @@
 import 'dayjs/locale/de'
 
-import { Box, Button, Drawer, setRef, Stack, Typography } from '@mui/material'
+import { Box, Button, Drawer, Stack, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import { GridCellParams } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
@@ -143,7 +143,7 @@ const Timetable: React.FC = () => {
                       contract={c}
                       existingLesson={existingLesson}
                       refresh={() => {
-                        setRefreshCalendar((n) => (++n))
+                        setRefreshCalendar((n) => ++n)
                       }}
                       calendarDate={date}
                       date={dayjs(

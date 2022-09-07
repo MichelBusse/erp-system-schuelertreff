@@ -278,7 +278,7 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
       </Stack>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
         <DatePicker
-          label={initialContract ? "Änderungsdatum" : "Startdatum"}
+          label={initialContract ? 'Änderungsdatum' : 'Startdatum'}
           mask="__.__.____"
           value={form.minStartDate}
           onChange={(value) => {
