@@ -13,6 +13,7 @@ import {
   Stepper,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
+import axios from 'axios'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useSnackbar } from 'notistack'
@@ -30,7 +31,6 @@ import ConfirmationDialog, {
 } from './ConfirmationDialog'
 import ContractCreation, { suggestion } from './contractDialog/ContractCreation'
 import Filter from './contractDialog/Filter'
-import axios from 'axios'
 
 dayjs.extend(customParseFormat)
 
@@ -164,7 +164,7 @@ const ContractDialog: React.FC<Props> = ({
           dow: form0.startDate?.day() ?? 1,
           selsuggestion: '',
         })
-        
+
         setSuggestions(res.data)
 
         setActiveStep(1)
@@ -242,7 +242,7 @@ const ContractDialog: React.FC<Props> = ({
         : ContractState.ACCEPTED,
       contractType: form0.contractType,
       initialContractId: initialContract?.id,
-      schoolId: form0.school?.id ?? undefined
+      schoolId: form0.school?.id ?? undefined,
     })
       .then(() => {
         onSuccess()
@@ -264,24 +264,26 @@ const ContractDialog: React.FC<Props> = ({
         title: 'Einsatz wirklich beenden?',
         text: 'Möchtest du den Einsatz wirklich beenden?',
         action: () => {
-          API.delete('contracts/' + initialContract?.id).then(() => {
-            enqueueSnackbar('Einsatz beendet', snackbarOptions)
-            onSuccess()
-          }).catch((error) => {
-            if (axios.isAxiosError(error) && error.response?.status === 400) {
-              enqueueSnackbar(
-                (error.response.data as { message: string }).message,
-                snackbarOptionsError,
-              )
+          API.delete('contracts/' + initialContract?.id)
+            .then(() => {
+              enqueueSnackbar('Einsatz beendet', snackbarOptions)
               onSuccess()
-            } else {
-              console.error(error)
-              enqueueSnackbar(
-                'Ein Fehler ist aufgetreten.',
-                snackbarOptionsError,
-              )
-            }
-          })
+            })
+            .catch((error) => {
+              if (axios.isAxiosError(error) && error.response?.status === 400) {
+                enqueueSnackbar(
+                  (error.response.data as { message: string }).message,
+                  snackbarOptionsError,
+                )
+                onSuccess()
+              } else {
+                console.error(error)
+                enqueueSnackbar(
+                  'Ein Fehler ist aufgetreten.',
+                  snackbarOptionsError,
+                )
+              }
+            })
         },
       })
     }
@@ -385,11 +387,13 @@ const ContractDialog: React.FC<Props> = ({
         </DialogContent>
         <DialogActions>
           {steps[activeStep].actions}
-          {initialContract && (!initialContract.endDate || dayjs(initialContract.endDate).isAfter(dayjs())) && (
-            <Button onClick={deleteContract} color="error">
-              Beenden
-            </Button>
-          )}
+          {initialContract &&
+            (!initialContract.endDate ||
+              dayjs(initialContract.endDate).isAfter(dayjs())) && (
+              <Button onClick={deleteContract} color="error">
+                Beenden
+              </Button>
+            )}
         </DialogActions>
       </Dialog>
       <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />

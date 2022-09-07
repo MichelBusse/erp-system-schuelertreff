@@ -14,8 +14,8 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
-import { PrevIdProps } from '../App'
 
+import { PrevIdProps } from '../App'
 import { useAuth } from '../components/AuthProvider'
 import TeacherDialog from '../components/TeacherDialog'
 import { dataGridLocaleText, teacherStateToString } from '../consts'

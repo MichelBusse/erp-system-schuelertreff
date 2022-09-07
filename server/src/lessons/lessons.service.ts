@@ -72,6 +72,8 @@ export class LessonsService {
     private readonly dataSource: DataSource,
   ) {}
 
+
+  // Creates lesson if corresponding contract is accepted
   async create(dto: CreateLessonDto, teacherId?: number): Promise<Lesson> {
     const lesson = new Lesson()
 
@@ -107,6 +109,7 @@ export class LessonsService {
     }
   }
 
+  // Updated Lessons
   async update(
     id: number,
     dto: CreateLessonDto,
@@ -142,6 +145,7 @@ export class LessonsService {
     })
   }
 
+  //
   async findOne(contractId: number, date: string, teacherId?: number) {
     const lessonQuery = this.lessonsRepository
       .createQueryBuilder('l')
@@ -167,6 +171,14 @@ export class LessonsService {
     await this.lessonsRepository.delete(id)
   }
 
+  /**
+   * 
+   * @param week // Date of the required week
+   * @param teacherId // Optional TeacherId if only results of one teacher should be send
+   * @returns // Lessons of the specified week
+   *          // Contracts of the specified week
+   *          // All Contracts which have not been accepted or declined by the teacher yet
+   */
   async findByWeek(week: Dayjs | Date, teacherId?: number) {
     const q = this.lessonsRepository
       .createQueryBuilder('l')
@@ -196,6 +208,14 @@ export class LessonsService {
     }
   }
 
+  /**
+   * 
+   * @param invoiceMonth // Date of the month of the required invoice
+   * @param customerId // Optional: id of the privateCustomer of the invoice
+   * @param schoolId // Optional: id of the school of the invoice
+   * @param teacherId // Optional: id of the teacher of the invoice
+   * @returns // all lessons which are relevant for the invoice generation (State: Held and in time range)
+   */
   async findInvoiceReadyByMonth({
     invoiceMonth,
     customerId,
@@ -238,6 +258,7 @@ export class LessonsService {
     return q.getMany()
   }
 
+  // Generate invoice PDF of the specified teacher
   async generateInvoiceTeacher({
     invoiceMonth,
     teacherId,
@@ -367,6 +388,7 @@ export class LessonsService {
     return buffer
   }
 
+  // Generate invoice PDF of the specified customer or school
   async generateInvoice({
     invoiceMonth,
     customerId,

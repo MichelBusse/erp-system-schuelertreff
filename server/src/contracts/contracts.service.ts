@@ -474,9 +474,12 @@ export class ContractsService {
           .andWhere(
             new Brackets((qb) => {
               qb.where('cardinality(t.teacherSchoolTypes) = 0')
-              qb.orWhere('t.teacherSchoolTypes @> :requiredTeacherSchoolTypes', {
-                requiredTeacherSchoolTypes,
-              })
+              qb.orWhere(
+                't.teacherSchoolTypes @> :requiredTeacherSchoolTypes',
+                {
+                  requiredTeacherSchoolTypes,
+                },
+              )
             }),
           )
 
@@ -572,16 +575,19 @@ export class ContractsService {
               .filter((r) => this.durationMinutes(r) >= 45)
               .map(async (r) => ({
                 ...r,
-                overlap: dto.interval > 1 ? (
-                  await this.checkOverlap(
-                    a.teacherId,
-                    dto.customers,
-                    r,
-                    dto.ignoreContracts,
-                    dto.startDate,
-                    dto.endDate,
-                  )
-                ).map((c) => c.id) : [],
+                overlap:
+                  dto.interval > 1
+                    ? (
+                        await this.checkOverlap(
+                          a.teacherId,
+                          dto.customers,
+                          r,
+                          dto.ignoreContracts,
+                          dto.startDate,
+                          dto.endDate,
+                        )
+                      ).map((c) => c.id)
+                    : [],
               })),
           ),
         ),
@@ -621,7 +627,9 @@ export class ContractsService {
       })
       .andWhere('c.startTime < :end::time')
       .andWhere('c.endTime > :start::time')
-      .andWhere('(c.endDate IS NULL OR c.endDate > :startDate::date)', { startDate })
+      .andWhere('(c.endDate IS NULL OR c.endDate > :startDate::date)', {
+        startDate,
+      })
       .andWhere(
         new Brackets((qb) => {
           qb.where('teacher.id = :tid', { tid: teacherId })

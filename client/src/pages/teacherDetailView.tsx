@@ -347,7 +347,6 @@ const TeacherDetailView: React.FC = () => {
     }
   }
 
-
   return (
     <div className={styles.wrapper} style={{ minHeight: '100vh' }}>
       <Box

@@ -14,8 +14,8 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
-import { PrevIdProps } from '../App'
 
+import { PrevIdProps } from '../App'
 import { useAuth } from '../components/AuthProvider'
 import TeacherDialog from '../components/TeacherDialog'
 import { dataGridLocaleText, teacherStateToString } from '../consts'
@@ -30,7 +30,7 @@ import {
 } from '../utils/teacherFilterData'
 import styles from './gridList.module.scss'
 
-const Applicants: React.FC<PrevIdProps> = ({prevId, setPrevId}) => {
+const Applicants: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
   const [open, setOpen] = useState(false)
   const [renderDialog, setRenderDialog] = useState(0)
   const [teachers, setTeachers] = useState<teacher[]>([])
