@@ -39,8 +39,8 @@ export class ContractsService {
     if (dto.customers.length === 0 && !dto.schoolId)
       throw new BadRequestException('Customers should not be empty')
 
-    // Case of default ClassCustomer
     if (dto.customers.length === 0 && dto.schoolId) {
+      // If no customers but a schoolId is set, use or create DefaultClassCustomer of school
       dto.customers.push(
         (await this.usersService.findOrCreateDefaultClassCustomer(dto.schoolId))
           .id,
@@ -70,13 +70,16 @@ export class ContractsService {
       await this.lessonsService.cancelByContract(savedContract)
 
     if (dto.initialContractId) {
+      // If initial contract is set, handle eventual deletion of initialContract
       const initialContract = await this.contractsRepository.findOneByOrFail({
         id: dto.initialContractId,
       })
 
       if (dayjs(initialContract.startDate).isAfter(dayjs())) {
+        // If initialContract has not started yet, delete it completely
         this.contractsRepository.delete({ id: dto.initialContractId })
-      } else {
+      } else if (dayjs().isBefore(dayjs(initialContract.endDate))) {
+        // If initialContract has not ended yet, end it now
         initialContract.endDate = dayjs().format('YYYY-MM-DD')
         await this.contractsRepository.save(initialContract)
       }
@@ -91,6 +94,7 @@ export class ContractsService {
     })
   }
 
+  // Find all contracts which are not accepted
   async findAllPending(): Promise<Contract[]> {
     const contracts = this.contractsRepository
       .createQueryBuilder('c')
@@ -106,6 +110,7 @@ export class ContractsService {
     return contracts.getMany()
   }
 
+  // Find all contracts for one teacher which are in state 'pending'
   async findAllPendingForTeacher(teacherId): Promise<Contract[]> {
     const contracts = this.contractsRepository
       .createQueryBuilder('c')
@@ -135,6 +140,7 @@ export class ContractsService {
     }
   }
 
+  // Find all ongoing or future contracts of one school
   async findAllBySchool(schoolId): Promise<Contract[]> {
     const contracts = this.contractsRepository
       .createQueryBuilder('c')
@@ -153,6 +159,7 @@ export class ContractsService {
     return contracts.getMany()
   }
 
+  // Find all ongoing or future contracts of one PrivateCustomer
   async findAllByPrivateCustomer(privateCustomerId): Promise<Contract[]> {
     const contracts = this.contractsRepository
       .createQueryBuilder('c')
@@ -171,6 +178,7 @@ export class ContractsService {
     return contracts.getMany()
   }
 
+  // Find all ongoing or future contracts of one Teacher
   async findAllByTeacher(teacherId): Promise<Contract[]> {
     const contracts = this.contractsRepository
       .createQueryBuilder('c')
@@ -187,6 +195,7 @@ export class ContractsService {
     return contracts.getMany()
   }
 
+  // Find all contracts of one day
   async findByDay(date: string): Promise<Contract[]> {
     const contracts = this.contractsRepository
       .createQueryBuilder('c')
@@ -218,6 +227,7 @@ export class ContractsService {
     return contracts.getMany()
   }
 
+  // Find all ongoing or future contracts without a teacher set yet
   async findByMissingTeacher(): Promise<Contract[]> {
     const contracts = this.contractsRepository
       .createQueryBuilder('c')
@@ -239,18 +249,20 @@ export class ContractsService {
 
     if (contract.state === ContractState.ACCEPTED) {
       if (!contract.endDate || dayjs().isBefore(contract.endDate)) {
-        // Cannot delete past contracts
         if (dayjs().isBefore(contract.startDate)) {
           // Delete Future contracts completely
           this.contractsRepository.delete(id)
         } else {
-          // End ongoing contracts
+          // End ongoing contracts today
           this.contractsRepository.update(id, {
             endDate: dayjs().format('YYYY-MM-DD'),
           })
         }
       } else {
-        throw new BadRequestException('Vergangene Verträge (oder Verträge, die heute enden) können nicht beendet werden')
+        // Cannot delete past contracts
+        throw new BadRequestException(
+          'Vergangene Verträge (oder Verträge, die heute enden) können nicht beendet werden',
+        )
       }
     } else {
       // Delete unaccepted contracts completely
@@ -306,24 +318,9 @@ export class ContractsService {
   }
 
   async suggestContracts(dto: SuggestContractsDto): Promise<any[]> {
-    const dowFilter =
-      typeof dto.dow !== 'undefined' ? [dto.dow] : [1, 2, 3, 4, 5]
-
-    const dowTime = dowFilter.map((dow) => {
-      const start = `2001-01-0${dow} ${dto.startTime ?? '00:00'}`
-      const end =
-        typeof dto.endTime !== 'undefined'
-          ? `2001-01-0${dow} ${dto.endTime}`
-          : `2001-01-0${dow + 1} 00:00` // exclusive bound of next day 00:00
-
-      return `[${start}, ${end})`
-    })
-
-    const dowTimeFilter = `{${dowTime.join(', ')}}`
-
-    // get schoolTypes from customers
     let customers = []
 
+    // get SchoolTypes from customers
     if (dto.customers.length > 0)
       customers = await this.connection
         .createQueryBuilder()
@@ -332,8 +329,9 @@ export class ContractsService {
         .andWhere('c.id IN (:...cid)', { cid: dto.customers })
         .getMany()
 
-    const requestedSchoolTypes: TeacherSchoolType[] = []
+    const requiredTeacherSchoolTypes: TeacherSchoolType[] = []
 
+    //Determine required TeacherSchoolTypes by mapping SchoolTypes of Customers
     customers.forEach((customer) => {
       if (
         customer.schoolType &&
@@ -342,32 +340,26 @@ export class ContractsService {
       ) {
         switch (customer.schoolType) {
           case SchoolType.GRUNDSCHULE:
-            requestedSchoolTypes.push(TeacherSchoolType.GRUNDSCHULE)
+            requiredTeacherSchoolTypes.push(TeacherSchoolType.GRUNDSCHULE)
             break
           case SchoolType.OBERSCHULE:
-            requestedSchoolTypes.push(TeacherSchoolType.OBERSCHULE)
+            requiredTeacherSchoolTypes.push(TeacherSchoolType.OBERSCHULE)
             break
           case SchoolType.GYMNASIUM:
             if (customer.grade < 11) {
-              requestedSchoolTypes.push(TeacherSchoolType.GYMSEK1)
+              requiredTeacherSchoolTypes.push(TeacherSchoolType.GYMSEK1)
             } else {
-              requestedSchoolTypes.push(TeacherSchoolType.GYMSEK2)
+              requiredTeacherSchoolTypes.push(TeacherSchoolType.GYMSEK2)
             }
             break
         }
       }
     })
 
-    // begin actual query
-
-    /* CUSTOMER QUERY */
-
+    // Get the avaiable times of all customers
     const customerTimes = this.connection
       .createQueryBuilder()
-      .select(
-        'intersection(c."timesAvailable") * :filter::tstzmultirange',
-        'customerTimes',
-      )
+      .select('intersection(c."timesAvailable")', 'customerTimes')
       .from(Customer, 'c')
     if (dto.customers.length > 0) {
       customerTimes.where('c.id IN (:...cid)', { cid: dto.customers })
@@ -375,10 +367,12 @@ export class ContractsService {
       customerTimes.where('1 = 0')
     }
     customerTimes.having('count(c) = :cc', { cc: dto.customers.length })
-    customerTimes.setParameter('filter', dowTimeFilter)
 
-    /* CONTRACT QUERY */
-
+    /** Get all times which are blocked by relevant contracts (within start and endDate).
+     * If the week interval of the new contract is higher than 1, use only contracts with interval 1
+     * (others are handled by '*'-text in checkOverlap)
+     * Either contracts of all customers or of all customers and the teacher
+     * */
     const contractTimes = (withTeacher: boolean) => {
       const qb = this.connection
         .createQueryBuilder()
@@ -393,14 +387,14 @@ export class ContractsService {
         .leftJoin('con.customers', 'customer')
         .where(
           new Brackets((qb) => {
-            if(dto.customers.length > 0){
+            if (dto.customers.length > 0) {
               qb.where(`customer.id IN (:...cid)`, {
                 cid: dto.customers,
               })
-            }else{
+            } else {
               qb.where('1 = 0')
             }
-            
+
             if (withTeacher) qb.orWhere('t.id = con.teacherId')
           }),
         )
@@ -431,21 +425,29 @@ export class ContractsService {
       return qb
     }
 
-    // Preset time resetrictions
-
+    // Optional Time Filter according to the user (whether he has already specified a weekday or timespan)
     let optionalTimeFilter = ``
-    if(dto.dow){
-      `* '{[2001-01-0${dto.dow} ${dto.startTime ?? ''}, 2001-01-0${dto.dow + 1} ${dto.endTime ?? ''})}'::tstzmultirange`
-    }else{
-      if(dto.startTime && dto.endTime){
-        `* ${[1,2,3,4,5].map((d) => {
-          `[2001-01-0${d} ${dto.startTime}, 2001-01-0${d+1} ${dto.endTime})`
-        }).join(',')}}'::tstzmultirange`
+    if (dto.dow) {
+      optionalTimeFilter = `* '{[2001-01-0${dto.dow} ${
+        dto.startTime ?? '00:00'
+      }, 2001-01-0${dto.dow} ${dto.endTime ?? '24:00'})}'::tstzmultirange`
+    } else {
+      if (dto.startTime && dto.endTime) {
+        optionalTimeFilter = `* ${[1, 2, 3, 4, 5]
+          .map((d) => {
+            ;`[2001-01-0${d} ${dto.startTime ?? '00:00'}, 2001-01-0${d} ${
+              dto.endTime ?? '24:00'
+            })`
+          })
+          .join(',')}}'::tstzmultirange`
       }
     }
 
-    /* MAIN QUERY */
-
+    /**
+     * Main Query:
+     * Get intersection of TeacherTimesAvailable, CustomerTimesAvaiable and the optional TimeFilter
+     * and subtract all blocked timespans of contracts from the teacher and customers
+     * */
     const mainQuery = this.connection
       .createQueryBuilder()
       .select('*')
@@ -472,8 +474,8 @@ export class ContractsService {
           .andWhere(
             new Brackets((qb) => {
               qb.where('cardinality(t.teacherSchoolTypes) = 0')
-              qb.orWhere('t.teacherSchoolTypes @> :requestedSchoolTypes', {
-                requestedSchoolTypes,
+              qb.orWhere('t.teacherSchoolTypes @> :requiredTeacherSchoolTypes', {
+                requiredTeacherSchoolTypes,
               })
             }),
           )
@@ -501,8 +503,12 @@ export class ContractsService {
       )
     })
 
-    /* TIMES WITHOUT TEACHER QUERY */
-
+    /**
+     * Times without teacher query:
+     * Get intersection only of CustomerTimesAvaiable and the optional TimeFilter
+     * and subtract all blocked timespans of contracts from the customers to
+     * get time suggestions without a teacher specified
+     * */
     const availableTimesWithoutTeacherQuery = this.connection
       .createQueryBuilder()
       .select('*')
@@ -511,7 +517,10 @@ export class ContractsService {
           .select('-1', 'teacherId')
           .addSelect('', 'firstName')
           .addSelect('', 'lastName')
-          .addSelect(`("customerTimes") - ("contractTimes")`, 'possibleTimes')
+          .addSelect(
+            `("customerTimes") ${optionalTimeFilter} - ("contractTimes")`,
+            'possibleTimes',
+          )
           .from('(' + customerTimes.getQuery() + ')', 'customerTimes')
           .addFrom('(' + contractTimes(false).getQuery() + ')', 'contractTimes')
 
@@ -547,8 +556,12 @@ export class ContractsService {
     const availableTimesWithoutTeacher =
       await availableTimesWithoutTeacherQuery.getRawMany<at>()
 
+    // Add the time suggestions without teacher infront of the time suggestions
     availableTeachers = availableTimesWithoutTeacher.concat(availableTeachers)
 
+    /** Process all time suggestions in a useful format for the frontend and use 'checkOverlap' to add a '*' in the frontend
+     * to all suggestions where some contracts with the interval > 1 are within the suggested timespan
+     */
     const suggestions = await Promise.all(
       availableTeachers.map(async (a) => ({
         teacherId: a.teacherId,
@@ -559,7 +572,7 @@ export class ContractsService {
               .filter((r) => this.durationMinutes(r) >= 45)
               .map(async (r) => ({
                 ...r,
-                overlap: (
+                overlap: dto.interval > 1 ? (
                   await this.checkOverlap(
                     a.teacherId,
                     dto.customers,
@@ -568,7 +581,7 @@ export class ContractsService {
                     dto.startDate,
                     dto.endDate,
                   )
-                ).map((c) => c.id),
+                ).map((c) => c.id) : [],
               })),
           ),
         ),
@@ -585,6 +598,10 @@ export class ContractsService {
     )
   }
 
+  /** 'checkOverlap' to add a '*' in the frontend
+   * to all suggestions where some contracts with the interval > 1 are within the suggested timespan
+   * the function returns all contracts which are within that timespan
+   */
   async checkOverlap(
     teacherId: number,
     customers: number[],
@@ -604,12 +621,12 @@ export class ContractsService {
       })
       .andWhere('c.startTime < :end::time')
       .andWhere('c.endTime > :start::time')
-      .andWhere('c.endDate > :startDate::date', { startDate })
+      .andWhere('(c.endDate IS NULL OR c.endDate > :startDate::date)', { startDate })
       .andWhere(
         new Brackets((qb) => {
           qb.where('teacher.id = :tid', { tid: teacherId })
 
-          if(customers.length > 0){
+          if (customers.length > 0) {
             qb.orWhere('customer.id IN (:...cid)', { cid: customers })
           }
         }),
@@ -626,6 +643,7 @@ export class ContractsService {
     return qb.getMany()
   }
 
+  // Find all accepted contracts of the specified week and optionally one specified teacher
   async findByWeek(week: Dayjs, teacherId?: number): Promise<Contract[]> {
     const q = this.contractsRepository
       .createQueryBuilder('c')
@@ -641,6 +659,7 @@ export class ContractsService {
       .andWhere(
         new Brackets((qb) => {
           qb.where('c.endDate IS NULL')
+          // endDate has to be higher than the dayOfWeek of the contract
           qb.orWhere(
             `c.endDate >= date_trunc('week', :week::date) + (extract(isodow from "c"."startDate")::text || ' day')::INTERVAL`,
           )
@@ -649,6 +668,7 @@ export class ContractsService {
       .andWhere('c.state = :contractState', {
         contractState: ContractState.ACCEPTED,
       })
+      // Handle interval > 1
       .andWhere(
         `extract( days from ( date_trunc('week', c.startDate) - date_trunc('week', :week::date) ) ) / 7 % c.interval = 0`,
       )

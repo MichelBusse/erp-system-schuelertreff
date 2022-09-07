@@ -152,9 +152,6 @@ const ContractDialog: React.FC<Props> = ({
       },
     })
       .then((res) => {
-        setSuggestions(res.data)
-        setActiveStep(1)
-
         setForm1({
           startDate: form0.startDate,
           endDate: form0.endDate,
@@ -167,6 +164,10 @@ const ContractDialog: React.FC<Props> = ({
           dow: form0.startDate?.day() ?? 1,
           selsuggestion: '',
         })
+        
+        setSuggestions(res.data)
+
+        setActiveStep(1)
 
         if (initialContract) {
           const initialStartDate = dayjs(
