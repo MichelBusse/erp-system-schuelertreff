@@ -22,6 +22,7 @@ type Props = {
   existingLesson: lesson | null
   date: Dayjs
   calendarDate: Dayjs
+  refresh: () => void
 }
 
 const LessonOverview: React.FC<Props> = ({
@@ -29,6 +30,7 @@ const LessonOverview: React.FC<Props> = ({
   existingLesson,
   date,
   calendarDate,
+  refresh
 }) => {
   const navigate = useNavigate()
   const { API } = useAuth()
@@ -44,6 +46,7 @@ const LessonOverview: React.FC<Props> = ({
     })
       .then(() => {
         enqueueSnackbar('Stunde gespeichert', snackbarOptions)
+        refresh()
       })
       .catch((err) => {
         console.error(err)

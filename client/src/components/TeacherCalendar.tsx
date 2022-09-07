@@ -16,15 +16,16 @@ type Props = {
   date: Dayjs
   setDrawer: (params: DrawerParameters) => void
   setDate: (date: Dayjs) => void
+  refresh?: number
+  setRefresh?: React.Dispatch<React.SetStateAction<number>>
 }
 
-const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
+const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate, refresh, setRefresh }) => {
   const { API } = useAuth()
   const [contracts, setContracts] = useState<contract[]>([])
   const [pendingContracts, setPendingContracts] = useState<contract[]>([])
   const [lessons, setLessons] = useState<lesson[]>([])
   const [dialogOpen, setDialogOpen] = useState<boolean>(false)
-  const [refresh, setRefresh] = useState<number>(0)
 
   useEffect(() => {
     API.get('lessons/myLessons', {
@@ -76,7 +77,7 @@ const TeacherCalendar: React.FC<Props> = ({ date, setDrawer, setDate }) => {
         contracts={pendingContracts}
         open={dialogOpen}
         setOpen={setDialogOpen}
-        refresh={() => setRefresh((re) => ++re)}
+        refresh={() => setRefresh && setRefresh((re) => ++re)}
       />
     </>
   )

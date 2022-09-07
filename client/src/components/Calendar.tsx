@@ -100,6 +100,7 @@ const Calendar: React.FC<Props> = ({
       (n): GridColDef => ({
         field: n.toString(),
         headerAlign: 'left',
+        headerName: date.day(n).format('YYYY-MM-DD'),
         renderHeader: () => (
           <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.2' }}>
             <span>

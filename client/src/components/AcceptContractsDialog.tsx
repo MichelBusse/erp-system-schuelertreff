@@ -44,7 +44,6 @@ const AcceptContractsDialog: React.FC<Props> = ({
       })
   }
 
-  console.log(contracts)
 
   return (
     <Dialog open={open} keepMounted>
