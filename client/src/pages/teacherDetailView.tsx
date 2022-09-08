@@ -348,18 +348,9 @@ const TeacherDetailView: React.FC = () => {
   }
 
   return (
-    <div className={styles.wrapper} style={{ minHeight: '100vh' }}>
+    <div className={styles.wrapper}>
       <Box
-        sx={{
-          flexGrow: 1,
-          backgroundColor: '#ffffff',
-          padding: '30px',
-          boxSizing: 'border-box',
-          borderRadius: '25px',
-          [theme.breakpoints.down('sm')]: {
-            borderRadius: '0px',
-          },
-        }}
+        className={styles.contentBox}
       >
         <Stack direction="column" alignItems="stretch" spacing={2}>
           <Typography variant="h6">Person:</Typography>
@@ -844,7 +835,7 @@ const TeacherDetailView: React.FC = () => {
             <Typography>Status: {teacherStateToString[data.state]}</Typography>
           )}
           <Stack
-            direction={{ xs: 'column', sm: 'row' }}
+            direction={{ xs: 'column', md: 'row' }}
             spacing={2}
             sx={{ marginTop: '15px' }}
           >
