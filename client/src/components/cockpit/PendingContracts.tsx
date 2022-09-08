@@ -1,11 +1,12 @@
 import { Box, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { CockpitComponent } from '../../pages/cockpit'
 
 import { contractWithTeacher } from '../../types/contract'
 import { useAuth } from '../AuthProvider'
 import ContractList from '../ContractList'
 
-const PendingContracts: React.FC = () => {
+const PendingContracts: CockpitComponent = ({listSx}) => {
   const { API } = useAuth()
   const [pendingContracts, setPendingContracts] = useState<
     contractWithTeacher[]
@@ -20,12 +21,20 @@ const PendingContracts: React.FC = () => {
 
   return (
     <>
-      <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px', paddingTop: "0px", paddingBottom: "0px" }}>
+      <Box
+        p={4}
+        sx={{
+          backgroundColor: '#ffffff',
+          borderRadius: '4px',
+        }}
+      >
         <Stack direction="column" spacing={2} height={'100%'}>
+          <Typography variant="h6">Ausstehende Bestätigungen</Typography>
           <ContractList
             contracts={pendingContracts}
             setContracts={setPendingContracts}
             onSuccess={() => setRefresh((r) => r + 1)}
+            sx={listSx}
           />
         </Stack>
       </Box>

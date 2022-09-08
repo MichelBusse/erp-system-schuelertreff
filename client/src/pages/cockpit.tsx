@@ -1,4 +1,5 @@
-import { Box, Typography, useTheme } from '@mui/material'
+import { Box, SxProps, Typography, useTheme } from '@mui/material'
+import { Theme } from '@mui/system'
 
 import ApplicationMeetings from '../components/cockpit/ApplicationMeetings'
 import CockpitLeaves from '../components/cockpit/CockpitLeaves'
@@ -8,8 +9,15 @@ import PendingContracts from '../components/cockpit/PendingContracts'
 import SchoolStarts from '../components/cockpit/SchoolStarts'
 import { LeaveState } from '../types/enums'
 
+type Props = {
+  listSx?: SxProps<Theme>
+}
+
+export type CockpitComponent = React.FC<Props>
+
 const Cockpit: React.FC = () => {
   const theme = useTheme()
+  const listSx = { height: '300px',  overflowY: 'scroll' }
 
   return (
     <Box
@@ -26,48 +34,21 @@ const Cockpit: React.FC = () => {
         },
       }}
     >
-      <Box sx={{ height: "300px", backgroundColor: "white", overflowY: "scroll", borderRadius: '4px' }}>
-        <Typography variant="h6" sx={{ position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white" }}>Tagesaktuelle Einsätze</Typography>
-        <DailyContracts />
-        <Box sx={{ height: "20px", backgroundColor: "white", position: "sticky", bottom: "0px" }} />
-      </Box>
-
-      <Box sx={{ height: "300px", backgroundColor: "white", overflowY: "scroll", borderRadius: '4px' }}>
-        <Typography variant="h6" sx={{ position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white" }}>Lehrer zuweisen</Typography>
-        <ContractsWithoutTeacher />
-        <Box sx={{ height: "20px", backgroundColor: "white", position: "sticky", bottom: "0px" }}></Box>
-      </Box>
-
-      <Box sx={{ height: "300px", backgroundColor: "white", overflowY: "scroll", borderRadius: '4px' }}>
-        <Typography variant="h6" sx={{ position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white" }}>Ausstehende Bestätigungen</Typography>
-        <PendingContracts />
-        <Box sx={{ height: "20px", backgroundColor: "white", position: "sticky", bottom: "0px" }}></Box>
-      </Box>
-
-      <Box sx={{ height: "300px", backgroundColor: "white", overflowY: "scroll", borderRadius: '4px' }}>
-        <Typography variant="h6" sx={{ position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white" }}>Schulen Startdaten</Typography>
-        <SchoolStarts />
-        <Box sx={{ height: "20px", backgroundColor: "white", position: "sticky", bottom: "0px" }}></Box>
-      </Box>
-
-      <Box sx={{ height: "300px", backgroundColor: "white", overflowY: "scroll", borderRadius: '4px' }}>
-        <Typography variant="h6" sx={{ position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white" }}>Ausstehende Urlaube/Krankmeldungen</Typography>
-        <CockpitLeaves state={LeaveState.PENDING} />
-        <Box sx={{ height: "20px", backgroundColor: "white", position: "sticky", bottom: "0px" }}></Box>
-      </Box>
-
-      <Box sx={{ height: "300px", backgroundColor: "white", overflowY: "scroll", borderRadius: '4px' }}>
-        <Typography variant="h6" sx={{ position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white" }}>Bestätigte Urlaube/Krankmeldungen</Typography>
-        <CockpitLeaves state={LeaveState.ACCEPTED} />
-        <Box sx={{ height: "20px", backgroundColor: "white", position: "sticky", bottom: "0px" }}></Box>
-      </Box>
-
-      <Box sx={{ height: "300px", backgroundColor: "white", overflowY: "scroll", borderRadius: '4px' }}>
-        <Typography variant="h6" sx={{ position: "sticky", top: "0px", padding: "15px 0px 0px 32px", zIndex: 10, backgroundColor: "white" }}>Anstehende Bewerbungsgespräche</Typography>
-        <ApplicationMeetings />
-        <Box sx={{ height: "20px", backgroundColor: "white", position: "sticky", bottom: "0px" }}></Box>
-      </Box>
-
+      <DailyContracts listSx={listSx} />
+      <SchoolStarts listSx={listSx} />
+      <ContractsWithoutTeacher
+        listSx={listSx}
+      />
+      <PendingContracts listSx={listSx} />
+      <CockpitLeaves
+        listSx={listSx}
+        state={LeaveState.PENDING}
+      />
+      <CockpitLeaves
+        listSx={listSx}
+        state={LeaveState.ACCEPTED}
+      />
+      <ApplicationMeetings listSx={listSx}/>
     </Box>
   )
 }

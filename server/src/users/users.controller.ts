@@ -235,12 +235,12 @@ export class UsersController {
 
   @Get('teacher/applicationMeetings')
   @Roles(Role.ADMIN)
-  async getApplicationMeetings(@Query('of') week: string) {
-    if (!dayjs(week).isValid()) throw new BadRequestException()
+  async getApplicationMeetings(@Query('of') day: string) {
+    if (!dayjs(day).isValid()) throw new BadRequestException()
 
     return this.usersService.getApplicationMeetings(
-      dayjs(week).day(1).format('YYYY-MM-DD'),
-      dayjs(week).day(7).format('YYYY-MM-DD'),
+      dayjs(day).format('YYYY-MM-DD'),
+      dayjs(day).format('YYYY-MM-DD'),
     )
   }
 

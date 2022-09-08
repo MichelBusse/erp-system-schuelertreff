@@ -5,8 +5,10 @@ import {
   List,
   ListItem,
   ListItemText,
+  SxProps,
   useTheme,
 } from '@mui/material'
+import { Theme } from '@mui/system'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
@@ -29,6 +31,7 @@ type Props = {
   contracts: contractWithTeacher[] | contract[]
   setContracts: React.Dispatch<React.SetStateAction<contractWithTeacher[]>>
   onSuccess?: () => void
+  sx?: SxProps<Theme>
 }
 
 const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
@@ -36,6 +39,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
   setContracts,
   onSuccess,
   children,
+  sx
 }) => {
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
@@ -88,6 +92,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
           borderRadius: '4px',
           margin: '5px 0',
           height: '100%',
+          ...sx,
         }}
       >
         {children}
