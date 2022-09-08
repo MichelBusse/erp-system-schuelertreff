@@ -98,8 +98,8 @@ const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
         src={logo}
         alt="Schülertreff"
         style={{
-          marginLeft: '25%',
-          marginRight: '25%',
+          marginLeft: '10%',
+          marginRight: '10%',
           marginBottom: '10%',
           userSelect: 'none',
         }}
