@@ -8,3 +8,11 @@
   padding: 15px;
   background-color: white;
 }
+
+@media only screen and (max-width: 899px) {
+  /* For mobile phones: */
+  .wrapper {
+    padding: 0px;
+    margin-bottom: 56px;
+  }
+}

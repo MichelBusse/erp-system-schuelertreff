@@ -93,14 +93,14 @@ const TeacherDialog: React.FC<Props> = ({
         }}
       >
         <DialogTitle>Lehrkraft hinzufügen</DialogTitle>
-        <DialogContent sx={{ width: '500px' }}>
+        <DialogContent>
           <Stack
             direction={'column'}
             spacing={2}
             alignItems={'stretch'}
             sx={{ paddingTop: '15px' }}
           >
-            <Stack direction="row" spacing={2}>
+            <Stack direction='row' spacing={2}>
               <TextField
                 fullWidth
                 required

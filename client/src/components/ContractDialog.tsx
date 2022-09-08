@@ -8,6 +8,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Stack,
   Step,
   StepLabel,
   Stepper,
@@ -305,7 +306,9 @@ const ContractDialog: React.FC<Props> = ({
       ),
       actions: (
         <>
-          <Button onClick={() => setOpen(false)}>Abbrechen</Button>
+          <Button onClick={() => setOpen(false)}>
+            Abbrechen
+          </Button>
           <LoadingButton
             variant="contained"
             onClick={handleSubmit0}
@@ -314,6 +317,13 @@ const ContractDialog: React.FC<Props> = ({
           >
             Weiter
           </LoadingButton>
+          {initialContract && 
+            (!initialContract.endDate ||
+              dayjs(initialContract.endDate).isAfter(dayjs())) && (
+            <Button onClick={deleteContract} color="error">
+              Beenden
+            </Button>
+          )}
         </>
       ),
     },
@@ -333,8 +343,12 @@ const ContractDialog: React.FC<Props> = ({
       ),
       actions: (
         <>
-          <Button onClick={() => setOpen(false)}>Abbrechen</Button>
-          <Button onClick={() => setActiveStep(0)}>Zurück</Button>
+          <Button onClick={() => setOpen(false)}>
+            Abbrechen
+          </Button>
+          <Button onClick={() => setActiveStep(0)}>
+            Zurück
+          </Button>
           <LoadingButton
             variant="contained"
             onClick={handleSubmit1}
@@ -385,16 +399,7 @@ const ContractDialog: React.FC<Props> = ({
             {steps[activeStep].content}
           </Box>
         </DialogContent>
-        <DialogActions>
-          {steps[activeStep].actions}
-          {initialContract &&
-            (!initialContract.endDate ||
-              dayjs(initialContract.endDate).isAfter(dayjs())) && (
-              <Button onClick={deleteContract} color="error">
-                Beenden
-              </Button>
-            )}
-        </DialogActions>
+        <DialogActions>{steps[activeStep].actions}</DialogActions>
       </Dialog>
       <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
     </>

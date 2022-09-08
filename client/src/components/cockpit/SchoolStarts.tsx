@@ -13,11 +13,12 @@ import {
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import { CockpitComponent } from '../../pages/cockpit'
 
 import { school } from '../../types/user'
 import { useAuth } from '../AuthProvider'
 
-const SchoolStarts: React.FC = () => {
+const SchoolStarts: CockpitComponent = ({ listSx }) => {
   const { API } = useAuth()
   const [schools, setSchools] = useState<Partial<school>[]>([])
   const [date, setDate] = useState<Dayjs>(dayjs())
@@ -34,7 +35,13 @@ const SchoolStarts: React.FC = () => {
 
   return (
     <>
-      <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px' }}>
+      <Box
+        p={4}
+        sx={{
+          backgroundColor: '#ffffff',
+          borderRadius: '4px',
+        }}
+      >
         <Stack direction="column" spacing={2} height={'100%'}>
           <Typography variant="h6">Schulen Startdaten</Typography>
           <List
@@ -43,29 +50,9 @@ const SchoolStarts: React.FC = () => {
               backgroundColor: '#f5f5f5',
               borderRadius: '4px',
               margin: '5px 0',
+              ...listSx,
             }}
           >
-            <ListItem>
-              <Stack
-                direction="row"
-                spacing={1}
-                alignItems="center"
-                justifyContent={'center'}
-                width={'100%'}
-              >
-                <IconButton
-                  onClick={() => setDate((d) => d.subtract(1, 'week'))}
-                >
-                  <ArrowBackIcon fontSize="small" />
-                </IconButton>
-                <Typography variant="body1">
-                  {`Kalenderwoche ${date.week()}`}
-                </Typography>
-                <IconButton onClick={() => setDate((d) => d.add(1, 'week'))}>
-                  <ArrowForwardIcon fontSize="small" />
-                </IconButton>
-              </Stack>
-            </ListItem>
             {schools.length === 0 && (
               <ListItem>
                 <ListItemText primary="keine Einträge" />
@@ -84,6 +71,23 @@ const SchoolStarts: React.FC = () => {
               </ListItemButton>
             ))}
           </List>
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            justifyContent={'center'}
+            width={'100%'}
+          >
+            <IconButton onClick={() => setDate((d) => d.subtract(1, 'week'))}>
+              <ArrowBackIcon fontSize="small" />
+            </IconButton>
+            <Typography variant="body2">
+              {`KW ${date.week()}`}
+            </Typography>
+            <IconButton onClick={() => setDate((d) => d.add(1, 'week'))}>
+              <ArrowForwardIcon fontSize="small" />
+            </IconButton>
+          </Stack>
         </Stack>
       </Box>
     </>

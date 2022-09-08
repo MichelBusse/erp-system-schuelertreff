@@ -378,13 +378,7 @@ const SchoolDetailView: React.FC = () => {
   return (
     <div className={styles.wrapper}>
       <Box
-        sx={{
-          flexGrow: 1,
-          backgroundColor: '#ffffff',
-          padding: '30px',
-          boxSizing: 'border-box',
-          borderRadius: '25px',
-        }}
+        className={styles.contentBox}
       >
         <Stack direction="column" alignItems={'stretch'}>
           <h3>Schule:</h3>

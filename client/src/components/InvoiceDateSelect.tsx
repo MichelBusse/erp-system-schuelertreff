@@ -29,7 +29,7 @@ const InvoiceDataSelect: React.FC<Props> = ({
 }) => {
   return (
     <>
-      <Stack direction={'row'} columnGap={2}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
         <FormControl fullWidth>
           <InputLabel id="invoiceYearLabel">Jahr</InputLabel>
           <Select

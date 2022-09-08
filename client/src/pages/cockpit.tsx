@@ -1,4 +1,5 @@
-import { Box, useTheme } from '@mui/material'
+import { Box, SxProps, Typography, useTheme } from '@mui/material'
+import { Theme } from '@mui/system'
 
 import ApplicationMeetings from '../components/cockpit/ApplicationMeetings'
 import CockpitLeaves from '../components/cockpit/CockpitLeaves'
@@ -8,8 +9,15 @@ import PendingContracts from '../components/cockpit/PendingContracts'
 import SchoolStarts from '../components/cockpit/SchoolStarts'
 import { LeaveState } from '../types/enums'
 
+type Props = {
+  listSx?: SxProps<Theme>
+}
+
+export type CockpitComponent = React.FC<Props>
+
 const Cockpit: React.FC = () => {
   const theme = useTheme()
+  const listSx = { height: '300px',  overflowY: 'scroll' }
 
   return (
     <Box
@@ -26,19 +34,21 @@ const Cockpit: React.FC = () => {
         },
       }}
     >
-      <DailyContracts />
-
-      <ContractsWithoutTeacher />
-
-      <PendingContracts />
-
-      <SchoolStarts />
-
-      <CockpitLeaves state={LeaveState.PENDING} />
-
-      <CockpitLeaves state={LeaveState.ACCEPTED} />
-
-      <ApplicationMeetings />
+      <DailyContracts listSx={listSx} />
+      <SchoolStarts listSx={listSx} />
+      <ContractsWithoutTeacher
+        listSx={listSx}
+      />
+      <PendingContracts listSx={listSx} />
+      <CockpitLeaves
+        listSx={listSx}
+        state={LeaveState.PENDING}
+      />
+      <CockpitLeaves
+        listSx={listSx}
+        state={LeaveState.ACCEPTED}
+      />
+      <ApplicationMeetings listSx={listSx}/>
     </Box>
   )
 }
