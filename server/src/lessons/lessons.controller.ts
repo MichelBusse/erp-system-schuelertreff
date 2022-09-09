@@ -118,18 +118,6 @@ export class LessonsController {
     res.end(buffer)
   }
 
-  @Post('')
-  create(
-    @Request() req,
-    @Body() createLessonDto: CreateLessonDto,
-  ): Promise<Lesson> {
-    if (req.user.role === Role.ADMIN) {
-      return this.lessonsService.create(createLessonDto)
-    } else {
-      return this.lessonsService.create(createLessonDto, req.user.id)
-    }
-  }
-
   @Post(':id')
   update(
     @Param('id') id: number,
@@ -142,6 +130,19 @@ export class LessonsController {
       return this.lessonsService.update(id, createLessonDto, req.user.id)
     }
   }
+
+  @Post('')
+  create(
+    @Request() req,
+    @Body() createLessonDto: CreateLessonDto,
+  ): Promise<Lesson> {
+    if (req.user.role === Role.ADMIN) {
+      return this.lessonsService.create(createLessonDto)
+    } else {
+      return this.lessonsService.create(createLessonDto, req.user.id)
+    }
+  }
+
 
   @Get(':contractId/:date')
   findOne(

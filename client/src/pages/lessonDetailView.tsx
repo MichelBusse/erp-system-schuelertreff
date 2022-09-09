@@ -52,12 +52,13 @@ const LessonDetailView: React.FC = () => {
         state: res.data.lesson ? res.data.lesson.state : LessonState.IDLE,
         notes: res.data.lesson ? res.data.lesson.notes : '',
       }
-      setId(res.data?.id)
+      setId(res.data.lesson?.id)
       setData(lesson)
     })
   }, [])
 
   const submitForm = () => {
+    console.log(id)
     API.post('lessons/' + (id ?? ''), {
       date: dayjs(date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
       contractId: parseInt(contractId ?? ''),
