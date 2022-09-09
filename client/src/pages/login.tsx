@@ -49,7 +49,7 @@ const Login: React.FC = () => {
         direction="column"
         justifyContent="center"
         alignItems="center"
-        style={{ height: '100vh' }}
+        style={{ height: '100%' }}
         rowGap={1}
         component={'form'}
       >

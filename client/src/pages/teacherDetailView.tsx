@@ -985,6 +985,7 @@ const TeacherDetailView: React.FC = () => {
                 label={`Terminvorschlag ${index + 1}`}
                 minDate={dayjs()}
                 key={index}
+                minutesStep={5}
                 mask="__.__.____ __:__"
                 value={requestDate}
                 disabled={
