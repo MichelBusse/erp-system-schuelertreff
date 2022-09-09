@@ -105,7 +105,7 @@ export function teacherFormValidation(
   }
 
   if (!admin) {
-    const workContractErrorTexts = workContractFormValidation(form)
+    const workContractErrorTexts = workContractFormValidation(form, false)
     errorTexts = { ...errorTexts, ...workContractErrorTexts }
   }
 
@@ -114,6 +114,7 @@ export function teacherFormValidation(
 
 export function workContractFormValidation(
   form: teacherForm,
+  admin: boolean = true
 ): teacherFormErrorTexts {
   const errorTexts = { ...defaultTeacherFormErrorTexts }
 
@@ -132,9 +133,9 @@ export function workContractFormValidation(
     errorTexts.valid = false
   }
 
-  if (
-    form.dateOfEmploymentStart === null ||
-    !dayjs(form.dateOfEmploymentStart).isValid()
+  if (admin &&
+    (form.dateOfEmploymentStart === null ||
+    !dayjs(form.dateOfEmploymentStart).isValid())
   ) {
     errorTexts.dateOfEmploymentStart = 'Kein korrektes Datum'
     errorTexts.valid = false
@@ -165,7 +166,7 @@ export function workContractFormValidation(
     errorTexts.valid = false
   }
 
-  if (form.fee === null || form.fee <= 0) {
+  if (admin && (form.fee === null || form.fee <= 0)) {
     errorTexts.fee = 'Muss größer 0 sein'
     errorTexts.valid = false
   }
