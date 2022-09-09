@@ -1,0 +1,16 @@
+{
+  "name": "1WSQ",
+  "short_name": "1WSQ",
+  "description": "1WSQ APP",
+  "display": "fullscreen",
+  "start_url": "/?homescreen=1",
+  "background_color": "#000000",
+  "theme_color": "#0f4a73",
+  "icons": [
+    {
+      "src": "touch-icon-ipad-retina.png",
+      "sizes": "167x167",
+      "type": "image/png"
+    }
+  ]
+}

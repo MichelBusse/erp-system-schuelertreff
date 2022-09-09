@@ -118,7 +118,6 @@ export class LessonsService {
       where: { id },
       relations: ['contract', 'contract.teacher'],
     })
-
     // check for intersecting leaves
     if (
       lesson.contract.teacher &&
@@ -136,7 +135,7 @@ export class LessonsService {
       return this.lessonsRepository.save(lesson)
     } else {
       throw new BadRequestException(
-        'You do not have permission to create this lesson',
+        'You do not have permission to update this lesson',
       )
     }
   }
@@ -166,6 +165,7 @@ export class LessonsService {
     let blocked = false
     if (contract.teacher)
       blocked = (await this.checkLeave(date, contract.teacher.id)) > 0
+
     return { contract, lesson, blocked }
   }
 

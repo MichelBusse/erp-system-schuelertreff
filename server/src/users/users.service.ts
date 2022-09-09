@@ -645,7 +645,6 @@ export class UsersService {
 
     if (dto.fixedRequest) {
       user.dateOfApplicationMeeting = dto.dates[0]
-
       // Send ApplicationMeetingRequestMail with fixed date (dto.dates[0])
       try {
         this.transport.sendMail(
