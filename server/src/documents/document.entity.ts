@@ -22,7 +22,9 @@ export class Document {
   @Column()
   fileType: string
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, {
+    onDelete: 'CASCADE',
+  })
   owner: User
 
   @Column({ default: true })
