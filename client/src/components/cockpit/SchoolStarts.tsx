@@ -13,8 +13,8 @@ import {
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { CockpitComponent } from '../../pages/cockpit'
 
+import { CockpitComponent } from '../../pages/cockpit'
 import { school } from '../../types/user'
 import { useAuth } from '../AuthProvider'
 
@@ -81,9 +81,7 @@ const SchoolStarts: CockpitComponent = ({ listSx }) => {
             <IconButton onClick={() => setDate((d) => d.subtract(1, 'week'))}>
               <ArrowBackIcon fontSize="small" />
             </IconButton>
-            <Typography variant="body2">
-              {`KW ${date.week()}`}
-            </Typography>
+            <Typography variant="body2">{`KW ${date.week()}`}</Typography>
             <IconButton onClick={() => setDate((d) => d.add(1, 'week'))}>
               <ArrowForwardIcon fontSize="small" />
             </IconButton>

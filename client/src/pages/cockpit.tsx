@@ -1,4 +1,4 @@
-import { Box, SxProps, Typography, useTheme } from '@mui/material'
+import { Box, SxProps, useTheme } from '@mui/material'
 import { Theme } from '@mui/system'
 
 import ApplicationMeetings from '../components/cockpit/ApplicationMeetings'
@@ -17,7 +17,7 @@ export type CockpitComponent = React.FC<Props>
 
 const Cockpit: React.FC = () => {
   const theme = useTheme()
-  const listSx = { height: '300px',  overflowY: 'scroll' }
+  const listSx = { height: '300px', overflowY: 'scroll' }
 
   return (
     <Box
@@ -36,19 +36,11 @@ const Cockpit: React.FC = () => {
     >
       <DailyContracts listSx={listSx} />
       <SchoolStarts listSx={listSx} />
-      <ContractsWithoutTeacher
-        listSx={listSx}
-      />
+      <ContractsWithoutTeacher listSx={listSx} />
       <PendingContracts listSx={listSx} />
-      <CockpitLeaves
-        listSx={listSx}
-        state={LeaveState.PENDING}
-      />
-      <CockpitLeaves
-        listSx={listSx}
-        state={LeaveState.ACCEPTED}
-      />
-      <ApplicationMeetings listSx={listSx}/>
+      <CockpitLeaves listSx={listSx} state={LeaveState.PENDING} />
+      <CockpitLeaves listSx={listSx} state={LeaveState.ACCEPTED} />
+      <ApplicationMeetings listSx={listSx} />
     </Box>
   )
 }

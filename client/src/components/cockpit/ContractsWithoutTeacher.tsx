@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { CockpitComponent } from '../../pages/cockpit'
 
+import { CockpitComponent } from '../../pages/cockpit'
 import { contractWithTeacher } from '../../types/contract'
 import { useAuth } from '../AuthProvider'
 import ContractList from '../ContractList'
@@ -27,7 +27,7 @@ const ContractsWithoutTeacher: CockpitComponent = ({ listSx }) => {
         }}
       >
         <Stack direction="column" spacing={2} height={'100%'}>
-          <Typography variant="h6">Lehrer zuweisen</Typography>
+          <Typography variant="h6">Lehrkraft zuweisen</Typography>
           <ContractList
             contracts={contracts}
             setContracts={setContracts}

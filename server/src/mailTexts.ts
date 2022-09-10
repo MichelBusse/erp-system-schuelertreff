@@ -1,6 +1,7 @@
 export const passwordResetMail = (link: string) => {
   return (
-    `Liebes Schülertreff-Mitglied,\n\nmit dem folgenden Link kannst du ein neues Passwort für deinen Account festlegen:\n\nLink:\n${link}\n\n` + contactSignature
+    `Liebes Schülertreff-Mitglied,\n\nmit dem folgenden Link kannst du ein neues Passwort für deinen Account festlegen:\n\nLink:\n${link}\n\n` +
+    contactSignature
   )
 }
 
@@ -18,8 +19,8 @@ export const applicationMeetingProposalMail = (
 ) => {
   return (
     `Sehr geehrte/r ${name},\n\ndas Team von Schülertreff bedankt sich für Ihr Interesse an unserer Stellenausschreibung.\nGern würden wir Sie im persönlichen Gespräch kennenlernen.\n\nBitte bestätigen Sie einen dieser Termine:\n\n${formattedDates.reduce(
-    (prevVal, currentVal) => prevVal + '\n' + currentVal,
-  )}\nDas Meeting würde online über Zoom stattfinden.\nMeeting-Link:\n${link}\n\nMeeting-ID: 737 0707 8960\nKenncode: qMwjR9\n\nSollten Sie bereits zu diesen Zeiten verplant sein, bitten wir um einen Terminvorschlag Ihrerseits.\n\nBei Interesse können Sie uns auch gerne auf unserer Internetseite www.schuelertreff-nachhilfe.de besuchen.\n\nWir hoffen auf eine gute zukünftige  Zusammenarbeit, welche im Sinne unserer Schülerinnen und Schüler liegen soll.\n\nBei Fragen stehen wir Ihnen gern unter den angegebenen Kontaktdaten zur Verfügung.\n\n` +
+      (prevVal, currentVal) => prevVal + '\n' + currentVal,
+    )}\nDas Meeting würde online über Zoom stattfinden.\nMeeting-Link:\n${link}\n\nMeeting-ID: 737 0707 8960\nKenncode: qMwjR9\n\nSollten Sie bereits zu diesen Zeiten verplant sein, bitten wir um einen Terminvorschlag Ihrerseits.\n\nBei Interesse können Sie uns auch gerne auf unserer Internetseite www.schuelertreff-nachhilfe.de besuchen.\n\nWir hoffen auf eine gute zukünftige  Zusammenarbeit, welche im Sinne unserer Schülerinnen und Schüler liegen soll.\n\nBei Fragen stehen wir Ihnen gern unter den angegebenen Kontaktdaten zur Verfügung.\n\n` +
     contactSignature
   )
 }

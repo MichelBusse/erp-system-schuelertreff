@@ -1,12 +1,12 @@
 import { Box, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { CockpitComponent } from '../../pages/cockpit'
 
+import { CockpitComponent } from '../../pages/cockpit'
 import { contractWithTeacher } from '../../types/contract'
 import { useAuth } from '../AuthProvider'
 import ContractList from '../ContractList'
 
-const PendingContracts: CockpitComponent = ({listSx}) => {
+const PendingContracts: CockpitComponent = ({ listSx }) => {
   const { API } = useAuth()
   const [pendingContracts, setPendingContracts] = useState<
     contractWithTeacher[]

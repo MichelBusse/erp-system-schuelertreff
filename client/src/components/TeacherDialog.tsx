@@ -100,7 +100,7 @@ const TeacherDialog: React.FC<Props> = ({
             alignItems={'stretch'}
             sx={{ paddingTop: '15px' }}
           >
-            <Stack direction='row' spacing={2}>
+            <Stack direction="row" spacing={2}>
               <TextField
                 fullWidth
                 required
