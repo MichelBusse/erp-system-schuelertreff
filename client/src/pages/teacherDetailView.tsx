@@ -347,11 +347,19 @@ const TeacherDetailView: React.FC = () => {
     }
   }
 
+  const resetPassword = () => {
+    API.post('auth/reset/mail', { mail: data.email })
+      .then(() => {
+        enqueueSnackbar('Der Passwort-Reset wurde an die E-Mail gesendet')
+      })
+      .catch(() => {
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+      })
+  }
+
   return (
     <div className={styles.wrapper}>
-      <Box
-        className={styles.contentBox}
-      >
+      <Box className={styles.contentBox}>
         <Stack direction="column" alignItems="stretch" spacing={2}>
           <Typography variant="h6">Person:</Typography>
           <Stack direction="row" columnGap={2}>
@@ -936,18 +944,15 @@ const TeacherDetailView: React.FC = () => {
                   Einstellen
                 </Button>
               )}
+            {id &&
+              (data.state === TeacherState.CONTRACT ||
+                data.state === TeacherState.EMPLOYED) &&
+              data.deleteState === DeleteState.ACTIVE && (
+                <Button variant="outlined" onClick={() => resetPassword()}>
+                  Passwort-Reset
+                </Button>
+              )}
           </Stack>
-          {requestedId === 'me' &&
-            data.state === TeacherState.APPLIED &&
-            data.deleteState === DeleteState.ACTIVE && (
-              <Stack direction="row" alignItems="center" gap={1}>
-                <CheckIcon color="success" />
-                <Typography variant="subtitle1">
-                  Alle benötigten Daten wurden hinterlegt und werden nun
-                  geprüft.
-                </Typography>
-              </Stack>
-            )}
           {id &&
             data.state === TeacherState.EMPLOYED &&
             data.deleteState === DeleteState.ACTIVE && (
