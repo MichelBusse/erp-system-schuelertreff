@@ -114,7 +114,7 @@ export function teacherFormValidation(
 
 export function workContractFormValidation(
   form: teacherForm,
-  admin: boolean = true
+  admin = true,
 ): teacherFormErrorTexts {
   const errorTexts = { ...defaultTeacherFormErrorTexts }
 
@@ -133,9 +133,10 @@ export function workContractFormValidation(
     errorTexts.valid = false
   }
 
-  if (admin &&
+  if (
+    admin &&
     (form.dateOfEmploymentStart === null ||
-    !dayjs(form.dateOfEmploymentStart).isValid())
+      !dayjs(form.dateOfEmploymentStart).isValid())
   ) {
     errorTexts.dateOfEmploymentStart = 'Kein korrektes Datum'
     errorTexts.valid = false

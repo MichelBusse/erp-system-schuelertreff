@@ -8,8 +8,8 @@ import {
   SxProps,
   useTheme,
 } from '@mui/material'
-import axios from 'axios'
 import { Theme } from '@mui/system'
+import axios from 'axios'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
@@ -40,7 +40,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
   setContracts,
   onSuccess,
   children,
-  sx
+  sx,
 }) => {
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
@@ -131,7 +131,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
             }
           >
             <ListItemText
-              sx={{marginRight:'50px'}}
+              sx={{ marginRight: '50px' }}
               primary={
                 <>
                   <span>

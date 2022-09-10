@@ -1,5 +1,4 @@
 import { Clear as ClearIcon } from '@mui/icons-material'
-import CheckIcon from '@mui/icons-material/Check'
 import DescriptionIcon from '@mui/icons-material/Description'
 import {
   Autocomplete,
@@ -20,7 +19,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
 import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
 import axios from 'axios'
 import dayjs, { Dayjs } from 'dayjs'
@@ -91,8 +89,6 @@ const TeacherDetailView: React.FC = () => {
       dates: [null, null, null],
       fixedRequest: false,
     })
-
-  const theme = useTheme()
 
   const requestedId = id ?? 'me'
   const activeTeacherState = decodeToken().state

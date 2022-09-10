@@ -229,9 +229,7 @@ const PrivateCustomerDetailView: React.FC = () => {
 
   return (
     <div className={styles.wrapper}>
-      <Box
-        className={styles.contentBox}
-      >
+      <Box className={styles.contentBox}>
         <Stack direction="column" alignItems={'stretch'}>
           <h3>Person:</h3>
           <Stack direction="row" columnGap={2}>
@@ -353,7 +351,7 @@ const PrivateCustomerDetailView: React.FC = () => {
             />
           </Stack>
           <h3>Weitere Infos:</h3>
-          <Stack direction={{xs: "column", sm:"row"}} spacing={2}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <FormControl fullWidth>
               <InputLabel id="invoiceMonthLabel">Schulart</InputLabel>
               <Select

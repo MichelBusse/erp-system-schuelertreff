@@ -14,7 +14,6 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 
 import { leaveStateToString, leaveTypeToString } from '../../consts'
-import { CockpitComponent } from '../../pages/cockpit'
 import { LeaveState } from '../../types/enums'
 import { leave } from '../../types/user'
 import { useAuth } from '../AuthProvider'
@@ -66,14 +65,14 @@ const CockpitLeaves: React.FC<Props> = ({ state, listSx }) => {
       />
       <Box p={4} sx={{ backgroundColor: '#ffffff', borderRadius: '4px' }}>
         <Stack direction="column" spacing={2} height={'100%'}>
-          <Typography variant='h6'>{leaveStateToHeading[state]}</Typography>
+          <Typography variant="h6">{leaveStateToHeading[state]}</Typography>
           <List
             dense={true}
             sx={{
               backgroundColor: '#f5f5f5',
               borderRadius: '4px',
               margin: '5px 0',
-              ...listSx
+              ...listSx,
             }}
           >
             {leaves.length === 0 && (

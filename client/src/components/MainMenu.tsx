@@ -76,7 +76,7 @@ const MainMenu: React.FC<MainMenuProps> = ({ items }) => {
       variant="permanent"
       open={open}
       sx={{
-        height: "100vh",
+        height: '100vh',
         [theme.breakpoints.down('md')]: {
           display: 'none',
         },

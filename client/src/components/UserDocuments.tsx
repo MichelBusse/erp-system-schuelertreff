@@ -4,7 +4,14 @@ import {
   Download as DownloadIcon,
 } from '@mui/icons-material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { Button, IconButton, List, ListItem, ListItemText, Stack } from '@mui/material'
+import {
+  Button,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Stack,
+} from '@mui/material'
 import * as B64ArrayBuffer from 'base64-arraybuffer'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
@@ -162,19 +169,19 @@ const UserDocuments: React.FC<Props> = ({
         }}
       >
         <ListItem>
-          <Stack direction={{xs: "column", sm:"row"}} sx={{width:"100%"}}>
-          <Button variant="text" component="label" endIcon={<AddIcon />}>
-            <input
-              hidden
-              accept="*"
-              type="file"
-              onChange={(e) => {
-                if (e.target.files) openDialog(e.target.files[0])
-              }}
-            />
-            {'Hinzufügen'}
-          </Button>
-          {actions}
+          <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ width: '100%' }}>
+            <Button variant="text" component="label" endIcon={<AddIcon />}>
+              <input
+                hidden
+                accept="*"
+                type="file"
+                onChange={(e) => {
+                  if (e.target.files) openDialog(e.target.files[0])
+                }}
+              />
+              {'Hinzufügen'}
+            </Button>
+            {actions}
           </Stack>
         </ListItem>
         {documents.length === 0 && (

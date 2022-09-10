@@ -13,8 +13,8 @@ import {
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { CockpitComponent } from '../../pages/cockpit'
 
+import { CockpitComponent } from '../../pages/cockpit'
 import { teacher } from '../../types/user'
 import { useAuth } from '../AuthProvider'
 

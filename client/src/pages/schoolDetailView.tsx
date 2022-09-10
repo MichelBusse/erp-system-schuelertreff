@@ -377,9 +377,7 @@ const SchoolDetailView: React.FC = () => {
 
   return (
     <div className={styles.wrapper}>
-      <Box
-        className={styles.contentBox}
-      >
+      <Box className={styles.contentBox}>
         <Stack direction="column" alignItems={'stretch'}>
           <h3>Schule:</h3>
           <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>

@@ -143,7 +143,6 @@ export class LessonsController {
     }
   }
 
-
   @Get(':contractId/:date')
   findOne(
     @Request() req,

@@ -37,10 +37,10 @@ const Subjects: React.FC = () => {
   }
 
   return (
-    <Box 
+    <Box
       sx={{
         p: 4,
-      }} 
+      }}
       className={styles.wrapper}
     >
       <Grid container spacing={{ xs: 2, sm: 3, md: 4, lg: 5 }} columns={24}>

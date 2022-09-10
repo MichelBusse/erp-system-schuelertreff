@@ -1,18 +1,10 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBackIosNew'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIos'
-import {
-  Box,
-  IconButton,
-  ListItem,
-  Stack,
-  SxProps,
-  Typography,
-} from '@mui/material'
-import { Theme } from '@mui/system'
+import { Box, IconButton, Stack, Typography } from '@mui/material'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
-import { CockpitComponent } from '../../pages/cockpit'
 
+import { CockpitComponent } from '../../pages/cockpit'
 import { contractWithTeacher } from '../../types/contract'
 import { useAuth } from '../AuthProvider'
 import ContractList from '../ContractList'

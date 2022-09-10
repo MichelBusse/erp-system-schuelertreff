@@ -174,7 +174,7 @@ const ContractCreation: React.FC<Props> = ({
           {suggestions.flatMap((t, i) => [
             <ListSubheader key={t.teacherId}>
               {t.teacherId === -1
-                ? 'Ohne Lehrer'
+                ? 'Ohne Lehrkraft'
                 : t.teacherName + ` (${getTeacherById(t.teacherId)?.city})`}
             </ListSubheader>,
             t.suggestions.map((s, j) => {
