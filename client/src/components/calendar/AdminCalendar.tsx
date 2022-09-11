@@ -1,7 +1,6 @@
 import AddIcon from '@mui/icons-material/Add'
-import { CircularProgress, Fab, useTheme } from '@mui/material'
+import { CircularProgress, Fab } from '@mui/material'
 import { Box } from '@mui/system'
-import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
@@ -12,7 +11,7 @@ import { contract } from '../../types/contract'
 import { lesson } from '../../types/lesson'
 import { teacher } from '../../types/user'
 import { useAuth } from '../AuthProvider'
-import styles from './AdminCalendar.module.scss'
+import MultiCalendar from './multiCalendar'
 
 type Props = {
   date: Dayjs
@@ -28,18 +27,22 @@ const AdminCalendar: React.FC<Props> = ({
   refresh,
 }) => {
   const { API } = useAuth()
-  const theme = useTheme()
   const { enqueueSnackbar } = useSnackbar()
 
   const [contracts, setContracts] = useState<Record<number, contract[]>>({})
   const [lessons, setLessons] = useState<lesson[]>([])
-  const [teachers, setTeachers] = useState<teacher[]>([])
+  const [teachers, setTeachers] = useState<{id : number, title : string}[]>([])
 
   const [loading, setLoading] = useState(true)
   const [renderLoading, setRenderLoading] = useState(0)
 
   useEffect(() => {
-    API.get('users/teacher/employed').then((res) => setTeachers(res.data))
+    API.get('users/teacher/employed').then((res) => setTeachers(res.data.map((data: teacher) => 
+      ({
+        id: data.id,
+        title: `${data.firstName} ${data.lastName}`
+      })
+    )))
   }, [refresh])
 
   useEffect(() => {
@@ -87,108 +90,19 @@ const AdminCalendar: React.FC<Props> = ({
     return () => ongoingRequest.abort()
   }, [date, refresh])
 
-  const getCellValue: GridColDef['valueGetter'] = ({ id, colDef: { field } }) =>
-    contracts[id as number]?.filter(
-      (c) => dayjs(c.startDate).day().toString() === field,
-    )
-
-  const renderCell: GridColDef['renderCell'] = (params) => (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        cursor: (params.value ?? []).length > 0 ? 'pointer' : 'normal',
-      }}
-    >
-      {(params.value as contract[])?.map((c) => {
-        return (
-          <Box
-            key={c.id}
-            sx={{
-              backgroundColor: c.subject.color + '70',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              boxShadow: c.teacher
-                ? `0 0 2px ${c.subject.color} inset`
-                : undefined,
-              borderWidth: !c.teacher ? '2px' : undefined,
-              borderStyle: !c.teacher ? 'solid' : undefined,
-              borderColor: !c.teacher ? theme.palette.error.main : undefined,
-            }}
-          >
-            {c.subject.shortForm}
-          </Box>
-        )
-      })}
-    </Box>
-  )
-
-  const columns: GridColDef[] = [
-    { field: 'teacher', headerName: '', width: 200, sortable: false },
-
-    ...[1, 2, 3, 4, 5].map(
-      (n): GridColDef => ({
-        field: n.toString(),
-        headerName: date.day(n).format('YYYY-MM-DD'),
-        renderHeader: () => (
-          <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.2' }}>
-            <span>
-              <b>{date.day(n).format('dddd')}</b>
-            </span>
-            <br />
-            <span>{date.day(n).format('DD.MM.YYYY')}</span>
-          </div>
-        ),
-        width: 150,
-        sortable: false,
-        valueGetter: getCellValue,
-        renderCell,
-      }),
-    ),
-  ]
-
-  const rows: GridRowsProp = teachers
-    .map((t) => ({
-      id: t.id,
-      teacher: `${t.firstName} ${t.lastName}`,
-    }))
-    .concat([{ id: -1, teacher: `Ausstehend` }])
-
   return (
     <>
       <Box
-        className={styles.wrapper}
         sx={{
-          width: columns.reduce((p, c) => p + (c.width ?? 100), 0),
-          maxWidth: '100%',
           height: '100%',
-          overflowX: 'scroll',
         }}
       >
-        <DataGrid
-          style={{
-            flexGrow: 1,
-            border: 'none',
-          }}
-          rows={rows}
-          columns={columns}
-          disableColumnMenu={true}
-          disableSelectionOnClick={true}
-          onCellClick={(params) => {
-            if (
-              params.colDef.field !== 'teacher' &&
-              (params.value ?? []).length > 0
-            ) {
-              setDrawer({
-                open: true,
-                params: params,
-                lessons: lessons,
-              })
-            }
-          }}
+        <MultiCalendar
+          date={date}
+          setDrawer={setDrawer}
+          contracts={contracts}
+          lessons={lessons}
+          labels={teachers}
         />
 
         <CircularProgress
