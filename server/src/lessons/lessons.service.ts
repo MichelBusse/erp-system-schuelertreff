@@ -659,4 +659,20 @@ export class LessonsService {
 
     return q.getCount()
   }
+
+  /**
+   * check if a date is valid for a contract
+   * returns true if valid
+   */
+  async validateDate(date: string, contractId: number): Promise<boolean> {
+    return this.contractsService
+      .findOne(contractId)
+      .then(
+        (c) =>
+          c !== null &&
+          !dayjs(date).isBefore(c.startDate) &&
+          !dayjs(date).isAfter(c.endDate) &&
+          (dayjs(c.startDate).diff(date, 'day') / 7) % c.interval === 0,
+      )
+  }
 }

@@ -52,11 +52,13 @@ export class UsersController {
   ) {}
 
   @Get()
+  @Roles(Role.ADMIN)
   findAll(): Promise<User[]> {
     return this.usersService.findAll()
   }
 
   @Get('customer')
+  @Roles(Role.ADMIN)
   findAllCustomers(): Promise<Customer[]> {
     return this.usersService.findAllCustomers()
   }
@@ -68,16 +70,19 @@ export class UsersController {
   }
 
   @Get('privateCustomer')
+  @Roles(Role.ADMIN)
   findAppliedPrivateCustomers(): Promise<PrivateCustomer[]> {
     return this.usersService.findPrivateCustomers()
   }
 
   @Get('privateCustomer/deleted')
+  @Roles(Role.ADMIN)
   findDeletedPrivateCustomers(): Promise<PrivateCustomer[]> {
     return this.usersService.findDeletedPrivateCustomers()
   }
 
   @Get('classCustomer')
+  @Roles(Role.ADMIN)
   findAllClassCustomers(): Promise<ClassCustomer[]> {
     return this.usersService.findClassCustomers()
   }
@@ -90,40 +95,48 @@ export class UsersController {
   }
 
   @Get('school')
+  @Roles(Role.ADMIN)
   findAllSchools(): Promise<School[]> {
     return this.usersService.findSchools()
   }
   @Get('school/deleted')
+  @Roles(Role.ADMIN)
   findDeletedSchools(): Promise<School[]> {
     return this.usersService.findDeletedSchools()
   }
 
   @Get('school/startInFuture')
+  @Roles(Role.ADMIN)
   findSchoolsWithStartInFuture(@Query('of') date: string): Promise<School[]> {
     return this.usersService.findSchoolsWithStartInFuture(date)
   }
 
   @Get('teacher')
+  @Roles(Role.ADMIN)
   findTeachers(): Promise<Teacher[]> {
     return this.usersService.findTeachers()
   }
 
   @Get('teacher/employed')
+  @Roles(Role.ADMIN)
   findEmployedTeachers(): Promise<Teacher[]> {
     return this.usersService.findEmployedTeachers()
   }
 
   @Get('teacher/applied')
+  @Roles(Role.ADMIN)
   findAppliedTeachers(): Promise<Teacher[]> {
     return this.usersService.findAppliedTeachers()
   }
 
   @Get('teacher/employed/deleted')
+  @Roles(Role.ADMIN)
   findEmployedDeletedTeachers(): Promise<Teacher[]> {
     return this.usersService.findEmployedDeletedTeachers()
   }
 
   @Get('teacher/applied/deleted')
+  @Roles(Role.ADMIN)
   findAppliedDeletedTeachers(): Promise<Teacher[]> {
     return this.usersService.findAppliedDeletedTeachers()
   }

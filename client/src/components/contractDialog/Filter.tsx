@@ -36,9 +36,10 @@ type Props = {
   form: ContractFilterForm
   setForm: React.Dispatch<React.SetStateAction<ContractFilterForm>>
   initialContract?: contractWithTeacher | null
+  alreadySubmitted?: boolean
 }
 
-const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
+const Filter: React.FC<Props> = ({ form, setForm, initialContract, alreadySubmitted }) => {
   const [privCustomers, setPrivCustomers] = useState<privateCustomer[]>([])
   const [classCustomers, setClassCustomers] = useState<classCustomer[]>([])
   const [schools, setSchools] = useState<school[]>([])
@@ -49,33 +50,21 @@ const Filter: React.FC<Props> = ({ form, setForm, initialContract }) => {
 
   useEffect(() => {
     if (!initialContract) return
+    if (alreadySubmitted) return
 
     if (initialContract.customers[0].role === CustomerType.PRIVATE) {
       setForm((f) => ({ ...f, customerType: CustomerType.PRIVATE }))
     } else {
       setForm((f) => ({ ...f, customerType: CustomerType.SCHOOL }))
     }
-
     setForm((f) => {
       const initialForm0Entry: ContractFilterForm = {
         ...f,
-        minStartDate: dayjs(initialContract.startDate, 'YYYY-MM-DD').isAfter(
-          dayjs(),
-        )
-          ? dayjs(initialContract.startDate, 'YYYY-MM-DD')
-          : dayjs().add(1, 'day'),
-        startDate: dayjs(initialContract.startDate, 'YYYY-MM-DD').isAfter(
-          dayjs(),
-        )
-          ? dayjs(initialContract.startDate, 'YYYY-MM-DD')
-          : dayjs().add(1, 'day'),
-        endDate:
-          initialContract.endDate &&
-          dayjs(initialContract.endDate, 'YYYY-MM-DD').isAfter(
-            dayjs().add(1, 'day'),
-          )
-            ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
-            : null,
+        minStartDate: dayjs(initialContract.startDate, 'YYYY-MM-DD'),
+        startDate: dayjs(initialContract.startDate, 'YYYY-MM-DD'),
+        endDate: initialContract.endDate
+          ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
+          : null,
         subject: initialContract.subject,
         interval: initialContract.interval,
         startTime: dayjs(initialContract.startTime, 'HH:mm'),

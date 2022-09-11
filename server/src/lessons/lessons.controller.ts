@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Post,
   Query,
@@ -131,24 +133,27 @@ export class LessonsController {
     }
   }
 
-  @Post('')
-  create(
-    @Request() req,
-    @Body() createLessonDto: CreateLessonDto,
-  ): Promise<Lesson> {
+  @Post()
+  async create(@Request() req, @Body() dto: CreateLessonDto): Promise<Lesson> {
+    if (!(await this.lessonsService.validateDate(dto.date, dto.contractId)))
+      throw new BadRequestException('Datum ist nicht gültig für diesen Einsatz')
+
     if (req.user.role === Role.ADMIN) {
-      return this.lessonsService.create(createLessonDto)
+      return this.lessonsService.create(dto)
     } else {
-      return this.lessonsService.create(createLessonDto, req.user.id)
+      return this.lessonsService.create(dto, req.user.id)
     }
   }
 
   @Get(':contractId/:date')
-  findOne(
+  async findOne(
     @Request() req,
     @Param('contractId') id: number,
     @Param('date') date: string,
   ): Promise<{ contract: Contract; lesson: Lesson; blocked: boolean }> {
+    if (!(await this.lessonsService.validateDate(date, id)))
+      throw new NotFoundException()
+
     if (req.user.role === Role.ADMIN) {
       return this.lessonsService.findOne(id, date)
     } else {

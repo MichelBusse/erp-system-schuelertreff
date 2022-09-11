@@ -11,6 +11,7 @@ import { Box } from '@mui/system'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 
+import { snackbarOptionsError } from '../consts'
 import { contract, ContractState } from '../types/contract'
 import { ContractType } from '../types/enums'
 import { useAuth } from './AuthProvider'
@@ -40,7 +41,7 @@ const AcceptContractsDialog: React.FC<Props> = ({
         refresh()
       })
       .catch(() => {
-        enqueueSnackbar('Ein Fehler ist aufgetreten')
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
       })
   }
 
