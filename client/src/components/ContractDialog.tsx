@@ -61,7 +61,7 @@ const ContractDialog: React.FC<Props> = ({
   const theme = useTheme()
   const [confirmationDialogProps, setConfirmationDialogProps] =
     useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
-  
+
   const [alreadySubmitted, setAlreadySubmitted] = useState<boolean>(false)
 
   // step 0
