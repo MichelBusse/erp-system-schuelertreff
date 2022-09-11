@@ -5,11 +5,11 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
-import { snackbarOptionsError } from '../../consts'
+import { defaultClassCustomerFormData, snackbarOptionsError } from '../../consts'
 import { DrawerParameters } from '../../pages/timetable'
 import { contract } from '../../types/contract'
 import { lesson } from '../../types/lesson'
-import { teacher } from '../../types/user'
+import { classCustomer, teacher } from '../../types/user'
 import { useAuth } from '../AuthProvider'
 import MultiCalendar from './multiCalendar'
 
@@ -20,7 +20,7 @@ type Props = {
   refresh?: number
 }
 
-const AdminCalendar: React.FC<Props> = ({
+const SchoolCalendar: React.FC<Props> = ({
   date,
   setDrawer,
   openDialog,
@@ -31,16 +31,16 @@ const AdminCalendar: React.FC<Props> = ({
 
   const [contracts, setContracts] = useState<Record<number, contract[]>>({})
   const [lessons, setLessons] = useState<lesson[]>([])
-  const [teachers, setTeachers] = useState<{id : number, title : string}[]>([])
+  const [classes, setClasses] = useState<{id : number, title : string}[]>([])
 
   const [loading, setLoading] = useState(true)
   const [renderLoading, setRenderLoading] = useState(0)
 
   useEffect(() => {
-    API.get('users/teacher/employed').then((res) => setTeachers(res.data.map((teacher: teacher) => 
+    API.get('users/classCustomer/193').then((res) => setClasses(res.data.map((classCustomer: classCustomer) => 
       ({
-        id: teacher.id,
-        title: `${teacher.firstName} ${teacher.lastName}`
+        id: classCustomer.id,
+        title: classCustomer.className
       })
     )))
   }, [refresh])
@@ -59,23 +59,23 @@ const AdminCalendar: React.FC<Props> = ({
       },
     })
       .then((res) => {
-        const contractsByTeacher: Record<number, contract[]> = {}
-        console.log(res.data)
+        const contractsByClass: Record<number, contract[]> = {}
+
         res.data.contracts
           .sort((a: contract, b: contract) => {
             return dayjs(a.startTime, 'HH:mm').diff(dayjs(b.startTime, 'HH:mm'))
           })
           .map((c: contract) => {
-            if (c.teacher) {
-              contractsByTeacher[c.teacher.id] = (
-                contractsByTeacher[c.teacher.id] ?? []
-              ).concat(c)
-            } else {
-              contractsByTeacher[-1] = (contractsByTeacher[-1] ?? []).concat(c)
-            }
+            c.customers.map((customer) => {
+              if (customer.role === 'classCustomer') {
+                contractsByClass[customer.id] = (
+                  contractsByClass[customer.id] ?? []
+                ).concat(c)
+              }
+            })
           })
 
-        setContracts(contractsByTeacher)
+        setContracts(contractsByClass)
         setLessons(res.data.lessons)
         setLoading(false)
       })
@@ -102,7 +102,7 @@ const AdminCalendar: React.FC<Props> = ({
           setDrawer={setDrawer}
           contracts={contracts}
           lessons={lessons}
-          labels={teachers}
+          labels={classes}
         />
 
         <CircularProgress
@@ -135,4 +135,4 @@ const AdminCalendar: React.FC<Props> = ({
   )
 }
 
-export default AdminCalendar
+export default SchoolCalendar
