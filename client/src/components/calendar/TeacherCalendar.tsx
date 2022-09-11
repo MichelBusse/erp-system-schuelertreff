@@ -1,24 +1,55 @@
-import { Box } from '@mui/material'
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh'
+import { Box, Fab } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
+import { useEffect, useState } from 'react'
 
-import { DrawerParameters } from '../pages/timetable'
-import { contract } from '../types/contract'
-import { lesson } from '../types/lesson'
+import { DrawerParameters } from '../../pages/timetable'
+import { contract } from '../../types/contract'
+import { lesson } from '../../types/lesson'
+import AcceptContractsDialog from '../AcceptContractsDialog'
+import { useAuth } from '../AuthProvider'
+import styles from './TeacherCalendar.module.scss'
 
 type Props = {
   date: Dayjs
-  contracts: contract[]
-  setDrawer?: (params: DrawerParameters) => void
-  lessons: lesson[]
+  setDrawer: (params: DrawerParameters) => void
+  refresh?: number
+  setRefresh?: React.Dispatch<React.SetStateAction<number>>
 }
 
-const Calendar: React.FC<Props> = ({
+const TeacherCalendar: React.FC<Props> = ({
   date,
-  contracts,
   setDrawer,
-  lessons,
-}: Props) => {
+  refresh,
+  setRefresh,
+}) => {
+  const { API } = useAuth()
+  const [contracts, setContracts] = useState<contract[]>([])
+  const [pendingContracts, setPendingContracts] = useState<contract[]>([])
+  const [lessons, setLessons] = useState<lesson[]>([])
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+
+  useEffect(() => {
+    API.get('lessons/myLessons', {
+      params: {
+        of: date.format('YYYY-MM-DD'),
+      },
+    }).then((res) => {
+      setContracts(
+        res.data.contracts.sort((a: contract, b: contract) => {
+          return dayjs(a.startTime, 'HH:mm').isAfter(
+            dayjs(b.startTime, 'HH:mm'),
+          )
+            ? 1
+            : -1
+        }),
+      )
+      setPendingContracts(res.data.pendingContracts)
+      setLessons(res.data.lessons)
+    })
+  }, [date, refresh])
+
   const rowHeight = 777
   const startTimeAM = 7
   const numberOfHours = 14
@@ -119,37 +150,61 @@ const Calendar: React.FC<Props> = ({
   ]
 
   return (
-    <div
-      style={{
-        width: columns.reduce((p, c) => p + (c.width ?? 100), 0),
-        maxWidth: '100%',
-        height: '100%',
-        overflowX: 'scroll',
-      }}
-    >
-      <DataGrid
-        getRowHeight={() => rowHeight}
-        hideFooter={true}
+    <>
+      <Box
+        className={styles.wrapper}
+        sx={{
+          width: columns.reduce((p, c) => p + (c.width ?? 100), 0),
+          maxWidth: '100%',
+          height: '100%',
+          overflowX: 'scroll',
+        }}
+      >
+        <DataGrid
+          getRowHeight={() => rowHeight}
+          hideFooter={true}
+          style={{
+            flexGrow: 1,
+            border: 'none',
+          }}
+          rows={[{ id: 0 }]}
+          columns={columns}
+          disableColumnMenu={true}
+          disableSelectionOnClick={true}
+          onCellClick={(params) => {
+            if (
+              params.colDef.field !== 'teacher' &&
+              (params.value ?? []).length > 0 &&
+              setDrawer
+            ) {
+              setDrawer({ open: true, params: params, lessons: lessons })
+            }
+          }}
+        />
+      </Box>
+
+      <Fab
+        color="primary"
+        aria-label="add"
         style={{
-          flexGrow: 1,
-          border: 'none',
+          position: 'absolute',
+          bottom: 16,
+          right: 16,
+          display: pendingContracts.length > 0 ? 'block' : 'none',
         }}
-        rows={[{ id: 0 }]}
-        columns={columns}
-        disableColumnMenu={true}
-        disableSelectionOnClick={true}
-        onCellClick={(params) => {
-          if (
-            params.colDef.field !== 'teacher' &&
-            (params.value ?? []).length > 0 &&
-            setDrawer
-          ) {
-            setDrawer({ open: true, params: params, lessons: lessons })
-          }
-        }}
+        onClick={() => setDialogOpen(true)}
+      >
+        <PriorityHighIcon />
+      </Fab>
+
+      <AcceptContractsDialog
+        contracts={pendingContracts}
+        open={dialogOpen}
+        setOpen={setDialogOpen}
+        refresh={() => setRefresh && setRefresh((re) => ++re)}
       />
-    </div>
+    </>
   )
 }
 
-export default Calendar
+export default TeacherCalendar

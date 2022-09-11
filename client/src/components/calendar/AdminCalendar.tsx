@@ -1,40 +1,40 @@
 import AddIcon from '@mui/icons-material/Add'
-import { Fab, Paper, useTheme } from '@mui/material'
+import { Fab, useTheme } from '@mui/material'
 import { Box } from '@mui/system'
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 
-import { DrawerParameters } from '../pages/timetable'
-import { contract } from '../types/contract'
-import { lesson } from '../types/lesson'
-import { teacher } from '../types/user'
-import { useAuth } from './AuthProvider'
-import styles from './Calendar.module.scss'
-import CalendarControl from './CalendarControl'
+import { DrawerParameters } from '../../pages/timetable'
+import { contract } from '../../types/contract'
+import { lesson } from '../../types/lesson'
+import { teacher } from '../../types/user'
+import { useAuth } from '../AuthProvider'
+import styles from './AdminCalendar.module.scss'
 
 type Props = {
   date: Dayjs
   setDrawer: (params: DrawerParameters) => void
-  setDate: (date: Dayjs) => void
   openDialog: () => void
   refresh?: number
-  teachers: teacher[]
 }
 
 const AdminCalendar: React.FC<Props> = ({
   date,
   setDrawer,
-  setDate,
   openDialog,
   refresh,
-  teachers,
 }) => {
   const { API } = useAuth()
+  const theme = useTheme()
 
   const [contracts, setContracts] = useState<Record<number, contract[]>>([])
   const [lessons, setLessons] = useState<lesson[]>([])
-  const theme = useTheme()
+  const [teachers, setTeachers] = useState<teacher[]>([])
+
+  useEffect(() => {
+    API.get('users/teacher/employed').then((res) => setTeachers(res.data))
+  }, [refresh])
 
   useEffect(() => {
     API.get('lessons/week', {
@@ -138,35 +138,39 @@ const AdminCalendar: React.FC<Props> = ({
     .concat([{ id: -1, teacher: `Ausstehend` }])
 
   return (
-    <Paper
-      className={styles.wrapper}
-      sx={{
-        width: columns.reduce((p, c) => p + (c.width ?? 100), 0),
-      }}
-    >
-      <CalendarControl date={date} setDate={setDate} />
-      <DataGrid
-        style={{
-          flexGrow: 1,
-          border: 'none',
+    <>
+      <Box
+        className={styles.wrapper}
+        sx={{
+          width: columns.reduce((p, c) => p + (c.width ?? 100), 0),
+          maxWidth: '100%',
+          height: '100%',
+          overflowX: 'scroll',
         }}
-        rows={rows}
-        columns={columns}
-        disableColumnMenu={true}
-        disableSelectionOnClick={true}
-        onCellClick={(params) => {
-          if (
-            params.colDef.field !== 'teacher' &&
-            (params.value ?? []).length > 0
-          ) {
-            setDrawer({
-              open: true,
-              params: params,
-              lessons: lessons,
-            })
-          }
-        }}
-      />
+      >
+        <DataGrid
+          style={{
+            flexGrow: 1,
+            border: 'none',
+          }}
+          rows={rows}
+          columns={columns}
+          disableColumnMenu={true}
+          disableSelectionOnClick={true}
+          onCellClick={(params) => {
+            if (
+              params.colDef.field !== 'teacher' &&
+              (params.value ?? []).length > 0
+            ) {
+              setDrawer({
+                open: true,
+                params: params,
+                lessons: lessons,
+              })
+            }
+          }}
+        />
+      </Box>
 
       <Fab
         color="primary"
@@ -180,7 +184,7 @@ const AdminCalendar: React.FC<Props> = ({
       >
         <AddIcon />
       </Fab>
-    </Paper>
+    </>
   )
 }
 

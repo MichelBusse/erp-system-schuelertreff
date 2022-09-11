@@ -1,12 +1,4 @@
 .wrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  max-width: 100%;
-  height: 100%;
-  border-radius: 25px !important;
-
   :global(.MuiDataGrid-columnHeadersInner) {
     height: 56px;
 
@@ -25,13 +17,11 @@
     outline: none !important;
   }
 
-  :global(.MuiDataGrid-columnHeader),
-  :global(.MuiDataGrid-row) > :first-child {
+  :global(.MuiDataGrid-columnHeader) {
     background-color: #a8f0ff;
   }
 
-  :global(.MuiDataGrid-columnHeader):nth-child(2n),
-  :global(.MuiDataGrid-row):nth-child(2n + 1) > :first-child {
+  :global(.MuiDataGrid-columnHeader):nth-child(2n) {
     background-color: #8ce6f9;
   }
 
@@ -44,7 +34,7 @@
   }
 
   :global(.MuiDataGrid-row):last-child {
-    margin-bottom: 70px;
+    margin-bottom: 0px;
   }
 
   :global(.MuiDataGrid-columnHeaderTitle) {
@@ -64,26 +54,15 @@
   :global(.MuiDataGrid-cell) {
     border-bottom: none !important;
     outline: none !important;
+    background-color: #ffffff23 !important;
+    padding: 0 !important;
+  }
+
+  :global(.MuiDataGrid-cell):nth-child(2n + 1) {
+    background-color: #c3d4d523 !important;
   }
 
   :global(.MuiDataGrid-columnSeparator) {
     display: none !important;
-  }
-
-  :global(.MuiDataGrid-cell):not(:first-child) {
-    padding: 0;
-  }
-}
-
-.list {
-  padding-left: 20px;
-  margin-top: 0px !important;
-  list-style-type: '-  ';
-}
-
-@media only screen and (max-width: 1199px) {
-  /* For mobile phones: */
-  .wrapper {
-    border-radius: 0px !important;
   }
 }
