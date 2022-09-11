@@ -61,6 +61,8 @@ const ContractDialog: React.FC<Props> = ({
   const theme = useTheme()
   const [confirmationDialogProps, setConfirmationDialogProps] =
     useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
+  
+  const [alreadySubmitted, setAlreadySubmitted] = useState<boolean>(false)
 
   // step 0
   const [loading0, setLoading0] = useState(false)
@@ -109,6 +111,7 @@ const ContractDialog: React.FC<Props> = ({
 
   const handleSubmit0 = () => {
     setLoading0(true)
+    setAlreadySubmitted(true)
 
     API.get('users/leaves/intersecting', {
       params: {
@@ -301,6 +304,7 @@ const ContractDialog: React.FC<Props> = ({
           form={form0}
           setForm={setForm0}
           initialContract={initialContract}
+          alreadySubmitted={alreadySubmitted}
         />
       ),
       actions: (

@@ -118,14 +118,16 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
             key={contract.id}
             secondaryAction={
               <Box>
-                <IconButton onClick={() => editContract(contract)}>
-                  <Edit />
-                </IconButton>
                 {(!contract.endDate ||
                   dayjs(contract.endDate).isAfter(dayjs())) && (
-                  <IconButton onClick={() => deleteContract(contract.id)}>
-                    <Delete />
-                  </IconButton>
+                  <>
+                    <IconButton onClick={() => editContract(contract)}>
+                      <Edit />
+                    </IconButton>
+                    <IconButton onClick={() => deleteContract(contract.id)}>
+                      <Delete />
+                    </IconButton>
+                  </>
                 )}
               </Box>
             }
