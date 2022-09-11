@@ -1,10 +1,12 @@
 import AddIcon from '@mui/icons-material/Add'
-import { Fab, useTheme } from '@mui/material'
+import { CircularProgress, Fab, useTheme } from '@mui/material'
 import { Box } from '@mui/system'
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
+import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
+import { snackbarOptionsError } from '../../consts'
 import { DrawerParameters } from '../../pages/timetable'
 import { contract } from '../../types/contract'
 import { lesson } from '../../types/lesson'
@@ -27,44 +29,62 @@ const AdminCalendar: React.FC<Props> = ({
 }) => {
   const { API } = useAuth()
   const theme = useTheme()
+  const { enqueueSnackbar } = useSnackbar()
 
-  const [contracts, setContracts] = useState<Record<number, contract[]>>([])
+  const [contracts, setContracts] = useState<Record<number, contract[]>>({})
   const [lessons, setLessons] = useState<lesson[]>([])
   const [teachers, setTeachers] = useState<teacher[]>([])
+
+  const [loading, setLoading] = useState(true)
+  const [renderLoading, setRenderLoading] = useState(0)
 
   useEffect(() => {
     API.get('users/teacher/employed').then((res) => setTeachers(res.data))
   }, [refresh])
 
   useEffect(() => {
+    const ongoingRequest = new AbortController()
+
+    setRenderLoading((r) => r + 1)
+    setLoading(true)
+    setContracts({})
+
     API.get('lessons/week', {
+      signal: ongoingRequest.signal,
       params: {
         of: date.format('YYYY-MM-DD'),
       },
-    }).then((res) => {
-      const contractsByTeacher: Record<number, contract[]> = {}
-
-      res.data.contracts
-        .sort((a: contract, b: contract) => {
-          return dayjs(a.startTime, 'HH:mm').isAfter(
-            dayjs(b.startTime, 'HH:mm'),
-          )
-            ? 1
-            : -1
-        })
-        .map((c: contract) => {
-          if (c.teacher) {
-            contractsByTeacher[c.teacher.id] = (
-              contractsByTeacher[c.teacher.id] ?? []
-            ).concat(c)
-          } else {
-            contractsByTeacher[-1] = (contractsByTeacher[-1] ?? []).concat(c)
-          }
-        })
-
-      setContracts(contractsByTeacher)
-      setLessons(res.data.lessons)
     })
+      .then((res) => {
+        const contractsByTeacher: Record<number, contract[]> = {}
+
+        res.data.contracts
+          .sort((a: contract, b: contract) => {
+            return dayjs(a.startTime, 'HH:mm').diff(dayjs(b.startTime, 'HH:mm'))
+          })
+          .map((c: contract) => {
+            if (c.teacher) {
+              contractsByTeacher[c.teacher.id] = (
+                contractsByTeacher[c.teacher.id] ?? []
+              ).concat(c)
+            } else {
+              contractsByTeacher[-1] = (contractsByTeacher[-1] ?? []).concat(c)
+            }
+          })
+
+        setContracts(contractsByTeacher)
+        setLessons(res.data.lessons)
+        setLoading(false)
+      })
+      .catch((err) => {
+        if (err?.code !== 'ERR_CANCELED') {
+          console.error(err)
+          enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        }
+      })
+
+    // abort request
+    return () => ongoingRequest.abort()
   }, [date, refresh])
 
   const getCellValue: GridColDef['valueGetter'] = ({ id, colDef: { field } }) =>
@@ -168,6 +188,19 @@ const AdminCalendar: React.FC<Props> = ({
                 lessons: lessons,
               })
             }
+          }}
+        />
+
+        <CircularProgress
+          key={renderLoading}
+          size={26}
+          sx={{
+            pointerEvents: 'none',
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            opacity: loading ? 1 : 0,
+            transition: 'opacity .25s ease',
           }}
         />
       </Box>

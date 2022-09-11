@@ -1,9 +1,11 @@
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh'
-import { Box, Fab } from '@mui/material'
+import { Box, CircularProgress, Fab } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
+import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
+import { snackbarOptionsError } from '../../consts'
 import { DrawerParameters } from '../../pages/timetable'
 import { contract } from '../../types/contract'
 import { lesson } from '../../types/lesson'
@@ -25,29 +27,48 @@ const TeacherCalendar: React.FC<Props> = ({
   setRefresh,
 }) => {
   const { API } = useAuth()
+  const { enqueueSnackbar } = useSnackbar()
+
   const [contracts, setContracts] = useState<contract[]>([])
   const [pendingContracts, setPendingContracts] = useState<contract[]>([])
   const [lessons, setLessons] = useState<lesson[]>([])
   const [dialogOpen, setDialogOpen] = useState<boolean>(false)
 
+  const [loading, setLoading] = useState(true)
+  const [renderLoading, setRenderLoading] = useState(0)
+
   useEffect(() => {
+    const ongoingRequest = new AbortController()
+
+    setRenderLoading((r) => r + 1)
+    setLoading(true)
+    setContracts([])
+
     API.get('lessons/myLessons', {
+      signal: ongoingRequest.signal,
       params: {
         of: date.format('YYYY-MM-DD'),
       },
-    }).then((res) => {
-      setContracts(
-        res.data.contracts.sort((a: contract, b: contract) => {
-          return dayjs(a.startTime, 'HH:mm').isAfter(
-            dayjs(b.startTime, 'HH:mm'),
-          )
-            ? 1
-            : -1
-        }),
-      )
-      setPendingContracts(res.data.pendingContracts)
-      setLessons(res.data.lessons)
     })
+      .then((res) => {
+        setContracts(
+          res.data.contracts.sort((a: contract, b: contract) => {
+            return dayjs(a.startTime, 'HH:mm').diff(dayjs(b.startTime, 'HH:mm'))
+          }),
+        )
+        setPendingContracts(res.data.pendingContracts)
+        setLessons(res.data.lessons)
+        setLoading(false)
+      })
+      .catch((err) => {
+        if (err?.code !== 'ERR_CANCELED') {
+          console.error(err)
+          enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        }
+      })
+
+    // abort request
+    return () => ongoingRequest.abort()
   }, [date, refresh])
 
   const rowHeight = 777
@@ -179,6 +200,19 @@ const TeacherCalendar: React.FC<Props> = ({
             ) {
               setDrawer({ open: true, params: params, lessons: lessons })
             }
+          }}
+        />
+
+        <CircularProgress
+          key={renderLoading}
+          size={26}
+          sx={{
+            pointerEvents: 'none',
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            opacity: loading ? 1 : 0,
+            transition: 'opacity .25s ease',
           }}
         />
       </Box>
