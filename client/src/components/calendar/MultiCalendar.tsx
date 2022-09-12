@@ -5,8 +5,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import { DrawerParameters } from '../../pages/timetable'
 import { contract } from '../../types/contract'
 import { lesson } from '../../types/lesson'
-import { teacher } from '../../types/user'
-import styles from './Calendar.module.scss'
+import styles from './MultiCalendar.module.scss'
 
 type Props = {
   date: Dayjs
@@ -66,7 +65,7 @@ const MultiCalendar: React.FC<Props> = ({
   )
 
   const columns: GridColDef[] = [
-    { field: 'teacher', headerName: '', width: 200, sortable: false },
+    { field: 'label', headerName: '', width: 200, sortable: false },
 
     ...[1, 2, 3, 4, 5].map(
       (n): GridColDef => ({
@@ -92,9 +91,8 @@ const MultiCalendar: React.FC<Props> = ({
   const rows: GridRowsProp = labels
     .map((t) => ({
       id: t.id,
-      teacher: t.title,
+      label: t.title,
     }))
-    .concat([{ id: -1, teacher: `Ausstehend` }])
 
   return (
     <Box
@@ -117,7 +115,7 @@ const MultiCalendar: React.FC<Props> = ({
         disableSelectionOnClick={true}
         onCellClick={(params) => {
           if (
-            params.colDef.field !== 'teacher' &&
+            params.colDef.field !== 'label' &&
             (params.value ?? []).length > 0
           ) {
             setDrawer({

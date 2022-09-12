@@ -5,13 +5,13 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
-import { defaultClassCustomerFormData, snackbarOptionsError } from '../../consts'
+import { snackbarOptionsError } from '../../consts'
 import { DrawerParameters } from '../../pages/timetable'
 import { contract } from '../../types/contract'
 import { lesson } from '../../types/lesson'
 import { classCustomer, teacher } from '../../types/user'
 import { useAuth } from '../AuthProvider'
-import MultiCalendar from './multiCalendar'
+import MultiCalendar from './MultiCalendar'
 
 type Props = {
   date: Dayjs
@@ -31,18 +31,22 @@ const SchoolCalendar: React.FC<Props> = ({
 
   const [contracts, setContracts] = useState<Record<number, contract[]>>({})
   const [lessons, setLessons] = useState<lesson[]>([])
-  const [classes, setClasses] = useState<{id : number, title : string}[]>([])
+  const [classes, setClasses] = useState<{ id: number; title: string }[]>([])
 
   const [loading, setLoading] = useState(true)
   const [renderLoading, setRenderLoading] = useState(0)
 
   useEffect(() => {
-    API.get('users/classCustomer/193').then((res) => setClasses(res.data.map((classCustomer: classCustomer) => 
-      ({
-        id: classCustomer.id,
-        title: classCustomer.className
-      })
-    )))
+    API.get('users/classCustomer/193').then((res) =>
+      setClasses(
+        res.data
+          .map((classCustomer: classCustomer) => ({
+            id: classCustomer.id,
+            title: classCustomer.className,
+          }))
+          .concat({ id: -1, title: 'Allgemein' }),
+      ),
+    )
   }, [refresh])
 
   useEffect(() => {
@@ -68,9 +72,13 @@ const SchoolCalendar: React.FC<Props> = ({
           .map((c: contract) => {
             c.customers.map((customer) => {
               if (customer.role === 'classCustomer') {
-                contractsByClass[customer.id] = (
-                  contractsByClass[customer.id] ?? []
-                ).concat(c)
+                if (customer.defaultClassCustomer === true) {
+                  contractsByClass[-1] = (contractsByClass[-1] ?? []).concat(c)
+                } else {
+                  contractsByClass[customer.id] = (
+                    contractsByClass[customer.id] ?? []
+                  ).concat(c)
+                }
               }
             })
           })

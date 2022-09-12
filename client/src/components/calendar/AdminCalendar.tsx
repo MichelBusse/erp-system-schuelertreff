@@ -11,7 +11,7 @@ import { contract } from '../../types/contract'
 import { lesson } from '../../types/lesson'
 import { teacher } from '../../types/user'
 import { useAuth } from '../AuthProvider'
-import MultiCalendar from './multiCalendar'
+import MultiCalendar from './MultiCalendar'
 
 type Props = {
   date: Dayjs
@@ -31,18 +31,22 @@ const AdminCalendar: React.FC<Props> = ({
 
   const [contracts, setContracts] = useState<Record<number, contract[]>>({})
   const [lessons, setLessons] = useState<lesson[]>([])
-  const [teachers, setTeachers] = useState<{id : number, title : string}[]>([])
+  const [teachers, setTeachers] = useState<{ id: number; title: string }[]>([])
 
   const [loading, setLoading] = useState(true)
   const [renderLoading, setRenderLoading] = useState(0)
 
   useEffect(() => {
-    API.get('users/teacher/employed').then((res) => setTeachers(res.data.map((teacher: teacher) => 
-      ({
-        id: teacher.id,
-        title: `${teacher.firstName} ${teacher.lastName}`
-      })
-    )))
+    API.get('users/teacher/employed').then((res) =>
+      setTeachers(
+        res.data
+          .map((teacher: teacher) => ({
+            id: teacher.id,
+            title: `${teacher.firstName} ${teacher.lastName}`,
+          }))
+          .concat({ id: -1, title: 'Ausstehend' }),
+      ),
+    )
   }, [refresh])
 
   useEffect(() => {
@@ -60,7 +64,6 @@ const AdminCalendar: React.FC<Props> = ({
     })
       .then((res) => {
         const contractsByTeacher: Record<number, contract[]> = {}
-        console.log(res.data)
         res.data.contracts
           .sort((a: contract, b: contract) => {
             return dayjs(a.startTime, 'HH:mm').diff(dayjs(b.startTime, 'HH:mm'))
