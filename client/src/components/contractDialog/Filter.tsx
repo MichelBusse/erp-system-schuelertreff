@@ -39,7 +39,12 @@ type Props = {
   alreadySubmitted?: boolean
 }
 
-const Filter: React.FC<Props> = ({ form, setForm, initialContract, alreadySubmitted }) => {
+const Filter: React.FC<Props> = ({
+  form,
+  setForm,
+  initialContract,
+  alreadySubmitted,
+}) => {
   const [privCustomers, setPrivCustomers] = useState<privateCustomer[]>([])
   const [classCustomers, setClassCustomers] = useState<classCustomer[]>([])
   const [schools, setSchools] = useState<school[]>([])
