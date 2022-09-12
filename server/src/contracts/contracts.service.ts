@@ -76,7 +76,7 @@ export class ContractsService {
       })
 
       if (dayjs(initialContract.startDate).isAfter(dayjs(dto.startDate))) {
-        //if initialContract starts after editedContract -> delete initial contract completely
+        //if initialContract starts after editedContract -> delete initial contract completely and cascade to all of its lessons
         this.contractsRepository.delete({ id: dto.initialContractId })
       } else if (
         !initialContract.endDate ||
@@ -87,7 +87,10 @@ export class ContractsService {
         initialContract.endDate = dayjs(dto.startDate)
           .subtract(1, 'day')
           .format('YYYY-MM-DD')
-        await this.contractsRepository.save(initialContract)
+        const updatedContract = await this.contractsRepository.save(initialContract)
+
+        // Delete all Lessons which are now out of bounds
+        this.lessonsService.findAndValidateAllByContract(updatedContract)
       }
     }
 

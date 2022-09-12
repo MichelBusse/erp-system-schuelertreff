@@ -23,7 +23,7 @@ export class Lesson {
   })
   state: LessonState
 
-  @ManyToOne(() => Contract, (contract) => contract.lessons)
+  @ManyToOne(() => Contract, (contract) => contract.lessons, { onDelete: 'CASCADE' })
   contract: Contract
 
   @Column({ type: 'text', default: '' })
