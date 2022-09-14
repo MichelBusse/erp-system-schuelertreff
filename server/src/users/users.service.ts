@@ -144,13 +144,10 @@ export class UsersService {
     private config: ConfigService,
   ) {}
 
-  private transport = nodemailer.createTransport(
-    {
-      host: this.config.get<string>('SMTP_HOST'),
-      port: this.config.get<number>('SMTP_PORT'),
-    },
-    { from: this.config.get<string>('EMAIL_FROM') },
-  )
+  private transport = nodemailer.createTransport({
+    host: this.config.get<string>('SMTP_HOST'),
+    port: this.config.get<number>('SMTP_PORT'),
+  })
 
   /**
    * Check if email is already in DB
@@ -605,6 +602,7 @@ export class UsersService {
       try {
         this.transport.sendMail(
           {
+            from: this.config.get<string>('EMAIL_FROM'),
             to: user.email,
             subject: 'Schülertreff - Willkommen',
             text: employmentMail(
@@ -649,6 +647,7 @@ export class UsersService {
       try {
         this.transport.sendMail(
           {
+            from: this.config.get<string>('EMAIL_FROM_BEWERBUNG'),
             to: user.email,
             subject: 'Schülertreff - Termin Bewerbungsgespräch',
             text: applicationMeetingSetDateMail(
@@ -676,6 +675,7 @@ export class UsersService {
       try {
         this.transport.sendMail(
           {
+            from: this.config.get<string>('EMAIL_FROM_BEWERBUNG'),
             to: user.email,
             subject: 'Schülertreff - Terminvorschläge Bewerbungsgespräch',
             text: applicationMeetingProposalMail(
