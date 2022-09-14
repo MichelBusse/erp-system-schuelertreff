@@ -1,4 +1,4 @@
-import { FolderDelete } from '@mui/icons-material'
+import { FolderDelete, IosShare as IosShareIcon } from '@mui/icons-material'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { Autocomplete, IconButton, TextField } from '@mui/material'
 import { Box } from '@mui/system'
@@ -16,6 +16,7 @@ import {
   GridToolbarContainer,
   GridToolbarFilterButton,
 } from '@mui/x-data-grid'
+import { useSnackbar } from 'notistack'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
@@ -23,7 +24,11 @@ import useMeasure from 'react-use-measure'
 import { PrevIdProps } from '../App'
 import { useAuth } from '../components/AuthProvider'
 import SchoolDialog from '../components/SchoolDialog'
-import { dataGridLocaleText } from '../consts'
+import {
+  dataGridLocaleText,
+  snackbarOptions,
+  snackbarOptionsError,
+} from '../consts'
 import { SchoolType } from '../types/enums'
 import { school } from '../types/user'
 import styles from './gridList.module.scss'
@@ -101,14 +106,15 @@ const schoolTypesOperator: GridFilterOperator = {
 }
 
 const Schools: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
-  const [open, setOpen] = useState(false)
-  const [customers, setCustomers] = useState<school[]>([])
   const navigate = useNavigate()
   const location = useLocation()
+  const { API } = useAuth()
+  const { enqueueSnackbar } = useSnackbar()
+
+  const [open, setOpen] = useState(false)
+  const [customers, setCustomers] = useState<school[]>([])
   const [deletedSchoolsToggle, setDeletedSchoolsToggle] =
     useState<boolean>(false)
-
-  const { API } = useAuth()
 
   const [ref, bounds] = useMeasure()
   const small = bounds.width < 600
@@ -230,6 +236,23 @@ const Schools: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
     navigate('' + params.id)
   }
 
+  // click event
+  const copyEmailsToClipboard = () => {
+    navigator.clipboard
+      .writeText(
+        customers.map((s) => `${s.schoolName} <${s.email}>`).join('\r\n'),
+      )
+      .then(() =>
+        enqueueSnackbar(
+          'Email-Adressen wurden in die Zwischenablage kopiert',
+          snackbarOptions,
+        ),
+      )
+      .catch(() =>
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError),
+      )
+  }
+
   return (
     <div
       className={styles.wrapper + ' ' + styles.pageWrapper}
@@ -254,11 +277,15 @@ const Schools: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
               <GridToolbarContainer
                 className={styles.customGridToolbarContainer}
               >
-                <GridToolbarFilterButton />
+                <GridToolbarFilterButton sx={{ marginRight: 'auto' }} />
+                {!deletedSchoolsToggle && (
+                  <IconButton onClick={copyEmailsToClipboard}>
+                    <IosShareIcon fontSize="large" />
+                  </IconButton>
+                )}
                 <IconButton
                   color={deletedSchoolsToggle ? 'secondary' : 'default'}
                   onClick={() => setDeletedSchoolsToggle((data) => !data)}
-                  sx={{ marginLeft: 'auto' }}
                 >
                   <FolderDelete fontSize="large" />
                 </IconButton>

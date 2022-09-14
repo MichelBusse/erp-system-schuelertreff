@@ -1,4 +1,4 @@
-import { FolderDelete } from '@mui/icons-material'
+import { FolderDelete, IosShare as IosShareIcon } from '@mui/icons-material'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { IconButton } from '@mui/material'
 import {
@@ -11,6 +11,7 @@ import {
   GridToolbarContainer,
   GridToolbarFilterButton,
 } from '@mui/x-data-grid'
+import { useSnackbar } from 'notistack'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
@@ -18,19 +19,24 @@ import useMeasure from 'react-use-measure'
 import { PrevIdProps } from '../App'
 import { useAuth } from '../components/AuthProvider'
 import PrivateCustomerDialog from '../components/PrivateCustomerDialog'
-import { dataGridLocaleText } from '../consts'
+import {
+  dataGridLocaleText,
+  snackbarOptions,
+  snackbarOptionsError,
+} from '../consts'
 import { privateCustomer } from '../types/user'
 import styles from './gridList.module.scss'
 
 const PrivateCustomers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
-  const [open, setOpen] = useState(false)
-  const [customers, setCustomers] = useState<privateCustomer[]>([])
   const navigate = useNavigate()
   const location = useLocation()
+  const { API } = useAuth()
+  const { enqueueSnackbar } = useSnackbar()
+
+  const [open, setOpen] = useState(false)
+  const [customers, setCustomers] = useState<privateCustomer[]>([])
   const [deletedCustomersToggle, setDeletedCustomersToggle] =
     useState<boolean>(false)
-
-  const { API } = useAuth()
 
   const [ref, bounds] = useMeasure()
   const small = bounds.width < 600
@@ -136,6 +142,25 @@ const PrivateCustomers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
     navigate('' + params.id)
   }
 
+  // click event
+  const copyEmailsToClipboard = () => {
+    navigator.clipboard
+      .writeText(
+        customers
+          .map((s) => `${s.firstName} ${s.lastName} <${s.email}>`)
+          .join('\r\n'),
+      )
+      .then(() =>
+        enqueueSnackbar(
+          'Email-Adressen wurden in die Zwischenablage kopiert',
+          snackbarOptions,
+        ),
+      )
+      .catch(() =>
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError),
+      )
+  }
+
   return (
     <div
       className={styles.wrapper + ' ' + styles.pageWrapper}
@@ -160,11 +185,15 @@ const PrivateCustomers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
               <GridToolbarContainer
                 className={styles.customGridToolbarContainer}
               >
-                <GridToolbarFilterButton />
+                <GridToolbarFilterButton sx={{ marginRight: 'auto' }} />
+                {!deletedCustomersToggle && (
+                  <IconButton onClick={copyEmailsToClipboard}>
+                    <IosShareIcon fontSize="large" />
+                  </IconButton>
+                )}
                 <IconButton
                   color={deletedCustomersToggle ? 'secondary' : 'default'}
                   onClick={() => setDeletedCustomersToggle((data) => !data)}
-                  sx={{ marginLeft: 'auto' }}
                 >
                   <FolderDelete fontSize="large" />
                 </IconButton>
