@@ -157,7 +157,7 @@ const TeacherDetailView: React.FC = () => {
 
     API.post('users/teacher/applicationMeetingRequest/' + requestedId, {
       ...applicationMeetingRequestForm,
-      dates: applicationMeetingRequestForm.dates.map((date) => date?.format()),
+      dates: applicationMeetingRequestForm.dates.map((date) => date?.format('YYYY-MM-DD HH:mm')),
     })
       .then((res) => {
         enqueueSnackbar('Rückmeldung gesendet', snackbarOptions)
