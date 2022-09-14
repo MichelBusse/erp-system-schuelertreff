@@ -169,6 +169,33 @@ export class LessonsService {
     return { contract, lesson, blocked }
   }
 
+  async findByWeekForSchool(week: Dayjs | Date, schoolId?: number) {
+    const q = this.lessonsRepository
+      .createQueryBuilder('l')
+      .select(['l', 'c', 'customer', 'school', 'subject'])
+      .leftJoin('l.contract', 'c')
+      .leftJoin('c.subject', 'subject')
+      .leftJoin('c.customers', 'customer')
+      .leftJoin('customer.school', 'school')
+      .where(`l.date >= date_trunc('week', :week::date)`, {
+        week: dayjs(week).format(),
+      })
+      .andWhere(`l.date <= date_trunc('week', :week::date) + interval '4 day'`)
+      .andWhere('customer.schoolId = :schoolId', { schoolId: schoolId })
+
+    const lessonsOfWeek = await q.getMany()
+    const contractsOfWeek = await this.contractsService.findByWeek(
+      dayjs(week),
+      undefined,
+      schoolId,
+    )
+
+    return {
+      lessons: lessonsOfWeek,
+      contracts: contractsOfWeek,
+    }
+  }
+
   async remove(id: number): Promise<void> {
     await this.lessonsRepository.delete(id)
   }

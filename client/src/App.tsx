@@ -59,7 +59,7 @@ export type PrevIdProps = {
 }
 
 const App: React.FC = () => {
-  const { isAuthed } = useAuth()
+  const { isAuthed, hasRole } = useAuth()
   const [prevId, setPrevId] = useState<number>()
 
   return (
@@ -207,7 +207,12 @@ const App: React.FC = () => {
                 path="profile"
                 element={
                   <ProtectedRoute>
-                    <Pages.TeacherDetailView />
+                    {hasRole(Role.SCHOOL) ? (
+                        <Pages.SchoolDetailView />
+                    ) : null}
+                    {hasRole(Role.TEACHER) ? (
+                        <Pages.SchoolDetailView />
+                    ) : null}
                   </ProtectedRoute>
                 }
               />

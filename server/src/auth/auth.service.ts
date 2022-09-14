@@ -10,7 +10,7 @@ import * as argon2 from 'argon2'
 import nodemailer from 'nodemailer'
 
 import { passwordResetMail, registrationMailText } from 'src/mailTexts'
-import { Teacher, User } from 'src/users/entities'
+import { School, Teacher, User } from 'src/users/entities'
 import { DeleteState } from 'src/users/entities/user.entity'
 import { UsersService } from 'src/users/users.service'
 

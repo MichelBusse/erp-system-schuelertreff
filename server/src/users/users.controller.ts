@@ -17,6 +17,7 @@ import dayjs from 'dayjs'
 import { Response } from 'express'
 
 import { AuthService } from 'src/auth/auth.service'
+import { Public } from 'src/auth/decorators/public.decorator'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 import { Document } from 'src/documents/document.entity'
@@ -87,12 +88,19 @@ export class UsersController {
     return this.usersService.findClassCustomers()
   }
 
+  @Get('classCustomer/me')
+  findMyClassesOfSchool(@Request() req) {
+    return this.usersService.findAllClassesOfSchool(req.user.id)
+  }
+
   @Get('classCustomer/:schoolId')
+  @Roles(Role.ADMIN)
   findAllClassesOfSchool(
     @Param('schoolId') schoolId: number,
   ): Promise<ClassCustomer[]> {
     return this.usersService.findAllClassesOfSchool(schoolId)
   }
+
 
   @Get('school')
   @Roles(Role.ADMIN)
@@ -164,7 +172,11 @@ export class UsersController {
     if (await this.usersService.checkDuplicateEmail(dto.email))
       throw new BadRequestException('Email ist bereits im System registriert.')
 
-    return this.usersService.createSchool(dto)
+    const user = await this.usersService.createSchool(dto)
+
+    this.authService.initReset(user)
+
+    return user
   }
 
   @Post('school/:id')

@@ -926,7 +926,7 @@ export class UsersService {
   async createSchool(dto: CreateSchoolDto): Promise<School> {
     const school = this.schoolsRepository.create({
       ...dto,
-      mayAuthenticate: false,
+      mayAuthenticate: true,
     })
 
     return this.schoolsRepository.save(school)

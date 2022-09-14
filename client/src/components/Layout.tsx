@@ -64,7 +64,7 @@ const menuItems = [
     icon: ManageAccountsIcon,
     text: 'Profil',
     href: '/profile',
-    roles: ['teacher'],
+    roles: ['teacher', 'school'],
   },
 ]
 

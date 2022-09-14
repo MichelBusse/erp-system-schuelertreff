@@ -44,9 +44,15 @@ export class LessonsController {
   }
 
   @Get('week')
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.SCHOOL)
   getWeek(@Query('of') date: string) {
     return this.lessonsService.findByWeek(dayjs(date))
+  }
+
+  @Get('week/mySchool')
+  @Roles(Role.ADMIN, Role.SCHOOL)
+  getWeekForSchool(@Query('of') date: string, @Request() req) {
+    return this.lessonsService.findByWeekForSchool(dayjs(date), req.user.id)
   }
 
   @Post('invoice/teacher')

@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsOptional } from 'class-validator'
+import { IsArray, IsBoolean, IsNotEmpty, IsOptional } from 'class-validator'
 
 import { SchoolType } from '../entities/user.entity'
 import { CreateUserDto } from './create-user.dto'

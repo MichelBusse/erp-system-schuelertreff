@@ -4,6 +4,7 @@ import { Box } from '@mui/system'
 import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 
 import { snackbarOptionsError } from '../../consts'
 import { DrawerParameters } from '../../pages/timetable'
@@ -36,8 +37,13 @@ const SchoolCalendar: React.FC<Props> = ({
   const [loading, setLoading] = useState(true)
   const [renderLoading, setRenderLoading] = useState(0)
 
+  const { id } = useParams()
+  const requestedId = id ?? 'me'
+  console.log(requestedId)
+  console.log(id)
+
   useEffect(() => {
-    API.get('users/classCustomer/193').then((res) =>
+    API.get('users/classCustomer/' + requestedId).then((res) =>
       setClasses(
         res.data
           .map((classCustomer: classCustomer) => ({
@@ -56,7 +62,7 @@ const SchoolCalendar: React.FC<Props> = ({
     setLoading(true)
     setContracts({})
 
-    API.get('lessons/week', {
+    API.get('lessons/week/mySchool', {
       signal: ongoingRequest.signal,
       params: {
         of: date.format('YYYY-MM-DD'),
@@ -64,7 +70,7 @@ const SchoolCalendar: React.FC<Props> = ({
     })
       .then((res) => {
         const contractsByClass: Record<number, contract[]> = {}
-
+        console.log(res.data.contracts)
         res.data.contracts
           .sort((a: contract, b: contract) => {
             return dayjs(a.startTime, 'HH:mm').diff(dayjs(b.startTime, 'HH:mm'))
