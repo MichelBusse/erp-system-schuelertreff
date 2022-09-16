@@ -466,6 +466,26 @@ export class UsersService {
       .then(transformUser)
   }
 
+  async findOneTeacherAsSchool(id: number): Promise<Partial<Teacher>> {
+    const teacher = await this.teachersRepository
+      .findOneOrFail({
+        where: { id },
+        relations: ['subjects'],
+      })
+      .then(transformUser)
+
+    return {
+      id: teacher.id,
+      firstName: teacher.firstName,
+      lastName: teacher.lastName,
+      email: teacher.email,
+      phone: teacher.phone,
+      teacherSchoolTypes: teacher.teacherSchoolTypes,
+      degree: teacher.degree,
+      subjects: teacher.subjects,
+    }
+  }
+
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
     const teacher = this.teachersRepository.create({
       firstName: dto.firstName,
@@ -581,7 +601,7 @@ export class UsersService {
 
     const updatedTeacher: Teacher = {
       ...user,
-      ...dto, 
+      ...dto,
       email: dto.email ? dto.email.toLowerCase() : user.email,
       timesAvailable:
         typeof dto.timesAvailable !== 'undefined'
