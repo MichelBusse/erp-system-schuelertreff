@@ -597,7 +597,7 @@ const SchoolDetailView: React.FC = () => {
               onChange={(event) =>
                 setSchool((data) => ({
                   ...data,
-                  email: event.target.value,
+                  email: event.target.value.toLowerCase(),
                 }))
               }
             />

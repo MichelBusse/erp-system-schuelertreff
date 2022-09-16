@@ -38,13 +38,13 @@ const LessonOverview: React.FC<Props> = ({
   const { enqueueSnackbar } = useSnackbar()
 
   const toggleLessonHeld = (held: boolean) => {
-    setHeld(held)
     API.post('lessons/' + (existingLesson?.id ?? ''), {
       date: dayjs(date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
       contractId: contract.id,
       state: held ? LessonState.HELD : LessonState.IDLE,
     })
       .then(() => {
+        setHeld(held)
         enqueueSnackbar('Stunde gespeichert', snackbarOptions)
         refresh()
       })
