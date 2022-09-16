@@ -178,7 +178,7 @@ export class UsersService {
   findByEmailAuth(email: string): Promise<User> {
     return this.usersRepository
       .createQueryBuilder('user')
-      .where({ email: email })
+      .where({ email: email.trim().toLocaleLowerCase() })
       .addSelect(['user.passwordHash', 'user.mayAuthenticate'])
       .getOne()
   }
