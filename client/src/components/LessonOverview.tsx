@@ -38,13 +38,13 @@ const LessonOverview: React.FC<Props> = ({
   const { enqueueSnackbar } = useSnackbar()
 
   const toggleLessonHeld = (held: boolean) => {
-    setHeld(held)
     API.post('lessons/' + (existingLesson?.id ?? ''), {
       date: dayjs(date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
       contractId: contract.id,
       state: held ? LessonState.HELD : LessonState.IDLE,
     })
       .then(() => {
+        setHeld(held)
         enqueueSnackbar('Stunde gespeichert', snackbarOptions)
         refresh()
       })
@@ -59,7 +59,9 @@ const LessonOverview: React.FC<Props> = ({
       key={contract.id}
       spacing={0.5}
       sx={{
-        backgroundColor: contract.subject.color + 50,
+        backgroundColor: contract.blocked
+          ? '#cccccc'
+          : contract.subject.color + 50,
         p: 2,
         borderRadius: 2,
       }}
@@ -140,6 +142,7 @@ const LessonOverview: React.FC<Props> = ({
       </Stack>
       <FormGroup>
         <FormControlLabel
+          disabled={contract.blocked}
           control={
             <Checkbox
               checked={held}
@@ -151,20 +154,22 @@ const LessonOverview: React.FC<Props> = ({
           label="Gehalten"
         />
       </FormGroup>
-      <Button
-        onClick={() =>
-          navigate(
-            '/timetable/' +
-              calendarDate.format('YYYY-MM-DD') +
-              '/' +
-              contract.id +
-              '/' +
-              date.format('YYYY-MM-DD'),
-          )
-        }
-      >
-        Mehr anzeigen
-      </Button>
+      {!contract.blocked && (
+        <Button
+          onClick={() =>
+            navigate(
+              '/timetable/' +
+                calendarDate.format('YYYY-MM-DD') +
+                '/' +
+                contract.id +
+                '/' +
+                date.format('YYYY-MM-DD'),
+            )
+          }
+        >
+          Mehr anzeigen
+        </Button>
+      )}
     </Stack>
   )
 }

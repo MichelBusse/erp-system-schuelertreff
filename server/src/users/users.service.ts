@@ -178,7 +178,7 @@ export class UsersService {
   findByEmailAuth(email: string): Promise<User> {
     return this.usersRepository
       .createQueryBuilder('user')
-      .where({ email: email.trim().toLocaleLowerCase() })
+      .where({ email: email.trim().toLowerCase() })
       .addSelect(['user.passwordHash', 'user.mayAuthenticate'])
       .getOne()
   }
@@ -466,11 +466,31 @@ export class UsersService {
       .then(transformUser)
   }
 
+  async findOneTeacherAsSchool(id: number): Promise<Partial<Teacher>> {
+    const teacher = await this.teachersRepository
+      .findOneOrFail({
+        where: { id },
+        relations: ['subjects'],
+      })
+      .then(transformUser)
+
+    return {
+      id: teacher.id,
+      firstName: teacher.firstName,
+      lastName: teacher.lastName,
+      email: teacher.email,
+      phone: teacher.phone,
+      teacherSchoolTypes: teacher.teacherSchoolTypes,
+      degree: teacher.degree,
+      subjects: teacher.subjects,
+    }
+  }
+
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
     const teacher = this.teachersRepository.create({
       firstName: dto.firstName,
       lastName: dto.lastName,
-      email: dto.email,
+      email: dto.email.toLowerCase(),
       applicationLocation: dto.applicationLocation,
       dateOfApplication: dto.dateOfApplication,
       state: dto.skip ? TeacherState.EMPLOYED : TeacherState.CREATED,
@@ -582,6 +602,7 @@ export class UsersService {
     const updatedTeacher: Teacher = {
       ...user,
       ...dto,
+      email: dto.email ? dto.email.toLowerCase() : user.email,
       timesAvailable:
         typeof dto.timesAvailable !== 'undefined'
           ? formatTimesAvailable(dto.timesAvailable)

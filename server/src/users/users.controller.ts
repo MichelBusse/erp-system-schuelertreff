@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   Post,
@@ -258,9 +259,13 @@ export class UsersController {
   }
 
   @Get('teacher/:id')
-  @Roles(Role.ADMIN)
-  findOneTeacher(@Param('id') id: number): Promise<Teacher> {
-    return this.usersService.findOneTeacher(id)
+  findOneTeacher(@Request() req, @Param('id') id: number): Promise<Partial<Teacher>> {
+    if (req.user.role === Role.ADMIN) {
+      return this.usersService.findOneTeacher(id)
+    } else if (req.user.role === Role.SCHOOL) {
+      return this.usersService.findOneTeacherAsSchool(id)
+    }
+    throw new ForbiddenException("You do not have permission to request this teacher")
   }
 
   @Post('teacher/me')

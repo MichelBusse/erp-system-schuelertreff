@@ -187,7 +187,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
               fullWidth={true}
               value={data.email}
               onChange={(event) =>
-                setData((data) => ({ ...data, email: event.target.value }))
+                setData((data) => ({ ...data, email: event.target.value.toLowerCase() }))
               }
             />
             <TextField
