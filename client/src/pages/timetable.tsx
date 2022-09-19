@@ -38,9 +38,12 @@ export type DrawerParameters = {
 
 const Timetable: React.FC = () => {
   const { hasRole } = useAuth()
+  const { decodeToken } = useAuth()
   const { initialDate } = useParams()
   const theme = useTheme()
   const navigate = useNavigate()
+
+  const userRole = decodeToken().role
 
   const [drawer, setDrawer] = useState<DrawerParameters>({
     open: false,
@@ -189,6 +192,7 @@ const Timetable: React.FC = () => {
                     }}
                     calendarDate={date}
                     date={dayjs(drawer.params?.colDef.headerName, 'YYYY-MM-DD')}
+                    userRole={userRole}
                   />
                 )
               })}
