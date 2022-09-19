@@ -6,6 +6,7 @@ import {
   Get,
   Param,
   Post,
+  Request,
   Query,
 } from '@nestjs/common'
 import dayjs from 'dayjs'
@@ -89,6 +90,11 @@ export class ContractsController {
   @Roles(Role.ADMIN)
   findAllPending(): Promise<Contract[]> {
     return this.contractsService.findAllPending()
+  }
+
+  @Get('school/me')
+  findAllByMySchool(@Request() req) {
+    return this.contractsService.findAllBySchool(req.user.id)
   }
 
   @Get('school/:id')

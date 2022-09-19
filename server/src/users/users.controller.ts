@@ -149,6 +149,11 @@ export class UsersController {
     return this.usersService.findAppliedDeletedTeachers()
   }
 
+  @Get('school/me')
+  findMySchool(@Request() req){
+    return this.usersService.findOneSchool(req.user.id)
+  }
+
   @Get('school/:id')
   @Roles(Role.ADMIN)
   findOneSchool(@Param('id') id: number): Promise<School> {
@@ -179,20 +184,40 @@ export class UsersController {
     return user
   }
 
+  @Post('school/me')
+  async updateMySchool(
+    @Request() req,
+    @Body() dto: UpdateSchoolDto,
+  ): Promise<School> {
+    return this.usersService.updateSchool(req.user.id, {
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      schoolTypes: dto.schoolTypes,
+      street: dto.street,
+      postalCode: dto.postalCode,
+      city: dto.city,
+      phone: dto.phone,
+    })
+  }
+
   @Post('school/:id')
   @Roles(Role.ADMIN)
   async updateSchoolAdmin(
     @Param('id') id: number,
     @Body() dto: UpdateSchoolDto,
   ): Promise<School> {
-    return this.usersService.updateSchoolAdmin(id, dto)
+    return this.usersService.updateSchool(id, dto)
   }
 
   @Post('classCustomer')
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.SCHOOL)
   async createClassCustomer(
+    @Request() req,
     @Body() dto: CreateClassCustomerDto,
   ): Promise<ClassCustomer> {
+    if(dto.school === -1){
+      dto.school = req.user.id
+    }
     return this.usersService.createClassCustomer(dto)
   }
 

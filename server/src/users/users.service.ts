@@ -932,7 +932,7 @@ export class UsersService {
     return this.schoolsRepository.save(school)
   }
 
-  async updateSchoolAdmin(id: number, dto: UpdateSchoolDto): Promise<School> {
+  async updateSchool(id: number, dto: Partial<UpdateSchoolDto>): Promise<School> {
     const school = await this.findOne(id)
 
     return this.schoolsRepository

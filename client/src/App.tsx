@@ -211,7 +211,7 @@ const App: React.FC = () => {
                         <Pages.SchoolDetailView />
                     ) : null}
                     {hasRole(Role.TEACHER) ? (
-                        <Pages.SchoolDetailView />
+                        <Pages.TeacherDetailView />
                     ) : null}
                   </ProtectedRoute>
                 }

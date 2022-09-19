@@ -68,7 +68,7 @@ const SchoolDetailView: React.FC = () => {
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
 
-  const requestedId = id ? id : 'me'
+  const requestedId = id ?? 'me'
 
   const [classCustomers, setClassCustomers] = useState<classCustomerForm[]>([])
   const [school, setSchool] = useState<schoolForm>(defaultSchoolFormData)
@@ -277,9 +277,11 @@ const SchoolDetailView: React.FC = () => {
   const addClass = () => {
     setAddClassDialogOpen(false)
     if (newClassCustomer.className) {
+      let schoolId: number | string
+      requestedId === 'me' ? schoolId = -1 : schoolId = requestedId
       API.post('users/classCustomer/', {
         ...newClassCustomer,
-        school: requestedId,
+        school: schoolId,
         timesAvailable: newClassCustomer.timesAvailable.map((time) => ({
           dow: time.dow,
           start: time.start?.format('HH:mm'),
@@ -394,7 +396,7 @@ const SchoolDetailView: React.FC = () => {
               error={schoolErrors.schoolName !== ''}
               value={school.schoolName ?? ''}
               InputProps={{
-                readOnly: requestedId === 'me',
+                disabled: requestedId === 'me',
               }}
             />
             <Autocomplete
@@ -444,9 +446,6 @@ const SchoolDetailView: React.FC = () => {
                 }))
               }
               value={school.firstName ?? ''}
-              InputProps={{
-                readOnly: requestedId === 'me',
-              }}
             />
             <TextField
               fullWidth={true}
@@ -460,9 +459,6 @@ const SchoolDetailView: React.FC = () => {
                 }))
               }
               value={school.lastName ?? ''}
-              InputProps={{
-                readOnly: requestedId === 'me',
-              }}
             />
           </Stack>
           <h3>Adresse:</h3>
@@ -516,76 +512,79 @@ const SchoolDetailView: React.FC = () => {
               }}
             />
           </Stack>
-
-          <h3>Weitere Infos</h3>
-          <Stack direction="row" columnGap={2}>
-            <TextField
-              type="number"
-              id="fee"
-              label="Stundensatz Standard"
-              helperText={schoolErrors.feeStandard}
-              error={schoolErrors.feeStandard !== ''}
-              variant="outlined"
-              fullWidth
-              disabled={requestedId === 'me'}
-              value={school.feeStandard ?? ''}
-              onChange={(event) =>
-                setSchool((data) => ({
-                  ...data,
-                  feeStandard: Number(event.target.value),
-                }))
-              }
-            />
-            <TextField
-              type="number"
-              id="fee"
-              label="Stundensatz Online"
-              helperText={schoolErrors.feeOnline}
-              error={schoolErrors.feeOnline !== ''}
-              variant="outlined"
-              fullWidth
-              disabled={requestedId === 'me'}
-              value={school.feeOnline ?? ''}
-              onChange={(event) =>
-                setSchool((data) => ({
-                  ...data,
-                  feeOnline: Number(event.target.value),
-                }))
-              }
-            />
-            <DatePicker
-              label="Startdatum"
-              mask="__.__.____"
-              value={school.dateOfStart}
-              onChange={(value) => {
-                setSchool((s) => ({ ...s, dateOfStart: value }))
-              }}
-              renderInput={(params) => (
+          { id && (
+            <>
+              <h3>Weitere Infos</h3>
+              <Stack direction="row" columnGap={2}>
                 <TextField
-                  fullWidth
-                  {...params}
-                  required
+                  type="number"
+                  id="fee"
+                  label="Stundensatz Standard"
+                  helperText={schoolErrors.feeStandard}
+                  error={schoolErrors.feeStandard !== ''}
                   variant="outlined"
-                  helperText={schoolErrors.dateOfStart}
-                  error={schoolErrors.dateOfStart !== ''}
+                  fullWidth
+                  disabled={requestedId === 'me'}
+                  value={school.feeStandard ?? ''}
+                  onChange={(event) =>
+                    setSchool((data) => ({
+                      ...data,
+                      feeStandard: Number(event.target.value),
+                    }))
+                  }
                 />
-              )}
-              InputAdornmentProps={{
-                position: 'start',
-              }}
-              InputProps={{
-                endAdornment: (
-                  <IconButtonAdornment
-                    icon={ClearIcon}
-                    hidden={school.dateOfStart === null}
-                    onClick={() =>
-                      setSchool((s) => ({ ...s, dateOfStart: null }))
-                    }
-                  />
-                ),
-              }}
-            />
-          </Stack>
+                <TextField
+                  type="number"
+                  id="fee"
+                  label="Stundensatz Online"
+                  helperText={schoolErrors.feeOnline}
+                  error={schoolErrors.feeOnline !== ''}
+                  variant="outlined"
+                  fullWidth
+                  disabled={requestedId === 'me'}
+                  value={school.feeOnline ?? ''}
+                  onChange={(event) =>
+                    setSchool((data) => ({
+                      ...data,
+                      feeOnline: Number(event.target.value),
+                    }))
+                  }
+                />
+                <DatePicker
+                  label="Startdatum"
+                  mask="__.__.____"
+                  value={school.dateOfStart}
+                  onChange={(value) => {
+                    setSchool((s) => ({ ...s, dateOfStart: value }))
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      fullWidth
+                      {...params}
+                      required
+                      variant="outlined"
+                      helperText={schoolErrors.dateOfStart}
+                      error={schoolErrors.dateOfStart !== ''}
+                    />
+                  )}
+                  InputAdornmentProps={{
+                    position: 'start',
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButtonAdornment
+                        icon={ClearIcon}
+                        hidden={school.dateOfStart === null}
+                        onClick={() =>
+                          setSchool((s) => ({ ...s, dateOfStart: null }))
+                        }
+                      />
+                    ),
+                  }}
+                />
+              </Stack>
+            </>
+          )}
           <h3>Kontakt:</h3>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
@@ -600,6 +599,9 @@ const SchoolDetailView: React.FC = () => {
                   email: event.target.value,
                 }))
               }
+              InputProps={{
+                disabled: requestedId === 'me',
+              }}
             />
 
             <TextField
@@ -616,16 +618,20 @@ const SchoolDetailView: React.FC = () => {
               }
             />
           </Stack>
-          <h3>Notizen</h3>
-          <TextField
-            multiline
-            value={school.notes ?? ''}
-            onChange={(e) => {
-              setSchool((data) => ({ ...data, notes: e.target.value }))
-            }}
-            fullWidth
-            rows={5}
-          />
+          {id && (
+            <>
+              <h3>Notizen</h3>
+              <TextField
+                multiline
+                value={school.notes ?? ''}
+                onChange={(e) => {
+                  setSchool((data) => ({ ...data, notes: e.target.value }))
+                }}
+                fullWidth
+                rows={5}
+              />
+            </>
+          )}
           <Stack direction={'row'} columnGap={2}>
             <h3>Klassen:</h3>
             {school.deleteState !== DeleteState.DELETED && (
@@ -754,7 +760,7 @@ const SchoolDetailView: React.FC = () => {
           ))}
           <Stack direction={'row'} columnGap={2}>
             <h3>Einsätze:</h3>
-            {school.deleteState !== DeleteState.DELETED && (
+            {id && school.deleteState !== DeleteState.DELETED && (
               <IconButton
                 sx={{ marginLeft: 'auto' }}
                 onClick={() => {
@@ -810,12 +816,15 @@ const SchoolDetailView: React.FC = () => {
               </Button>
             )}
           </Stack>
-
-          <h3>Rechnung generieren:</h3>
-          <CustomerInvoiceDataSelect
-            generateInvoice={generateInvoice}
-            type={Role.SCHOOL}
-          />
+          {id && (
+            <>
+              <h3>Rechnung generieren:</h3>
+              <CustomerInvoiceDataSelect
+                generateInvoice={generateInvoice}
+                type={Role.SCHOOL}
+              />
+            </>
+          )}
         </Stack>
       </Box>
       <Dialog open={addClassDialogOpen}>

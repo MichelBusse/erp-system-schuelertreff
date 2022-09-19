@@ -373,9 +373,6 @@ const TeacherDetailView: React.FC = () => {
                 }))
               }
               value={data.firstName ?? ''}
-              InputProps={{
-                readOnly: requestedId === 'me',
-              }}
             />
             <TextField
               helperText={errors.lastName}
@@ -391,9 +388,6 @@ const TeacherDetailView: React.FC = () => {
                 }))
               }
               value={data.lastName ?? ''}
-              InputProps={{
-                readOnly: requestedId === 'me',
-              }}
             />
           </Stack>
           <DatePicker
@@ -528,9 +522,6 @@ const TeacherDetailView: React.FC = () => {
                 }))
               }
               value={data.email ?? ''}
-              InputProps={{
-                readOnly: requestedId === 'me',
-              }}
             />
 
             <TextField
@@ -835,7 +826,7 @@ const TeacherDetailView: React.FC = () => {
               )
             }
           />
-          {requestedId !== 'me' && (
+          {id && (
             <Typography>Status: {teacherStateToString[data.state]}</Typography>
           )}
           <Stack
