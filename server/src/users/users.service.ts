@@ -51,6 +51,7 @@ import {
 import { Leave, LeaveState } from './entities/leave.entity'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
+import { Role } from 'src/auth/role.enum'
 
 require('dayjs/locale/de')
 
@@ -792,7 +793,7 @@ export class UsersService {
       .where('customer.id = :id', { id: id })
 
     const customersContracs = await contractQuery.getMany()
-    const customer = await this.findOnePrivateCustomer(id)
+    const customer = await this.findOneCustomer(id)
 
     let allowedToRemove = true
 
@@ -813,7 +814,7 @@ export class UsersService {
         )
       }
     } else {
-      if (customer.deleteState !== DeleteState.DELETED) {
+      if (customer.deleteState !== DeleteState.DELETED && customer.role === Role.PRIVATECUSTOMER) {
         this.privateCustomersRepository.update(id, {
           deleteState: DeleteState.DELETED,
         })
@@ -1026,9 +1027,8 @@ export class UsersService {
       .where('c.schoolId = :schoolId', {
         schoolId: schoolId,
       })
-      .andWhere('c.defaultClassCustomer = FALSE', {
-        schoolId: schoolId,
-      })
+      .andWhere('c.defaultClassCustomer = FALSE')
+      .andWhere('c.deleteState = :deleteState', {deleteState: DeleteState.ACTIVE})
       .orderBy('c.className', 'ASC')
 
     return q.getMany().then(transformUsers)

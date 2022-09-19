@@ -80,11 +80,11 @@ const Filter: React.FC<Props> = ({
         initialForm0Entry.privateCustomers =
           initialContract.customers as privateCustomer[]
       } else {
-        initialForm0Entry.school = (
-          initialContract.customers[0] as classCustomer
-        ).school
-        initialForm0Entry.classCustomers =
-          initialContract.customers as classCustomer[]
+        const school = (initialContract.customers[0] as classCustomer).school
+        initialForm0Entry.school = school
+        initialForm0Entry.classCustomers = (initialContract.customers as classCustomer[]).filter((c) => !c.defaultClassCustomer) as classCustomer[]
+
+        loadClasses(school.id)
       }
 
       return initialForm0Entry
