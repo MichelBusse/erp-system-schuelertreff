@@ -68,6 +68,9 @@ const SchoolDetailView: React.FC = () => {
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
 
+  const { decodeToken } = useAuth()
+  const role = decodeToken().role
+
   const requestedId = id ?? 'me'
 
   const [classCustomers, setClassCustomers] = useState<classCustomerForm[]>([])
@@ -776,6 +779,7 @@ const SchoolDetailView: React.FC = () => {
             contracts={contracts}
             setContracts={setContracts}
             onSuccess={() => setRefreshContracts((r) => r + 1)}
+            userRole={role}
           />
           <h3>Dokumente:</h3>
           <UserDocuments

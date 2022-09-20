@@ -23,7 +23,7 @@ type Props = {
   date: Dayjs
   calendarDate: Dayjs
   refresh: () => void
-  userRole: string
+  userRole?: string
 }
 
 const LessonOverview: React.FC<Props> = ({

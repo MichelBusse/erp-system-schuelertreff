@@ -222,7 +222,7 @@ export class UsersController {
   }
 
   @Post('classCustomer/:id')
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.SCHOOL)
   async updateClassCustomer(
     @Param('id') id: number,
     @Body() dto: UpdateClassCustomerDto,

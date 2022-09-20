@@ -33,6 +33,7 @@ type Props = {
   setContracts: React.Dispatch<React.SetStateAction<contractWithTeacher[]>>
   onSuccess?: () => void
   sx?: SxProps<Theme>
+  userRole?: string
 }
 
 const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
@@ -41,6 +42,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
   onSuccess,
   children,
   sx,
+  userRole,
 }) => {
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
@@ -51,6 +53,8 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
   const [open, setOpen] = useState<boolean>(false)
   const [confirmationDialogProps, setConfirmationDialogProps] =
     useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
+
+  const [limitedView, setLimitedView] = useState(userRole === 'school' ? true : false)
   const theme = useTheme()
 
   const deleteContract = (contractId: number) => {
@@ -116,7 +120,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
         {contracts.map((contract) => (
           <ListItem
             key={contract.id}
-            secondaryAction={
+            secondaryAction={!limitedView && (
               <Box>
                 {(!contract.endDate ||
                   dayjs(contract.endDate).isAfter(dayjs())) && (
@@ -130,7 +134,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
                   </>
                 )}
               </Box>
-            }
+            )}
           >
             <ListItemText
               sx={{ marginRight: '50px' }}

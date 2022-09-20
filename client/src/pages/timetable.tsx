@@ -103,12 +103,6 @@ const Timetable: React.FC = () => {
           <SchoolCalendar
             date={date}
             setDrawer={setDrawer}
-            openDialog={() => {
-              // dialog component is re-created each time
-              // -> data will be fetched on button press
-              setRender(render + 1)
-              setOpen(true)
-            }}
             refresh={refreshCalendar}
           />
         ) : null}

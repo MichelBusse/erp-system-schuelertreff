@@ -17,14 +17,12 @@ import MultiCalendar from './MultiCalendar'
 type Props = {
   date: Dayjs
   setDrawer: (params: DrawerParameters) => void
-  openDialog: () => void
   refresh?: number
 }
 
 const SchoolCalendar: React.FC<Props> = ({
   date,
   setDrawer,
-  openDialog,
   refresh,
 }) => {
   const { API } = useAuth()
@@ -132,19 +130,6 @@ const SchoolCalendar: React.FC<Props> = ({
           }}
         />
       </Box>
-
-      <Fab
-        color="primary"
-        aria-label="add"
-        style={{
-          position: 'absolute',
-          bottom: 64,
-          right: 16,
-        }}
-        onClick={openDialog}
-      >
-        <AddIcon />
-      </Fab>
     </>
   )
 }
