@@ -52,10 +52,10 @@ const Calendar: React.FC<Props> = ({ date, setDrawer, contracts, lessons }) => {
               justifyContent: 'center',
               alignItems: 'center',
               boxShadow: c.blocked
-              ? `0 0 2px #bbbbbb inset`
-              : c.teacher
-              ? `0 0 2px ${c.subject.color} inset`
-              : undefined,
+                ? `0 0 2px #bbbbbb inset`
+                : c.teacher
+                ? `0 0 2px ${c.subject.color} inset`
+                : undefined,
             }}
           >
             <div>{c.subject.name}</div>

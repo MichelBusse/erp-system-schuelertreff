@@ -87,7 +87,9 @@ export class ContractsService {
         initialContract.endDate = dayjs(dto.startDate)
           .subtract(1, 'day')
           .format('YYYY-MM-DD')
-        const updatedContract = await this.contractsRepository.save(initialContract)
+        const updatedContract = await this.contractsRepository.save(
+          initialContract,
+        )
 
         // Delete all Lessons which are now out of bounds
         this.lessonsService.findAndValidateAllByContract(updatedContract)

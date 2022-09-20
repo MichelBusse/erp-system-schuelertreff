@@ -7,7 +7,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint ./src --rule 'prettier/prettier: off'",
-    "lint:fix": "eslint ./src --fix --rule 'simple-import-sort/imports: warn' --rule 'simple-import-sort/exports: warn'"
+    "lint:style": "eslint ./src --rule 'simple-import-sort/imports: warn' --rule 'simple-import-sort/exports: warn'",
+    "lint:fix": "npm run lint:style -- --fix"
   },
   "dependencies": {
     "@date-io/dayjs": "^2.14.0",
