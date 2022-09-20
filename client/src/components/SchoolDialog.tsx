@@ -97,7 +97,10 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
               fullWidth={true}
               value={data.email}
               onChange={(event) =>
-                setData((data) => ({ ...data, email: event.target.value.toLowerCase() }))
+                setData((data) => ({
+                  ...data,
+                  email: event.target.value.toLowerCase(),
+                }))
               }
             />
           </Stack>

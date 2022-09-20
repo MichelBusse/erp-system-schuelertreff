@@ -82,7 +82,9 @@ const Filter: React.FC<Props> = ({
       } else {
         const school = (initialContract.customers[0] as classCustomer).school
         initialForm0Entry.school = school
-        initialForm0Entry.classCustomers = (initialContract.customers as classCustomer[]).filter((c) => !c.defaultClassCustomer) as classCustomer[]
+        initialForm0Entry.classCustomers = (
+          initialContract.customers as classCustomer[]
+        ).filter((c) => !c.defaultClassCustomer) as classCustomer[]
 
         loadClasses(school.id)
       }

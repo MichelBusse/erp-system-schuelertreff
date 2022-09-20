@@ -55,7 +55,9 @@ export class AuthService {
       console.log(err)
     }
 
-    console.log(`Login failed for ${email}: User may not authenticate or password hash could not be verified`)
+    console.log(
+      `Login failed for ${email}: User may not authenticate or password hash could not be verified`,
+    )
     return null
   }
 

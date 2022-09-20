@@ -1,5 +1,4 @@
 import {
-  AfterUpdate,
   Column,
   Entity,
   JoinTable,
