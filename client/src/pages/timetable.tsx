@@ -178,7 +178,13 @@ const Timetable: React.FC = () => {
                 }
                 return (
                   <LessonOverview
-                    key={c.id}
+                    key={
+                      c.id +
+                      dayjs(
+                        drawer.params?.colDef.headerName,
+                        'YYYY-MM-DD',
+                      ).format()
+                    }
                     contract={c}
                     existingLesson={existingLesson}
                     refresh={() => {

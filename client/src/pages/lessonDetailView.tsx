@@ -258,6 +258,7 @@ const LessonDetailView: React.FC = () => {
                 variant={'outlined'}
                 multiline
                 rows={3}
+                disabled={blocked}
                 onChange={(e) => {
                   setData((prevData) => ({
                     ...prevData,

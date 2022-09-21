@@ -157,7 +157,9 @@ const TeacherDetailView: React.FC = () => {
 
     API.post('users/teacher/applicationMeetingRequest/' + requestedId, {
       ...applicationMeetingRequestForm,
-      dates: applicationMeetingRequestForm.dates.map((date) => date?.format()),
+      dates: applicationMeetingRequestForm.dates.map((date) =>
+        date?.format('YYYY-MM-DD HH:mm'),
+      ),
     })
       .then((res) => {
         enqueueSnackbar('Rückmeldung gesendet', snackbarOptions)
@@ -518,7 +520,7 @@ const TeacherDetailView: React.FC = () => {
               onChange={(event) =>
                 setData((data) => ({
                   ...data,
-                  email: event.target.value,
+                  email: event.target.value.toLowerCase(),
                 }))
               }
               value={data.email ?? ''}

@@ -37,7 +37,10 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmailAuth(email)
 
-    if (!user || user.deleteState === DeleteState.DELETED) return null
+    if (!user || user.deleteState === DeleteState.DELETED) {
+      console.log(`Login failed for ${email}: User not found or is deleted`)
+      return null
+    }
 
     try {
       if (
@@ -48,8 +51,13 @@ export class AuthService {
 
         return result
       }
-    } catch (err) {}
+    } catch (err) {
+      console.log(err)
+    }
 
+    console.log(
+      `Login failed for ${email}: User may not authenticate or password hash could not be verified`,
+    )
     return null
   }
 

@@ -1,3 +1,4 @@
+import { IosShare as IosShareIcon } from '@mui/icons-material'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import FolderDeleteIcon from '@mui/icons-material/FolderDelete'
 import { Chip, IconButton, Stack } from '@mui/material'
@@ -11,6 +12,7 @@ import {
   GridToolbarContainer,
   GridToolbarFilterButton,
 } from '@mui/x-data-grid'
+import { useSnackbar } from 'notistack'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
@@ -18,7 +20,12 @@ import useMeasure from 'react-use-measure'
 import { PrevIdProps } from '../App'
 import { useAuth } from '../components/AuthProvider'
 import TeacherDialog from '../components/TeacherDialog'
-import { dataGridLocaleText, teacherStateToString } from '../consts'
+import {
+  dataGridLocaleText,
+  snackbarOptions,
+  snackbarOptionsError,
+  teacherStateToString,
+} from '../consts'
 import { TeacherState } from '../types/enums'
 import subject from '../types/subject'
 import { teacher } from '../types/user'
@@ -30,15 +37,16 @@ import {
 import styles from './gridList.module.scss'
 
 const Teachers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { API } = useAuth()
+  const { enqueueSnackbar } = useSnackbar()
+
   const [open, setOpen] = useState(false)
   const [renderDialog, setRenderDialog] = useState(0)
   const [teachers, setTeachers] = useState<teacher[]>([])
-  const navigate = useNavigate()
-  const location = useLocation()
   const [deletedTeacherToggle, setDeletedTeacherToggle] =
     useState<boolean>(false)
-
-  const { API } = useAuth()
 
   const [ref, bounds] = useMeasure()
   const small = bounds.width < 600
@@ -203,6 +211,25 @@ const Teachers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
     navigate('/teachers/' + params.id)
   }
 
+  // click event
+  const copyEmailsToClipboard = () => {
+    navigator.clipboard
+      .writeText(
+        teachers
+          .map((t) => `${t.firstName} ${t.lastName} <${t.email}>`)
+          .join('\r\n'),
+      )
+      .then(() =>
+        enqueueSnackbar(
+          'Email-Adressen wurden in die Zwischenablage kopiert',
+          snackbarOptions,
+        ),
+      )
+      .catch(() =>
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError),
+      )
+  }
+
   return (
     <div
       className={styles.wrapper + ' ' + styles.pageWrapper}
@@ -227,11 +254,15 @@ const Teachers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
               <GridToolbarContainer
                 className={styles.customGridToolbarContainer}
               >
-                <GridToolbarFilterButton />
+                <GridToolbarFilterButton sx={{ marginRight: 'auto' }} />
+                {!deletedTeacherToggle && (
+                  <IconButton onClick={copyEmailsToClipboard}>
+                    <IosShareIcon fontSize="large" />
+                  </IconButton>
+                )}
                 <IconButton
                   color={deletedTeacherToggle ? 'secondary' : 'default'}
                   onClick={() => setDeletedTeacherToggle((data) => !data)}
-                  sx={{ marginLeft: 'auto' }}
                 >
                   <FolderDeleteIcon fontSize="large" />
                 </IconButton>

@@ -136,7 +136,10 @@ const TeacherDialog: React.FC<Props> = ({
               label="E-Mail"
               value={form.email}
               onChange={(event) =>
-                setForm((data) => ({ ...data, email: event.target.value }))
+                setForm((data) => ({
+                  ...data,
+                  email: event.target.value.toLowerCase(),
+                }))
               }
             />
             <TextField

@@ -36,7 +36,7 @@ export class LessonsController {
     @Request() req,
     @Query('of') date: string,
   ): Promise<{
-    contracts: Contract[]
+    contracts: (Contract & { blocked: boolean })[]
     lessons: Lesson[]
     pendingContracts: Contract[]
   }> {

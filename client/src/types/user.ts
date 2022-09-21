@@ -102,7 +102,7 @@ export interface classCustomer {
   school: school
   schoolType: SchoolType
   grade: number
-  defaultClassCustomer: boolean
+  defaultClassCustomer?: boolean
 }
 
 export type customer = privateCustomer | classCustomer

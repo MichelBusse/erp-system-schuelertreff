@@ -204,7 +204,7 @@ export class LessonsService {
    *
    * @param week // Date of the required week
    * @param teacherId // Optional TeacherId if only results of one teacher should be send
-   * @returns // Lessons of the specified week
+   * @returns // Lessons of the specified week with boolean if it's blocked
    *          // Contracts of the specified week
    *          // All Contracts which have not been accepted or declined by the teacher yet
    */
@@ -230,11 +230,50 @@ export class LessonsService {
     const pendingContracts =
       await this.contractsService.findAllPendingForTeacher(teacherId)
 
+    const contractsWithBlockState = await Promise.all(
+      contractsOfWeek.map(async (c) => {
+        if (c.teacher)
+          return {
+            ...c,
+            blocked:
+              (await this.checkLeave(
+                dayjs(week)
+                  .startOf('week')
+                  .add(dayjs(c.startDate).day(), 'day')
+                  .format(),
+                c.teacher.id,
+              )) > 0,
+          }
+        return { ...c, blocked: false }
+      }),
+    )
+
     return {
       lessons: lessonsOfWeek,
-      contracts: contractsOfWeek,
+      contracts: contractsWithBlockState,
       pendingContracts: pendingContracts,
     }
+  }
+
+  /**
+   * Checks if the lessons of a given contract are before or after its livespan and if they are, deletes them
+   *
+   * @param contract // the contract of which the lessons have to be validated
+   */
+  async findAndValidateAllByContract(contract: Contract) {
+    const lessonsOfContract = this.lessonsRepository.findBy({
+      contract: { id: contract.id },
+    })
+
+    ;(await lessonsOfContract).forEach((l) => {
+      //If lesson date is before the startDate of contract or after the endDate
+      if (
+        dayjs(l.date).isBefore(dayjs(contract.startDate)) ||
+        dayjs(l.date).isAfter(dayjs(contract.endDate))
+      ) {
+        this.lessonsRepository.delete(l.id)
+      }
+    })
   }
 
   /**

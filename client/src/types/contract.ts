@@ -24,6 +24,7 @@ export type contract = {
   childContracts: contract[]
   lessons: lesson[]
   contractType: ContractType
+  blocked?: boolean
 }
 
 export type contractWithTeacher = {
@@ -38,4 +39,5 @@ export type contractWithTeacher = {
   teacher: teacher
   state: ContractState
   contractType: ContractType
+  blocked?: boolean
 }

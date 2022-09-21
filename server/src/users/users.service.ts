@@ -13,6 +13,7 @@ import nodemailer from 'nodemailer'
 import { DataSource, Not, Repository } from 'typeorm'
 
 import { AuthService } from 'src/auth/auth.service'
+import { Role } from 'src/auth/role.enum'
 import { Contract } from 'src/contracts/contract.entity'
 import { Document } from 'src/documents/document.entity'
 import {
@@ -144,13 +145,10 @@ export class UsersService {
     private config: ConfigService,
   ) {}
 
-  private transport = nodemailer.createTransport(
-    {
-      host: this.config.get<string>('SMTP_HOST'),
-      port: this.config.get<number>('SMTP_PORT'),
-    },
-    { from: this.config.get<string>('EMAIL_FROM') },
-  )
+  private transport = nodemailer.createTransport({
+    host: this.config.get<string>('SMTP_HOST'),
+    port: this.config.get<number>('SMTP_PORT'),
+  })
 
   /**
    * Check if email is already in DB
@@ -181,7 +179,7 @@ export class UsersService {
   findByEmailAuth(email: string): Promise<User> {
     return this.usersRepository
       .createQueryBuilder('user')
-      .where({ email: email })
+      .where({ email: email.trim().toLowerCase() })
       .addSelect(['user.passwordHash', 'user.mayAuthenticate'])
       .getOne()
   }
@@ -469,11 +467,31 @@ export class UsersService {
       .then(transformUser)
   }
 
+  async findOneTeacherAsSchool(id: number): Promise<Partial<Teacher>> {
+    const teacher = await this.teachersRepository
+      .findOneOrFail({
+        where: { id },
+        relations: ['subjects'],
+      })
+      .then(transformUser)
+
+    return {
+      id: teacher.id,
+      firstName: teacher.firstName,
+      lastName: teacher.lastName,
+      email: teacher.email,
+      phone: teacher.phone,
+      teacherSchoolTypes: teacher.teacherSchoolTypes,
+      degree: teacher.degree,
+      subjects: teacher.subjects,
+    }
+  }
+
   async createTeacher(dto: CreateTeacherDto): Promise<Teacher> {
     const teacher = this.teachersRepository.create({
       firstName: dto.firstName,
       lastName: dto.lastName,
-      email: dto.email,
+      email: dto.email.toLowerCase(),
       applicationLocation: dto.applicationLocation,
       dateOfApplication: dto.dateOfApplication,
       state: dto.skip ? TeacherState.EMPLOYED : TeacherState.CREATED,
@@ -585,6 +603,7 @@ export class UsersService {
     const updatedTeacher: Teacher = {
       ...user,
       ...dto,
+      email: dto.email ? dto.email.toLowerCase() : user.email,
       timesAvailable:
         typeof dto.timesAvailable !== 'undefined'
           ? formatTimesAvailable(dto.timesAvailable)
@@ -605,6 +624,7 @@ export class UsersService {
       try {
         this.transport.sendMail(
           {
+            from: this.config.get<string>('EMAIL_FROM'),
             to: user.email,
             subject: 'Schülertreff - Willkommen',
             text: employmentMail(
@@ -649,6 +669,7 @@ export class UsersService {
       try {
         this.transport.sendMail(
           {
+            from: this.config.get<string>('EMAIL_FROM_BEWERBUNG'),
             to: user.email,
             subject: 'Schülertreff - Termin Bewerbungsgespräch',
             text: applicationMeetingSetDateMail(
@@ -676,6 +697,7 @@ export class UsersService {
       try {
         this.transport.sendMail(
           {
+            from: this.config.get<string>('EMAIL_FROM_BEWERBUNG'),
             to: user.email,
             subject: 'Schülertreff - Terminvorschläge Bewerbungsgespräch',
             text: applicationMeetingProposalMail(
@@ -771,7 +793,7 @@ export class UsersService {
       .where('customer.id = :id', { id: id })
 
     const customersContracs = await contractQuery.getMany()
-    const customer = await this.findOnePrivateCustomer(id)
+    const customer = await this.findOneCustomer(id)
 
     let allowedToRemove = true
 
@@ -792,7 +814,10 @@ export class UsersService {
         )
       }
     } else {
-      if (customer.deleteState !== DeleteState.DELETED) {
+      if (
+        customer.deleteState !== DeleteState.DELETED &&
+        customer.role === Role.PRIVATECUSTOMER
+      ) {
         this.privateCustomersRepository.update(id, {
           deleteState: DeleteState.DELETED,
         })
@@ -1005,8 +1030,9 @@ export class UsersService {
       .where('c.schoolId = :schoolId', {
         schoolId: schoolId,
       })
-      .andWhere('c.defaultClassCustomer = FALSE', {
-        schoolId: schoolId,
+      .andWhere('c.defaultClassCustomer = FALSE')
+      .andWhere('c.deleteState = :deleteState', {
+        deleteState: DeleteState.ACTIVE,
       })
       .orderBy('c.className', 'ASC')
 

@@ -42,7 +42,7 @@ const Calendar: React.FC<Props> = ({ date, setDrawer, contracts, lessons }) => {
           <Box
             key={c.id}
             sx={{
-              backgroundColor: c.subject.color + '70',
+              backgroundColor: c.blocked ? '#cccccc' : c.subject.color + '70',
               height: hourHeight * hours,
               width: 180,
               position: 'absolute',
@@ -51,7 +51,11 @@ const Calendar: React.FC<Props> = ({ date, setDrawer, contracts, lessons }) => {
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
-              boxShadow: `0 0 2px ${c.subject.color} inset`,
+              boxShadow: c.blocked
+                ? `0 0 2px #bbbbbb inset`
+                : c.teacher
+                ? `0 0 2px ${c.subject.color} inset`
+                : undefined,
             }}
           >
             <div>{c.subject.name}</div>

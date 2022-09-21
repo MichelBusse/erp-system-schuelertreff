@@ -327,7 +327,7 @@ const PrivateCustomerDetailView: React.FC = () => {
               onChange={(event) =>
                 setData((data) => ({
                   ...data,
-                  email: event.target.value,
+                  email: event.target.value.toLowerCase(),
                 }))
               }
               value={data.email ?? ''}
