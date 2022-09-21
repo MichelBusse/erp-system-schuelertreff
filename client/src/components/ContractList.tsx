@@ -54,7 +54,9 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
   const [confirmationDialogProps, setConfirmationDialogProps] =
     useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
 
-  const [limitedView, setLimitedView] = useState(userRole === 'school' ? true : false)
+  const [limitedView, setLimitedView] = useState(
+    userRole === 'school' ? true : false,
+  )
   const theme = useTheme()
 
   const deleteContract = (contractId: number) => {
@@ -120,21 +122,23 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
         {contracts.map((contract) => (
           <ListItem
             key={contract.id}
-            secondaryAction={!limitedView && (
-              <Box>
-                {(!contract.endDate ||
-                  dayjs(contract.endDate).isAfter(dayjs())) && (
-                  <>
-                    <IconButton onClick={() => editContract(contract)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton onClick={() => deleteContract(contract.id)}>
-                      <Delete />
-                    </IconButton>
-                  </>
-                )}
-              </Box>
-            )}
+            secondaryAction={
+              !limitedView && (
+                <Box>
+                  {(!contract.endDate ||
+                    dayjs(contract.endDate).isAfter(dayjs())) && (
+                    <>
+                      <IconButton onClick={() => editContract(contract)}>
+                        <Edit />
+                      </IconButton>
+                      <IconButton onClick={() => deleteContract(contract.id)}>
+                        <Delete />
+                      </IconButton>
+                    </>
+                  )}
+                </Box>
+              )
+            }
           >
             <ListItemText
               sx={{ marginRight: '50px' }}

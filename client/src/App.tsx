@@ -96,6 +96,14 @@ const App: React.FC = () => {
                   }
                 />
                 <Route
+                  path="teacher/:id"
+                  element={
+                    <ProtectedRoute>
+                      <Pages.TeacherOverview />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path=":initialDate/:contractId/:date"
                   element={
                     <ProtectedRoute>
@@ -207,12 +215,8 @@ const App: React.FC = () => {
                 path="profile"
                 element={
                   <ProtectedRoute>
-                    {hasRole(Role.SCHOOL) ? (
-                        <Pages.SchoolDetailView />
-                    ) : null}
-                    {hasRole(Role.TEACHER) ? (
-                        <Pages.TeacherDetailView />
-                    ) : null}
+                    {hasRole(Role.SCHOOL) ? <Pages.SchoolDetailView /> : null}
+                    {hasRole(Role.TEACHER) ? <Pages.TeacherDetailView /> : null}
                   </ProtectedRoute>
                 }
               />

@@ -1,5 +1,4 @@
-import AddIcon from '@mui/icons-material/Add'
-import { CircularProgress, Fab } from '@mui/material'
+import { CircularProgress } from '@mui/material'
 import { Box } from '@mui/system'
 import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
@@ -10,7 +9,7 @@ import { snackbarOptionsError } from '../../consts'
 import { DrawerParameters } from '../../pages/timetable'
 import { contract } from '../../types/contract'
 import { lesson } from '../../types/lesson'
-import { classCustomer, teacher } from '../../types/user'
+import { classCustomer } from '../../types/user'
 import { useAuth } from '../AuthProvider'
 import MultiCalendar from './MultiCalendar'
 
@@ -20,11 +19,7 @@ type Props = {
   refresh?: number
 }
 
-const SchoolCalendar: React.FC<Props> = ({
-  date,
-  setDrawer,
-  refresh,
-}) => {
+const SchoolCalendar: React.FC<Props> = ({ date, setDrawer, refresh }) => {
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
 

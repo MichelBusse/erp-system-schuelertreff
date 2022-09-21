@@ -12,7 +12,7 @@ type Props = {
   setDrawer: (params: DrawerParameters) => void
   contracts: Record<number, contract[]>
   lessons: lesson[]
-  labels: {id : number, title: string}[]
+  labels: { id: number; title: string }[]
 }
 
 const MultiCalendar: React.FC<Props> = ({
@@ -22,7 +22,6 @@ const MultiCalendar: React.FC<Props> = ({
   lessons,
   labels,
 }) => {
-
   const theme = useTheme()
 
   const getCellValue: GridColDef['valueGetter'] = ({ id, colDef: { field } }) =>
@@ -90,11 +89,10 @@ const MultiCalendar: React.FC<Props> = ({
     ),
   ]
 
-  const rows: GridRowsProp = labels
-    .map((t) => ({
-      id: t.id,
-      label: t.title,
-    }))
+  const rows: GridRowsProp = labels.map((t) => ({
+    id: t.id,
+    label: t.title,
+  }))
 
   return (
     <Box

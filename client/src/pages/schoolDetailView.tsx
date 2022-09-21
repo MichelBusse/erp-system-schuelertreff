@@ -39,8 +39,8 @@ import ContractList from '../components/ContractList'
 import CustomerInvoiceDataSelect, {
   CustomerInvoiceData,
 } from '../components/CustomerInvoiceDateSelect'
-import IconButtonAdornment from '../components/IconButtonAdornment'
 import UserDocuments from '../components/documents/UserDocuments'
+import IconButtonAdornment from '../components/IconButtonAdornment'
 import {
   defaultClassCustomerFormData,
   defaultSchoolFormData,
@@ -281,7 +281,7 @@ const SchoolDetailView: React.FC = () => {
     setAddClassDialogOpen(false)
     if (newClassCustomer.className) {
       let schoolId: number | string
-      requestedId === 'me' ? schoolId = -1 : schoolId = requestedId
+      requestedId === 'me' ? (schoolId = -1) : (schoolId = requestedId)
       API.post('users/classCustomer/', {
         ...newClassCustomer,
         school: schoolId,
@@ -379,7 +379,6 @@ const SchoolDetailView: React.FC = () => {
         enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
       })
   }
-
 
   const resetPassword = () => {
     API.post('auth/reset/mail', { mail: school.email })
@@ -526,7 +525,7 @@ const SchoolDetailView: React.FC = () => {
               }}
             />
           </Stack>
-          { id && (
+          {id && (
             <>
               <h3>Weitere Infos</h3>
               <Stack direction="row" columnGap={2}>
@@ -830,12 +829,11 @@ const SchoolDetailView: React.FC = () => {
                   : 'Schule archivieren'}
               </Button>
             )}
-            {id &&
-              school.deleteState === DeleteState.ACTIVE && (
-                <Button variant="outlined" onClick={() => resetPassword()}>
-                  Passwort-Reset
-                </Button>
-              )}
+            {id && school.deleteState === DeleteState.ACTIVE && (
+              <Button variant="outlined" onClick={() => resetPassword()}>
+                Passwort-Reset
+              </Button>
+            )}
           </Stack>
           {id && (
             <>

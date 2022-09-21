@@ -38,7 +38,8 @@ const LessonOverview: React.FC<Props> = ({
   const { API } = useAuth()
   const [held, setHeld] = useState(existingLesson?.state === LessonState.HELD)
   const { enqueueSnackbar } = useSnackbar()
-  const [limitedView, setLimitedView] = useState(userRole === 'school' ? true : false)
+
+  const limitedView = userRole === 'school' ? true : false
 
   const toggleLessonHeld = (held: boolean) => {
     API.post('lessons/' + (existingLesson?.id ?? ''), {
@@ -148,7 +149,7 @@ const LessonOverview: React.FC<Props> = ({
           disabled={contract.blocked}
           control={
             <Checkbox
-              disabled = {limitedView}
+              disabled={limitedView}
               checked={held}
               onChange={(e) => {
                 toggleLessonHeld(e.target.checked)
@@ -172,6 +173,17 @@ const LessonOverview: React.FC<Props> = ({
           }
         >
           Mehr anzeigen
+        </Button>
+      )}
+      {limitedView && (
+        <Button
+          onClick={() =>
+            navigate(
+              '/timetable/teacher/' + contract.teacher.id
+            )
+          }
+        >
+          Lehrkraft anzeigen
         </Button>
       )}
     </Stack>

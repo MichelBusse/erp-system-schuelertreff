@@ -47,7 +47,7 @@ const UserDocuments: React.FC<Props> = ({
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const { API, hasRole } = useAuth()
+  const { API, hasRole, decodeToken } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const UserDocuments: React.FC<Props> = ({
 
   const saveDoc = async (form: UploadDialogForm) => {
     if (!editDialogDocument) return
-    
+
     API.post(`documents/` + editDialogDocument.id, {
       fileName: form.fileName,
       visibleToUser: form.visibleToUser,
@@ -161,6 +161,12 @@ const UserDocuments: React.FC<Props> = ({
   const ListItemDoc: React.FC<{ doc: documentType }> = ({ doc }) => {
     const [confirm, setConfirm] = useState(false)
 
+    const editDisabled = !(
+      hasRole(Role.ADMIN) ||
+      ((userId === undefined || userId === decodeToken().sub) &&
+        doc.mayDelete)
+    )
+
     return (
       <ListItem
         secondaryAction={
@@ -169,11 +175,14 @@ const UserDocuments: React.FC<Props> = ({
               <IconButton onClick={() => downloadDoc(doc)}>
                 <DownloadIcon />
               </IconButton>
-              {hasRole(Role.ADMIN) && <IconButton onClick={() => editDoc(doc)}>
-                <Edit />
-              </IconButton>}
               <IconButton
-                disabled={!userId && !doc.mayDelete}
+                disabled={editDisabled}
+                onClick={() => editDoc(doc)}
+              >
+                <Edit />
+              </IconButton>
+              <IconButton
+                disabled={editDisabled}
                 onClick={() => setConfirm(true)}
               >
                 <DeleteIcon />
@@ -185,8 +194,8 @@ const UserDocuments: React.FC<Props> = ({
                 <CloseIcon />
               </IconButton>
               <IconButton
+                disabled={editDisabled}
                 color="error"
-                disabled={!userId && !doc.mayDelete}
                 onClick={() => deleteDoc(doc.id)}
               >
                 <DeleteIcon />

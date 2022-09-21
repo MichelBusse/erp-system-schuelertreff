@@ -12,9 +12,11 @@ import {
   TextField,
 } from '@mui/material'
 import { useState } from 'react'
-import document from '../../types/document'
-import { UploadDialogForm } from './UploadDialog'
 
+import document from '../../types/document'
+import { Role } from '../../types/user'
+import { useAuth } from '../AuthProvider'
+import { UploadDialogForm } from './UploadDialog'
 
 type Props = {
   open: boolean
@@ -23,9 +25,13 @@ type Props = {
   document?: document
 }
 
-const DocumentEditDialog: React.FC<Props> = ({ open, close, onSubmit, document }) => {
-  if(!document)
-    return <></>
+const DocumentEditDialog: React.FC<Props> = ({
+  open,
+  close,
+  onSubmit,
+  document,
+}) => {
+  if (!document) return <></>
 
   const [form, setForm] = useState<UploadDialogForm>({
     fileName: document.fileName,
@@ -33,6 +39,8 @@ const DocumentEditDialog: React.FC<Props> = ({ open, close, onSubmit, document }
     visibleToEverybody: document.visibleToEverybody,
     protected: !document.mayDelete,
   })
+
+  const {hasRole} = useAuth()
 
   const validForm = !!form.fileName
 
@@ -89,6 +97,7 @@ const DocumentEditDialog: React.FC<Props> = ({ open, close, onSubmit, document }
               control={
                 <Checkbox
                   checked={form.protected}
+                  disabled={!hasRole(Role.ADMIN)}
                   onChange={(e) =>
                     setForm((f) => ({
                       ...f,

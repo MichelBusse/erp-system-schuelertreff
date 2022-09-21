@@ -77,14 +77,22 @@ export class DocumentsService {
     return this.documentsRepository.save(doc)
   }
 
-  async update(id: number, dto: UpdateDocumentDto): Promise<Document> {
-    let doc = await this.documentsRepository.findOneOrFail({where: {id}})
+  async update(
+    id: number,
+    dto: UpdateDocumentDto,
+    userId?: number,
+  ): Promise<Document> {
+    let doc = await this.documentsRepository.findOneOrFail({
+      where: { id },
+      relations: ['owner'],
+    })
 
-    doc = {...doc, ...dto}
+    if (userId && userId !== doc.owner.id) throw new ForbiddenException()
+
+    doc = { ...doc, ...dto }
 
     return this.documentsRepository.save(doc)
   }
-
 
   async delete(id: number, userId?: number) {
     const doc = await this.documentsRepository.findOne({
@@ -92,9 +100,11 @@ export class DocumentsService {
       relations: ['owner'],
     })
 
+    if (userId && userId !== doc.owner.id) throw new ForbiddenException()
+
     if (doc === null) throw new NotFoundException()
 
-    if (typeof userId !== 'undefined') {
+    if (userId) {
       if (
         (doc.owner.id === userId && !doc.visibleToUser) ||
         (doc.owner.id !== userId && !doc.visibleToEverybody)
@@ -160,8 +170,18 @@ export class DocumentsService {
       .addSelect('doc.content')
       .where(`doc.id = :id`, { id })
 
-    if (typeof userId !== 'undefined')
-      q.andWhere(`doc."ownerId" = :userId`, { userId })
+    if (userId) {
+      q.andWhere(
+        new Brackets((qb) => {
+          qb.where(`(doc."ownerId" = :userId AND doc."visibleToUser" = true)`, {
+            userId,
+          })
+          qb.orWhere(
+            `(doc."ownerId" <> :userId AND doc."visibleToEverybody" = true)`,
+          )
+        }),
+      )
+    }
 
     return q.getOneOrFail()
   }

@@ -9,6 +9,7 @@ import SchoolDetailView from './schoolDetailView'
 import Schools from './schools'
 import Subjects from './subjects'
 import TeacherDetailView from './teacherDetailView'
+import TeacherOverview from './teacherOverview'
 import Teachers from './teachers'
 import Timetable from './timetable'
 
@@ -26,4 +27,5 @@ export default {
   PrivateCustomerDetailView,
   SchoolDetailView,
   LessonDetailView,
+  TeacherOverview
 }

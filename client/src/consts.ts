@@ -4,6 +4,7 @@ import { OptionsObject as SnackbarOptions } from 'notistack'
 import { ContractState } from './types/contract'
 import {
   ContractType,
+  Degree,
   LeaveState,
   LeaveType,
   SchoolType,
@@ -117,6 +118,13 @@ export const teacherSchoolTypeToString: { [key in TeacherSchoolType]: string } =
     sek1: 'Gymnasium Sek. 1',
     sek2: 'Gymnasium Sek. 2',
   }
+
+export const degreeToString: { [key in Degree]: string } = {
+  noinfo: 'Keine Angabe',
+  highschool: 'Abitur',
+  bachelor: 'Bachelor',
+  master: 'Master',
+}
 
 export const defaultSchoolFormData: schoolForm = {
   firstName: '',
