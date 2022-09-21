@@ -380,6 +380,17 @@ const SchoolDetailView: React.FC = () => {
       })
   }
 
+
+  const resetPassword = () => {
+    API.post('auth/reset/mail', { mail: school.email })
+      .then(() => {
+        enqueueSnackbar('Der Passwort-Reset wurde an die E-Mail gesendet')
+      })
+      .catch(() => {
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+      })
+  }
+
   return (
     <div className={styles.wrapper}>
       <Box className={styles.contentBox}>
@@ -819,6 +830,12 @@ const SchoolDetailView: React.FC = () => {
                   : 'Schule archivieren'}
               </Button>
             )}
+            {id &&
+              school.deleteState === DeleteState.ACTIVE && (
+                <Button variant="outlined" onClick={() => resetPassword()}>
+                  Passwort-Reset
+                </Button>
+              )}
           </Stack>
           {id && (
             <>
