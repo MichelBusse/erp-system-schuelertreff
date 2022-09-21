@@ -45,11 +45,13 @@ const MultiCalendar: React.FC<Props> = ({
           <Box
             key={c.id}
             sx={{
-              backgroundColor: c.subject.color + '70',
+              backgroundColor: c.blocked ? '#cccccc' : c.subject.color + '70',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              boxShadow: c.teacher
+              boxShadow: c.blocked
+                ? `0 0 2px #bbbbbb inset`
+                : c.teacher
                 ? `0 0 2px ${c.subject.color} inset`
                 : undefined,
               borderWidth: !c.teacher ? '2px' : undefined,
