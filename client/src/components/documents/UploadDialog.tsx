@@ -15,7 +15,8 @@ import { useState } from 'react'
 
 export type UploadDialogForm = {
   fileName: string
-  hidden: boolean
+  visibleToUser: boolean
+  visibleToEverybody: boolean
   protected: boolean
 }
 
@@ -38,7 +39,8 @@ const UploadDialog: React.FC<Props> = ({
 }) => {
   const [form, setForm] = useState<UploadDialogForm>({
     fileName: file.name,
-    hidden: false,
+    visibleToUser: true,
+    visibleToEverybody: false,
     protected: false,
   })
 
@@ -64,15 +66,30 @@ const UploadDialog: React.FC<Props> = ({
           {!minimalView && (
             <FormGroup>
               <FormControlLabel
-                label="Versteckt"
+                label="Für Nutzer sichtbar"
+                disabled={form.visibleToEverybody}
                 control={
                   <Checkbox
-                    checked={form.hidden}
+                    checked={form.visibleToUser}
                     onChange={(e) =>
                       setForm((f) => ({
                         ...f,
-                        hidden: e.target.checked,
-                        protected: e.target.checked,
+                        visibleToUser: e.target.checked,
+                      }))
+                    }
+                  />
+                }
+              />
+              <FormControlLabel
+                label="Für alle Nutzer sichtbar"
+                control={
+                  <Checkbox
+                    checked={form.visibleToEverybody}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        visibleToUser: true,
+                        visibleToEverybody: e.target.checked,
                       }))
                     }
                   />
@@ -80,7 +97,6 @@ const UploadDialog: React.FC<Props> = ({
               />
               <FormControlLabel
                 label="Schreibgeschützt"
-                disabled={form.hidden}
                 control={
                   <Checkbox
                     checked={form.protected}

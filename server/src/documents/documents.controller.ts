@@ -16,10 +16,22 @@ import { Role } from 'src/auth/role.enum'
 import { Document } from './document.entity'
 import { DocumentsService } from './documents.service'
 import { CreateDocumentDto } from './dto/create-document.dto'
+import { UpdateDocumentDto } from './dto/update-document.dto'
 
 @Controller('documents')
 export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
+
+
+  @Post(':id')
+  async update(@Param('id') id: number, @Body() dto: UpdateDocumentDto) {
+    // filter out content, doesn't need to be transferred back (huge overhead!)
+    const { content: _, ...response } = await this.documentsService.update(id, {
+      ...dto,
+    })
+
+    return response
+  }
 
   @Post()
   async create(@Request() req, @Body() dto: CreateDocumentDto) {
@@ -36,14 +48,13 @@ export class DocumentsController {
   @Get()
   async findAllBy(
     @Request() req,
-    @Query('by') userId?: number,
+    @Query('by') userId?: string,
   ): Promise<Document[]> {
-    const id =
-      req.user.role === Role.ADMIN ? userId ?? req.user.userId : req.user.id
+    const id = userId ? Number(userId) : req.user.id
 
-    const showHidden = id !== req.user.id
+    const isAdmin = req.user.role === Role.ADMIN
 
-    return this.documentsService.findAllBy(id, showHidden)
+    return this.documentsService.findAllBy(id, req.user.id, isAdmin)
   }
 
   @Get(':id')

@@ -28,7 +28,10 @@ export class Document {
   owner: User
 
   @Column({ default: true })
-  mayRead: boolean
+  visibleToUser: boolean
+
+  @Column({ default: false })
+  visibleToEverybody: boolean
 
   @Column({ default: true })
   mayDelete: boolean

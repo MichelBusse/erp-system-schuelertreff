@@ -40,7 +40,7 @@ import CustomerInvoiceDataSelect, {
   CustomerInvoiceData,
 } from '../components/CustomerInvoiceDateSelect'
 import IconButtonAdornment from '../components/IconButtonAdornment'
-import UserDocuments from '../components/UserDocuments'
+import UserDocuments from '../components/documents/UserDocuments'
 import {
   defaultClassCustomerFormData,
   defaultSchoolFormData,

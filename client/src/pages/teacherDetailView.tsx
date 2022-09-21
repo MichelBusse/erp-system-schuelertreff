@@ -39,7 +39,7 @@ import Leave from '../components/Leave'
 import TeacherInvoiceDataSelect, {
   TeacherInvoiceData,
 } from '../components/TeacherInvoiceDateSelect'
-import UserDocuments from '../components/UserDocuments'
+import UserDocuments from '../components/documents/UserDocuments'
 import {
   defaultTeacherFormData,
   snackbarOptions,

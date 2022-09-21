@@ -14,7 +14,11 @@ export class CreateDocumentDto {
 
   @IsOptional()
   @IsBoolean()
-  mayRead?: boolean
+  visibleToUser?: boolean
+
+  @IsOptional()
+  @IsBoolean()
+  visibleToEverybody?: boolean
 
   @IsOptional()
   @IsBoolean()

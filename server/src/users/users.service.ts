@@ -539,7 +539,8 @@ export class UsersService {
       fileName: 'Arbeitsvertrag.pdf',
       fileType: 'application/pdf',
       owner: user.id,
-      mayRead: true,
+      visibleToUser: true,
+      visibleToEverybody: true,
       mayDelete: false,
       content: buffer,
     })
@@ -583,7 +584,8 @@ export class UsersService {
       fileName: 'Führungszeugnis Antrag.pdf',
       fileType: 'application/pdf',
       owner: user.id,
-      mayRead: true,
+      visibleToUser: true,
+      visibleToEverybody: false,
       mayDelete: false,
       content: buffer,
     })

@@ -2,6 +2,7 @@ import {
   Add as AddIcon,
   Close as CloseIcon,
   Download as DownloadIcon,
+  Edit,
 } from '@mui/icons-material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import {
@@ -12,14 +13,17 @@ import {
   ListItemText,
   Stack,
 } from '@mui/material'
+import axios from 'axios'
 import * as B64ArrayBuffer from 'base64-arraybuffer'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
-import { snackbarOptions, snackbarOptionsError } from '../consts'
-import documentType from '../types/document'
-import { formatDate } from '../utils/date'
-import { useAuth } from './AuthProvider'
+import { snackbarOptions, snackbarOptionsError } from '../../consts'
+import documentType from '../../types/document'
+import { Role } from '../../types/user'
+import { formatDate } from '../../utils/date'
+import { useAuth } from '../AuthProvider'
+import DocumentEditDialog from './DocumentEditDialog'
 import UploadDialog, { UploadDialogForm } from './UploadDialog'
 
 type Props = {
@@ -36,10 +40,14 @@ const UserDocuments: React.FC<Props> = ({
   const [documents, setDocuments] = useState<documentType[]>([])
   const [refresh, setRefresh] = useState(0)
   const [file, setFile] = useState<File>(new File([], ''))
+  const [editDialogDocument, setEditDialogDocument] = useState<
+    documentType | undefined
+  >(undefined)
   const [open, setOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const { API } = useAuth()
+  const { API, hasRole } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
@@ -56,6 +64,39 @@ const UserDocuments: React.FC<Props> = ({
     setOpen(true)
   }
 
+  const editDoc = (doc: documentType) => {
+    setEditDialogDocument(doc)
+    setEditDialogOpen(true)
+  }
+
+  const saveDoc = async (form: UploadDialogForm) => {
+    if (!editDialogDocument) return
+    
+    API.post(`documents/` + editDialogDocument.id, {
+      fileName: form.fileName,
+      visibleToUser: form.visibleToUser,
+      visibleToEverybody: form.visibleToEverybody,
+      mayDelete: !form.protected,
+    })
+      .then(() => {
+        enqueueSnackbar('Dokument gespeichert.', snackbarOptions)
+        setEditDialogDocument(undefined)
+        setEditDialogOpen(false)
+        setRefresh((r) => ++r)
+      })
+      .catch((error) => {
+        if (axios.isAxiosError(error) && error.response?.status === 400) {
+          enqueueSnackbar(
+            (error.response.data as { message: string }).message,
+            snackbarOptionsError,
+          )
+        } else {
+          console.error(error)
+          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        }
+      })
+  }
+
   const uploadDoc = async (form: UploadDialogForm) => {
     setLoading(true)
 
@@ -65,7 +106,8 @@ const UserDocuments: React.FC<Props> = ({
       fileName: form.fileName,
       fileType: file.type,
       owner: userId,
-      mayRead: !form.hidden,
+      visibleToUser: form.visibleToUser,
+      visibleToEverybody: form.visibleToEverybody,
       mayDelete: !form.protected,
       content: B64ArrayBuffer.encode(buf),
     })
@@ -127,6 +169,9 @@ const UserDocuments: React.FC<Props> = ({
               <IconButton onClick={() => downloadDoc(doc)}>
                 <DownloadIcon />
               </IconButton>
+              {hasRole(Role.ADMIN) && <IconButton onClick={() => editDoc(doc)}>
+                <Edit />
+              </IconButton>}
               <IconButton
                 disabled={!userId && !doc.mayDelete}
                 onClick={() => setConfirm(true)}
@@ -201,6 +246,15 @@ const UserDocuments: React.FC<Props> = ({
         onSubmit={uploadDoc}
         file={file}
         minimalView={typeof userId === 'undefined'}
+      />
+      <DocumentEditDialog
+        open={editDialogOpen}
+        close={() => {
+          setEditDialogOpen(false)
+          setEditDialogDocument(undefined)
+        }}
+        onSubmit={saveDoc}
+        document={editDialogDocument}
       />
     </>
   )
