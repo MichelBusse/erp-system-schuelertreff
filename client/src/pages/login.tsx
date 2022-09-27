@@ -38,7 +38,10 @@ const Login: React.FC = () => {
         enqueueSnackbar('Der Passwort-Reset wurde an die E-Mail gesendet')
       })
       .catch(() => {
-        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        enqueueSnackbar(
+          'Der Nutzer konnte nicht gefunden werden oder hat nicht die nötigen Berechtigungen',
+          snackbarOptionsError,
+        )
       })
   }
 
