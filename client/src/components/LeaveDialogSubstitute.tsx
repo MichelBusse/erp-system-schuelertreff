@@ -156,6 +156,9 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
         startDate: minStartDate.format('YYYY-MM-DD'),
         endDate: maxEndDate.format('YYYY-MM-DD'),
         originalTeacher: contract.teacher.id,
+        startTime: dayjs(contract.startTime, 'HH:mm').format('HH:mm'),
+        dow: minStartDate.day(),
+        endTime: dayjs(contract.endTime, 'HH:mm').format('HH:mm'),
         ignoreContracts: contracts.map((c) => c.id).join(','),
       },
     })
