@@ -364,14 +364,16 @@ export class UsersService {
       .then(transformUser)
   }
 
-  async updateUserMayAuthenticate(id: number, mayAuthenticate: boolean): Promise<User> {
+  async updateUserMayAuthenticate(
+    id: number,
+    mayAuthenticate: boolean,
+  ): Promise<User> {
     const user = await this.findOne(id)
 
-    return this.usersRepository
-      .save({
-        ...user,
-        mayAuthenticate: mayAuthenticate,
-      })
+    return this.usersRepository.save({
+      ...user,
+      mayAuthenticate: mayAuthenticate,
+    })
   }
 
   async createAdmin(dto: CreateAdminDto): Promise<Admin> {

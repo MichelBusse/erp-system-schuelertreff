@@ -254,7 +254,9 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography>
-                {`(${c.subject.shortForm}) ${dow} ${formatTime(c.startTime)} - ${formatTime(c.endTime)} `}
+                {`(${c.subject.shortForm}) ${dow} ${formatTime(
+                  c.startTime,
+                )} - ${formatTime(c.endTime)} `}
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
