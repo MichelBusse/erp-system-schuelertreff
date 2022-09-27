@@ -47,15 +47,11 @@ export class AuthController {
 
   @Public()
   @Post('reset/mail')
-  async selfReset(@Request() req, @Body() body: { mail: string }) {
+  async selfReset(@Body() body: { mail: string }) {
     const user = await this.usersService.findByEmailAuth(body.mail)
 
-    if (user === null || (req.user.role ! == Role.ADMIN && !user.mayAuthenticate)){
+    if (user === null || !user.mayAuthenticate)
       throw new NotFoundException("Nutzer nicht gefunden")
-    }else if(req.user.role === Role.ADMIN && !user.mayAuthenticate){
-      // If Admin requests reset and user may not authenticate yet, change that 
-      await this.usersService.updateUserMayAuthenticate(user.id, true)
-    }
 
     this.authService.initReset(user)
   }
