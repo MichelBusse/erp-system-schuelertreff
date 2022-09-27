@@ -180,6 +180,7 @@ export class UsersService {
     return this.usersRepository
       .createQueryBuilder('user')
       .where({ email: email.trim().toLowerCase() })
+      .andWhere({ deleteState: DeleteState.ACTIVE })
       .addSelect(['user.passwordHash', 'user.mayAuthenticate'])
       .getOne()
   }

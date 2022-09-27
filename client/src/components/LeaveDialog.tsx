@@ -406,7 +406,7 @@ const LeaveDialog: React.FC<Props> = ({
       </DialogContent>
       <DialogActions>
         {value.id && (
-          <Button color="error" onClick={handleDelete}>
+          <Button variant="contained" color="error" onClick={handleDelete}>
             {deleteConfirmation ? 'Bestätigen' : 'Löschen'}
           </Button>
         )}
@@ -423,7 +423,7 @@ const LeaveDialog: React.FC<Props> = ({
             </LoadingButton>
           </>
         ) : (
-          <Button variant="contained" onClick={close}>
+          <Button variant="text" onClick={close}>
             Schließen
           </Button>
         )}

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common'
+import { Body, Controller, ForbiddenException, Get, NotFoundException, Post, Request, UseGuards } from '@nestjs/common'
 
 import { UsersService } from 'src/users/users.service'
 
@@ -31,7 +31,8 @@ export class AuthController {
   async adminReset(@Body() body: { mail: string }) {
     const user = await this.usersService.findByEmailAuth(body.mail)
 
-    if (user === null) return
+    if (user === null || user.mayAuthenticate === false)
+      throw new NotFoundException("Nutzer nicht gefunden")
 
     this.authService.initReset(user)
   }
