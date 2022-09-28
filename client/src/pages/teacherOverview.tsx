@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAuth } from '../components/AuthProvider'
-import UserDocuments from '../components/documents/UserDocuments'
+import UserDocuments, { UserDocumentsType } from '../components/documents/UserDocuments'
 import { degreeToString, teacherSchoolTypeToString } from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { TeacherSchoolType } from '../types/enums'
@@ -141,8 +141,11 @@ const TeacherOverview: React.FC = () => {
               />
             </Stack>
           </Stack>
-          <h3>Dokumente:</h3>
-          <UserDocuments userId={Number(id)} />
+          <h3>Öffentliche Dokumente:</h3>
+          <UserDocuments
+            userDocumentsType={UserDocumentsType.PUBLIC}
+            userId={Number(id)}
+          />
           <Stack
             direction={{ xs: 'column', md: 'row' }}
             spacing={2}

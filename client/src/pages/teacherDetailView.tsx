@@ -34,7 +34,7 @@ import ConfirmationDialog, {
   ConfirmationDialogProps,
   defaultConfirmationDialogProps,
 } from '../components/ConfirmationDialog'
-import UserDocuments from '../components/documents/UserDocuments'
+import UserDocuments, { UserDocumentsType } from '../components/documents/UserDocuments'
 import IconButtonAdornment from '../components/IconButtonAdornment'
 import Leave from '../components/Leave'
 import TeacherInvoiceDataSelect, {
@@ -800,11 +800,11 @@ const TeacherDetailView: React.FC = () => {
               />
             </>
           )}
-
           <h3>Dokumente:</h3>
           <UserDocuments
             refresh={refreshDocuments}
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
+            userDocumentsType={UserDocumentsType.PRIVATE}
             actions={
               id &&
               (data.state === TeacherState.CONTRACT ||
@@ -827,6 +827,12 @@ const TeacherDetailView: React.FC = () => {
                 </>
               )
             }
+          />
+          <h3>Öffentliche Dokumente:</h3>
+          <UserDocuments
+            userDocumentsType={UserDocumentsType.PUBLIC}
+            refresh={refreshDocuments}
+            userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
           />
           {id && (
             <Typography>Status: {teacherStateToString[data.state]}</Typography>

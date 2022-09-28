@@ -972,16 +972,23 @@ export class UsersService {
     return this.schoolsRepository.save(school)
   }
 
-  async updateSchool(id: number, dto: Partial<UpdateSchoolDto>): Promise<School> {
+  async updateSchool(
+    id: number,
+    dto: Partial<UpdateSchoolDto>,
+  ): Promise<School> {
     const school = await this.findOne(id)
 
-    return this.schoolsRepository
-      .save({
-        ...school,
-        ...dto,
-        timesAvailable: `{${maxTimeRange}}`,
-      })
-      .then(transformUser)
+    const updatedSchool = {
+      ...school,
+      ...dto,
+      timesAvailable: `{${maxTimeRange}}`,
+    }
+
+    if (school.email !== updatedSchool.email) {
+      this.authService.initReset(school)
+    }
+
+    return this.schoolsRepository.save(updatedSchool).then(transformUser)
   }
 
   async deleteSchool(id: number) {

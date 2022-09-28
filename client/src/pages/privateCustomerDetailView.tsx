@@ -28,7 +28,7 @@ import ContractList from '../components/ContractList'
 import CustomerInvoiceDataSelect, {
   CustomerInvoiceData,
 } from '../components/CustomerInvoiceDateSelect'
-import UserDocuments from '../components/documents/UserDocuments'
+import UserDocuments, { UserDocumentsType } from '../components/documents/UserDocuments'
 import {
   defaultPrivateCustomerFormData,
   snackbarOptions,
@@ -464,6 +464,7 @@ const PrivateCustomerDetailView: React.FC = () => {
           />
           <h3>Dokumente:</h3>
           <UserDocuments
+            userDocumentsType={UserDocumentsType.PRIVATE}
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
           />
           <Stack

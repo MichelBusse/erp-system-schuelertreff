@@ -180,7 +180,7 @@ export class UsersController {
 
     const user = await this.usersService.createSchool(dto)
 
-    this.authService.initReset(user)
+    if (user.mayAuthenticate) this.authService.initReset(user)
 
     return user
   }
@@ -364,7 +364,7 @@ export class UsersController {
 
     const user = await this.usersService.createTeacher(dto)
 
-    if (dto.skip) this.authService.initReset(user)
+    if (user.mayAuthenticate) this.authService.initReset(user)
 
     return user
   }

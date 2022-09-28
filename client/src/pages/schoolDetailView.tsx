@@ -39,7 +39,9 @@ import ContractList from '../components/ContractList'
 import CustomerInvoiceDataSelect, {
   CustomerInvoiceData,
 } from '../components/CustomerInvoiceDateSelect'
-import UserDocuments from '../components/documents/UserDocuments'
+import UserDocuments, {
+  UserDocumentsType,
+} from '../components/documents/UserDocuments'
 import IconButtonAdornment from '../components/IconButtonAdornment'
 import {
   defaultClassCustomerFormData,
@@ -381,7 +383,7 @@ const SchoolDetailView: React.FC = () => {
   }
 
   const resetPassword = () => {
-    API.post('auth/reset/mail', { mail: school.email })
+    API.post('auth/reset/mail/admin', { mail: school.email })
       .then(() => {
         enqueueSnackbar('Der Passwort-Reset wurde an die E-Mail gesendet')
       })
@@ -793,6 +795,7 @@ const SchoolDetailView: React.FC = () => {
           />
           <h3>Dokumente:</h3>
           <UserDocuments
+            userDocumentsType={UserDocumentsType.PRIVATE}
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
           />
           <Stack

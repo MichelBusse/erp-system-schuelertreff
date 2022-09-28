@@ -12,6 +12,7 @@ import {
   TextField,
 } from '@mui/material'
 import { useState } from 'react'
+import { UserDocumentsType } from './UserDocuments'
 
 export type UploadDialogForm = {
   fileName: string
@@ -27,6 +28,7 @@ type Props = {
   onSubmit: (form: UploadDialogForm) => void
   file: File
   minimalView?: boolean
+  userDocumentsType?: UserDocumentsType
 }
 
 const UploadDialog: React.FC<Props> = ({
@@ -36,12 +38,13 @@ const UploadDialog: React.FC<Props> = ({
   onSubmit,
   file,
   minimalView = false,
+  userDocumentsType
 }) => {
   const [form, setForm] = useState<UploadDialogForm>({
     fileName: file.name,
     visibleToUser: true,
-    visibleToEverybody: false,
-    protected: false,
+    visibleToEverybody: userDocumentsType === UserDocumentsType.PUBLIC,
+    protected: userDocumentsType === UserDocumentsType.PUBLIC,
   })
 
   const validForm = !!form.fileName
@@ -85,6 +88,7 @@ const UploadDialog: React.FC<Props> = ({
                 control={
                   <Checkbox
                     checked={form.visibleToEverybody}
+                    disabled={userDocumentsType !== undefined}
                     onChange={(e) =>
                       setForm((f) => ({
                         ...f,

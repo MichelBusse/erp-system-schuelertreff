@@ -26,16 +26,23 @@ import { useAuth } from '../AuthProvider'
 import DocumentEditDialog from './DocumentEditDialog'
 import UploadDialog, { UploadDialogForm } from './UploadDialog'
 
+export enum UserDocumentsType {
+  PUBLIC = 'public',
+  PRIVATE = 'private'
+}
+
 type Props = {
   refresh?: number
   userId?: number
   actions?: React.ReactNode
+  userDocumentsType?: UserDocumentsType
 }
 
 const UserDocuments: React.FC<Props> = ({
   userId,
   actions,
   refresh: outsideRefresh,
+  userDocumentsType
 }) => {
   const [documents, setDocuments] = useState<documentType[]>([])
   const [refresh, setRefresh] = useState(0)
@@ -51,7 +58,7 @@ const UserDocuments: React.FC<Props> = ({
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
-    API.get('documents', { params: { by: userId } })
+    API.get('documents', { params: { by: userId, type: userDocumentsType } })
       .then((res) => setDocuments(res.data))
       .catch((err) => {
         console.error(err)
@@ -163,8 +170,7 @@ const UserDocuments: React.FC<Props> = ({
 
     const editDisabled = !(
       hasRole(Role.ADMIN) ||
-      ((userId === undefined || userId === decodeToken().sub) &&
-        doc.mayDelete)
+      ((userId === undefined || userId === decodeToken().sub) && doc.mayDelete)
     )
 
     return (
@@ -175,10 +181,7 @@ const UserDocuments: React.FC<Props> = ({
               <IconButton onClick={() => downloadDoc(doc)}>
                 <DownloadIcon />
               </IconButton>
-              <IconButton
-                disabled={editDisabled}
-                onClick={() => editDoc(doc)}
-              >
+              <IconButton disabled={editDisabled} onClick={() => editDoc(doc)}>
                 <Edit />
               </IconButton>
               <IconButton
@@ -224,17 +227,19 @@ const UserDocuments: React.FC<Props> = ({
       >
         <ListItem>
           <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ width: '100%' }}>
-            <Button variant="text" component="label" endIcon={<AddIcon />}>
-              <input
-                hidden
-                accept="*"
-                type="file"
-                onChange={(e) => {
-                  if (e.target.files) openDialog(e.target.files[0])
-                }}
-              />
-              {'Hinzufügen'}
-            </Button>
+            {(hasRole(Role.ADMIN) || !userId) && (
+              <Button variant="text" component="label" endIcon={<AddIcon />}>
+                <input
+                  hidden
+                  accept="*"
+                  type="file"
+                  onChange={(e) => {
+                    if (e.target.files) openDialog(e.target.files[0])
+                  }}
+                />
+                {'Hinzufügen'}
+              </Button>
+            )}
             {actions}
           </Stack>
         </ListItem>
@@ -249,12 +254,13 @@ const UserDocuments: React.FC<Props> = ({
       </List>
       <UploadDialog
         key={file.name}
+        userDocumentsType={userDocumentsType}
         open={open}
         close={() => setOpen(false)}
         loading={loading}
         onSubmit={uploadDoc}
         file={file}
-        minimalView={typeof userId === 'undefined'}
+        minimalView={!hasRole(Role.ADMIN)}
       />
       <DocumentEditDialog
         open={editDialogOpen}

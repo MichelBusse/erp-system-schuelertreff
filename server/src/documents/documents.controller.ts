@@ -49,12 +49,13 @@ export class DocumentsController {
   async findAllBy(
     @Request() req,
     @Query('by') userId?: string,
+    @Query('type') type?: string,
   ): Promise<Document[]> {
     const id = userId ? Number(userId) : req.user.id
 
     const isAdmin = req.user.role === Role.ADMIN
 
-    return this.documentsService.findAllBy(id, req.user.id, isAdmin)
+    return this.documentsService.findAllBy(id, req.user.id, isAdmin, type)
   }
 
   @Get(':id')
