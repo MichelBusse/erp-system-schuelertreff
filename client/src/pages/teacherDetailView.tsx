@@ -346,7 +346,7 @@ const TeacherDetailView: React.FC = () => {
   }
 
   const resetPassword = () => {
-    API.post('auth/reset/mail', { mail: data.email })
+    API.post('auth/reset/mail/admin', { mail: data.email })
       .then(() => {
         enqueueSnackbar('Der Passwort-Reset wurde an die E-Mail gesendet')
       })

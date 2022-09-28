@@ -180,6 +180,7 @@ export class UsersService {
     return this.usersRepository
       .createQueryBuilder('user')
       .where({ email: email.trim().toLowerCase() })
+      .andWhere({ deleteState: DeleteState.ACTIVE })
       .addSelect(['user.passwordHash', 'user.mayAuthenticate'])
       .getOne()
   }
@@ -361,6 +362,18 @@ export class UsersService {
         timesAvailable: formatTimesAvailable(dto.timesAvailable),
       })
       .then(transformUser)
+  }
+
+  async updateUserMayAuthenticate(
+    id: number,
+    mayAuthenticate: boolean,
+  ): Promise<User> {
+    const user = await this.findOne(id)
+
+    return this.usersRepository.save({
+      ...user,
+      mayAuthenticate: mayAuthenticate,
+    })
   }
 
   async createAdmin(dto: CreateAdminDto): Promise<Admin> {

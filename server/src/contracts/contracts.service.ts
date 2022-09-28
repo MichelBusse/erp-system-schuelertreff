@@ -714,19 +714,42 @@ export class ContractsService {
       .from(Contract, 'c')
       .where(`c."teacherId" = :teacherId`, { teacherId })
       .andWhere(`c.state = :state`, { state: ContractState.ACCEPTED })
-
-    if (endDate !== null)
-      qb.andWhere(`c."startDate" <= :end::date`, { end: endDate })
-
-    qb.andWhere(
-      new Brackets((qb) => {
-        qb.where('c."endDate" IS NULL')
-        qb.orWhere(`c."endDate" >= :start::date`, { start: startDate })
-      }),
-    )
-      .leftJoinAndSelect('c.lessons', 'lesson')
-      .andWhere(`lesson.date >= :start::date`)
-      .andWhere(`lesson.date <= :end::date`)
+      .andWhere(`c."startDate" <= :end::date`, { end: endDate })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('c."endDate" IS NULL')
+          qb.orWhere(`c."endDate" >= :start::date`, { start: startDate })
+        }),
+      )
+      // trick typeorm to map "lessons_" properties to c.lessons
+      .leftJoin('c.lessons', 'lessons', 'false')
+      // get all possible lesson dates for each contract
+      .leftJoinAndMapMany(
+        'c.lessons',
+        (qb) => {
+          // hack: override getQuery method because QueryBuilder does not allow 'generate_series' in FROM
+          qb.getQuery = () => `(
+            select
+              c.id "contractId",
+              lesson "lessons_date",
+              (c.id || ' ' || lesson) "lessons_id"
+            from
+              contract c,
+              generate_series(
+                c."startDate",
+                least(c."endDate", :end::date),
+                (c."interval" || ' week')::interval
+              ) lesson
+            where
+              lesson >= :start::date
+              and c."teacherId" = :teacherId
+          )`
+          return qb
+        },
+        'fakelessons',
+        `"fakelessons"."contractId" = c.id`,
+      )
+      .addSelect('lessons.date')
       .leftJoinAndSelect(
         'c.childContracts',
         'cc',
