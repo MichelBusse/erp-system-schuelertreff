@@ -7,6 +7,7 @@ import {
   Degree,
   LeaveState,
   LeaveType,
+  SchoolState,
   SchoolType,
   TeacherSchoolType,
   TeacherState,
@@ -89,6 +90,11 @@ export const teacherStateToString: { [key in TeacherState]: string } = {
   employed: 'Eingestellt',
 }
 
+export const schoolStateToString: { [key in SchoolState]: string } = {
+  created: 'Registriert',
+  confirmed: 'Bestätigt',
+}
+
 export const leaveTypeToString: { [key in LeaveType]: string } = {
   regular: 'Urlaub',
   sick: 'Krankmeldung',
@@ -140,6 +146,7 @@ export const defaultSchoolFormData: schoolForm = {
   feeOnline: 20,
   notes: '',
   dateOfStart: null,
+  schoolState: SchoolState.CREATED
 }
 
 export const defaultClassCustomerFormData: classCustomerForm = {

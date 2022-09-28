@@ -1,7 +1,7 @@
 import { Dayjs } from 'dayjs'
 
 import { CustomerType } from '../components/ContractDialog'
-import { ContractType, DeleteState, SchoolType, TeacherState } from './enums'
+import { ContractType, DeleteState, SchoolState, SchoolType, TeacherState } from './enums'
 import { LessonState } from './lesson'
 import subject from './subject'
 import timeAvailable from './timeAvailable'
@@ -70,6 +70,7 @@ export interface schoolForm extends Omit<userForm, 'timesAvailable'> {
   feeOnline: number
   notes: string
   dateOfStart: Dayjs | null
+  schoolState: SchoolState
 }
 export interface schoolFormErrorTexts extends userFormErrorTexts {
   schoolName: string

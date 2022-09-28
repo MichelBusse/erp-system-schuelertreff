@@ -4,9 +4,21 @@ import { Role } from 'src/auth/role.enum'
 
 import { SchoolType, User } from './user.entity'
 
+export enum SchoolState {
+  CREATED = 'created',
+  CONFIRMED = 'confirmed',
+}
+
 @ChildEntity()
 export class School extends User {
   role = Role.SCHOOL
+
+  @Column({
+    type: 'enum',
+    default: SchoolState.CREATED,
+    enum: SchoolState,
+  })
+  schoolState: SchoolState
 
   @Column()
   schoolName: string

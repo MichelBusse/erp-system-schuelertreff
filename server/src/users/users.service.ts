@@ -52,6 +52,7 @@ import {
 import { Leave, LeaveState } from './entities/leave.entity'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
+import { SchoolState } from './entities/school.entity'
 
 require('dayjs/locale/de')
 
@@ -966,7 +967,7 @@ export class UsersService {
   async createSchool(dto: CreateSchoolDto): Promise<School> {
     const school = this.schoolsRepository.create({
       ...dto,
-      mayAuthenticate: true,
+      mayAuthenticate: false
     })
 
     return this.schoolsRepository.save(school)
@@ -976,7 +977,7 @@ export class UsersService {
     id: number,
     dto: Partial<UpdateSchoolDto>,
   ): Promise<School> {
-    const school = await this.findOne(id)
+    const school = await this.findOneSchool(id)
 
     const updatedSchool = {
       ...school,
@@ -984,7 +985,17 @@ export class UsersService {
       timesAvailable: `{${maxTimeRange}}`,
     }
 
-    if (school.email !== updatedSchool.email) {
+    if (
+      school.schoolState !== SchoolState.CONFIRMED &&
+      updatedSchool.schoolState === SchoolState.CONFIRMED
+    ) {
+      updatedSchool.mayAuthenticate = true
+
+      this.authService.initReset(school)
+    }
+
+
+    if (school.email !== updatedSchool.email && school.mayAuthenticate) {
       this.authService.initReset(school)
     }
 

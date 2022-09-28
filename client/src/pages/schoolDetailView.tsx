@@ -46,12 +46,13 @@ import IconButtonAdornment from '../components/IconButtonAdornment'
 import {
   defaultClassCustomerFormData,
   defaultSchoolFormData,
+  schoolStateToString,
   snackbarOptions,
   snackbarOptionsError,
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { contractWithTeacher } from '../types/contract'
-import { DeleteState, SchoolType } from '../types/enums'
+import { DeleteState, SchoolState, SchoolType } from '../types/enums'
 import {
   classCustomerForm,
   schoolForm,
@@ -103,25 +104,30 @@ const SchoolDetailView: React.FC = () => {
 
   useEffect(() => {
     API.get('users/school/' + requestedId).then((res) => {
-      setSchool((data) => ({
-        ...data,
-        firstName: res.data.firstName ?? '',
-        lastName: res.data.lastName ?? '',
-        schoolName: res.data.schoolName ?? '',
-        city: res.data.city ?? '',
-        postalCode: res.data.postalCode ?? '',
-        street: res.data.street ?? '',
-        email: res.data.email ?? '',
-        phone: res.data.phone ?? '',
-        schoolTypes: res.data.schoolTypes ?? [],
-        feeStandard: res.data.feeStandard,
-        feeOnline: res.data.feeOnline,
-        notes: res.data.notes ?? '',
-        dateOfStart: res.data.dateOfStart ? dayjs(res.data.dateOfStart) : null,
-        deleteState: res.data.deleteState as DeleteState,
-      }))
+      updateSchool(res.data)
     })
   }, [])
+
+  const updateSchool = (newData: any) => {
+    setSchool((data) => ({
+      ...data,
+      firstName: newData.firstName ?? '',
+      lastName: newData.lastName ?? '',
+      schoolName: newData.schoolName ?? '',
+      city: newData.city ?? '',
+      postalCode: newData.postalCode ?? '',
+      street: newData.street ?? '',
+      email: newData.email ?? '',
+      phone: newData.phone ?? '',
+      schoolTypes: newData.schoolTypes ?? [],
+      feeStandard: newData.feeStandard,
+      feeOnline: newData.feeOnline,
+      notes: newData.notes ?? '',
+      dateOfStart: newData.dateOfStart ? dayjs(newData.dateOfStart) : null,
+      deleteState: newData.deleteState as DeleteState,
+      schoolState: newData.schoolState as SchoolState,
+    }))
+  }
 
   useEffect(() => {
     API.get('users/classCustomer/' + requestedId).then((res) => {
@@ -156,18 +162,20 @@ const SchoolDetailView: React.FC = () => {
     })
   }, [])
 
-  const submitForm = () => {
+  const submitForm = (override: Partial<schoolForm> = {}) => {
     const errorTexts = schoolFormValidation(school)
 
     if (errorTexts.valid) {
       API.post('users/school/' + requestedId, {
         ...school,
+        ...override,
         firstName: school.firstName !== '' ? school.firstName : undefined,
         lastName: school.lastName !== '' ? school.lastName : undefined,
         dateOfStart: school.dateOfStart?.format(),
       })
-        .then(() => {
+        .then((res) => {
           enqueueSnackbar(school.schoolName + ' gespeichert')
+          updateSchool(res.data)
         })
         .catch(() => {
           enqueueSnackbar('Fehler beim Speichern der Schuldaten')
@@ -647,132 +655,139 @@ const SchoolDetailView: React.FC = () => {
               />
             </>
           )}
-          <Stack direction={'row'} columnGap={2}>
-            <h3>Klassen:</h3>
-            {school.deleteState !== DeleteState.DELETED && (
-              <IconButton
-                sx={{ marginLeft: 'auto' }}
-                onClick={() => {
-                  if (school.schoolTypes.length > 0) {
-                    newClassCustomer.schoolType = school
-                      .schoolTypes[0] as SchoolType
-                  }
-                  setAddClassDialogOpen(true)
+          {id && (
+            <Stack direction={'row'} columnGap={2}>
+              <h3>Klassen:</h3>
+              {school.deleteState !== DeleteState.DELETED && (
+                <IconButton
+                  sx={{ marginLeft: 'auto' }}
+                  onClick={() => {
+                    if (school.schoolTypes.length > 0) {
+                      newClassCustomer.schoolType = school
+                        .schoolTypes[0] as SchoolType
+                    }
+                    setAddClassDialogOpen(true)
+                  }}
+                >
+                  <AddCircleIcon fontSize="large" color="primary" />
+                </IconButton>
+              )}
+            </Stack>
+          )}
+          {id &&
+            classCustomers.map((classCustomer, index) => (
+              <Accordion
+                key={classCustomer.id}
+                sx={{
+                  border: '1px solid rgba(0, 0, 0, 0.23)',
+                  boxShadow: 'none',
+                  transition: 'none',
+                  borderRadius: '4px',
+                  margin: '4px 0',
                 }}
               >
-                <AddCircleIcon fontSize="large" color="primary" />
-              </IconButton>
-            )}
-          </Stack>
-          {classCustomers.map((classCustomer, index) => (
-            <Accordion
-              key={classCustomer.id}
-              sx={{
-                border: '1px solid rgba(0, 0, 0, 0.23)',
-                boxShadow: 'none',
-                transition: 'none',
-                borderRadius: '4px',
-                margin: '4px 0',
-              }}
-            >
-              <AccordionSummary
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-                sx={{ alignItems: 'center' }}
-              >
-                <Stack
-                  direction={'row'}
-                  sx={{ width: '100%' }}
-                  columnGap={2}
-                  alignItems={'center'}
+                <AccordionSummary
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                  sx={{ alignItems: 'center' }}
                 >
-                  <Typography sx={{ width: '10em' }}>
-                    {classCustomer.className}
-                  </Typography>
-                  <IconButton
-                    onClick={() => deleteClass(index)}
-                    sx={{ marginLeft: 'auto' }}
-                    color="error"
+                  <Stack
+                    direction={'row'}
+                    sx={{ width: '100%' }}
+                    columnGap={2}
+                    alignItems={'center'}
                   >
-                    <DeleteIcon />
-                  </IconButton>
-                </Stack>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Box>
-                  <Stack direction={'column'} rowGap={2}>
-                    <Stack direction={'row'} columnGap={2}>
-                      <TextField
-                        fullWidth
-                        value={classCustomer.className ?? ''}
-                        label={'Klassenname'}
-                        onChange={(e) =>
-                          editClassCustomer(
-                            { className: e.target.value },
-                            index,
-                          )
-                        }
-                      />
-                    </Stack>
-                    <Stack direction={'row'} columnGap={2}>
-                      <FormControl fullWidth>
-                        <InputLabel id="invoiceMonthLabel">Schulart</InputLabel>
-                        <Select
-                          label={'Schulart'}
+                    <Typography sx={{ width: '10em' }}>
+                      {classCustomer.className}
+                    </Typography>
+                    <IconButton
+                      onClick={() => deleteClass(index)}
+                      sx={{ marginLeft: 'auto' }}
+                      color="error"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Stack>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box>
+                    <Stack direction={'column'} rowGap={2}>
+                      <Stack direction={'row'} columnGap={2}>
+                        <TextField
                           fullWidth
-                          value={classCustomer.schoolType ?? ''}
+                          value={classCustomer.className ?? ''}
+                          label={'Klassenname'}
+                          onChange={(e) =>
+                            editClassCustomer(
+                              { className: e.target.value },
+                              index,
+                            )
+                          }
+                        />
+                      </Stack>
+                      <Stack direction={'row'} columnGap={2}>
+                        <FormControl fullWidth>
+                          <InputLabel id="invoiceMonthLabel">
+                            Schulart
+                          </InputLabel>
+                          <Select
+                            label={'Schulart'}
+                            fullWidth
+                            value={classCustomer.schoolType ?? ''}
+                            onChange={(e) => {
+                              editClassCustomer(
+                                { schoolType: e.target.value as SchoolType },
+                                index,
+                              )
+                            }}
+                          >
+                            <MenuItem value={SchoolType.GRUNDSCHULE}>
+                              Grundschule
+                            </MenuItem>
+                            <MenuItem value={SchoolType.OBERSCHULE}>
+                              Oberschule
+                            </MenuItem>
+                            <MenuItem value={SchoolType.GYMNASIUM}>
+                              Gymnasium
+                            </MenuItem>
+                            <MenuItem value={SchoolType.ANDERE}>
+                              Andere
+                            </MenuItem>
+                          </Select>
+                        </FormControl>
+                        <TextField
+                          type="number"
+                          label={'Klassenstufe'}
+                          InputProps={{ inputProps: { min: 0, max: 13 } }}
+                          fullWidth
+                          value={classCustomer.grade ?? ''}
                           onChange={(e) => {
                             editClassCustomer(
-                              { schoolType: e.target.value as SchoolType },
+                              { grade: Number(e.target.value) },
                               index,
                             )
                           }}
-                        >
-                          <MenuItem value={SchoolType.GRUNDSCHULE}>
-                            Grundschule
-                          </MenuItem>
-                          <MenuItem value={SchoolType.OBERSCHULE}>
-                            Oberschule
-                          </MenuItem>
-                          <MenuItem value={SchoolType.GYMNASIUM}>
-                            Gymnasium
-                          </MenuItem>
-                          <MenuItem value={SchoolType.ANDERE}>Andere</MenuItem>
-                        </Select>
-                      </FormControl>
-                      <TextField
-                        type="number"
-                        label={'Klassenstufe'}
-                        InputProps={{ inputProps: { min: 0, max: 13 } }}
-                        fullWidth
-                        value={classCustomer.grade ?? ''}
-                        onChange={(e) => {
-                          editClassCustomer(
-                            { grade: Number(e.target.value) },
-                            index,
-                          )
-                        }}
+                        />
+                      </Stack>
+                      <AddTimes
+                        value={classCustomer.timesAvailable ?? []}
+                        setValue={(newValue) =>
+                          editClassCustomer({ timesAvailable: newValue }, index)
+                        }
                       />
+                      <Stack direction={'row'}>
+                        <Button
+                          variant="contained"
+                          onClick={() => saveClassCustomer(index)}
+                        >
+                          Klasse Speichern
+                        </Button>
+                      </Stack>
                     </Stack>
-                    <AddTimes
-                      value={classCustomer.timesAvailable ?? []}
-                      setValue={(newValue) =>
-                        editClassCustomer({ timesAvailable: newValue }, index)
-                      }
-                    />
-                    <Stack direction={'row'}>
-                      <Button
-                        variant="contained"
-                        onClick={() => saveClassCustomer(index)}
-                      >
-                        Klasse Speichern
-                      </Button>
-                    </Stack>
-                  </Stack>
-                </Box>
-              </AccordionDetails>
-            </Accordion>
-          ))}
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+            ))}
           <Stack direction={'row'} columnGap={2}>
             <h3>Einsätze:</h3>
             {id && school.deleteState !== DeleteState.DELETED && (
@@ -798,6 +813,11 @@ const SchoolDetailView: React.FC = () => {
             userDocumentsType={UserDocumentsType.PRIVATE}
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
           />
+          {id && (
+            <Typography>
+              Status: {schoolStateToString[school.schoolState]}
+            </Typography>
+          )}
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={2}
@@ -808,7 +828,7 @@ const SchoolDetailView: React.FC = () => {
                 Zurück
               </Button>
             )}
-            <Button onClick={submitForm} variant="contained">
+            <Button onClick={() => submitForm()} variant="contained">
               Schule Speichern
             </Button>
             {id && school.deleteState === DeleteState.DELETED && (
@@ -832,11 +852,26 @@ const SchoolDetailView: React.FC = () => {
                   : 'Schule archivieren'}
               </Button>
             )}
-            {id && school.deleteState === DeleteState.ACTIVE && (
-              <Button variant="outlined" onClick={() => resetPassword()}>
-                Passwort-Reset
-              </Button>
-            )}
+            {id &&
+              school.schoolState === SchoolState.CREATED &&
+              school.deleteState === DeleteState.ACTIVE && (
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() =>
+                    submitForm({ schoolState: SchoolState.CONFIRMED })
+                  }
+                >
+                  Bestätigen
+                </Button>
+              )}
+            {id &&
+              school.deleteState === DeleteState.ACTIVE &&
+              school.schoolState === SchoolState.CONFIRMED && (
+                <Button variant="outlined" onClick={() => resetPassword()}>
+                  Passwort-Reset
+                </Button>
+              )}
           </Stack>
           {id && (
             <>

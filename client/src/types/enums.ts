@@ -6,6 +6,11 @@ export enum TeacherState {
   EMPLOYED = 'employed',
 }
 
+export enum SchoolState {
+  CREATED = 'created',
+  CONFIRMED = 'confirmed',
+}
+
 export enum Degree {
   NOINFO = 'noinfo',
   HIGHSCHOOL = 'highschool',

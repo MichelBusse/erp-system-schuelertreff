@@ -67,7 +67,7 @@ export abstract class User {
   @Column({ select: false, nullable: true })
   passwordHash?: string
 
-  @Column({ select: false })
+  @Column({ select: false, default: false })
   mayAuthenticate: boolean
 
   @Column({
