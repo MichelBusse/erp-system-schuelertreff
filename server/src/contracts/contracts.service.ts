@@ -134,6 +134,7 @@ export class ContractsService {
         contractState: ContractState.PENDING,
       })
       .andWhere('c.teacherId = :teacherId', { teacherId: teacherId })
+      .andWhere('(c.endDate IS NULL OR c.endDate <= now())')
 
     return contracts.getMany()
   }
