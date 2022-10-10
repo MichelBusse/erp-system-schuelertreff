@@ -16,30 +16,29 @@ const PendingContracts: CockpitComponent = ({ listSx }) => {
 
   useEffect(() => {
     API.get('contracts/pending').then((res) => {
-      const pendingContracts : contractWithTeacher[] = res.data;
+      const pendingContracts: contractWithTeacher[] = res.data
 
-      pendingContracts.sort((a,b) => {
-
+      pendingContracts.sort((a, b) => {
         // Past contracts at top
         // Declined contracts next
 
-        if(dayjs(a.endDate).isBefore(dayjs())){
-          if(dayjs(b.endDate).isBefore(dayjs())){
-            if(a.state === ContractState.DECLINED) return -1;
-            if(b.state === ContractState.DECLINED) return 1;
-          }else{
-            return -1;
+        if (dayjs(a.endDate).isBefore(dayjs())) {
+          if (dayjs(b.endDate).isBefore(dayjs())) {
+            if (a.state === ContractState.DECLINED) return -1
+            if (b.state === ContractState.DECLINED) return 1
+          } else {
+            return -1
           }
-        }else{
-          if(dayjs(b.endDate).isBefore(dayjs())){
-            return 1;
-          }else{
-            if(a.state === ContractState.DECLINED) return -1;
-            if(b.state === ContractState.DECLINED) return 1;
+        } else {
+          if (dayjs(b.endDate).isBefore(dayjs())) {
+            return 1
+          } else {
+            if (a.state === ContractState.DECLINED) return -1
+            if (b.state === ContractState.DECLINED) return 1
           }
         }
 
-        return 0;
+        return 0
       })
 
       setPendingContracts(res.data)
