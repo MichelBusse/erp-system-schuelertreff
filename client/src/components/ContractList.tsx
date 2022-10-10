@@ -119,7 +119,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
             secondaryAction={
               <Box>
                 {(!contract.endDate ||
-                  dayjs(contract.endDate).isAfter(dayjs())) && (
+                  dayjs(contract.endDate).isAfter(dayjs()) || contract.state !== ContractState.ACCEPTED) && (
                   <>
                     <IconButton onClick={() => editContract(contract)}>
                       <Edit />
