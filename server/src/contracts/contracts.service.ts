@@ -282,7 +282,6 @@ export class ContractsService {
     }
   }
 
-
   async acceptOrDeclineContract(
     id: number,
     dto: AcceptOrDeclineContractDto,
