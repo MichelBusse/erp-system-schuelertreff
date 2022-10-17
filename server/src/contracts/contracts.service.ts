@@ -282,28 +282,6 @@ export class ContractsService {
     }
   }
 
-  async updateContract(id: number, dto: CreateContractDto): Promise<void> {
-    let contract: any = await this.contractsRepository.findOneBy({ id })
-
-    contract = {
-      ...contract,
-      ...dto,
-      subject: { id: dto.subject },
-      teacher:
-        dto.teacher !== 'later'
-          ? await this.usersService
-              .findOneTeacher(Number(dto.teacher))
-              .then((c) => ({ id: c.id }))
-          : null,
-      customers: await Promise.all(
-        dto.customers.map((id) =>
-          this.usersService.findOneCustomer(id).then((c) => ({ id: c.id })),
-        ),
-      ),
-    }
-
-    await this.contractsRepository.save(contract)
-  }
 
   async acceptOrDeclineContract(
     id: number,

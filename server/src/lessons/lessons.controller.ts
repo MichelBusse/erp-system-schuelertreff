@@ -45,7 +45,8 @@ export class LessonsController {
 
   @Get('week')
   @Roles(Role.ADMIN)
-  getWeek(@Query('of') date: string) {
+  getWeek(@Query('of') date: string) {    
+
     return this.lessonsService.findByWeek(dayjs(date))
   }
 
