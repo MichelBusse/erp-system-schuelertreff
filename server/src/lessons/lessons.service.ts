@@ -451,7 +451,7 @@ export class LessonsService {
     if (customerId) {
       customer = await this.usersService.findOneCustomer(customerId)
     } else if (schoolId) {
-      customer = await this.usersService.findOneSchool(customerId)
+      customer = await this.usersService.findOneSchool(schoolId)
     }
 
     const lessons = await this.findInvoiceReadyByMonth({
