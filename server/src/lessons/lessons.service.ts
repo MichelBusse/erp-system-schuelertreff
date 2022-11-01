@@ -25,6 +25,7 @@ import { UsersService } from 'src/users/users.service'
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Invoice } from './invoice.entity'
 import { Lesson, LessonState } from './lesson.entity'
+import { ClassCustomer } from 'src/users/entities'
 
 require('dayjs/locale/de')
 
@@ -478,11 +479,28 @@ export class LessonsService {
     const subjectCounts = new Map()
 
     for (const lesson of lessons) {
-      const name =
-        lesson.contract.subject.name +
-        (lesson.contract.contractType === 'standard'
-          ? ' (Präsenz)'
-          : ' (Online)')
+      const customers = lesson.contract.customers;
+      
+      let name = '';
+      if(customers[0].role === Role.PRIVATECUSTOMER){
+        name =
+          lesson.contract.subject.name +
+          (lesson.contract.contractType === 'standard'
+            ? ' (Präsenz)'
+            : ' (Online)')
+      }else if (customers[0].role === Role.CLASSCUSTOMER){
+        const schoolName = (customers[0] as ClassCustomer).school.schoolName
+        const classNames = customers.map((c) => (c as ClassCustomer).className).join(', ');
+
+        name =
+          schoolName + ' (' +
+          classNames + ') ' +
+          lesson.contract.subject.name +
+          (lesson.contract.contractType === 'standard'
+            ? ' (Präsenz)'
+            : ' (Online)')
+      }
+
       const duration =
         (dayjs(lesson.contract.endTime, 'HH:mm').diff(
           dayjs(lesson.contract.startTime, 'HH:mm'),
