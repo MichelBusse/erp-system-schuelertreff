@@ -19,6 +19,7 @@ import {
 } from 'src/contracts/contract.entity'
 import { ContractsService } from 'src/contracts/contracts.service'
 import { getNextDow, maxDate, minDate } from 'src/date'
+import { ClassCustomer } from 'src/users/entities'
 import { Leave, LeaveState } from 'src/users/entities/leave.entity'
 import { UsersService } from 'src/users/users.service'
 
@@ -451,7 +452,7 @@ export class LessonsService {
     if (customerId) {
       customer = await this.usersService.findOneCustomer(customerId)
     } else if (schoolId) {
-      customer = await this.usersService.findOneSchool(customerId)
+      customer = await this.usersService.findOneSchool(schoolId)
     }
 
     const lessons = await this.findInvoiceReadyByMonth({
@@ -478,11 +479,32 @@ export class LessonsService {
     const subjectCounts = new Map()
 
     for (const lesson of lessons) {
-      const name =
-        lesson.contract.subject.name +
-        (lesson.contract.contractType === 'standard'
-          ? ' (Präsenz)'
-          : ' (Online)')
+      const customers = lesson.contract.customers
+
+      let name = ''
+      if (customers[0].role === Role.PRIVATECUSTOMER) {
+        name =
+          lesson.contract.subject.name +
+          (lesson.contract.contractType === 'standard'
+            ? ' (Präsenz)'
+            : ' (Online)')
+      } else if (customers[0].role === Role.CLASSCUSTOMER) {
+        const schoolName = (customers[0] as ClassCustomer).school.schoolName
+        const classNames = customers
+          .map((c) => (c as ClassCustomer).className)
+          .join(', ')
+
+        name =
+          schoolName +
+          ' (' +
+          classNames +
+          ') ' +
+          lesson.contract.subject.name +
+          (lesson.contract.contractType === 'standard'
+            ? ' (Präsenz)'
+            : ' (Online)')
+      }
+
       const duration =
         (dayjs(lesson.contract.endTime, 'HH:mm').diff(
           dayjs(lesson.contract.startTime, 'HH:mm'),
