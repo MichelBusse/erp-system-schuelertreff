@@ -19,13 +19,13 @@ import {
 } from 'src/contracts/contract.entity'
 import { ContractsService } from 'src/contracts/contracts.service'
 import { getNextDow, maxDate, minDate } from 'src/date'
+import { ClassCustomer } from 'src/users/entities'
 import { Leave, LeaveState } from 'src/users/entities/leave.entity'
 import { UsersService } from 'src/users/users.service'
 
 import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Invoice } from './invoice.entity'
 import { Lesson, LessonState } from './lesson.entity'
-import { ClassCustomer } from 'src/users/entities'
 
 require('dayjs/locale/de')
 
@@ -479,22 +479,26 @@ export class LessonsService {
     const subjectCounts = new Map()
 
     for (const lesson of lessons) {
-      const customers = lesson.contract.customers;
-      
-      let name = '';
-      if(customers[0].role === Role.PRIVATECUSTOMER){
+      const customers = lesson.contract.customers
+
+      let name = ''
+      if (customers[0].role === Role.PRIVATECUSTOMER) {
         name =
           lesson.contract.subject.name +
           (lesson.contract.contractType === 'standard'
             ? ' (Präsenz)'
             : ' (Online)')
-      }else if (customers[0].role === Role.CLASSCUSTOMER){
+      } else if (customers[0].role === Role.CLASSCUSTOMER) {
         const schoolName = (customers[0] as ClassCustomer).school.schoolName
-        const classNames = customers.map((c) => (c as ClassCustomer).className).join(', ');
+        const classNames = customers
+          .map((c) => (c as ClassCustomer).className)
+          .join(', ')
 
         name =
-          schoolName + ' (' +
-          classNames + ') ' +
+          schoolName +
+          ' (' +
+          classNames +
+          ') ' +
           lesson.contract.subject.name +
           (lesson.contract.contractType === 'standard'
             ? ' (Präsenz)'
