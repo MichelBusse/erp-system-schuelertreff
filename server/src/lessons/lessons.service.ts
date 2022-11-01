@@ -327,13 +327,26 @@ export class LessonsService {
     let totalHours = 0
 
     lessons.forEach((lesson) => {
+      const customers = lesson.contract.customers
+      let name = lesson.contract.subject.name
+
+      if (customers[0].role === Role.CLASSCUSTOMER) {
+        const schoolName = (customers[0] as ClassCustomer).school.schoolName
+        const classNames = customers
+          .map((c) => (c as ClassCustomer).className)
+          .join(', ')
+
+        name =
+          schoolName + ' (' + classNames + ') ' + lesson.contract.subject.name
+      }
+
       const duration =
         dayjs(lesson.contract.endTime, 'HH:mm').diff(
           dayjs(lesson.contract.startTime, 'HH:mm'),
           'minute',
         ) / 60
       rows.push({
-        subject: lesson.contract.subject.name,
+        subject: name,
         duration: duration.toFixed(2).replace('.', ','),
         date: dayjs(lesson.date).format('DD.MM.YYYY'),
         notes: lesson.notes,
@@ -479,31 +492,11 @@ export class LessonsService {
     const subjectCounts = new Map()
 
     for (const lesson of lessons) {
-      const customers = lesson.contract.customers
-
-      let name = ''
-      if (customers[0].role === Role.PRIVATECUSTOMER) {
-        name =
-          lesson.contract.subject.name +
-          (lesson.contract.contractType === 'standard'
-            ? ' (Präsenz)'
-            : ' (Online)')
-      } else if (customers[0].role === Role.CLASSCUSTOMER) {
-        const schoolName = (customers[0] as ClassCustomer).school.schoolName
-        const classNames = customers
-          .map((c) => (c as ClassCustomer).className)
-          .join(', ')
-
-        name =
-          schoolName +
-          ' (' +
-          classNames +
-          ') ' +
-          lesson.contract.subject.name +
-          (lesson.contract.contractType === 'standard'
-            ? ' (Präsenz)'
-            : ' (Online)')
-      }
+      const name =
+        lesson.contract.subject.name +
+        (lesson.contract.contractType === 'standard'
+          ? ' (Präsenz)'
+          : ' (Online)')
 
       const duration =
         (dayjs(lesson.contract.endTime, 'HH:mm').diff(
