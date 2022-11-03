@@ -137,9 +137,7 @@ export class ContractsController {
 
   @Delete(':id')
   @Roles(Role.ADMIN)
-  delete(
-    @Param('id') id: number,
-  ): Promise<void> {
+  delete(@Param('id') id: number): Promise<void> {
     return this.contractsService.deleteContract(id)
   }
 }

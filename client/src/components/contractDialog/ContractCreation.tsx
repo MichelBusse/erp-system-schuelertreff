@@ -14,7 +14,6 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
 import { leaveTypeToString, snackbarOptionsError } from '../../consts'
-import { contractWithTeacher } from '../../types/contract'
 import { TeacherState } from '../../types/enums'
 import { ContractCreationForm } from '../../types/form'
 import subject from '../../types/subject'
@@ -46,7 +45,6 @@ type Props = {
   maxEndDate: Dayjs | null
   initialStartTime: Dayjs | null
   initialEndTime: Dayjs | null
-  initialContract?: contractWithTeacher
 }
 
 const ContractCreation: React.FC<Props> = ({
@@ -59,7 +57,6 @@ const ContractCreation: React.FC<Props> = ({
   maxEndDate,
   initialStartTime,
   initialEndTime,
-  initialContract,
 }) => {
   const [teachers, setTeachers] = useState<teacher[]>([])
 
