@@ -9,8 +9,9 @@ import dayjs, { Dayjs } from 'dayjs'
 import { Brackets, DataSource, Repository } from 'typeorm'
 
 import { LessonsService } from 'src/lessons/lessons.service'
+import { SubjectsService } from 'src/subjects/subjects.service'
 import { timeAvailable } from 'src/users/dto/timeAvailable'
-import { Customer, Teacher, User } from 'src/users/entities'
+import { Customer, User } from 'src/users/entities'
 import { SchoolType, TeacherSchoolType } from 'src/users/entities/user.entity'
 import { parseMultirange, UsersService } from 'src/users/users.service'
 
@@ -18,7 +19,6 @@ import { Contract, ContractState } from './contract.entity'
 import { AcceptOrDeclineContractDto } from './dto/accept-or-decline-contract-dto'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
-import { SubjectsService } from 'src/subjects/subjects.service'
 
 @Injectable()
 export class ContractsService {
@@ -50,12 +50,13 @@ export class ContractsService {
         where: { id: dto.initialContractId },
         relations: ['teacher', 'customers'],
       })
-      
 
       if (
         dayjs(dto.startDate).isSame(dayjs(initialContract.startDate), 'day') &&
         dto.interval == initialContract.interval &&
-        ((dto.teacher === 'later' && !initialContract.teacher) || (initialContract.teacher && Number(dto.teacher) === initialContract.teacher.id)) &&
+        ((dto.teacher === 'later' && !initialContract.teacher) ||
+          (initialContract.teacher &&
+            Number(dto.teacher) === initialContract.teacher.id)) &&
         this.usersService.checkCustomersEqual(
           initialContract.customers,
           dto.customers,

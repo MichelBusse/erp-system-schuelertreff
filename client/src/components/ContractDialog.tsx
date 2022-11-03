@@ -341,7 +341,6 @@ const ContractDialog: React.FC<Props> = ({
           maxEndDate={form0.endDate}
           initialStartTime={form0.startTime}
           initialEndTime={form0.endTime}
-          initialContract={initialContract}
         />
       ),
       actions: (

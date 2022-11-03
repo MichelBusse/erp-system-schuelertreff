@@ -126,7 +126,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
                       <Edit />
                     </IconButton>
                     <IconButton onClick={() => deleteContract(contract.id)}>
-                      <Delete color={'error'}/>
+                      <Delete color={'error'} />
                     </IconButton>
                   </>
                 )}
