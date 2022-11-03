@@ -332,6 +332,8 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
                 subject={data.contract.subject}
                 minStartDate={data.minStartDate}
                 maxEndDate={data.maxEndDate}
+                initialStartTime={null}
+                initialEndTime={null}
               />
             )}
           </Box>
