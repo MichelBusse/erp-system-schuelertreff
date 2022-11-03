@@ -60,6 +60,7 @@ const PendingContracts: CockpitComponent = ({ listSx }) => {
             contracts={pendingContracts}
             setContracts={setPendingContracts}
             onSuccess={() => setRefresh((r) => r + 1)}
+            allowTogglePast={true}
             sx={listSx}
           />
         </Stack>

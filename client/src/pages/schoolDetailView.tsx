@@ -768,6 +768,7 @@ const SchoolDetailView: React.FC = () => {
           </Stack>
           <ContractList
             contracts={contracts}
+            allowTogglePast={true}
             setContracts={setContracts}
             onSuccess={() => setRefreshContracts((r) => r + 1)}
           />
