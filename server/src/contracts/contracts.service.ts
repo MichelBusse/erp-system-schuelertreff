@@ -40,8 +40,6 @@ export class ContractsService {
   ) {}
 
   async createOrUpdate(dto: CreateContractDto): Promise<Contract> {
-    console.log(dto)
-
     if (dto.customers.length === 0 && !dto.schoolId)
       throw new BadRequestException('Customers should not be empty')
 
@@ -161,6 +159,9 @@ export class ContractsService {
       .where('c.state != :contractState', {
         contractState: ContractState.ACCEPTED,
       })
+      .orderBy('extract(dow from c.startDate)', 'ASC')
+      .addOrderBy('c.startTime', 'ASC')
+      .addOrderBy('c.startDate', 'ASC')
 
     return contracts.getMany()
   }
@@ -179,6 +180,9 @@ export class ContractsService {
       })
       .andWhere('c.teacherId = :teacherId', { teacherId: teacherId })
       .andWhere('(c.endDate IS NULL OR c.endDate <= now())')
+      .orderBy('extract(dow from c.startDate)', 'ASC')
+      .addOrderBy('c.startTime', 'ASC')
+      .addOrderBy('c.startDate', 'ASC')
 
     return contracts.getMany()
   }
@@ -208,9 +212,9 @@ export class ContractsService {
       .where('customer.school IS NOT NULL AND customer.school.id = :schoolId', {
         schoolId: schoolId,
       })
-      .andWhere('(c.endDate IS NULL OR c.endDate > now())')
-      .orderBy('c.startDate', 'ASC')
+      .orderBy('extract(dow from c.startDate)', 'ASC')
       .addOrderBy('c.startTime', 'ASC')
+      .addOrderBy('c.startDate', 'ASC')
 
     return contracts.getMany()
   }
@@ -227,9 +231,9 @@ export class ContractsService {
       .where('customer.id = :privateCustomerId', {
         privateCustomerId: privateCustomerId,
       })
-      .andWhere('(c.endDate IS NULL OR c.endDate > now())')
-      .orderBy('c.startDate', 'ASC')
+      .orderBy('extract(dow from c.startDate)', 'ASC')
       .addOrderBy('c.startTime', 'ASC')
+      .addOrderBy('c.startDate', 'ASC')
 
     return contracts.getMany()
   }
@@ -245,8 +249,9 @@ export class ContractsService {
       .leftJoinAndSelect('c.teacher', 't')
       .where('id IS NOT NULL AND t.id = :teacherId', { teacherId: teacherId })
       .andWhere('(c.endDate IS NULL OR c.endDate > now())')
-      .orderBy('c.startDate', 'ASC')
+      .orderBy('extract(dow from c.startDate)', 'ASC')
       .addOrderBy('c.startTime', 'ASC')
+      .addOrderBy('c.startDate', 'ASC')
 
     return contracts.getMany()
   }
@@ -277,8 +282,9 @@ export class ContractsService {
           })
         }),
       )
-      .orderBy('c.startDate', 'ASC')
+      .orderBy('extract(dow from c.startDate)', 'ASC')
       .addOrderBy('c.startTime', 'ASC')
+      .addOrderBy('c.startDate', 'ASC')
 
     return contracts.getMany()
   }
@@ -293,9 +299,9 @@ export class ContractsService {
       .leftJoin('customer.school', 'school')
       .leftJoinAndSelect('c.teacher', 't')
       .where('c.teacher IS NULL')
-      .andWhere('c.endDate > now()')
-      .orderBy('c.startDate', 'ASC')
+      .orderBy('extract(dow from c.startDate)', 'ASC')
       .addOrderBy('c.startTime', 'ASC')
+      .addOrderBy('c.startDate', 'ASC')
 
     return contracts.getMany()
   }
