@@ -57,8 +57,8 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
     setConfirmationDialogProps({
       open: true,
       setProps: setConfirmationDialogProps,
-      title: 'Einsatz wirklich beenden?',
-      text: 'Möchtest du den Einsatz wirklich beenden?',
+      title: 'Einsatz wirklich löschen?',
+      text: 'Es werden auch alle gehaltenen Stunden gelöscht und dieser Vorgang kann nicht mehr rückgängig gemacht werden.',
       action: () => {
         API.delete('contracts/' + contractId)
           .then(() => {
@@ -69,7 +69,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
               }
               return newContracts
             })
-            enqueueSnackbar('Einsatz beendet', snackbarOptions)
+            enqueueSnackbar('Einsatz gelöscht', snackbarOptions)
           })
           .catch((error) => {
             if (axios.isAxiosError(error) && error.response?.status === 400) {
@@ -126,7 +126,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
                       <Edit />
                     </IconButton>
                     <IconButton onClick={() => deleteContract(contract.id)}>
-                      <Delete />
+                      <Delete color={'error'}/>
                     </IconButton>
                   </>
                 )}

@@ -127,11 +127,11 @@ const ContractEditDialog: React.FC<Props> = ({
     setConfirmationDialogProps({
       open: true,
       setProps: setConfirmationDialogProps,
-      title: 'Vertrag wirklich beenden?',
-      text: 'Möchtest du den Vertrag wirklich beenden?',
+      title: 'Einsatz wirklich löschen?',
+      text: 'Es werden auch alle gehaltenen Stunden gelöscht und dieser Vorgang kann nicht mehr rückgängig gemacht werden.',
       action: () => {
         API.delete('contracts/' + dialogInfo.id).then(() => {
-          enqueueSnackbar('Vertrag beendet', snackbarOptions)
+          enqueueSnackbar('Einsatz gelöscht', snackbarOptions)
           setDialogInfo(false, -1)
           onSuccess()
         })
@@ -346,7 +346,7 @@ const ContractEditDialog: React.FC<Props> = ({
           <Button onClick={cancel}>Abbrechen</Button>
           <Button onClick={submitForm}>Speichern</Button>
           <Button onClick={deleteContract} color="error">
-            Beenden
+            Löschen
           </Button>
         </DialogActions>
       </Dialog>

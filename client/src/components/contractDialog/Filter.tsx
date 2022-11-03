@@ -253,6 +253,7 @@ const Filter: React.FC<Props> = ({
           label="Wochenintervall"
           variant="outlined"
           type="number"
+          disabled={initialContract != null}
           value={form.interval}
           sx={{ width: '150px' }}
           onChange={(e) => {
@@ -285,7 +286,14 @@ const Filter: React.FC<Props> = ({
             }))
           }}
           renderInput={(params) => (
-            <TextField {...params} required variant="outlined" />
+            <TextField
+              {...params}
+              required
+              variant="outlined"
+              helperText={
+                !form.minStartDate?.isSame(initialContract?.startDate, 'day') && 'Alle gehaltenen Stunden ab diesem Datum werden gelöscht'
+              }
+            />
           )}
           InputAdornmentProps={{
             position: 'start',

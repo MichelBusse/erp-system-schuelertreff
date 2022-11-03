@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -50,7 +51,7 @@ export class ContractsController {
   async create(@Body() dto: CreateContractDto): Promise<Contract> {
     this.validateDto(dto)
 
-    return this.contractsService.create(dto).catch((err) => {
+    return this.contractsService.createOrUpdate(dto).catch((err) => {
       if (err instanceof EntityNotFoundError) {
         throw new BadRequestException(err.message)
       }
@@ -132,5 +133,13 @@ export class ContractsController {
     @Body() dto: AcceptOrDeclineContractDto,
   ): void {
     this.contractsService.acceptOrDeclineContract(id, dto)
+  }
+
+  @Delete(':id')
+  @Roles(Role.ADMIN)
+  delete(
+    @Param('id') id: number,
+  ): Promise<void> {
+    return this.contractsService.deleteContract(id)
   }
 }
