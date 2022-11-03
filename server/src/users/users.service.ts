@@ -10,7 +10,7 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import * as argon2 from 'argon2'
 import dayjs from 'dayjs'
 import nodemailer from 'nodemailer'
-import { DataSource, Not, Repository } from 'typeorm'
+import { DataSource, FindOptionsWhere, Not, Repository } from 'typeorm'
 
 import { AuthService } from 'src/auth/auth.service'
 import { Role } from 'src/auth/role.enum'
@@ -789,6 +789,16 @@ export class UsersService {
         order: { firstName: 'ASC', lastName: 'ASC' },
       })
       .then(transformUsers)
+  }
+
+  checkCustomersEqual(customers: Customer[], ids: number[]): boolean {
+    const customerIds = customers.map((c) => (c.id));
+
+    if(customerIds.sort().join(',') === ids.sort().join(',')){
+      return true;
+    }else{
+      return false;
+    }
   }
 
   async findOneCustomer(id: number): Promise<Customer> {

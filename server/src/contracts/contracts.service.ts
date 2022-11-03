@@ -10,7 +10,7 @@ import { Brackets, DataSource, Repository } from 'typeorm'
 
 import { LessonsService } from 'src/lessons/lessons.service'
 import { timeAvailable } from 'src/users/dto/timeAvailable'
-import { Customer, User } from 'src/users/entities'
+import { Customer, Teacher, User } from 'src/users/entities'
 import { SchoolType, TeacherSchoolType } from 'src/users/entities/user.entity'
 import { parseMultirange, UsersService } from 'src/users/users.service'
 
@@ -18,6 +18,7 @@ import { Contract, ContractState } from './contract.entity'
 import { AcceptOrDeclineContractDto } from './dto/accept-or-decline-contract-dto'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
+import { SubjectsService } from 'src/subjects/subjects.service'
 
 @Injectable()
 export class ContractsService {
@@ -31,9 +32,78 @@ export class ContractsService {
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
 
+    @Inject(forwardRef(() => SubjectsService))
+    private readonly subjectsService: SubjectsService,
+
     @Inject(forwardRef(() => LessonsService))
     private readonly lessonsService: LessonsService,
   ) {}
+
+  async createOrUpdate(dto: CreateContractDto): Promise<Contract> {
+    console.log(dto)
+
+    if (dto.customers.length === 0 && !dto.schoolId)
+      throw new BadRequestException('Customers should not be empty')
+
+    if (dto.initialContractId) {
+      const initialContract = await this.contractsRepository.findOne({
+        where: { id: dto.initialContractId },
+        relations: ['teacher', 'customers'],
+      })
+      
+
+      if (
+        dayjs(dto.startDate).isSame(dayjs(initialContract.startDate), 'day') &&
+        dto.interval == initialContract.interval &&
+        ((dto.teacher === 'later' && !initialContract.teacher) || (initialContract.teacher && Number(dto.teacher) === initialContract.teacher.id)) &&
+        this.usersService.checkCustomersEqual(
+          initialContract.customers,
+          dto.customers,
+        )
+      ) {
+        //If StartDate and key features match, just edit initial contract itself
+        initialContract.subject = await this.subjectsService.findOne(
+          dto.subject,
+        )
+        initialContract.endDate = dto.endDate
+        initialContract.startTime = dto.startTime
+        initialContract.endTime = dto.endTime
+
+        const updatedContract = await this.contractsRepository.save(
+          initialContract,
+        )
+
+        // Delete all Lessons which are now out of bounds
+        await this.lessonsService.findAndValidateAllByContract(updatedContract)
+
+        return updatedContract
+      } else {
+        // If updated features do not match with initial contract, handle eventual deletion of initialContract
+
+        if (dayjs(initialContract.startDate).isAfter(dayjs(dto.startDate))) {
+          //if initialContract starts after editedContract -> delete initial contract completely and cascade to all of its lessons
+          this.contractsRepository.delete({ id: dto.initialContractId })
+        } else if (
+          !initialContract.endDate ||
+          (dayjs().isBefore(dayjs(initialContract.endDate)) &&
+            dayjs(dto.startDate).isBefore(dayjs(initialContract.endDate)))
+        ) {
+          // If initialContract has not ended yet and ends after the editedContracts startDate, end it one day before the startDate of the editedContract
+          initialContract.endDate = dayjs(dto.startDate)
+            .subtract(1, 'day')
+            .format('YYYY-MM-DD')
+          const updatedContract = await this.contractsRepository.save(
+            initialContract,
+          )
+
+          // Delete all Lessons which are now out of bounds
+          this.lessonsService.findAndValidateAllByContract(updatedContract)
+        }
+      }
+    }
+
+    return this.create(dto)
+  }
 
   async create(dto: CreateContractDto): Promise<Contract> {
     if (dto.customers.length === 0 && !dto.schoolId)
@@ -68,33 +138,6 @@ export class ContractsService {
 
     if (savedContract.state === ContractState.ACCEPTED)
       await this.lessonsService.cancelByContract(savedContract)
-
-    if (dto.initialContractId) {
-      // If initial contract is set, handle eventual deletion of initialContract
-      const initialContract = await this.contractsRepository.findOneByOrFail({
-        id: dto.initialContractId,
-      })
-
-      if (dayjs(initialContract.startDate).isAfter(dayjs(dto.startDate))) {
-        //if initialContract starts after editedContract -> delete initial contract completely and cascade to all of its lessons
-        this.contractsRepository.delete({ id: dto.initialContractId })
-      } else if (
-        !initialContract.endDate ||
-        (dayjs().isBefore(dayjs(initialContract.endDate)) &&
-          dayjs(dto.startDate).isBefore(dayjs(initialContract.endDate)))
-      ) {
-        // If initialContract has not ended yet and ends after the editedContracts startDate, end it one day before the startDate of the editedContract
-        initialContract.endDate = dayjs(dto.startDate)
-          .subtract(1, 'day')
-          .format('YYYY-MM-DD')
-        const updatedContract = await this.contractsRepository.save(
-          initialContract,
-        )
-
-        // Delete all Lessons which are now out of bounds
-        this.lessonsService.findAndValidateAllByContract(updatedContract)
-      }
-    }
 
     return savedContract
   }
@@ -256,30 +299,8 @@ export class ContractsService {
     return contracts.getMany()
   }
 
-  async endOrDeleteContract(id: number): Promise<void> {
-    const contract = await this.contractsRepository.findOneByOrFail({ id })
-
-    if (contract.state === ContractState.ACCEPTED) {
-      if (!contract.endDate || dayjs().isBefore(contract.endDate)) {
-        if (dayjs().isBefore(contract.startDate)) {
-          // Delete Future contracts completely
-          this.contractsRepository.delete(id)
-        } else {
-          // End ongoing contracts today
-          this.contractsRepository.update(id, {
-            endDate: dayjs().format('YYYY-MM-DD'),
-          })
-        }
-      } else {
-        // Cannot delete past contracts
-        throw new BadRequestException(
-          'Vergangene Verträge (oder Verträge, die heute enden) können nicht beendet werden',
-        )
-      }
-    } else {
-      // Delete unaccepted contracts completely
-      this.contractsRepository.delete(id)
-    }
+  async deleteContract(id: number): Promise<void> {
+    await this.contractsRepository.delete({ id })
   }
 
   async acceptOrDeclineContract(

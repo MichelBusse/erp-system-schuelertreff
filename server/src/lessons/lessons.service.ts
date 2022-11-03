@@ -19,7 +19,7 @@ import {
 } from 'src/contracts/contract.entity'
 import { ContractsService } from 'src/contracts/contracts.service'
 import { getNextDow, maxDate, minDate } from 'src/date'
-import { ClassCustomer } from 'src/users/entities'
+import { ClassCustomer, PrivateCustomer } from 'src/users/entities'
 import { Leave, LeaveState } from 'src/users/entities/leave.entity'
 import { UsersService } from 'src/users/users.service'
 
@@ -243,10 +243,20 @@ export class LessonsService {
       //If lesson date is before the startDate of contract or after the endDate
       if (
         dayjs(l.date).isBefore(dayjs(contract.startDate)) ||
-        dayjs(l.date).isAfter(dayjs(contract.endDate))
+        !dayjs(l.date).isBefore(dayjs(contract.endDate))
       ) {
         this.lessonsRepository.delete(l.id)
       }
+    })
+  }
+
+  async findAndDeleteAllByContract(id: number) {
+    const lessonsOfContract = this.lessonsRepository.findBy({
+      contract: { id: id },
+    })
+
+    ;(await lessonsOfContract).forEach((l) => {
+      this.lessonsRepository.delete(l.id)
     })
   }
 
@@ -337,7 +347,18 @@ export class LessonsService {
           .join(', ')
 
         name =
-          schoolName + ' (' + classNames + ') ' + lesson.contract.subject.name
+          schoolName + ' (' + classNames + ')\n' + lesson.contract.subject.name
+      } else {
+        const customerNames = customers
+          .map(
+            (c) =>
+              `${(c as PrivateCustomer).firstName} ${
+                (c as PrivateCustomer).lastName
+              }`,
+          )
+          .join(', ')
+
+        name = customerNames + '\n' + lesson.contract.subject.name
       }
 
       const duration =

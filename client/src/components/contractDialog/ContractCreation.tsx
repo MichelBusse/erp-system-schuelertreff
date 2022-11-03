@@ -44,6 +44,8 @@ type Props = {
   subject: subject | null
   minStartDate: Dayjs | null
   maxEndDate: Dayjs | null
+  initialStartTime: Dayjs | null
+  initialEndTime: Dayjs | null
   initialContract?: contractWithTeacher
 }
 
@@ -55,6 +57,8 @@ const ContractCreation: React.FC<Props> = ({
   subject,
   minStartDate,
   maxEndDate,
+  initialStartTime,
+  initialEndTime,
   initialContract,
 }) => {
   const [teachers, setTeachers] = useState<teacher[]>([])
@@ -93,8 +97,8 @@ const ContractCreation: React.FC<Props> = ({
           ? getNextDow(suggestion.dow, minStartDate)
           : null,
         endDate: maxEndDate,
-        startTime: startTime,
-        endTime: endTime,
+        startTime: initialStartTime,
+        endTime: initialEndTime,
         minTime: startTime,
         maxTime: endTime,
         teacher:
@@ -103,40 +107,12 @@ const ContractCreation: React.FC<Props> = ({
         dow: suggestion.dow,
         selsuggestion: form.selsuggestion,
       })
-
-      if (initialContract) {
-        const initialStartDate = dayjs(initialContract.startDate, 'YYYY-MM-DD')
-        const initialStartTime = dayjs(initialContract.startTime, 'HH:mm')
-        const initialEndTime = dayjs(initialContract.endTime, 'HH:mm')
-
-        if (
-          (initialContract.teacher &&
-            teacher.teacherId === initialContract.teacher.id) ||
-          (!initialContract.teacher && teacher.teacherId === -1)
-        ) {
-          if (
-            suggestion.dow === initialStartDate.day() &&
-            !dayjs(suggestion.start, 'HH:mm').isAfter(initialStartTime) &&
-            !dayjs(suggestion.end, 'HH:mm').isBefore(initialEndTime)
-          ) {
-            setForm((f) => ({
-              ...f,
-              startDate: getNextDow(suggestion.dow, f.startDate ?? undefined),
-              endDate: initialContract.endDate
-                ? dayjs(initialContract.endDate, 'YYYY-MM-DD')
-                : null,
-              startTime: initialStartTime,
-              endTime: initialEndTime,
-            }))
-          }
-        }
-      }
     } else {
       setForm({
         startDate: minStartDate,
         endDate: maxEndDate,
-        startTime: null,
-        endTime: null,
+        startTime: initialStartTime,
+        endTime: initialEndTime,
         minTime: null,
         maxTime: null,
         teacher: 'later',
@@ -144,14 +120,6 @@ const ContractCreation: React.FC<Props> = ({
         dow: minStartDate?.day() ?? 1,
         selsuggestion: form.selsuggestion,
       })
-
-      if (initialContract && !initialContract.teacher) {
-        setForm((f) => ({
-          ...f,
-          startTime: dayjs(initialContract.startTime, 'HH:mm'),
-          endTime: dayjs(initialContract.endTime, 'HH:mm'),
-        }))
-      }
     }
   }, [form.selsuggestion])
 
