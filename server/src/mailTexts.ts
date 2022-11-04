@@ -48,5 +48,5 @@ const contactSignature = `Unsere Kontaktdaten:\n\n
 0176/22079244 (Nikita Soldatov)\n
 info@schuelertreff-nachhilfe.de\n
 www.schuelertreff-nachhilfe.de\n\n
-Liebe Grüßen\n
+Liebe Grüße,\n
 Dein Schülertreff-Team`
