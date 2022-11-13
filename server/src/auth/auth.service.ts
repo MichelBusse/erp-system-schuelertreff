@@ -31,7 +31,10 @@ export class AuthService {
       host: this.config.get<string>('SMTP_HOST'),
       port: this.config.get<number>('SMTP_PORT'),
     },
-    { from: this.config.get<string>('EMAIL_FROM') },
+    {
+      from: this.config.get<string>('EMAIL_NOREPLY'),
+      replyTo: this.config.get<string>('EMAIL_FROM'),
+    },
   )
 
   async validateUser(email: string, password: string): Promise<any> {
