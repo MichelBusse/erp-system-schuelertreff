@@ -291,7 +291,7 @@ const Filter: React.FC<Props> = ({
               required
               variant="outlined"
               helperText={
-                !form.minStartDate?.isSame(initialContract?.startDate, 'day') &&
+                initialContract && !form.minStartDate?.isSame(initialContract?.startDate, 'day') &&
                 'Alle gehaltenen Stunden ab diesem Datum werden gelöscht'
               }
             />
