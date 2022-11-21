@@ -579,6 +579,7 @@ export class ContractsService {
     // Add the time suggestions without teacher infront of the time suggestions
     availableTeachers = availableTimesWithoutTeacher.concat(availableTeachers)
 
+
     /** Process all time suggestions in a useful format for the frontend and use 'checkOverlap' to add a '*' in the frontend
      * to all suggestions where some contracts with the interval > 1 are within the suggested timespan
      */
@@ -611,7 +612,7 @@ export class ContractsService {
       })),
     )
 
-    return suggestions
+    return suggestions.filter((s) => s.suggestions.length > 0);
   }
 
   durationMinutes(range: timeAvailable): number {
