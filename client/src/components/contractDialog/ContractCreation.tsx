@@ -43,6 +43,7 @@ type Props = {
   subject: subject | null
   minStartDate: Dayjs | null
   maxEndDate: Dayjs | null
+  initialDow?: number
   initialStartTime: Dayjs | null
   initialEndTime: Dayjs | null
 }
@@ -55,6 +56,7 @@ const ContractCreation: React.FC<Props> = ({
   subject,
   minStartDate,
   maxEndDate,
+  initialDow,
   initialStartTime,
   initialEndTime,
 }) => {
@@ -106,7 +108,7 @@ const ContractCreation: React.FC<Props> = ({
       })
     } else {
       setForm({
-        startDate: minStartDate,
+        startDate: minStartDate ? getNextDow(initialDow ?? minStartDate?.day(), minStartDate) : null,
         endDate: maxEndDate,
         startTime: initialStartTime,
         endTime: initialEndTime,
@@ -114,7 +116,7 @@ const ContractCreation: React.FC<Props> = ({
         maxTime: null,
         teacher: 'later',
         teacherConfirmation: false,
-        dow: minStartDate?.day() ?? 1,
+        dow: initialDow ?? minStartDate?.day() ?? 1,
         selsuggestion: form.selsuggestion,
       })
     }
