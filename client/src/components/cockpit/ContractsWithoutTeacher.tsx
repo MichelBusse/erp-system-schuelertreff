@@ -33,6 +33,7 @@ const ContractsWithoutTeacher: CockpitComponent = ({ listSx }) => {
             setContracts={setContracts}
             onSuccess={() => setRefreshContracts((r) => ++r)}
             sx={listSx}
+            allowTogglePast={true}
           />
         </Stack>
       </Box>

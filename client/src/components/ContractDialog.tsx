@@ -237,7 +237,7 @@ const ContractDialog: React.FC<Props> = ({
       interval: form0.interval,
       teacher: form1.teacher,
       startDate: form1.startDate?.format('YYYY-MM-DD'),
-      endDate: form1.endDate?.format('YYYY-MM-DD'),
+      endDate: form1.endDate?.format('YYYY-MM-DD') ?? null,
       startTime: form1.startTime?.format('HH:mm'),
       endTime: form1.endTime?.format('HH:mm'),
       state: form1.teacherConfirmation
@@ -264,12 +264,12 @@ const ContractDialog: React.FC<Props> = ({
       setConfirmationDialogProps({
         open: true,
         setProps: setConfirmationDialogProps,
-        title: 'Einsatz wirklich beenden?',
-        text: 'Möchtest du den Einsatz wirklich beenden?',
+        title: 'Einsatz wirklich löschen?',
+        text: 'Es werden auch alle gehaltenen Stunden gelöscht und dieser Vorgang kann nicht mehr rückgängig gemacht werden.',
         action: () => {
           API.delete('contracts/' + initialContract?.id)
             .then(() => {
-              enqueueSnackbar('Einsatz beendet', snackbarOptions)
+              enqueueSnackbar('Einsatz gelöscht', snackbarOptions)
               onSuccess()
             })
             .catch((error) => {
@@ -322,7 +322,7 @@ const ContractDialog: React.FC<Props> = ({
             (!initialContract.endDate ||
               dayjs(initialContract.endDate).isAfter(dayjs())) && (
               <Button onClick={deleteContract} color="error">
-                Beenden
+                Löschen
               </Button>
             )}
         </>
@@ -339,7 +339,8 @@ const ContractDialog: React.FC<Props> = ({
           subject={form0.subject}
           minStartDate={form0.startDate}
           maxEndDate={form0.endDate}
-          initialContract={initialContract}
+          initialStartTime={form0.startTime}
+          initialEndTime={form0.endTime}
         />
       ),
       actions: (

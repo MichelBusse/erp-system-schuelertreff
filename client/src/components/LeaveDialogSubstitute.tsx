@@ -157,9 +157,6 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
         startDate: minStartDate.format('YYYY-MM-DD'),
         endDate: maxEndDate.format('YYYY-MM-DD'),
         originalTeacher: contract.teacher.id,
-        startTime: dayjs(contract.startTime, 'HH:mm').format('HH:mm'),
-        dow: minStartDate.day(),
-        endTime: dayjs(contract.endTime, 'HH:mm').format('HH:mm'),
         ignoreContracts: contracts.map((c) => c.id).join(','),
       },
     })
@@ -172,15 +169,15 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
     if (typeof suggestions === 'undefined') return
 
     setForm({
-      startDate: minStartDate,
+      startDate: dayjs(contract.startDate),
       endDate: maxEndDate,
-      startTime: null,
-      endTime: null,
+      startTime: dayjs(contract.startTime, 'HH:mm'),
+      endTime: dayjs(contract.endTime, 'HH:mm'),
       minTime: null,
       maxTime: null,
       teacher: '',
       teacherConfirmation: true,
-      dow: 1,
+      dow: dayjs(contract.startDate).day(),
       selsuggestion: '',
     })
 
@@ -333,6 +330,9 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
                 subject={data.contract.subject}
                 minStartDate={data.minStartDate}
                 maxEndDate={data.maxEndDate}
+                initialDow={form.dow}
+                initialStartTime={form.startTime}
+                initialEndTime={form.endTime}
               />
             )}
           </Box>

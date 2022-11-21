@@ -146,10 +146,15 @@ export class UsersService {
     private config: ConfigService,
   ) {}
 
-  private transport = nodemailer.createTransport({
-    host: this.config.get<string>('SMTP_HOST'),
-    port: this.config.get<number>('SMTP_PORT'),
-  })
+  private transport = nodemailer.createTransport(
+    {
+      host: this.config.get<string>('SMTP_HOST'),
+      port: this.config.get<number>('SMTP_PORT'),
+    },
+    {
+      from: this.config.get<string>('EMAIL_NOREPLY'),
+    },
+  )
 
   /**
    * Check if email is already in DB
@@ -640,7 +645,7 @@ export class UsersService {
       try {
         this.transport.sendMail(
           {
-            from: this.config.get<string>('EMAIL_FROM'),
+            replyTo: this.config.get<string>('EMAIL_FROM'),
             to: user.email,
             subject: 'Schülertreff - Willkommen',
             text: employmentMail(
@@ -685,7 +690,7 @@ export class UsersService {
       try {
         this.transport.sendMail(
           {
-            from: this.config.get<string>('EMAIL_FROM_BEWERBUNG'),
+            replyTo: this.config.get<string>('EMAIL_FROM_BEWERBUNG'),
             to: user.email,
             subject: 'Schülertreff - Termin Bewerbungsgespräch',
             text: applicationMeetingSetDateMail(
@@ -713,7 +718,7 @@ export class UsersService {
       try {
         this.transport.sendMail(
           {
-            from: this.config.get<string>('EMAIL_FROM_BEWERBUNG'),
+            replyTo: this.config.get<string>('EMAIL_FROM_BEWERBUNG'),
             to: user.email,
             subject: 'Schülertreff - Terminvorschläge Bewerbungsgespräch',
             text: applicationMeetingProposalMail(
@@ -792,6 +797,16 @@ export class UsersService {
         order: { firstName: 'ASC', lastName: 'ASC' },
       })
       .then(transformUsers)
+  }
+
+  checkCustomersEqual(customers: Customer[], ids: number[]): boolean {
+    const customerIds = customers.map((c) => c.id)
+
+    if (customerIds.sort().join(',') === ids.sort().join(',')) {
+      return true
+    } else {
+      return false
+    }
   }
 
   async findOneCustomer(id: number): Promise<Customer> {

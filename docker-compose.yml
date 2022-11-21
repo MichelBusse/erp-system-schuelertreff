@@ -20,6 +20,9 @@ services:
     - db
     ports:
     - 127.0.0.1:8080:8080
+    networks:
+    - default
+    - smtp
     environment:
     - DB_HOST=db
     - DB_NAME
@@ -32,6 +35,7 @@ services:
     - SMTP_PORT=25
     - EMAIL_FROM
     - EMAIL_FROM_BEWERBUNG
+    - EMAIL_NOREPLY
 
   client:
     build:
@@ -44,9 +48,9 @@ services:
     ports:
     - 127.0.0.1:8081:80
 
-  smtp:
-    image: namshi/smtp
-    restart: unless-stopped
-
 volumes:
   db:
+
+networks:
+  smtp:
+    external: true

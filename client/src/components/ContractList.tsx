@@ -1,6 +1,7 @@
 import { Delete, Edit } from '@mui/icons-material'
 import {
   Box,
+  Button,
   IconButton,
   List,
   ListItem,
@@ -32,6 +33,7 @@ type Props = {
   contracts: contractWithTeacher[] | contract[]
   setContracts: React.Dispatch<React.SetStateAction<contractWithTeacher[]>>
   onSuccess?: () => void
+  allowTogglePast?: boolean
   sx?: SxProps<Theme>
   userRole?: string
 }
@@ -41,6 +43,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
   setContracts,
   onSuccess,
   children,
+  allowTogglePast = false,
   sx,
   userRole,
 }) => {
@@ -58,13 +61,14 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
     userRole === 'school' ? true : false,
   )
   const theme = useTheme()
+  const [showPast, setShowPast] = useState(false)
 
   const deleteContract = (contractId: number) => {
     setConfirmationDialogProps({
       open: true,
       setProps: setConfirmationDialogProps,
-      title: 'Einsatz wirklich beenden?',
-      text: 'Möchtest du den Einsatz wirklich beenden?',
+      title: 'Einsatz wirklich löschen?',
+      text: 'Es werden auch alle gehaltenen Stunden gelöscht und dieser Vorgang kann nicht mehr rückgängig gemacht werden.',
       action: () => {
         API.delete('contracts/' + contractId)
           .then(() => {
@@ -75,7 +79,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
               }
               return newContracts
             })
-            enqueueSnackbar('Einsatz beendet', snackbarOptions)
+            enqueueSnackbar('Einsatz gelöscht', snackbarOptions)
           })
           .catch((error) => {
             if (axios.isAxiosError(error) && error.response?.status === 400) {
@@ -106,107 +110,130 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
       <List
         dense={true}
         sx={{
+          position: 'relative',
           backgroundColor: '#f5f5f5',
           borderRadius: '4px',
           margin: '5px 0',
           height: '100%',
+          overflowY: 'scroll',
           ...sx,
         }}
       >
+        {allowTogglePast && (
+          <ListItem sx={{ position: 'sticky', top: '0' }}>
+            <Button onClick={() => setShowPast(!showPast)}>
+              {showPast ? 'Vergangene ausblenden' : 'Vergangene einblenden'}
+            </Button>
+          </ListItem>
+        )}
         {children}
         {contracts.length === 0 && (
           <ListItem>
             <ListItemText primary="Keine Einträge" />
           </ListItem>
         )}
-        {contracts.map((contract) => (
-          <ListItem
-            key={contract.id}
-            secondaryAction={
-              !limitedView && (
+        {contracts
+          .filter((contract) => {
+            if (showPast) {
+              return true
+            } else {
+              if (
+                !contract.endDate ||
+                dayjs(contract.endDate).isAfter(dayjs())
+              ) {
+                return true
+              } else {
+                return false
+              }
+            }
+          })
+          .map((contract) => (
+            <ListItem
+              key={contract.id}
+              secondaryAction={
                 <Box>
                   {(!contract.endDate ||
-                    dayjs(contract.endDate).isAfter(dayjs())) && (
-                    <>
-                      <IconButton onClick={() => editContract(contract)}>
-                        <Edit />
-                      </IconButton>
-                      <IconButton onClick={() => deleteContract(contract.id)}>
-                        <Delete />
-                      </IconButton>
-                    </>
+                    dayjs(contract.endDate).isAfter(dayjs()) ||
+                    contract.state !== ContractState.ACCEPTED) && (
+                    <IconButton onClick={() => editContract(contract)}>
+                      <Edit />
+                    </IconButton>
                   )}
+                  <IconButton onClick={() => deleteContract(contract.id)}>
+                    <Delete color={'error'} />
+                  </IconButton>
                 </Box>
-              )
-            }
-          >
-            <ListItemText
-              sx={{ marginRight: '50px' }}
-              primary={
-                <>
-                  <span>
-                    {contract.subject.name +
-                      ' (' +
-                      contractTypeToString[contract.contractType] +
-                      ')'}
-                  </span>{' '}
-                  <span>
-                    {contract.state !== ContractState.ACCEPTED &&
-                      `(${contractStateToString[contract.state]})`}
-                  </span>
-                  {contract.endDate &&
-                    !dayjs(contract.endDate, 'YYYY-MM-DD').isAfter(dayjs()) && (
-                      <span style={{ color: theme.palette.error.main }}>
-                        {' '}
-                        (Beendet)
-                      </span>
-                    )}
-                </>
               }
-              secondary={
-                <>
-                  <span>
-                    {contract.teacher ? (
-                      `${contract.teacher.firstName} ${contract.teacher.lastName}`
-                    ) : (
-                      <span style={{ color: theme.palette.error.main }}>
-                        Keine Lehrkraft zugewiesen
-                      </span>
-                    )}
-                  </span>
-                  <br />
-                  <span>
-                    {contract.customers[0]?.role === 'classCustomer' &&
-                      contract.customers[0].school.schoolName + ': '}
-                    {contract.customers
-                      .map((customer) => {
-                        return customer.role === 'privateCustomer'
-                          ? customer.firstName + ' ' + customer.lastName
-                          : customer.className
-                      })
-                      .join(', ')}
-                  </span>
-                  <br />
-                  <span>
-                    {dayjs(contract.startDate).format('dddd') +
-                      's ' +
-                      dayjs(contract.startTime, 'HH:mm').format('HH:mm') +
-                      ' - ' +
-                      dayjs(contract.endTime, 'HH:mm').format('HH:mm')}
-                  </span>
-                  <br />
-                  <span>
-                    {dayjs(contract.startDate).format('DD.MM.YYYY') +
-                      ' - ' +
-                      (contract.endDate
-                        ? dayjs(contract.endDate).format('DD.MM.YYYY')
-                        : 'unbegrenzt')}
-                  </span>
-                </>
-              }
-            />
-          </ListItem>
-        ))}
+            >
+              <ListItemText
+                sx={{ marginRight: '50px' }}
+                primary={
+                  <>
+                    <span>
+                      {contract.subject.name +
+                        ' (' +
+                        contractTypeToString[contract.contractType] +
+                        ')'}
+                    </span>{' '}
+                    <span>
+                      {contract.state !== ContractState.ACCEPTED &&
+                        `(${contractStateToString[contract.state]})`}
+                    </span>
+                    {contract.endDate &&
+                      !dayjs(contract.endDate, 'YYYY-MM-DD').isAfter(
+                        dayjs(),
+                      ) && (
+                        <span style={{ color: theme.palette.error.main }}>
+                          {' '}
+                          (Beendet)
+                        </span>
+                      )}
+                  </>
+                }
+                secondary={
+                  <>
+                    <span>
+                      {contract.teacher ? (
+                        `${contract.teacher.firstName} ${contract.teacher.lastName}`
+                      ) : (
+                        <span style={{ color: theme.palette.error.main }}>
+                          Keine Lehrkraft zugewiesen
+                        </span>
+                      )}
+                    </span>
+                    <br />
+                    <span>
+                      {contract.customers[0]?.role === 'classCustomer' &&
+                        contract.customers[0].school.schoolName + ': '}
+                      {contract.customers
+                        .map((customer) => {
+                          return customer.role === 'privateCustomer'
+                            ? customer.firstName + ' ' + customer.lastName
+                            : customer.className
+                        })
+                        .join(', ')}
+                    </span>
+                    <br />
+                    <span>
+                      {dayjs(contract.startDate).format('dddd') +
+                        's ' +
+                        dayjs(contract.startTime, 'HH:mm').format('HH:mm') +
+                        ' - ' +
+                        dayjs(contract.endTime, 'HH:mm').format('HH:mm')}
+                    </span>
+                    <br />
+                    <span>
+                      {dayjs(contract.startDate).format('DD.MM.YYYY') +
+                        ' - ' +
+                        (contract.endDate
+                          ? dayjs(contract.endDate).format('DD.MM.YYYY')
+                          : 'unbegrenzt')}
+                    </span>
+                  </>
+                }
+              />
+            </ListItem>
+          ))}
       </List>
       <ContractDialog
         key={render}

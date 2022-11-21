@@ -52,7 +52,7 @@ export class ContractsController {
   async create(@Body() dto: CreateContractDto): Promise<Contract> {
     this.validateDto(dto)
 
-    return this.contractsService.create(dto).catch((err) => {
+    return this.contractsService.createOrUpdate(dto).catch((err) => {
       if (err instanceof EntityNotFoundError) {
         throw new BadRequestException(err.message)
       }
@@ -141,46 +141,9 @@ export class ContractsController {
     this.contractsService.acceptOrDeclineContract(id, dto)
   }
 
-  @Post(':id')
-  @Roles(Role.ADMIN)
-  async update(
-    @Param('id') id: number,
-    @Body() dto: CreateContractDto,
-  ): Promise<void> {
-    this.validateDto(dto)
-
-    const contract = await this.contractsService.findOne(id)
-
-    if (
-      dayjs(dto.startDate).isAfter(dayjs()) ||
-      (contract.teacher !== null && dto.teacher !== 'later'
-        ? contract.teacher.id !== Number(dto.teacher)
-        : contract.teacher !== null) ||
-      (contract.teacher === null && dto.teacher !== 'later')
-    ) {
-      // If contract starts in future, then update existing contract
-
-      this.contractsService.updateContract(id, dto)
-    } else if (!dto.endDate || dayjs(dto.endDate).isAfter(dayjs())) {
-      //If contract has already started and does not have ended yet, then end it and create new with updated params
-      this.contractsService.endOrDeleteContract(id)
-
-      this.contractsService.create(dto).catch((err) => {
-        if (err instanceof EntityNotFoundError) {
-          throw new BadRequestException(err.message)
-        }
-
-        throw err
-      })
-    } else {
-      //Past contracts cannot be updated
-      throw new BadRequestException('Cannot update past contracts')
-    }
-  }
-
   @Delete(':id')
   @Roles(Role.ADMIN)
-  endOrDelete(@Param('id') id: number): Promise<void> {
-    return this.contractsService.endOrDeleteContract(id)
+  delete(@Param('id') id: number): Promise<void> {
+    return this.contractsService.deleteContract(id)
   }
 }

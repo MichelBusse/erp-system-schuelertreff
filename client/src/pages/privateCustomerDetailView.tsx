@@ -460,6 +460,7 @@ const PrivateCustomerDetailView: React.FC = () => {
           <ContractList
             contracts={contracts}
             setContracts={setContracts}
+            allowTogglePast={true}
             onSuccess={() => setRefreshContracts((r) => r + 1)}
           />
           <h3>Dokumente:</h3>

@@ -19,6 +19,7 @@ import {
 } from 'src/contracts/contract.entity'
 import { ContractsService } from 'src/contracts/contracts.service'
 import { getNextDow, maxDate, minDate } from 'src/date'
+import { ClassCustomer, PrivateCustomer } from 'src/users/entities'
 import { Leave, LeaveState } from 'src/users/entities/leave.entity'
 import { UsersService } from 'src/users/users.service'
 
@@ -269,10 +270,20 @@ export class LessonsService {
       //If lesson date is before the startDate of contract or after the endDate
       if (
         dayjs(l.date).isBefore(dayjs(contract.startDate)) ||
-        dayjs(l.date).isAfter(dayjs(contract.endDate))
+        !dayjs(l.date).isBefore(dayjs(contract.endDate))
       ) {
         this.lessonsRepository.delete(l.id)
       }
+    })
+  }
+
+  async findAndDeleteAllByContract(id: number) {
+    const lessonsOfContract = this.lessonsRepository.findBy({
+      contract: { id: id },
+    })
+
+    ;(await lessonsOfContract).forEach((l) => {
+      this.lessonsRepository.delete(l.id)
     })
   }
 
@@ -353,13 +364,37 @@ export class LessonsService {
     let totalHours = 0
 
     lessons.forEach((lesson) => {
+      const customers = lesson.contract.customers
+      let name = lesson.contract.subject.name
+
+      if (customers[0].role === Role.CLASSCUSTOMER) {
+        const schoolName = (customers[0] as ClassCustomer).school.schoolName
+        const classNames = customers
+          .map((c) => (c as ClassCustomer).className)
+          .join(', ')
+
+        name =
+          schoolName + ' (' + classNames + ')\n' + lesson.contract.subject.name
+      } else {
+        const customerNames = customers
+          .map(
+            (c) =>
+              `${(c as PrivateCustomer).firstName} ${
+                (c as PrivateCustomer).lastName
+              }`,
+          )
+          .join(', ')
+
+        name = customerNames + '\n' + lesson.contract.subject.name
+      }
+
       const duration =
         dayjs(lesson.contract.endTime, 'HH:mm').diff(
           dayjs(lesson.contract.startTime, 'HH:mm'),
           'minute',
         ) / 60
       rows.push({
-        subject: lesson.contract.subject.name,
+        subject: name,
         duration: duration.toFixed(2).replace('.', ','),
         date: dayjs(lesson.date).format('DD.MM.YYYY'),
         notes: lesson.notes,
@@ -478,7 +513,7 @@ export class LessonsService {
     if (customerId) {
       customer = await this.usersService.findOneCustomer(customerId)
     } else if (schoolId) {
-      customer = await this.usersService.findOneSchool(customerId)
+      customer = await this.usersService.findOneSchool(schoolId)
     }
 
     const lessons = await this.findInvoiceReadyByMonth({
@@ -510,6 +545,7 @@ export class LessonsService {
         (lesson.contract.contractType === 'standard'
           ? ' (Präsenz)'
           : ' (Online)')
+
       const duration =
         (dayjs(lesson.contract.endTime, 'HH:mm').diff(
           dayjs(lesson.contract.startTime, 'HH:mm'),
