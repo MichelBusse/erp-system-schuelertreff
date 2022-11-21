@@ -18,7 +18,6 @@ import dayjs from 'dayjs'
 import { Response } from 'express'
 
 import { AuthService } from 'src/auth/auth.service'
-import { Public } from 'src/auth/decorators/public.decorator'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 import { Document } from 'src/documents/document.entity'
@@ -102,7 +101,6 @@ export class UsersController {
     return this.usersService.findAllClassesOfSchool(schoolId)
   }
 
-
   @Get('school')
   @Roles(Role.ADMIN)
   findAllSchools(): Promise<School[]> {
@@ -151,7 +149,7 @@ export class UsersController {
   }
 
   @Get('school/me')
-  findMySchool(@Request() req){
+  findMySchool(@Request() req) {
     return this.usersService.findOneSchool(req.user.id)
   }
 
@@ -216,7 +214,7 @@ export class UsersController {
     @Request() req,
     @Body() dto: CreateClassCustomerDto,
   ): Promise<ClassCustomer> {
-    if(dto.school === -1){
+    if (dto.school === -1) {
       dto.school = req.user.id
     }
     return this.usersService.createClassCustomer(dto)

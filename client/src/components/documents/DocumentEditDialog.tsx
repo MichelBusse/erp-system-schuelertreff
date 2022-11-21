@@ -40,7 +40,7 @@ const DocumentEditDialog: React.FC<Props> = ({
     protected: !document.mayDelete,
   })
 
-  const {hasRole} = useAuth()
+  const { hasRole } = useAuth()
 
   const validForm = !!form.fileName
 

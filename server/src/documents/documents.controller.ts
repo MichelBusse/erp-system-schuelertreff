@@ -22,13 +22,20 @@ import { UpdateDocumentDto } from './dto/update-document.dto'
 export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
 
-
   @Post(':id')
-  async update(@Request() req, @Param('id') id: number, @Body() dto: UpdateDocumentDto) {
+  async update(
+    @Request() req,
+    @Param('id') id: number,
+    @Body() dto: UpdateDocumentDto,
+  ) {
     // filter out content, doesn't need to be transferred back (huge overhead!)
-    const { content: _, ...response } = await this.documentsService.update(id, {
-      ...dto,
-    }, (req.user.role === Role.ADMIN ? undefined : req.user.id))
+    const { content: _, ...response } = await this.documentsService.update(
+      id,
+      {
+        ...dto,
+      },
+      req.user.role === Role.ADMIN ? undefined : req.user.id,
+    )
 
     return response
   }

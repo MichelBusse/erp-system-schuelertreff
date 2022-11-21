@@ -2,7 +2,6 @@ import {
   Autocomplete,
   Box,
   Button,
-  Chip,
   Stack,
   TextField,
   Typography,
@@ -13,7 +12,9 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAuth } from '../components/AuthProvider'
-import UserDocuments, { UserDocumentsType } from '../components/documents/UserDocuments'
+import UserDocuments, {
+  UserDocumentsType,
+} from '../components/documents/UserDocuments'
 import { degreeToString, teacherSchoolTypeToString } from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { TeacherSchoolType } from '../types/enums'
@@ -105,11 +106,7 @@ const TeacherOverview: React.FC = () => {
                 teacherSchoolTypeToString[option]
               }
               renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant="outlined"
-                  label="Schularten"
-                />
+                <TextField {...params} variant="outlined" label="Schularten" />
               )}
               value={(teacher?.teacherSchoolTypes as TeacherSchoolType[]) ?? []}
             />
@@ -122,11 +119,7 @@ const TeacherOverview: React.FC = () => {
               getOptionLabel={(option) => option.name}
               isOptionEqualToValue={(o, v) => o.id === v.id}
               renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant="outlined"
-                  label="Fächer"
-                />
+                <TextField {...params} variant="outlined" label="Fächer" />
               )}
               value={teacher?.subjects ?? []}
             />

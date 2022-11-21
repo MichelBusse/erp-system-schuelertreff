@@ -28,7 +28,9 @@ import ContractList from '../components/ContractList'
 import CustomerInvoiceDataSelect, {
   CustomerInvoiceData,
 } from '../components/CustomerInvoiceDateSelect'
-import UserDocuments, { UserDocumentsType } from '../components/documents/UserDocuments'
+import UserDocuments, {
+  UserDocumentsType,
+} from '../components/documents/UserDocuments'
 import {
   defaultPrivateCustomerFormData,
   snackbarOptions,

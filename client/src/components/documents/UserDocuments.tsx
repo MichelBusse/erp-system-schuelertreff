@@ -28,7 +28,7 @@ import UploadDialog, { UploadDialogForm } from './UploadDialog'
 
 export enum UserDocumentsType {
   PUBLIC = 'public',
-  PRIVATE = 'private'
+  PRIVATE = 'private',
 }
 
 type Props = {
@@ -42,7 +42,7 @@ const UserDocuments: React.FC<Props> = ({
   userId,
   actions,
   refresh: outsideRefresh,
-  userDocumentsType
+  userDocumentsType,
 }) => {
   const [documents, setDocuments] = useState<documentType[]>([])
   const [refresh, setRefresh] = useState(0)

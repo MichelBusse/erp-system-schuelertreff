@@ -26,7 +26,10 @@ export const registrationMailText = (link: string) => {
   )
 }
 
-export const registrationMailTextSchool = (link: string, schoolName: string) => {
+export const registrationMailTextSchool = (
+  link: string,
+  schoolName: string,
+) => {
   return (
     `Hallo liebes Team der ${schoolName},\n\n\nnoch einmal möchten wir Sie auf unserer Plattform willkommen heißen.\n\nDamit auch Sie Ihren vollwertigen Zugang erhalten, ist es wichtig ein Passwort zu erstellen. Dies können Sie unter dem folgenden Link.\n\nLink:\n${link}\n\nDanach können Sie Ihre Mail, sowie Ihr neu festgelegtes Passwort für den LogIn verwenden.\n\n–Bitte beachte, dass dieser Passwort-Reset-Link nur eine Woche gültig ist.–\n\nNach dem ersten LogIn bitten wir Sie darum alle wichtigen Daten anzugeben, diese werden für unsere Vertragserstellung benötigt. Gern können Sie auch Ihren Vertrag hochladen, diesen würden wir dann schnellstmöglich bearbeiten.\n\nIn dem Menüpunkt "Stundenplan" haben Sie die Möglichkeit eine Stundenübersicht Ihrer Stunden bei uns zu erhalten, sowie alle relevanten Daten zu den Mitarbeitern einzusehen.\n\nZudem erhalten Sie eine Benachrichtigung per Mail, falls unser Kursleiter ausfallen sollte und eine weitere Mail, falls wir eine Vertretung gefunden haben.\n\nBei Fragen können Sie uns selbstverständlich unter den folgenden Kontaktdaten erreichen:\n\n` +
     contactSignature

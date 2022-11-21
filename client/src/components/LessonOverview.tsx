@@ -177,11 +177,7 @@ const LessonOverview: React.FC<Props> = ({
       )}
       {limitedView && (
         <Button
-          onClick={() =>
-            navigate(
-              '/timetable/teacher/' + contract.teacher.id
-            )
-          }
+          onClick={() => navigate('/timetable/teacher/' + contract.teacher.id)}
         >
           Lehrkraft anzeigen
         </Button>

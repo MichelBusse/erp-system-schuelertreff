@@ -147,7 +147,6 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
 
     if (typeof leaves === 'undefined') return
 
-
     // get suggestions
     const suggestions: suggestion[] = await API.get('contracts/suggest', {
       params: {

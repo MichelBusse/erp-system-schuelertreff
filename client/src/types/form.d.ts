@@ -1,7 +1,13 @@
 import { Dayjs } from 'dayjs'
 
 import { CustomerType } from '../components/ContractDialog'
-import { ContractType, DeleteState, SchoolState, SchoolType, TeacherState } from './enums'
+import {
+  ContractType,
+  DeleteState,
+  SchoolState,
+  SchoolType,
+  TeacherState,
+} from './enums'
 import { LessonState } from './lesson'
 import subject from './subject'
 import timeAvailable from './timeAvailable'

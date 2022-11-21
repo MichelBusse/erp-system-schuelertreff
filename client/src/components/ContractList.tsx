@@ -45,7 +45,6 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
   children,
   allowTogglePast = false,
   sx,
-  userRole,
 }) => {
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
@@ -57,9 +56,6 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
   const [confirmationDialogProps, setConfirmationDialogProps] =
     useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
 
-  const [limitedView, setLimitedView] = useState(
-    userRole === 'school' ? true : false,
-  )
   const theme = useTheme()
   const [showPast, setShowPast] = useState(false)
 

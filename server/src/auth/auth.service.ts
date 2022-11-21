@@ -9,7 +9,12 @@ import { JwtService } from '@nestjs/jwt'
 import * as argon2 from 'argon2'
 import nodemailer from 'nodemailer'
 
-import { passwordResetMail, passwordResetMailSchools, registrationMailText, registrationMailTextSchool } from 'src/mailTexts'
+import {
+  passwordResetMail,
+  passwordResetMailSchools,
+  registrationMailText,
+  registrationMailTextSchool,
+} from 'src/mailTexts'
 import { School, Teacher, User } from 'src/users/entities'
 import { DeleteState } from 'src/users/entities/user.entity'
 import { UsersService } from 'src/users/users.service'
@@ -96,20 +101,26 @@ export class AuthService {
       text: passwordResetMail(link),
     }
 
-    if(user.role === Role.SCHOOL){
-      mailOptions.text = passwordResetMailSchools(link, (user as School).schoolName)
-    }else{
+    if (user.role === Role.SCHOOL) {
+      mailOptions.text = passwordResetMailSchools(
+        link,
+        (user as School).schoolName,
+      )
+    } else {
       mailOptions.text = passwordResetMail(link)
     }
 
     // Welcome Mail when setting password the first time
     if (!user.passwordHash || user.passwordHash === '') {
-      if(user.role === Role.SCHOOL){
+      if (user.role === Role.SCHOOL) {
         mailOptions.subject = 'Willkommen auf unserer Plattform! | Schülertreff'
-        mailOptions.text = registrationMailTextSchool(link, (user as School).schoolName)
-      }else{
+        mailOptions.text = registrationMailTextSchool(
+          link,
+          (user as School).schoolName,
+        )
+      } else {
         mailOptions.subject = 'Willkommen bei Schülertreff'
-        mailOptions.text = registrationMailText(link)  
+        mailOptions.text = registrationMailText(link)
       }
     }
 

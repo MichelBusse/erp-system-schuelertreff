@@ -146,7 +146,7 @@ export const defaultSchoolFormData: schoolForm = {
   feeOnline: 20,
   notes: '',
   dateOfStart: null,
-  schoolState: SchoolState.CREATED
+  schoolState: SchoolState.CREATED,
 }
 
 export const defaultClassCustomerFormData: classCustomerForm = {

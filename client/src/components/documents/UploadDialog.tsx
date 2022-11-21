@@ -12,6 +12,7 @@ import {
   TextField,
 } from '@mui/material'
 import { useState } from 'react'
+
 import { UserDocumentsType } from './UserDocuments'
 
 export type UploadDialogForm = {
@@ -38,7 +39,7 @@ const UploadDialog: React.FC<Props> = ({
   onSubmit,
   file,
   minimalView = false,
-  userDocumentsType
+  userDocumentsType,
 }) => {
   const [form, setForm] = useState<UploadDialogForm>({
     fileName: file.name,

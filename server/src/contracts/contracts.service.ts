@@ -669,7 +669,11 @@ export class ContractsService {
   }
 
   // Find all accepted contracts of the specified week and optionally one specified teacher
-  async findByWeek(week: Dayjs, teacherId?: number, schoolId?: number): Promise<Contract[]> {
+  async findByWeek(
+    week: Dayjs,
+    teacherId?: number,
+    schoolId?: number,
+  ): Promise<Contract[]> {
     const q = this.contractsRepository
       .createQueryBuilder('c')
       .leftJoin('c.subject', 'subject')

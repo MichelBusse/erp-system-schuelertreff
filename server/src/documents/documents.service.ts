@@ -141,7 +141,7 @@ export class DocumentsService {
     ownerId: number,
     userId: number,
     isAdmin: boolean,
-    type: string
+    type: string,
   ): Promise<Document[]> {
     const q = this.documentsRepository
       .createQueryBuilder('doc')
@@ -161,9 +161,9 @@ export class DocumentsService {
       )
     }
 
-    if(type === 'private'){
+    if (type === 'private') {
       q.andWhere('doc."visibleToEverybody" = false')
-    }else if(type === 'public'){
+    } else if (type === 'public') {
       q.andWhere('doc."visibleToEverybody" = true')
     }
 

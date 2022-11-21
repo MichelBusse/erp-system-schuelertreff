@@ -50,9 +50,9 @@ import {
   User,
 } from './entities'
 import { Leave, LeaveState } from './entities/leave.entity'
+import { SchoolState } from './entities/school.entity'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
-import { SchoolState } from './entities/school.entity'
 
 require('dayjs/locale/de')
 
@@ -982,7 +982,7 @@ export class UsersService {
   async createSchool(dto: CreateSchoolDto): Promise<School> {
     const school = this.schoolsRepository.create({
       ...dto,
-      mayAuthenticate: false
+      mayAuthenticate: false,
     })
 
     //TODO Maybe send creation Mail
@@ -1010,7 +1010,6 @@ export class UsersService {
 
       this.authService.initReset(school)
     }
-
 
     if (school.email !== updatedSchool.email && school.mayAuthenticate) {
       this.authService.initReset(school)

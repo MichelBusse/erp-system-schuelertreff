@@ -27,5 +27,5 @@ export default {
   PrivateCustomerDetailView,
   SchoolDetailView,
   LessonDetailView,
-  TeacherOverview
+  TeacherOverview,
 }

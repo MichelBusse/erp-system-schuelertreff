@@ -108,7 +108,7 @@ const SchoolDetailView: React.FC = () => {
     })
   }, [])
 
-  const updateSchool = (newData: any) => {
+  const updateSchool = (newData: schoolForm) => {
     setSchool((data) => ({
       ...data,
       firstName: newData.firstName ?? '',

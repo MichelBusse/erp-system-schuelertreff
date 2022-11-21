@@ -34,7 +34,9 @@ import ConfirmationDialog, {
   ConfirmationDialogProps,
   defaultConfirmationDialogProps,
 } from '../components/ConfirmationDialog'
-import UserDocuments, { UserDocumentsType } from '../components/documents/UserDocuments'
+import UserDocuments, {
+  UserDocumentsType,
+} from '../components/documents/UserDocuments'
 import IconButtonAdornment from '../components/IconButtonAdornment'
 import Leave from '../components/Leave'
 import TeacherInvoiceDataSelect, {
