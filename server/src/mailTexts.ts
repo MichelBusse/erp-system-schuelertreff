@@ -5,9 +5,33 @@ export const passwordResetMail = (link: string) => {
   )
 }
 
+export const passwordResetMailSchools = (link: string, schoolName: string) => {
+  return (
+    `Liebes Team der ${schoolName},\n\n\nmit dem folgenden Link können Sie ein neues Passwort für Ihren Account festlegen:\n\nLink:\n${link}\n\n` +
+    contactSignature
+  )
+}
+
+export const creationMailSchools = (schoolName: string) => {
+  return (
+    `Hallo liebes Team der ${schoolName},\n\n\nWillkommen auf unserem Portal!\n\nWir benötigen nur noch wenige Schritte, dann können Sie unsere Leistungen in vollem Umfang nutzen.\n\nNach der Prüfung Ihres Accounts werden wir diesen freischalten! Dies kann einige Stunden in Anspruch nehmen.\n\nWährenddessen können Sie gern unsere Webseite erkunden.\n\nLink: https://www.schuelertreff-nachhilfe.de/für-schulen\n\nNach der erfolgreichen Freischaltung erhalten Sie in der nächsten Mail einen Link, um Ihr individuelles Passwort erstellen zu können.\n\n_____________________________________________________________\n\nWir bedanken uns für Ihr Interesse an unserem Unternehmen!\n\nBei weiteren Fragen können Sie uns gern jederzeit unter folgenden Kontaktmöglichkeiten erreichen.\n\n` +
+    contactSignature
+  )
+}
+
 export const registrationMailText = (link: string) => {
   return (
     `Liebes Schülertreff-Mitglied,\n\nnoch einmal möchten wir dich in unserem Team willkommen heißen.\n\nDamit auch du nun bald mit deinen Einsätzen bei uns starten kannst, erhältst du in dieser Mail einen Link zugesendet. Klicke auf diesen und lege dein neues Passwort fest. Danach kannst du diese Mail, sowie dein neu festgelegtes Passwort für den LogIn verwenden.\nBitte beachte, dass dieser Passwort-Reset-Link nur eine Woche gültig ist.\n\nLink:\n${link}\n\nNach dem ersten LogIn bitten wir dich darum alle wichtigen Daten anzugeben, diese werden für unsere Vertragserstellung benötigt.\nSobald alles eingefügt ist, erstellen wir deinen Vertrag, sowie dein Antrag für ein Erweitertes Führungszeugnis. Beides kannst du dann herunterladen. Solltest du bereits im Besitz des Erweiterten Führungszeugnisses sein, so kannst du dieses direkt hochladen.\n\nSobald du diese Schritte befolgt hast, können wir starten und du erhälst deine ersten Einsätze.\nBei Fragen kannst du uns selbstverständlich unter den folgenden Kontaktdaten erreichen:\n\n` +
+    contactSignature
+  )
+}
+
+export const registrationMailTextSchool = (
+  link: string,
+  schoolName: string,
+) => {
+  return (
+    `Hallo liebes Team der ${schoolName},\n\n\nnoch einmal möchten wir Sie auf unserer Plattform willkommen heißen.\n\nDamit auch Sie Ihren vollwertigen Zugang erhalten, ist es wichtig ein Passwort zu erstellen. Dies können Sie unter dem folgenden Link.\n\nLink:\n${link}\n\nDanach können Sie Ihre Mail, sowie Ihr neu festgelegtes Passwort für den LogIn verwenden.\n\n–Bitte beachte, dass dieser Passwort-Reset-Link nur eine Woche gültig ist.–\n\nNach dem ersten LogIn bitten wir Sie darum alle wichtigen Daten anzugeben, diese werden für unsere Vertragserstellung benötigt. Gern können Sie auch Ihren Vertrag hochladen, diesen würden wir dann schnellstmöglich bearbeiten.\n\nIn dem Menüpunkt "Stundenplan" haben Sie die Möglichkeit eine Stundenübersicht Ihrer Stunden bei uns zu erhalten, sowie alle relevanten Daten zu den Mitarbeitern einzusehen.\n\nZudem erhalten Sie eine Benachrichtigung per Mail, falls unser Kursleiter ausfallen sollte und eine weitere Mail, falls wir eine Vertretung gefunden haben.\n\nBei Fragen können Sie uns selbstverständlich unter den folgenden Kontaktdaten erreichen:\n\n` +
     contactSignature
   )
 }

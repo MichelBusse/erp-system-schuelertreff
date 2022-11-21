@@ -1,50 +1,49 @@
-import AddIcon from '@mui/icons-material/Add'
-import { CircularProgress, Fab } from '@mui/material'
+import { CircularProgress } from '@mui/material'
 import { Box } from '@mui/system'
 import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
 
 import { snackbarOptionsError } from '../../consts'
 import { DrawerParameters } from '../../pages/timetable'
 import { contract } from '../../types/contract'
 import { lesson } from '../../types/lesson'
-import { teacher } from '../../types/user'
+import { classCustomer } from '../../types/user'
 import { useAuth } from '../AuthProvider'
 import MultiCalendar from './MultiCalendar'
 
 type Props = {
   date: Dayjs
   setDrawer: (params: DrawerParameters) => void
-  openDialog: () => void
   refresh?: number
 }
 
-const AdminCalendar: React.FC<Props> = ({
-  date,
-  setDrawer,
-  openDialog,
-  refresh,
-}) => {
+const SchoolCalendar: React.FC<Props> = ({ date, setDrawer, refresh }) => {
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
 
   const [contracts, setContracts] = useState<Record<number, contract[]>>({})
   const [lessons, setLessons] = useState<lesson[]>([])
-  const [teachers, setTeachers] = useState<{ id: number; title: string }[]>([])
+  const [classes, setClasses] = useState<{ id: number; title: string }[]>([])
 
   const [loading, setLoading] = useState(true)
   const [renderLoading, setRenderLoading] = useState(0)
 
+  const { id } = useParams()
+  const requestedId = id ?? 'me'
+  console.log(requestedId)
+  console.log(id)
+
   useEffect(() => {
-    API.get('users/teacher/employed').then((res) =>
-      setTeachers(
+    API.get('users/classCustomer/' + requestedId).then((res) =>
+      setClasses(
         res.data
-          .map((teacher: teacher) => ({
-            id: teacher.id,
-            title: `${teacher.firstName} ${teacher.lastName}`,
+          .map((classCustomer: classCustomer) => ({
+            id: classCustomer.id,
+            title: classCustomer.className,
           }))
-          .concat({ id: -1, title: 'Ausstehend' }),
+          .concat({ id: -1, title: 'Allgemein' }),
       ),
     )
   }, [refresh])
@@ -56,29 +55,34 @@ const AdminCalendar: React.FC<Props> = ({
     setLoading(true)
     setContracts({})
 
-    API.get('lessons/week', {
+    API.get('lessons/week/mySchool', {
       signal: ongoingRequest.signal,
       params: {
         of: date.format('YYYY-MM-DD'),
       },
     })
       .then((res) => {
-        const contractsByTeacher: Record<number, contract[]> = {}
+        const contractsByClass: Record<number, contract[]> = {}
+        console.log(res.data.contracts)
         res.data.contracts
           .sort((a: contract, b: contract) => {
             return dayjs(a.startTime, 'HH:mm').diff(dayjs(b.startTime, 'HH:mm'))
           })
           .map((c: contract) => {
-            if (c.teacher) {
-              contractsByTeacher[c.teacher.id] = (
-                contractsByTeacher[c.teacher.id] ?? []
-              ).concat(c)
-            } else {
-              contractsByTeacher[-1] = (contractsByTeacher[-1] ?? []).concat(c)
-            }
+            c.customers.map((customer) => {
+              if (customer.role === 'classCustomer') {
+                if (customer.defaultClassCustomer === true) {
+                  contractsByClass[-1] = (contractsByClass[-1] ?? []).concat(c)
+                } else {
+                  contractsByClass[customer.id] = (
+                    contractsByClass[customer.id] ?? []
+                  ).concat(c)
+                }
+              }
+            })
           })
 
-        setContracts(contractsByTeacher)
+        setContracts(contractsByClass)
         setLessons(res.data.lessons)
         setLoading(false)
       })
@@ -105,7 +109,7 @@ const AdminCalendar: React.FC<Props> = ({
           setDrawer={setDrawer}
           contracts={contracts}
           lessons={lessons}
-          labels={teachers}
+          labels={classes}
         />
 
         <CircularProgress
@@ -121,21 +125,8 @@ const AdminCalendar: React.FC<Props> = ({
           }}
         />
       </Box>
-
-      <Fab
-        color="primary"
-        aria-label="add"
-        style={{
-          position: 'absolute',
-          bottom: 64,
-          right: 16,
-        }}
-        onClick={openDialog}
-      >
-        <AddIcon />
-      </Fab>
     </>
   )
 }
 
-export default AdminCalendar
+export default SchoolCalendar

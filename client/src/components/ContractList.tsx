@@ -35,6 +35,7 @@ type Props = {
   onSuccess?: () => void
   allowTogglePast?: boolean
   sx?: SxProps<Theme>
+  userRole?: string
 }
 
 const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
@@ -54,6 +55,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
   const [open, setOpen] = useState<boolean>(false)
   const [confirmationDialogProps, setConfirmationDialogProps] =
     useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
+
   const theme = useTheme()
   const [showPast, setShowPast] = useState(false)
 

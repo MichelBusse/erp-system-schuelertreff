@@ -2,6 +2,7 @@ import {
   Add as AddIcon,
   Close as CloseIcon,
   Download as DownloadIcon,
+  Edit,
 } from '@mui/icons-material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import {
@@ -12,38 +13,52 @@ import {
   ListItemText,
   Stack,
 } from '@mui/material'
+import axios from 'axios'
 import * as B64ArrayBuffer from 'base64-arraybuffer'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 
-import { snackbarOptions, snackbarOptionsError } from '../consts'
-import documentType from '../types/document'
-import { formatDate } from '../utils/date'
-import { useAuth } from './AuthProvider'
+import { snackbarOptions, snackbarOptionsError } from '../../consts'
+import documentType from '../../types/document'
+import { Role } from '../../types/user'
+import { formatDate } from '../../utils/date'
+import { useAuth } from '../AuthProvider'
+import DocumentEditDialog from './DocumentEditDialog'
 import UploadDialog, { UploadDialogForm } from './UploadDialog'
+
+export enum UserDocumentsType {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+}
 
 type Props = {
   refresh?: number
   userId?: number
   actions?: React.ReactNode
+  userDocumentsType?: UserDocumentsType
 }
 
 const UserDocuments: React.FC<Props> = ({
   userId,
   actions,
   refresh: outsideRefresh,
+  userDocumentsType,
 }) => {
   const [documents, setDocuments] = useState<documentType[]>([])
   const [refresh, setRefresh] = useState(0)
   const [file, setFile] = useState<File>(new File([], ''))
+  const [editDialogDocument, setEditDialogDocument] = useState<
+    documentType | undefined
+  >(undefined)
   const [open, setOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const { API } = useAuth()
+  const { API, hasRole, decodeToken } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
-    API.get('documents', { params: { by: userId } })
+    API.get('documents', { params: { by: userId, type: userDocumentsType } })
       .then((res) => setDocuments(res.data))
       .catch((err) => {
         console.error(err)
@@ -56,6 +71,39 @@ const UserDocuments: React.FC<Props> = ({
     setOpen(true)
   }
 
+  const editDoc = (doc: documentType) => {
+    setEditDialogDocument(doc)
+    setEditDialogOpen(true)
+  }
+
+  const saveDoc = async (form: UploadDialogForm) => {
+    if (!editDialogDocument) return
+
+    API.post(`documents/` + editDialogDocument.id, {
+      fileName: form.fileName,
+      visibleToUser: form.visibleToUser,
+      visibleToEverybody: form.visibleToEverybody,
+      mayDelete: !form.protected,
+    })
+      .then(() => {
+        enqueueSnackbar('Dokument gespeichert.', snackbarOptions)
+        setEditDialogDocument(undefined)
+        setEditDialogOpen(false)
+        setRefresh((r) => ++r)
+      })
+      .catch((error) => {
+        if (axios.isAxiosError(error) && error.response?.status === 400) {
+          enqueueSnackbar(
+            (error.response.data as { message: string }).message,
+            snackbarOptionsError,
+          )
+        } else {
+          console.error(error)
+          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        }
+      })
+  }
+
   const uploadDoc = async (form: UploadDialogForm) => {
     setLoading(true)
 
@@ -65,7 +113,8 @@ const UserDocuments: React.FC<Props> = ({
       fileName: form.fileName,
       fileType: file.type,
       owner: userId,
-      mayRead: !form.hidden,
+      visibleToUser: form.visibleToUser,
+      visibleToEverybody: form.visibleToEverybody,
       mayDelete: !form.protected,
       content: B64ArrayBuffer.encode(buf),
     })
@@ -119,6 +168,11 @@ const UserDocuments: React.FC<Props> = ({
   const ListItemDoc: React.FC<{ doc: documentType }> = ({ doc }) => {
     const [confirm, setConfirm] = useState(false)
 
+    const editDisabled = !(
+      hasRole(Role.ADMIN) ||
+      ((userId === undefined || userId === decodeToken().sub) && doc.mayDelete)
+    )
+
     return (
       <ListItem
         secondaryAction={
@@ -127,8 +181,11 @@ const UserDocuments: React.FC<Props> = ({
               <IconButton onClick={() => downloadDoc(doc)}>
                 <DownloadIcon />
               </IconButton>
+              <IconButton disabled={editDisabled} onClick={() => editDoc(doc)}>
+                <Edit />
+              </IconButton>
               <IconButton
-                disabled={!userId && !doc.mayDelete}
+                disabled={editDisabled}
                 onClick={() => setConfirm(true)}
               >
                 <DeleteIcon />
@@ -140,8 +197,8 @@ const UserDocuments: React.FC<Props> = ({
                 <CloseIcon />
               </IconButton>
               <IconButton
+                disabled={editDisabled}
                 color="error"
-                disabled={!userId && !doc.mayDelete}
                 onClick={() => deleteDoc(doc.id)}
               >
                 <DeleteIcon />
@@ -170,17 +227,19 @@ const UserDocuments: React.FC<Props> = ({
       >
         <ListItem>
           <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ width: '100%' }}>
-            <Button variant="text" component="label" endIcon={<AddIcon />}>
-              <input
-                hidden
-                accept="*"
-                type="file"
-                onChange={(e) => {
-                  if (e.target.files) openDialog(e.target.files[0])
-                }}
-              />
-              {'Hinzufügen'}
-            </Button>
+            {(hasRole(Role.ADMIN) || !userId) && (
+              <Button variant="text" component="label" endIcon={<AddIcon />}>
+                <input
+                  hidden
+                  accept="*"
+                  type="file"
+                  onChange={(e) => {
+                    if (e.target.files) openDialog(e.target.files[0])
+                  }}
+                />
+                {'Hinzufügen'}
+              </Button>
+            )}
             {actions}
           </Stack>
         </ListItem>
@@ -195,12 +254,22 @@ const UserDocuments: React.FC<Props> = ({
       </List>
       <UploadDialog
         key={file.name}
+        userDocumentsType={userDocumentsType}
         open={open}
         close={() => setOpen(false)}
         loading={loading}
         onSubmit={uploadDoc}
         file={file}
-        minimalView={typeof userId === 'undefined'}
+        minimalView={!hasRole(Role.ADMIN)}
+      />
+      <DocumentEditDialog
+        open={editDialogOpen}
+        close={() => {
+          setEditDialogOpen(false)
+          setEditDialogDocument(undefined)
+        }}
+        onSubmit={saveDoc}
+        document={editDialogDocument}
       />
     </>
   )

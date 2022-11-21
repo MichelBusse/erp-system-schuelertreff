@@ -50,6 +50,7 @@ import {
   User,
 } from './entities'
 import { Leave, LeaveState } from './entities/leave.entity'
+import { SchoolState } from './entities/school.entity'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
 
@@ -557,7 +558,8 @@ export class UsersService {
       fileName: 'Arbeitsvertrag.pdf',
       fileType: 'application/pdf',
       owner: user.id,
-      mayRead: true,
+      visibleToUser: true,
+      visibleToEverybody: true,
       mayDelete: false,
       content: buffer,
     })
@@ -601,7 +603,8 @@ export class UsersService {
       fileName: 'Führungszeugnis Antrag.pdf',
       fileType: 'application/pdf',
       owner: user.id,
-      mayRead: true,
+      visibleToUser: true,
+      visibleToEverybody: false,
       mayDelete: false,
       content: buffer,
     })
@@ -982,19 +985,37 @@ export class UsersService {
       mayAuthenticate: false,
     })
 
+    //TODO Maybe send creation Mail
+
     return this.schoolsRepository.save(school)
   }
 
-  async updateSchoolAdmin(id: number, dto: UpdateSchoolDto): Promise<School> {
-    const school = await this.findOne(id)
+  async updateSchool(
+    id: number,
+    dto: Partial<UpdateSchoolDto>,
+  ): Promise<School> {
+    const school = await this.findOneSchool(id)
 
-    return this.schoolsRepository
-      .save({
-        ...school,
-        ...dto,
-        timesAvailable: `{${maxTimeRange}}`,
-      })
-      .then(transformUser)
+    const updatedSchool = {
+      ...school,
+      ...dto,
+      timesAvailable: `{${maxTimeRange}}`,
+    }
+
+    if (
+      school.schoolState !== SchoolState.CONFIRMED &&
+      updatedSchool.schoolState === SchoolState.CONFIRMED
+    ) {
+      updatedSchool.mayAuthenticate = true
+
+      this.authService.initReset(school)
+    }
+
+    if (school.email !== updatedSchool.email && school.mayAuthenticate) {
+      this.authService.initReset(school)
+    }
+
+    return this.schoolsRepository.save(updatedSchool).then(transformUser)
   }
 
   async deleteSchool(id: number) {

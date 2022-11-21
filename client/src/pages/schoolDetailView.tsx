@@ -39,17 +39,20 @@ import ContractList from '../components/ContractList'
 import CustomerInvoiceDataSelect, {
   CustomerInvoiceData,
 } from '../components/CustomerInvoiceDateSelect'
+import UserDocuments, {
+  UserDocumentsType,
+} from '../components/documents/UserDocuments'
 import IconButtonAdornment from '../components/IconButtonAdornment'
-import UserDocuments from '../components/UserDocuments'
 import {
   defaultClassCustomerFormData,
   defaultSchoolFormData,
+  schoolStateToString,
   snackbarOptions,
   snackbarOptionsError,
 } from '../consts'
 import styles from '../pages/gridList.module.scss'
 import { contractWithTeacher } from '../types/contract'
-import { DeleteState, SchoolType } from '../types/enums'
+import { DeleteState, SchoolState, SchoolType } from '../types/enums'
 import {
   classCustomerForm,
   schoolForm,
@@ -68,7 +71,10 @@ const SchoolDetailView: React.FC = () => {
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
 
-  const requestedId = id ? id : 'me'
+  const { decodeToken } = useAuth()
+  const role = decodeToken().role
+
+  const requestedId = id ?? 'me'
 
   const [classCustomers, setClassCustomers] = useState<classCustomerForm[]>([])
   const [school, setSchool] = useState<schoolForm>(defaultSchoolFormData)
@@ -98,25 +104,30 @@ const SchoolDetailView: React.FC = () => {
 
   useEffect(() => {
     API.get('users/school/' + requestedId).then((res) => {
-      setSchool((data) => ({
-        ...data,
-        firstName: res.data.firstName ?? '',
-        lastName: res.data.lastName ?? '',
-        schoolName: res.data.schoolName ?? '',
-        city: res.data.city ?? '',
-        postalCode: res.data.postalCode ?? '',
-        street: res.data.street ?? '',
-        email: res.data.email ?? '',
-        phone: res.data.phone ?? '',
-        schoolTypes: res.data.schoolTypes ?? [],
-        feeStandard: res.data.feeStandard,
-        feeOnline: res.data.feeOnline,
-        notes: res.data.notes ?? '',
-        dateOfStart: res.data.dateOfStart ? dayjs(res.data.dateOfStart) : null,
-        deleteState: res.data.deleteState as DeleteState,
-      }))
+      updateSchool(res.data)
     })
   }, [])
+
+  const updateSchool = (newData: schoolForm) => {
+    setSchool((data) => ({
+      ...data,
+      firstName: newData.firstName ?? '',
+      lastName: newData.lastName ?? '',
+      schoolName: newData.schoolName ?? '',
+      city: newData.city ?? '',
+      postalCode: newData.postalCode ?? '',
+      street: newData.street ?? '',
+      email: newData.email ?? '',
+      phone: newData.phone ?? '',
+      schoolTypes: newData.schoolTypes ?? [],
+      feeStandard: newData.feeStandard,
+      feeOnline: newData.feeOnline,
+      notes: newData.notes ?? '',
+      dateOfStart: newData.dateOfStart ? dayjs(newData.dateOfStart) : null,
+      deleteState: newData.deleteState as DeleteState,
+      schoolState: newData.schoolState as SchoolState,
+    }))
+  }
 
   useEffect(() => {
     API.get('users/classCustomer/' + requestedId).then((res) => {
@@ -151,18 +162,20 @@ const SchoolDetailView: React.FC = () => {
     })
   }, [])
 
-  const submitForm = () => {
+  const submitForm = (override: Partial<schoolForm> = {}) => {
     const errorTexts = schoolFormValidation(school)
 
     if (errorTexts.valid) {
       API.post('users/school/' + requestedId, {
         ...school,
+        ...override,
         firstName: school.firstName !== '' ? school.firstName : undefined,
         lastName: school.lastName !== '' ? school.lastName : undefined,
         dateOfStart: school.dateOfStart?.format(),
       })
-        .then(() => {
+        .then((res) => {
           enqueueSnackbar(school.schoolName + ' gespeichert')
+          updateSchool(res.data)
         })
         .catch(() => {
           enqueueSnackbar('Fehler beim Speichern der Schuldaten')
@@ -277,9 +290,11 @@ const SchoolDetailView: React.FC = () => {
   const addClass = () => {
     setAddClassDialogOpen(false)
     if (newClassCustomer.className) {
+      let schoolId: number | string
+      requestedId === 'me' ? (schoolId = -1) : (schoolId = requestedId)
       API.post('users/classCustomer/', {
         ...newClassCustomer,
-        school: requestedId,
+        school: schoolId,
         timesAvailable: newClassCustomer.timesAvailable.map((time) => ({
           dow: time.dow,
           start: time.start?.format('HH:mm'),
@@ -375,6 +390,16 @@ const SchoolDetailView: React.FC = () => {
       })
   }
 
+  const resetPassword = () => {
+    API.post('auth/reset/mail/admin', { mail: school.email })
+      .then(() => {
+        enqueueSnackbar('Der Passwort-Reset wurde an die E-Mail gesendet')
+      })
+      .catch(() => {
+        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+      })
+  }
+
   return (
     <div className={styles.wrapper}>
       <Box className={styles.contentBox}>
@@ -394,7 +419,7 @@ const SchoolDetailView: React.FC = () => {
               error={schoolErrors.schoolName !== ''}
               value={school.schoolName ?? ''}
               InputProps={{
-                readOnly: requestedId === 'me',
+                disabled: requestedId === 'me',
               }}
             />
             <Autocomplete
@@ -444,9 +469,6 @@ const SchoolDetailView: React.FC = () => {
                 }))
               }
               value={school.firstName ?? ''}
-              InputProps={{
-                readOnly: requestedId === 'me',
-              }}
             />
             <TextField
               fullWidth={true}
@@ -460,9 +482,6 @@ const SchoolDetailView: React.FC = () => {
                 }))
               }
               value={school.lastName ?? ''}
-              InputProps={{
-                readOnly: requestedId === 'me',
-              }}
             />
           </Stack>
           <h3>Adresse:</h3>
@@ -516,76 +535,79 @@ const SchoolDetailView: React.FC = () => {
               }}
             />
           </Stack>
-
-          <h3>Weitere Infos</h3>
-          <Stack direction="row" columnGap={2}>
-            <TextField
-              type="number"
-              id="fee"
-              label="Stundensatz Standard"
-              helperText={schoolErrors.feeStandard}
-              error={schoolErrors.feeStandard !== ''}
-              variant="outlined"
-              fullWidth
-              disabled={requestedId === 'me'}
-              value={school.feeStandard ?? ''}
-              onChange={(event) =>
-                setSchool((data) => ({
-                  ...data,
-                  feeStandard: Number(event.target.value),
-                }))
-              }
-            />
-            <TextField
-              type="number"
-              id="fee"
-              label="Stundensatz Online"
-              helperText={schoolErrors.feeOnline}
-              error={schoolErrors.feeOnline !== ''}
-              variant="outlined"
-              fullWidth
-              disabled={requestedId === 'me'}
-              value={school.feeOnline ?? ''}
-              onChange={(event) =>
-                setSchool((data) => ({
-                  ...data,
-                  feeOnline: Number(event.target.value),
-                }))
-              }
-            />
-            <DatePicker
-              label="Startdatum"
-              mask="__.__.____"
-              value={school.dateOfStart}
-              onChange={(value) => {
-                setSchool((s) => ({ ...s, dateOfStart: value }))
-              }}
-              renderInput={(params) => (
+          {id && (
+            <>
+              <h3>Weitere Infos</h3>
+              <Stack direction="row" columnGap={2}>
                 <TextField
-                  fullWidth
-                  {...params}
-                  required
+                  type="number"
+                  id="fee"
+                  label="Stundensatz Standard"
+                  helperText={schoolErrors.feeStandard}
+                  error={schoolErrors.feeStandard !== ''}
                   variant="outlined"
-                  helperText={schoolErrors.dateOfStart}
-                  error={schoolErrors.dateOfStart !== ''}
+                  fullWidth
+                  disabled={requestedId === 'me'}
+                  value={school.feeStandard ?? ''}
+                  onChange={(event) =>
+                    setSchool((data) => ({
+                      ...data,
+                      feeStandard: Number(event.target.value),
+                    }))
+                  }
                 />
-              )}
-              InputAdornmentProps={{
-                position: 'start',
-              }}
-              InputProps={{
-                endAdornment: (
-                  <IconButtonAdornment
-                    icon={ClearIcon}
-                    hidden={school.dateOfStart === null}
-                    onClick={() =>
-                      setSchool((s) => ({ ...s, dateOfStart: null }))
-                    }
-                  />
-                ),
-              }}
-            />
-          </Stack>
+                <TextField
+                  type="number"
+                  id="fee"
+                  label="Stundensatz Online"
+                  helperText={schoolErrors.feeOnline}
+                  error={schoolErrors.feeOnline !== ''}
+                  variant="outlined"
+                  fullWidth
+                  disabled={requestedId === 'me'}
+                  value={school.feeOnline ?? ''}
+                  onChange={(event) =>
+                    setSchool((data) => ({
+                      ...data,
+                      feeOnline: Number(event.target.value),
+                    }))
+                  }
+                />
+                <DatePicker
+                  label="Startdatum"
+                  mask="__.__.____"
+                  value={school.dateOfStart}
+                  onChange={(value) => {
+                    setSchool((s) => ({ ...s, dateOfStart: value }))
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      fullWidth
+                      {...params}
+                      required
+                      variant="outlined"
+                      helperText={schoolErrors.dateOfStart}
+                      error={schoolErrors.dateOfStart !== ''}
+                    />
+                  )}
+                  InputAdornmentProps={{
+                    position: 'start',
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <IconButtonAdornment
+                        icon={ClearIcon}
+                        hidden={school.dateOfStart === null}
+                        onClick={() =>
+                          setSchool((s) => ({ ...s, dateOfStart: null }))
+                        }
+                      />
+                    ),
+                  }}
+                />
+              </Stack>
+            </>
+          )}
           <h3>Kontakt:</h3>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
@@ -600,6 +622,9 @@ const SchoolDetailView: React.FC = () => {
                   email: event.target.value.toLowerCase(),
                 }))
               }
+              InputProps={{
+                disabled: requestedId === 'me',
+              }}
             />
 
             <TextField
@@ -616,145 +641,156 @@ const SchoolDetailView: React.FC = () => {
               }
             />
           </Stack>
-          <h3>Notizen</h3>
-          <TextField
-            multiline
-            value={school.notes ?? ''}
-            onChange={(e) => {
-              setSchool((data) => ({ ...data, notes: e.target.value }))
-            }}
-            fullWidth
-            rows={5}
-          />
-          <Stack direction={'row'} columnGap={2}>
-            <h3>Klassen:</h3>
-            {school.deleteState !== DeleteState.DELETED && (
-              <IconButton
-                sx={{ marginLeft: 'auto' }}
-                onClick={() => {
-                  if (school.schoolTypes.length > 0) {
-                    newClassCustomer.schoolType = school
-                      .schoolTypes[0] as SchoolType
-                  }
-                  setAddClassDialogOpen(true)
+          {id && (
+            <>
+              <h3>Notizen</h3>
+              <TextField
+                multiline
+                value={school.notes ?? ''}
+                onChange={(e) => {
+                  setSchool((data) => ({ ...data, notes: e.target.value }))
+                }}
+                fullWidth
+                rows={5}
+              />
+            </>
+          )}
+          {id && (
+            <Stack direction={'row'} columnGap={2}>
+              <h3>Klassen:</h3>
+              {school.deleteState !== DeleteState.DELETED && (
+                <IconButton
+                  sx={{ marginLeft: 'auto' }}
+                  onClick={() => {
+                    if (school.schoolTypes.length > 0) {
+                      newClassCustomer.schoolType = school
+                        .schoolTypes[0] as SchoolType
+                    }
+                    setAddClassDialogOpen(true)
+                  }}
+                >
+                  <AddCircleIcon fontSize="large" color="primary" />
+                </IconButton>
+              )}
+            </Stack>
+          )}
+          {id &&
+            classCustomers.map((classCustomer, index) => (
+              <Accordion
+                key={classCustomer.id}
+                sx={{
+                  border: '1px solid rgba(0, 0, 0, 0.23)',
+                  boxShadow: 'none',
+                  transition: 'none',
+                  borderRadius: '4px',
+                  margin: '4px 0',
                 }}
               >
-                <AddCircleIcon fontSize="large" color="primary" />
-              </IconButton>
-            )}
-          </Stack>
-          {classCustomers.map((classCustomer, index) => (
-            <Accordion
-              key={classCustomer.id}
-              sx={{
-                border: '1px solid rgba(0, 0, 0, 0.23)',
-                boxShadow: 'none',
-                transition: 'none',
-                borderRadius: '4px',
-                margin: '4px 0',
-              }}
-            >
-              <AccordionSummary
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-                sx={{ alignItems: 'center' }}
-              >
-                <Stack
-                  direction={'row'}
-                  sx={{ width: '100%' }}
-                  columnGap={2}
-                  alignItems={'center'}
+                <AccordionSummary
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                  sx={{ alignItems: 'center' }}
                 >
-                  <Typography sx={{ width: '10em' }}>
-                    {classCustomer.className}
-                  </Typography>
-                  <IconButton
-                    onClick={() => deleteClass(index)}
-                    sx={{ marginLeft: 'auto' }}
-                    color="error"
+                  <Stack
+                    direction={'row'}
+                    sx={{ width: '100%' }}
+                    columnGap={2}
+                    alignItems={'center'}
                   >
-                    <DeleteIcon />
-                  </IconButton>
-                </Stack>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Box>
-                  <Stack direction={'column'} rowGap={2}>
-                    <Stack direction={'row'} columnGap={2}>
-                      <TextField
-                        fullWidth
-                        value={classCustomer.className ?? ''}
-                        label={'Klassenname'}
-                        onChange={(e) =>
-                          editClassCustomer(
-                            { className: e.target.value },
-                            index,
-                          )
-                        }
-                      />
-                    </Stack>
-                    <Stack direction={'row'} columnGap={2}>
-                      <FormControl fullWidth>
-                        <InputLabel id="invoiceMonthLabel">Schulart</InputLabel>
-                        <Select
-                          label={'Schulart'}
+                    <Typography sx={{ width: '10em' }}>
+                      {classCustomer.className}
+                    </Typography>
+                    <IconButton
+                      onClick={() => deleteClass(index)}
+                      sx={{ marginLeft: 'auto' }}
+                      color="error"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Stack>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box>
+                    <Stack direction={'column'} rowGap={2}>
+                      <Stack direction={'row'} columnGap={2}>
+                        <TextField
                           fullWidth
-                          value={classCustomer.schoolType ?? ''}
+                          value={classCustomer.className ?? ''}
+                          label={'Klassenname'}
+                          onChange={(e) =>
+                            editClassCustomer(
+                              { className: e.target.value },
+                              index,
+                            )
+                          }
+                        />
+                      </Stack>
+                      <Stack direction={'row'} columnGap={2}>
+                        <FormControl fullWidth>
+                          <InputLabel id="invoiceMonthLabel">
+                            Schulart
+                          </InputLabel>
+                          <Select
+                            label={'Schulart'}
+                            fullWidth
+                            value={classCustomer.schoolType ?? ''}
+                            onChange={(e) => {
+                              editClassCustomer(
+                                { schoolType: e.target.value as SchoolType },
+                                index,
+                              )
+                            }}
+                          >
+                            <MenuItem value={SchoolType.GRUNDSCHULE}>
+                              Grundschule
+                            </MenuItem>
+                            <MenuItem value={SchoolType.OBERSCHULE}>
+                              Oberschule
+                            </MenuItem>
+                            <MenuItem value={SchoolType.GYMNASIUM}>
+                              Gymnasium
+                            </MenuItem>
+                            <MenuItem value={SchoolType.ANDERE}>
+                              Andere
+                            </MenuItem>
+                          </Select>
+                        </FormControl>
+                        <TextField
+                          type="number"
+                          label={'Klassenstufe'}
+                          InputProps={{ inputProps: { min: 0, max: 13 } }}
+                          fullWidth
+                          value={classCustomer.grade ?? ''}
                           onChange={(e) => {
                             editClassCustomer(
-                              { schoolType: e.target.value as SchoolType },
+                              { grade: Number(e.target.value) },
                               index,
                             )
                           }}
-                        >
-                          <MenuItem value={SchoolType.GRUNDSCHULE}>
-                            Grundschule
-                          </MenuItem>
-                          <MenuItem value={SchoolType.OBERSCHULE}>
-                            Oberschule
-                          </MenuItem>
-                          <MenuItem value={SchoolType.GYMNASIUM}>
-                            Gymnasium
-                          </MenuItem>
-                          <MenuItem value={SchoolType.ANDERE}>Andere</MenuItem>
-                        </Select>
-                      </FormControl>
-                      <TextField
-                        type="number"
-                        label={'Klassenstufe'}
-                        InputProps={{ inputProps: { min: 0, max: 13 } }}
-                        fullWidth
-                        value={classCustomer.grade ?? ''}
-                        onChange={(e) => {
-                          editClassCustomer(
-                            { grade: Number(e.target.value) },
-                            index,
-                          )
-                        }}
+                        />
+                      </Stack>
+                      <AddTimes
+                        value={classCustomer.timesAvailable ?? []}
+                        setValue={(newValue) =>
+                          editClassCustomer({ timesAvailable: newValue }, index)
+                        }
                       />
+                      <Stack direction={'row'}>
+                        <Button
+                          variant="contained"
+                          onClick={() => saveClassCustomer(index)}
+                        >
+                          Klasse Speichern
+                        </Button>
+                      </Stack>
                     </Stack>
-                    <AddTimes
-                      value={classCustomer.timesAvailable ?? []}
-                      setValue={(newValue) =>
-                        editClassCustomer({ timesAvailable: newValue }, index)
-                      }
-                    />
-                    <Stack direction={'row'}>
-                      <Button
-                        variant="contained"
-                        onClick={() => saveClassCustomer(index)}
-                      >
-                        Klasse Speichern
-                      </Button>
-                    </Stack>
-                  </Stack>
-                </Box>
-              </AccordionDetails>
-            </Accordion>
-          ))}
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+            ))}
           <Stack direction={'row'} columnGap={2}>
             <h3>Einsätze:</h3>
-            {school.deleteState !== DeleteState.DELETED && (
+            {id && school.deleteState !== DeleteState.DELETED && (
               <IconButton
                 sx={{ marginLeft: 'auto' }}
                 onClick={() => {
@@ -771,11 +807,18 @@ const SchoolDetailView: React.FC = () => {
             allowTogglePast={true}
             setContracts={setContracts}
             onSuccess={() => setRefreshContracts((r) => r + 1)}
+            userRole={role}
           />
           <h3>Dokumente:</h3>
           <UserDocuments
+            userDocumentsType={UserDocumentsType.PRIVATE}
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
           />
+          {id && (
+            <Typography>
+              Status: {schoolStateToString[school.schoolState]}
+            </Typography>
+          )}
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={2}
@@ -786,7 +829,7 @@ const SchoolDetailView: React.FC = () => {
                 Zurück
               </Button>
             )}
-            <Button onClick={submitForm} variant="contained">
+            <Button onClick={() => submitForm()} variant="contained">
               Schule Speichern
             </Button>
             {id && school.deleteState === DeleteState.DELETED && (
@@ -810,13 +853,36 @@ const SchoolDetailView: React.FC = () => {
                   : 'Schule archivieren'}
               </Button>
             )}
+            {id &&
+              school.schoolState === SchoolState.CREATED &&
+              school.deleteState === DeleteState.ACTIVE && (
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() =>
+                    submitForm({ schoolState: SchoolState.CONFIRMED })
+                  }
+                >
+                  Bestätigen
+                </Button>
+              )}
+            {id &&
+              school.deleteState === DeleteState.ACTIVE &&
+              school.schoolState === SchoolState.CONFIRMED && (
+                <Button variant="outlined" onClick={() => resetPassword()}>
+                  Passwort-Reset
+                </Button>
+              )}
           </Stack>
-
-          <h3>Rechnung generieren:</h3>
-          <CustomerInvoiceDataSelect
-            generateInvoice={generateInvoice}
-            type={Role.SCHOOL}
-          />
+          {id && (
+            <>
+              <h3>Rechnung generieren:</h3>
+              <CustomerInvoiceDataSelect
+                generateInvoice={generateInvoice}
+                type={Role.SCHOOL}
+              />
+            </>
+          )}
         </Stack>
       </Box>
       <Dialog open={addClassDialogOpen}>

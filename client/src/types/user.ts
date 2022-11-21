@@ -3,6 +3,7 @@ import {
   DeleteState,
   LeaveState,
   LeaveType,
+  SchoolState,
   SchoolType,
   TeacherSchoolType,
   TeacherState,
@@ -91,6 +92,7 @@ export interface school extends Omit<user, 'lastName' | 'firstName'> {
   feeOnline: number
   schoolTypes: string[]
   dateOfStart: string | null
+  schoolState: SchoolState
 }
 
 export interface classCustomer {

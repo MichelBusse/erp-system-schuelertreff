@@ -4,8 +4,10 @@ import { OptionsObject as SnackbarOptions } from 'notistack'
 import { ContractState } from './types/contract'
 import {
   ContractType,
+  Degree,
   LeaveState,
   LeaveType,
+  SchoolState,
   SchoolType,
   TeacherSchoolType,
   TeacherState,
@@ -88,6 +90,11 @@ export const teacherStateToString: { [key in TeacherState]: string } = {
   employed: 'Eingestellt',
 }
 
+export const schoolStateToString: { [key in SchoolState]: string } = {
+  created: 'Registriert',
+  confirmed: 'Bestätigt',
+}
+
 export const leaveTypeToString: { [key in LeaveType]: string } = {
   regular: 'Urlaub',
   sick: 'Krankmeldung',
@@ -118,6 +125,13 @@ export const teacherSchoolTypeToString: { [key in TeacherSchoolType]: string } =
     sek2: 'Gymnasium Sek. 2',
   }
 
+export const degreeToString: { [key in Degree]: string } = {
+  noinfo: 'Keine Angabe',
+  highschool: 'Abitur',
+  bachelor: 'Bachelor',
+  master: 'Master',
+}
+
 export const defaultSchoolFormData: schoolForm = {
   firstName: '',
   lastName: '',
@@ -132,6 +146,7 @@ export const defaultSchoolFormData: schoolForm = {
   feeOnline: 20,
   notes: '',
   dateOfStart: null,
+  schoolState: SchoolState.CREATED,
 }
 
 export const defaultClassCustomerFormData: classCustomerForm = {

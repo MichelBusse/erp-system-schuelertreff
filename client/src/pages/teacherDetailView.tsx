@@ -34,12 +34,14 @@ import ConfirmationDialog, {
   ConfirmationDialogProps,
   defaultConfirmationDialogProps,
 } from '../components/ConfirmationDialog'
+import UserDocuments, {
+  UserDocumentsType,
+} from '../components/documents/UserDocuments'
 import IconButtonAdornment from '../components/IconButtonAdornment'
 import Leave from '../components/Leave'
 import TeacherInvoiceDataSelect, {
   TeacherInvoiceData,
 } from '../components/TeacherInvoiceDateSelect'
-import UserDocuments from '../components/UserDocuments'
 import {
   defaultTeacherFormData,
   snackbarOptions,
@@ -375,9 +377,6 @@ const TeacherDetailView: React.FC = () => {
                 }))
               }
               value={data.firstName ?? ''}
-              InputProps={{
-                readOnly: requestedId === 'me',
-              }}
             />
             <TextField
               helperText={errors.lastName}
@@ -393,9 +392,6 @@ const TeacherDetailView: React.FC = () => {
                 }))
               }
               value={data.lastName ?? ''}
-              InputProps={{
-                readOnly: requestedId === 'me',
-              }}
             />
           </Stack>
           <DatePicker
@@ -530,9 +526,6 @@ const TeacherDetailView: React.FC = () => {
                 }))
               }
               value={data.email ?? ''}
-              InputProps={{
-                readOnly: requestedId === 'me',
-              }}
             />
 
             <TextField
@@ -809,11 +802,11 @@ const TeacherDetailView: React.FC = () => {
               />
             </>
           )}
-
           <h3>Dokumente:</h3>
           <UserDocuments
             refresh={refreshDocuments}
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
+            userDocumentsType={UserDocumentsType.PRIVATE}
             actions={
               id &&
               (data.state === TeacherState.CONTRACT ||
@@ -837,7 +830,13 @@ const TeacherDetailView: React.FC = () => {
               )
             }
           />
-          {requestedId !== 'me' && (
+          <h3>Öffentliche Dokumente:</h3>
+          <UserDocuments
+            userDocumentsType={UserDocumentsType.PUBLIC}
+            refresh={refreshDocuments}
+            userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
+          />
+          {id && (
             <Typography>Status: {teacherStateToString[data.state]}</Typography>
           )}
           <Stack

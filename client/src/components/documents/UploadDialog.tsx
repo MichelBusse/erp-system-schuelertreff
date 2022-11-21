@@ -13,9 +13,12 @@ import {
 } from '@mui/material'
 import { useState } from 'react'
 
+import { UserDocumentsType } from './UserDocuments'
+
 export type UploadDialogForm = {
   fileName: string
-  hidden: boolean
+  visibleToUser: boolean
+  visibleToEverybody: boolean
   protected: boolean
 }
 
@@ -26,6 +29,7 @@ type Props = {
   onSubmit: (form: UploadDialogForm) => void
   file: File
   minimalView?: boolean
+  userDocumentsType?: UserDocumentsType
 }
 
 const UploadDialog: React.FC<Props> = ({
@@ -35,11 +39,13 @@ const UploadDialog: React.FC<Props> = ({
   onSubmit,
   file,
   minimalView = false,
+  userDocumentsType,
 }) => {
   const [form, setForm] = useState<UploadDialogForm>({
     fileName: file.name,
-    hidden: false,
-    protected: false,
+    visibleToUser: true,
+    visibleToEverybody: userDocumentsType === UserDocumentsType.PUBLIC,
+    protected: userDocumentsType === UserDocumentsType.PUBLIC,
   })
 
   const validForm = !!form.fileName
@@ -64,15 +70,31 @@ const UploadDialog: React.FC<Props> = ({
           {!minimalView && (
             <FormGroup>
               <FormControlLabel
-                label="Versteckt"
+                label="Für Nutzer sichtbar"
+                disabled={form.visibleToEverybody}
                 control={
                   <Checkbox
-                    checked={form.hidden}
+                    checked={form.visibleToUser}
                     onChange={(e) =>
                       setForm((f) => ({
                         ...f,
-                        hidden: e.target.checked,
-                        protected: e.target.checked,
+                        visibleToUser: e.target.checked,
+                      }))
+                    }
+                  />
+                }
+              />
+              <FormControlLabel
+                label="Für alle Nutzer sichtbar"
+                control={
+                  <Checkbox
+                    checked={form.visibleToEverybody}
+                    disabled={userDocumentsType !== undefined}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        visibleToUser: true,
+                        visibleToEverybody: e.target.checked,
                       }))
                     }
                   />
@@ -80,7 +102,6 @@ const UploadDialog: React.FC<Props> = ({
               />
               <FormControlLabel
                 label="Schreibgeschützt"
-                disabled={form.hidden}
                 control={
                   <Checkbox
                     checked={form.protected}

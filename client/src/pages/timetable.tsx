@@ -18,6 +18,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { useAuth } from '../components/AuthProvider'
 import AdminCalendar from '../components/calendar/AdminCalendar'
+import SchoolCalendar from '../components/calendar/SchoolCalendar'
 import TeacherCalendar from '../components/calendar/TeacherCalendar'
 import CalendarControl from '../components/CalendarControl'
 import ContractDialog from '../components/ContractDialog'
@@ -37,9 +38,12 @@ export type DrawerParameters = {
 
 const Timetable: React.FC = () => {
   const { hasRole } = useAuth()
+  const { decodeToken } = useAuth()
   const { initialDate } = useParams()
   const theme = useTheme()
   const navigate = useNavigate()
+
+  const userRole = decodeToken().role
 
   const [drawer, setDrawer] = useState<DrawerParameters>({
     open: false,
@@ -94,6 +98,14 @@ const Timetable: React.FC = () => {
         }}
       >
         <CalendarControl date={date} setDate={setDate} />
+
+        {hasRole(Role.SCHOOL) ? (
+          <SchoolCalendar
+            date={date}
+            setDrawer={setDrawer}
+            refresh={refreshCalendar}
+          />
+        ) : null}
 
         {hasRole(Role.ADMIN) ? (
           <AdminCalendar
@@ -180,6 +192,7 @@ const Timetable: React.FC = () => {
                     }}
                     calendarDate={date}
                     date={dayjs(drawer.params?.colDef.headerName, 'YYYY-MM-DD')}
+                    userRole={userRole}
                   />
                 )
               })}

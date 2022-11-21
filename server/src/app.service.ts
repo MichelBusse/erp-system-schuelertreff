@@ -64,11 +64,7 @@ export class AppService implements OnApplicationBootstrap {
       const user = await this.usersService.createAdmin({
         lastName: 'Administrator',
         firstName: '',
-        street: '',
-        city: '',
-        postalCode: '',
         email: adminUser,
-        phone: '',
       })
 
       this.usersService.setPassword(user.id, password)

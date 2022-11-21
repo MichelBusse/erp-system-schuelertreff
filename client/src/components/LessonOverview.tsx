@@ -23,6 +23,7 @@ type Props = {
   date: Dayjs
   calendarDate: Dayjs
   refresh: () => void
+  userRole?: string
 }
 
 const LessonOverview: React.FC<Props> = ({
@@ -31,11 +32,14 @@ const LessonOverview: React.FC<Props> = ({
   date,
   calendarDate,
   refresh,
+  userRole,
 }) => {
   const navigate = useNavigate()
   const { API } = useAuth()
   const [held, setHeld] = useState(existingLesson?.state === LessonState.HELD)
   const { enqueueSnackbar } = useSnackbar()
+
+  const limitedView = userRole === 'school' ? true : false
 
   const toggleLessonHeld = (held: boolean) => {
     API.post('lessons/' + (existingLesson?.id ?? ''), {
@@ -145,6 +149,7 @@ const LessonOverview: React.FC<Props> = ({
           disabled={contract.blocked}
           control={
             <Checkbox
+              disabled={limitedView}
               checked={held}
               onChange={(e) => {
                 toggleLessonHeld(e.target.checked)
@@ -154,7 +159,7 @@ const LessonOverview: React.FC<Props> = ({
           label="Gehalten"
         />
       </FormGroup>
-      {!contract.blocked && (
+      {!contract.blocked && !limitedView && (
         <Button
           onClick={() =>
             navigate(
@@ -168,6 +173,13 @@ const LessonOverview: React.FC<Props> = ({
           }
         >
           Mehr anzeigen
+        </Button>
+      )}
+      {limitedView && (
+        <Button
+          onClick={() => navigate('/timetable/teacher/' + contract.teacher.id)}
+        >
+          Lehrkraft anzeigen
         </Button>
       )}
     </Stack>

@@ -9,7 +9,9 @@ type document = {
 
   fileType: string
 
-  mayRead: boolean
+  visibleToUser: boolean
+
+  visibleToEverybody: boolean
 
   mayDelete: boolean
 

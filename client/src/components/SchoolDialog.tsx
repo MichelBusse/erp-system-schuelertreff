@@ -10,6 +10,7 @@ import {
   TextField,
 } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
+import axios from 'axios'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 
@@ -45,10 +46,22 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
       API.post('users/school', {
         ...data,
         dateOfStart: data.dateOfStart?.format(),
-      }).then((res) => {
-        setCustomers((s) => [...s, res.data])
-        closeForm()
       })
+        .then((res) => {
+          setCustomers((s) => [...s, res.data])
+          closeForm()
+        })
+        .catch((error) => {
+          if (axios.isAxiosError(error) && error.response?.status === 400) {
+            enqueueSnackbar(
+              (error.response.data as { message: string }).message,
+              snackbarOptionsError,
+            )
+          } else {
+            console.error(error)
+            enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+          }
+        })
     } else {
       setErrors(errorTexts)
       enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
@@ -145,7 +158,6 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
               id="street"
               label="Straße"
               variant="outlined"
-              required={true}
               fullWidth={true}
               value={data.street}
               onChange={(event) =>
@@ -160,7 +172,6 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
               id="city"
               label="Stadt"
               variant="outlined"
-              required={true}
               fullWidth={true}
               value={data.city}
               onChange={(event) =>
@@ -173,7 +184,6 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
               id="postalCode"
               label="Postleitzahl"
               variant="outlined"
-              required={true}
               fullWidth={true}
               value={data.postalCode}
               onChange={(event) =>
@@ -188,7 +198,6 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
               id="phone"
               label="Telefonnummer"
               variant="outlined"
-              required={true}
               fullWidth={true}
               value={data.phone}
               onChange={(event) =>
@@ -206,7 +215,6 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
                 <TextField
                   fullWidth
                   {...params}
-                  required
                   variant="outlined"
                   helperText={errors.dateOfStart}
                   error={errors.dateOfStart !== ''}

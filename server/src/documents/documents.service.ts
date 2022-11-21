@@ -7,10 +7,11 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import ejs from 'ejs'
 import path from 'path'
 import * as puppeteer from 'puppeteer'
-import { DataSource, Repository } from 'typeorm'
+import { Brackets, DataSource, Repository } from 'typeorm'
 
 import { Document } from './document.entity'
 import { CreateDocumentDto } from './dto/create-document.dto'
+import { UpdateDocumentDto } from './dto/update-document.dto'
 
 /**
  * render document from template
@@ -76,16 +77,38 @@ export class DocumentsService {
     return this.documentsRepository.save(doc)
   }
 
+  async update(
+    id: number,
+    dto: UpdateDocumentDto,
+    userId?: number,
+  ): Promise<Document> {
+    let doc = await this.documentsRepository.findOneOrFail({
+      where: { id },
+      relations: ['owner'],
+    })
+
+    if (userId && userId !== doc.owner.id) throw new ForbiddenException()
+
+    doc = { ...doc, ...dto }
+
+    return this.documentsRepository.save(doc)
+  }
+
   async delete(id: number, userId?: number) {
     const doc = await this.documentsRepository.findOne({
       where: { id },
       relations: ['owner'],
     })
 
+    if (userId && userId !== doc.owner.id) throw new ForbiddenException()
+
     if (doc === null) throw new NotFoundException()
 
-    if (typeof userId !== 'undefined') {
-      if (doc.owner.id !== userId || !doc.mayRead) {
+    if (userId) {
+      if (
+        (doc.owner.id === userId && !doc.visibleToUser) ||
+        (doc.owner.id !== userId && !doc.visibleToEverybody)
+      ) {
         throw new NotFoundException()
       } else if (!doc.mayDelete) {
         throw new ForbiddenException()
@@ -105,7 +128,8 @@ export class DocumentsService {
 
     if (
       typeof userId !== 'undefined' &&
-      (doc.owner.id !== userId || !doc.mayRead)
+      ((doc.owner.id === userId && !doc.visibleToUser) ||
+        (doc.owner.id !== userId && !doc.visibleToEverybody))
     ) {
       throw new NotFoundException()
     }
@@ -113,13 +137,35 @@ export class DocumentsService {
     return doc
   }
 
-  async findAllBy(userId: number, showHidden: boolean): Promise<Document[]> {
+  async findAllBy(
+    ownerId: number,
+    userId: number,
+    isAdmin: boolean,
+    type: string,
+  ): Promise<Document[]> {
     const q = this.documentsRepository
       .createQueryBuilder('doc')
       .select('doc')
-      .where(`doc."ownerId" = :userId`, { userId })
+      .where(`doc."ownerId" = :ownerId`, { ownerId })
 
-    if (!showHidden) q.andWhere(`doc."mayRead" = true`)
+    if (!isAdmin) {
+      q.andWhere(
+        new Brackets((qb) => {
+          qb.where(`(doc."ownerId" = :userId AND doc."visibleToUser" = true)`, {
+            userId,
+          })
+          qb.orWhere(
+            `(doc."ownerId" <> :userId AND doc."visibleToEverybody" = true)`,
+          )
+        }),
+      )
+    }
+
+    if (type === 'private') {
+      q.andWhere('doc."visibleToEverybody" = false')
+    } else if (type === 'public') {
+      q.andWhere('doc."visibleToEverybody" = true')
+    }
 
     return q.getMany()
   }
@@ -131,8 +177,18 @@ export class DocumentsService {
       .addSelect('doc.content')
       .where(`doc.id = :id`, { id })
 
-    if (typeof userId !== 'undefined')
-      q.andWhere(`doc."ownerId" = :userId`, { userId })
+    if (userId) {
+      q.andWhere(
+        new Brackets((qb) => {
+          qb.where(`(doc."ownerId" = :userId AND doc."visibleToUser" = true)`, {
+            userId,
+          })
+          qb.orWhere(
+            `(doc."ownerId" <> :userId AND doc."visibleToEverybody" = true)`,
+          )
+        }),
+      )
+    }
 
     return q.getOneOrFail()
   }
