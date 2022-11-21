@@ -108,7 +108,9 @@ const ContractCreation: React.FC<Props> = ({
       })
     } else {
       setForm({
-        startDate: minStartDate ? getNextDow(initialDow ?? minStartDate?.day(), minStartDate) : null,
+        startDate: minStartDate
+          ? getNextDow(initialDow ?? minStartDate?.day(), minStartDate)
+          : null,
         endDate: maxEndDate,
         startTime: initialStartTime,
         endTime: initialEndTime,
