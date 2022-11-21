@@ -170,8 +170,8 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
     setForm({
       startDate: dayjs(contract.startDate),
       endDate: maxEndDate,
-      startTime: dayjs(contract.startTime, "HH:mm"),
-      endTime: dayjs(contract.endTime, "HH:mm"),
+      startTime: dayjs(contract.startTime, 'HH:mm'),
+      endTime: dayjs(contract.endTime, 'HH:mm'),
       minTime: null,
       maxTime: null,
       teacher: '',
