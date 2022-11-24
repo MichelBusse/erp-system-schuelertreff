@@ -559,7 +559,7 @@ export class UsersService {
       fileType: 'application/pdf',
       owner: user.id,
       visibleToUser: true,
-      visibleToEverybody: true,
+      visibleToEverybody: false,
       mayDelete: false,
       content: buffer,
     })
