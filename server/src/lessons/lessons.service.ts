@@ -599,13 +599,11 @@ export class LessonsService {
 
     const filePath = path.join(__dirname, '../templates/customerInvoice.ejs')
 
-    console.log('[DEBUG] Ready to render file');
     const content = await ejs.renderFile(filePath, {
       rows,
       address,
       invoiceInfo,
     })
-    console.log('[DEBUG] Ready to rendered file');
 
     const browser = await puppeteer.launch({
       headless: true,
@@ -617,7 +615,6 @@ export class LessonsService {
         '--disable-dev-shm-usage',
       ],
     })
-    console.log('[DEBUG] Puppeteer launched');
 
     const page = await browser.newPage()
     await page.setContent(content)
