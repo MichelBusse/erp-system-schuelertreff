@@ -79,8 +79,8 @@ export class ContractsService {
       } else {
         // If updated features do not match with initial contract, handle eventual deletion of initialContract
 
-        if (dayjs(initialContract.startDate).isAfter(dayjs(dto.startDate))) {
-          //if initialContract starts after editedContract -> delete initial contract completely and cascade to all of its lessons
+        if (!dayjs(dto.startDate).isAfter(dayjs(initialContract.startDate))) {
+          //if initialContract starts after or right at editedContract -> delete initial contract completely and cascade to all of its lessons
           this.contractsRepository.delete({ id: dto.initialContractId })
         } else if (
           !initialContract.endDate ||
