@@ -83,7 +83,7 @@ const InvoiceDataSelect: React.FC<Props> = ({
               .filter(
                 (e) =>
                   invoiceDate.year < dayjs().year() ||
-                  e <= dayjs().subtract(27, 'day').month(),
+                  e <= dayjs().month(),
               )
               .map((e) => (
                 <MenuItem value={e} key={e}>
