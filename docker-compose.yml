@@ -18,11 +18,10 @@ services:
     restart: unless-stopped
     depends_on:
     - db
-    ports:
-    - 127.0.0.1:8080:8080
     networks:
     - default
     - smtp
+    - proxy
     environment:
     - DB_HOST=db
     - DB_NAME
@@ -45,12 +44,14 @@ services:
     restart: unless-stopped
     depends_on:
     - server
-    ports:
-    - 127.0.0.1:8081:80
+    networks:
+    - proxy
 
 volumes:
   db:
 
 networks:
   smtp:
+    external: true
+  proxy:
     external: true
