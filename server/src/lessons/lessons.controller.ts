@@ -127,7 +127,10 @@ export class LessonsController {
   }
 
   @Post()
-  async updateOrCreate(@Request() req, @Body() dto: CreateLessonDto): Promise<Lesson> {
+  async updateOrCreate(
+    @Request() req,
+    @Body() dto: CreateLessonDto,
+  ): Promise<Lesson> {
     if (!(await this.lessonsService.validateDate(dto.date, dto.contractId)))
       throw new BadRequestException('Datum ist nicht gültig für diesen Einsatz')
 

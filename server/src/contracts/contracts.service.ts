@@ -199,7 +199,7 @@ export class ContractsService {
       )
     }
 
-    return contract;
+    return contract
   }
 
   // Find all ongoing or future contracts of one school
