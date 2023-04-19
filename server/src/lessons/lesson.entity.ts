@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm'
 
 import { Contract } from 'src/contracts/contract.entity'
 
@@ -9,6 +15,7 @@ export enum LessonState {
 }
 
 @Entity()
+@Unique(['date', 'contract'])
 export class Lesson {
   @PrimaryGeneratedColumn()
   id: number

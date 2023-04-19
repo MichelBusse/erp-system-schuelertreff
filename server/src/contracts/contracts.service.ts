@@ -188,16 +188,18 @@ export class ContractsService {
   }
 
   async findOne(id: number, teacherId?: number): Promise<Contract> {
-    const contract = await this.contractsRepository.findOne({
+    const contract = await this.contractsRepository.findOneOrFail({
       where: { id },
       relations: ['subject', 'teacher', 'customers', 'customers.school'],
     })
 
-    if (!(teacherId && contract.teacher.id !== teacherId)) {
-      return contract
-    } else {
-      return null
+    if (teacherId && contract.teacher.id !== teacherId) {
+      throw new BadRequestException(
+        'You do not have permission to request this contract',
+      )
     }
+
+    return contract
   }
 
   // Find all ongoing or future contracts of one school

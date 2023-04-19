@@ -126,28 +126,18 @@ export class LessonsController {
     res.end(buffer)
   }
 
-  @Post(':id')
-  update(
-    @Param('id') id: number,
-    @Request() req,
-    @Body() createLessonDto: CreateLessonDto,
-  ): Promise<Lesson> {
-    if (req.user.role === Role.ADMIN) {
-      return this.lessonsService.update(id, createLessonDto)
-    } else {
-      return this.lessonsService.update(id, createLessonDto, req.user.id)
-    }
-  }
-
   @Post()
-  async create(@Request() req, @Body() dto: CreateLessonDto): Promise<Lesson> {
+  async updateOrCreate(
+    @Request() req,
+    @Body() dto: CreateLessonDto,
+  ): Promise<Lesson> {
     if (!(await this.lessonsService.validateDate(dto.date, dto.contractId)))
       throw new BadRequestException('Datum ist nicht gültig für diesen Einsatz')
 
     if (req.user.role === Role.ADMIN) {
-      return this.lessonsService.create(dto)
+      return this.lessonsService.updateOrCreate(dto)
     } else {
-      return this.lessonsService.create(dto, req.user.id)
+      return this.lessonsService.updateOrCreate(dto, req.user.id)
     }
   }
 

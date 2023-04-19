@@ -66,8 +66,7 @@ const LessonDetailView: React.FC = () => {
   }, [])
 
   const submitForm = () => {
-    console.log(id)
-    API.post('lessons/' + (id ?? ''), {
+    API.post('lessons/', {
       date: dayjs(date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
       contractId: parseInt(contractId ?? ''),
       ...data,
