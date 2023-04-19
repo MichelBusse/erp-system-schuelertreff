@@ -28,7 +28,6 @@ const LessonDetailView: React.FC = () => {
   const { API } = useAuth()
   const navigate = useNavigate()
   const { initialDate, contractId, date } = useParams()
-  const [id, setId] = useState<number | null>(null)
   const { decodeToken } = useAuth()
 
   const { enqueueSnackbar } = useSnackbar()
@@ -54,7 +53,6 @@ const LessonDetailView: React.FC = () => {
           state: res.data.lesson ? res.data.lesson.state : LessonState.IDLE,
           notes: res.data.lesson ? res.data.lesson.notes : '',
         }
-        setId(res.data.lesson?.id)
         setData(lesson)
 
         setPageStatus(200)
