@@ -42,7 +42,7 @@ const LessonOverview: React.FC<Props> = ({
   const limitedView = userRole === 'school' ? true : false
 
   const toggleLessonHeld = (held: boolean) => {
-    API.post('lessons/' + (existingLesson?.id ?? ''), {
+    API.post('lessons/', {
       date: dayjs(date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
       contractId: contract.id,
       state: held ? LessonState.HELD : LessonState.IDLE,

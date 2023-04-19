@@ -73,52 +73,28 @@ export class LessonsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  // Creates lesson if corresponding contract is accepted
-  async create(dto: CreateLessonDto, teacherId?: number): Promise<Lesson> {
-    const lesson = new Lesson()
-
-    const contract = await this.contractsService.findOne(
-      dto.contractId,
-      teacherId,
-    )
-
-    // check for intersecting leaves
-    if (
-      contract.teacher
-        ? (await this.checkLeave(dto.date, contract.teacher.id)) > 0
-        : false
-    )
-      throw new BadRequestException('Lesson is blocked')
-
-    if (contract) {
-      if (contract.state !== ContractState.ACCEPTED)
-        throw new BadRequestException(
-          'You cannot create lessons of unaccepted contracts',
-        )
-
-      lesson.date = dto.date
-      lesson.state = dto.state
-      lesson.notes = dto.notes
-      lesson.contract = contract
-
-      return this.lessonsRepository.save(lesson)
-    } else {
-      throw new BadRequestException(
-        'You do not have permission to create this lesson',
-      )
-    }
-  }
-
-  // Updated Lessons
-  async update(
-    id: number,
+  async updateOrCreate(
     dto: CreateLessonDto,
     teacherId?: number,
   ): Promise<Lesson> {
-    const lesson = await this.lessonsRepository.findOne({
-      where: { id },
+    let lesson = await this.lessonsRepository.findOne({
+      where: { contract: { id: dto.contractId }, date: dto.date },
       relations: ['contract', 'contract.teacher'],
     })
+
+    // Create new lesson if not exist
+    if (lesson == null) {
+      lesson ??= new Lesson()
+
+      const contract = await this.contractsService.findOne(
+        dto.contractId,
+        teacherId,
+      )
+
+      lesson.date = dto.date
+      lesson.contract = contract
+    }
+
     // check for intersecting leaves
     if (
       lesson.contract.teacher &&
@@ -126,19 +102,22 @@ export class LessonsService {
     )
       throw new BadRequestException('Lesson is blocked')
 
-    if (
-      lesson.contract.state === ContractState.ACCEPTED &&
-      (!teacherId || (teacherId && lesson.contract.teacher.id === teacherId))
-    ) {
-      lesson.state = dto.state
-      lesson.notes = dto.notes
+    // check if contract is accepted
+    if (lesson.contract.state !== ContractState.ACCEPTED)
+      throw new BadRequestException(
+        'You cannot create lessons of unaccepted contracts',
+      )
 
-      return this.lessonsRepository.save(lesson)
-    } else {
+    // check if user is admin or appropriate teacher
+    if (teacherId && lesson.contract.teacher.id !== teacherId)
       throw new BadRequestException(
         'You do not have permission to update this lesson',
       )
-    }
+
+    lesson.state = dto.state
+    lesson.notes = dto.notes
+
+    return this.lessonsRepository.save(lesson)
   }
 
   async findAll(): Promise<Lesson[]> {
@@ -270,7 +249,7 @@ export class LessonsService {
       //If lesson date is before the startDate of contract or after the endDate
       if (
         dayjs(l.date).isBefore(dayjs(contract.startDate)) ||
-        !dayjs(l.date).isBefore(dayjs(contract.endDate))
+        dayjs(l.date).isAfter(dayjs(contract.endDate))
       ) {
         this.lessonsRepository.delete(l.id)
       }
@@ -278,11 +257,11 @@ export class LessonsService {
   }
 
   async findAndDeleteAllByContract(id: number) {
-    const lessonsOfContract = this.lessonsRepository.findBy({
+    const lessonsOfContract = await this.lessonsRepository.findBy({
       contract: { id: id },
     })
 
-    ;(await lessonsOfContract).forEach((l) => {
+    lessonsOfContract.forEach((l) => {
       this.lessonsRepository.delete(l.id)
     })
   }
