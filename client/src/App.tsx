@@ -1,4 +1,4 @@
-import './globals.scss'
+import './core/styles/globals.scss'
 
 import { CssBaseline } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
@@ -8,12 +8,25 @@ import { SnackbarProvider } from 'notistack'
 import { useState } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
-import { useAuth } from './components/AuthProvider'
-import Layout from './components/Layout'
-import Pages from './pages/_pages'
-import * as Error from './pages/error'
-import { TeacherState } from './types/enums'
-import { Role } from './types/user'
+import { TeacherState } from './core/types/enums'
+import { Role } from './core/types/user'
+import { useAuth } from './features/auth/components/AuthProvider'
+import { Forbidden, NotFound } from './features/general/pages/Error'
+import Layout from './features/general/components/Layout'
+import Cockpit from './features/dashboard/pages/Cockpit'
+import Timetable from './features/timetable/pages/Timetable'
+import TeacherOverview from './features/teachers/pages/TeacherOverview'
+import LessonDetailView from './features/timetable/pages/LessonDetailView'
+import PrivateCustomers from './features/customers/pages/PrivateCustomers'
+import PrivateCustomerDetailView from './features/customers/pages/PrivateCustomersDetailView'
+import Schools from './features/customers/pages/Schools'
+import SchoolDetailView from './features/customers/pages/SchoolDetailView'
+import Teachers from './features/teachers/pages/Teachers'
+import TeacherDetailView from './features/teachers/pages/TeacherDetailView'
+import Applicants from './features/teachers/pages/Applicants'
+import Subjects from './features/subjects/pages/Subjects'
+import Login from './features/auth/pages/Login'
+import Reset from './features/auth/pages/Reset'
 
 export type NavigateState = { from: Location }
 
@@ -37,7 +50,7 @@ const ProtectedRoute: React.FC<{ roles?: Role[] }> = ({
   if (!isAuthed()) {
     return <Navigate to="/login" replace state={{ from: location }} />
   } else if (roles.length > 0 && !roles.some((r) => r === decodeToken().role)) {
-    return <Error.Forbidden />
+    return <Forbidden />
   }
 
   return <>{children}</>
@@ -82,7 +95,7 @@ const App: React.FC = () => {
                 path="cockpit"
                 element={
                   <ProtectedRoute>
-                    <Pages.Cockpit />
+                    <Cockpit />
                   </ProtectedRoute>
                 }
               ></Route>
@@ -91,7 +104,7 @@ const App: React.FC = () => {
                   path=""
                   element={
                     <ProtectedRoute>
-                      <Pages.Timetable />
+                      <Timetable />
                     </ProtectedRoute>
                   }
                 />
@@ -99,7 +112,7 @@ const App: React.FC = () => {
                   path="teacher/:id"
                   element={
                     <ProtectedRoute>
-                      <Pages.TeacherOverview />
+                      <TeacherOverview />
                     </ProtectedRoute>
                   }
                 />
@@ -107,7 +120,7 @@ const App: React.FC = () => {
                   path=":initialDate/:contractId/:date"
                   element={
                     <ProtectedRoute>
-                      <Pages.LessonDetailView />
+                      <LessonDetailView />
                     </ProtectedRoute>
                   }
                 />
@@ -115,7 +128,7 @@ const App: React.FC = () => {
                   path=":contractId/:date"
                   element={
                     <ProtectedRoute>
-                      <Pages.LessonDetailView />
+                      <LessonDetailView />
                     </ProtectedRoute>
                   }
                 />
@@ -123,7 +136,7 @@ const App: React.FC = () => {
                   path=":initialDate"
                   element={
                     <ProtectedRoute>
-                      <Pages.Timetable />
+                      <Timetable />
                     </ProtectedRoute>
                   }
                 />
@@ -133,7 +146,7 @@ const App: React.FC = () => {
                   path=""
                   element={
                     <ProtectedRoute>
-                      <Pages.PrivateCustomers
+                      <PrivateCustomers
                         prevId={prevId}
                         setPrevId={setPrevId}
                       />
@@ -144,7 +157,7 @@ const App: React.FC = () => {
                   path=":id"
                   element={
                     <ProtectedRoute>
-                      <Pages.PrivateCustomerDetailView />
+                      <PrivateCustomerDetailView />
                     </ProtectedRoute>
                   }
                 />
@@ -154,7 +167,7 @@ const App: React.FC = () => {
                   path=""
                   element={
                     <ProtectedRoute>
-                      <Pages.Schools prevId={prevId} setPrevId={setPrevId} />
+                      <Schools prevId={prevId} setPrevId={setPrevId} />
                     </ProtectedRoute>
                   }
                 />
@@ -162,7 +175,7 @@ const App: React.FC = () => {
                   path=":id"
                   element={
                     <ProtectedRoute>
-                      <Pages.SchoolDetailView />
+                      <SchoolDetailView />
                     </ProtectedRoute>
                   }
                 />
@@ -172,7 +185,7 @@ const App: React.FC = () => {
                   path=""
                   element={
                     <ProtectedRoute>
-                      <Pages.Teachers prevId={prevId} setPrevId={setPrevId} />
+                      <Teachers prevId={prevId} setPrevId={setPrevId} />
                     </ProtectedRoute>
                   }
                 />
@@ -180,7 +193,7 @@ const App: React.FC = () => {
                   path=":id"
                   element={
                     <ProtectedRoute>
-                      <Pages.TeacherDetailView />
+                      <TeacherDetailView />
                     </ProtectedRoute>
                   }
                 />
@@ -190,7 +203,7 @@ const App: React.FC = () => {
                   path=""
                   element={
                     <ProtectedRoute>
-                      <Pages.Applicants prevId={prevId} setPrevId={setPrevId} />
+                      <Applicants prevId={prevId} setPrevId={setPrevId} />
                     </ProtectedRoute>
                   }
                 />
@@ -198,7 +211,7 @@ const App: React.FC = () => {
                   path=":id"
                   element={
                     <ProtectedRoute>
-                      <Pages.TeacherDetailView />
+                      <TeacherDetailView />
                     </ProtectedRoute>
                   }
                 />
@@ -207,7 +220,7 @@ const App: React.FC = () => {
                 path="subjects"
                 element={
                   <ProtectedRoute>
-                    <Pages.Subjects />
+                    <Subjects />
                   </ProtectedRoute>
                 }
               />
@@ -215,8 +228,8 @@ const App: React.FC = () => {
                 path="profile"
                 element={
                   <ProtectedRoute>
-                    {hasRole(Role.SCHOOL) ? <Pages.SchoolDetailView /> : null}
-                    {hasRole(Role.TEACHER) ? <Pages.TeacherDetailView /> : null}
+                    {hasRole(Role.SCHOOL) ? <SchoolDetailView /> : null}
+                    {hasRole(Role.TEACHER) ? <TeacherDetailView /> : null}
                   </ProtectedRoute>
                 }
               />
@@ -226,7 +239,7 @@ const App: React.FC = () => {
               path="login"
               element={
                 !isAuthed() ? (
-                  <Pages.Login />
+                  <Login />
                 ) : (
                   <Navigate to="/" replace={true} />
                 )
@@ -235,10 +248,10 @@ const App: React.FC = () => {
 
             <Route path="reset">
               <Route path="" element={<Navigate to="/" replace={true} />} />
-              <Route path=":token" element={<Pages.Reset />} />
+              <Route path=":token" element={<Reset />} />
             </Route>
 
-            <Route path="*" element={<Error.NotFound />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </SnackbarProvider>
       </ThemeProvider>
