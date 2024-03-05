@@ -1,14 +1,11 @@
-import { contract } from './contract'
+import LessonState from "../enums/LessonState"
+import { Contract } from "./Contract"
 
-export enum LessonState {
-  IDLE = 'idle',
-  HELD = 'held',
-  CANCELLED = 'cancelled',
-}
-
-export type lesson = {
+type Lesson = {
   id: number
   date: string
   state: LessonState
-  contract: contract
+  contract: Contract
 }
+
+export default Lesson;

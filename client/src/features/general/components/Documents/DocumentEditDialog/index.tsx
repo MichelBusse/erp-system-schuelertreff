@@ -13,9 +13,9 @@ import {
 } from '@mui/material'
 import { useState } from 'react'
 import { UploadDialogForm } from '../UploadDialog'
-import { UserDocument } from '../../../../../core/types/document'
 import { useAuth } from '../../../../auth/components/AuthProvider'
-import { Role } from '../../../../../core/types/user'
+import UserDocument from '../../../../../core/types/UserDocument'
+import UserRole from '../../../../../core/enums/UserRole'
 
 type Props = {
   open: boolean
@@ -96,7 +96,7 @@ const DocumentEditDialog: React.FC<Props> = ({
               control={
                 <Checkbox
                   checked={form.protected}
-                  disabled={!hasRole(Role.ADMIN)}
+                  disabled={!hasRole(UserRole.ADMIN)}
                   onChange={(e) =>
                     setForm((f) => ({
                       ...f,

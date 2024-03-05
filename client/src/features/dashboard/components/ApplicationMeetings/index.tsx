@@ -14,12 +14,12 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { teacher } from '../../../../core/types/user'
 import { CockpitComponent } from '../../pages/Cockpit'
+import Teacher from '../../../../core/types/Teacher'
 
 const ApplicationMeetings: CockpitComponent = ({ listSx }) => {
   const { API } = useAuth()
-  const [teachers, setTeachers] = useState<Partial<teacher>[]>([])
+  const [teachers, setTeachers] = useState<Partial<Teacher>[]>([])
   const [date, setDate] = useState<Dayjs>(dayjs())
 
   useEffect(() => {

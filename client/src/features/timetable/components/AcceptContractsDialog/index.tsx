@@ -10,13 +10,14 @@ import {
 import { Box } from '@mui/system'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
-import { ContractState, contract } from '../../../../core/types/contract'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import { snackbarOptionsError } from '../../../../core/res/consts'
-import { ContractType } from '../../../../core/types/enums'
+import { Contract } from '../../../../core/types/Contract'
+import ContractState from '../../../../core/enums/ContractState'
+import ContractType from '../../../../core/enums/ContractType'
 
 type Props = {
-  contracts: contract[]
+  contracts: Contract[]
   open: boolean
   setOpen: (open: boolean) => void
   refresh: () => void
@@ -31,7 +32,7 @@ const AcceptContractsDialog: React.FC<Props> = ({
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
 
-  const acceptOrDecline = (contract: contract, state: ContractState) => {
+  const acceptOrDecline = (contract: Contract, state: ContractState) => {
     API.post('contracts/acceptOrDecline/' + contract.id, {
       state: state,
     })

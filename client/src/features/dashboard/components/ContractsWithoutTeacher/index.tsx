@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react'
 
 import { CockpitComponent } from '../../pages/Cockpit'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { contractWithTeacher } from '../../../../core/types/contract'
 import ContractList from '../../../general/components/ContractList'
+import { Contract } from '../../../../core/types/Contract'
 
 const ContractsWithoutTeacher: CockpitComponent = ({ listSx }) => {
   const { API } = useAuth()
-  const [contracts, setContracts] = useState<contractWithTeacher[]>([])
+  const [contracts, setContracts] = useState<Contract[]>([])
   const [refreshContracts, setRefreshContracts] = useState<number>(0)
 
   useEffect(() => {

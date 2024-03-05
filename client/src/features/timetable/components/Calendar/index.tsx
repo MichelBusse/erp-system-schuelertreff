@@ -4,14 +4,14 @@ import dayjs, { Dayjs } from 'dayjs'
 
 import { DrawerParameters } from '../../pages/Timetable'
 import styles from './styles.module.scss'
-import { contract } from '../../../../core/types/contract'
-import { lesson } from '../../../../core/types/lesson'
+import { Contract } from '../../../../core/types/Contract'
+import Lesson from '../../../../core/types/Lesson'
 
 type Props = {
   date: Dayjs
   setDrawer: (params: DrawerParameters) => void
-  contracts: contract[]
-  lessons: lesson[]
+  contracts: Contract[]
+  lessons: Lesson[]
 }
 
 const Calendar: React.FC<Props> = ({ date, setDrawer, contracts, lessons }) => {
@@ -29,7 +29,7 @@ const Calendar: React.FC<Props> = ({ date, setDrawer, contracts, lessons }) => {
         cursor: (params.value ?? []).length > 0 ? 'pointer' : 'normal',
       }}
     >
-      {(params.value as contract[])?.map((c) => {
+      {(params.value as Contract[])?.map((c) => {
         const hours =
           (Date.parse('01 Jan 1970 ' + c.endTime) -
             Date.parse('01 Jan 1970 ' + c.startTime)) /

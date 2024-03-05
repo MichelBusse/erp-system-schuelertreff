@@ -18,9 +18,9 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
 import { PrevIdProps } from '../../../../App'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { privateCustomer } from '../../../../core/types/user'
 import { dataGridLocaleText, snackbarOptions, snackbarOptionsError } from '../../../../core/res/consts'
 import PrivateCustomerDialog from '../../components/PrivateCustomerDialog'
+import PrivateCustomer from "../../../../core/types/PrivateCustomer";
 
 const PrivateCustomers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
   const navigate = useNavigate()
@@ -29,7 +29,7 @@ const PrivateCustomers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
   const { enqueueSnackbar } = useSnackbar()
 
   const [open, setOpen] = useState(false)
-  const [customers, setCustomers] = useState<privateCustomer[]>([])
+  const [customers, setCustomers] = useState<PrivateCustomer[]>([])
   const [deletedCustomersToggle, setDeletedCustomersToggle] =
     useState<boolean>(false)
 

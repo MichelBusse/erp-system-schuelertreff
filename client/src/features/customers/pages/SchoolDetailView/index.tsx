@@ -30,20 +30,27 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from "../../../auth/components/AuthProvider";
-import { classCustomerForm, schoolForm, schoolFormErrorTexts } from "../../../../core/types/form";
 import { defaultClassCustomerFormData, defaultSchoolFormData, schoolStateToString, snackbarOptions, snackbarOptionsError } from "../../../../core/res/consts";
 import ConfirmationDialog, { ConfirmationDialogProps, defaultConfirmationDialogProps } from "../../../general/components/ConfirmationDialog";
 import { defaultSchoolFormErrorTexts, schoolFormValidation } from "../../../../core/utils/formValidation";
-import { contractWithTeacher } from "../../../../core/types/contract";
-import { CustomerType, DeleteState, SchoolState, SchoolType } from "../../../../core/types/enums";
-import { Role, classCustomer, timesAvailableParsed } from "../../../../core/types/user";
-import timeAvailable from "../../../../core/types/timeAvailable";
 import CustomerInvoiceDataSelect, { CustomerInvoiceData } from "../../components/CustomerInvoiceDataSelect";
 import IconButtonAdornment from "../../../general/components/IconButtonAdornment";
 import AddTimes from "../../../general/components/AddTimes";
 import ContractList from "../../../general/components/ContractList";
 import UserDocuments, { UserDocumentsType } from "../../../general/components/Documents/UserDocuments";
 import ContractDialog from "../../../timetable/components/ContractDialog/ContractDialog";
+import { Contract } from "../../../../core/types/Contract";
+import SchoolFormErrorTexts from "../../../../core/types/Form/SchoolFormErrorTexts";
+import ClassCustomerFormState from "../../../../core/types/Form/ClassCustomerFormState";
+import SchoolFormState from "../../../../core/types/Form/SchoolFormState";
+import UserDeleteState from "../../../../core/enums/UserDeleteState";
+import SchoolState from "../../../../core/enums/SchoolState";
+import ClassCustomer from "../../../../core/types/ClassCustomer";
+import TimeSlotParsed from "../../../../core/types/TimeSlotParsed";
+import TimeSlot from "../../../../core/types/TimeSlot";
+import SchoolType from "../../../../core/enums/SchoolType";
+import UserRole from "../../../../core/enums/UserRole";
+import CustomerType from "../../../../core/enums/CustomerType";
 
 
 
@@ -58,9 +65,9 @@ const SchoolDetailView: React.FC = () => {
 
   const requestedId = id ?? 'me'
 
-  const [classCustomers, setClassCustomers] = useState<classCustomerForm[]>([])
-  const [school, setSchool] = useState<schoolForm>(defaultSchoolFormData)
-  const [newClassCustomer, setNewClassCustomer] = useState<classCustomerForm>(
+  const [classCustomers, setClassCustomers] = useState<ClassCustomerFormState[]>([])
+  const [school, setSchool] = useState<SchoolFormState>(defaultSchoolFormData)
+  const [newClassCustomer, setNewClassCustomer] = useState<ClassCustomerFormState>(
     defaultClassCustomerFormData,
   )
   const [addClassDialogOpen, setAddClassDialogOpen] = useState<boolean>(false)
@@ -68,14 +75,14 @@ const SchoolDetailView: React.FC = () => {
   const [confirmationDialogProps, setConfirmationDialogProps] =
     useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
 
-  const [schoolErrors, setSchoolErrors] = useState<schoolFormErrorTexts>(
+  const [schoolErrors, setSchoolErrors] = useState<SchoolFormErrorTexts>(
     defaultSchoolFormErrorTexts,
   )
 
   const [render, setRender] = useState<number>(0)
   const [contractDialogOpen, setContractDialogOpen] = useState<boolean>(false)
 
-  const [contracts, setContracts] = useState<contractWithTeacher[]>([])
+  const [contracts, setContracts] = useState<Contract[]>([])
   const [refreshContracts, setRefreshContracts] = useState<number>(0)
 
   useEffect(() => {
@@ -90,7 +97,7 @@ const SchoolDetailView: React.FC = () => {
     })
   }, [])
 
-  const updateSchool = (newData: schoolForm) => {
+  const updateSchool = (newData: SchoolFormState) => {
     setSchool((data) => ({
       ...data,
       firstName: newData.firstName ?? '',
@@ -106,7 +113,7 @@ const SchoolDetailView: React.FC = () => {
       feeOnline: newData.feeOnline,
       notes: newData.notes ?? '',
       dateOfStart: newData.dateOfStart ? dayjs(newData.dateOfStart) : null,
-      deleteState: newData.deleteState as DeleteState,
+      deleteState: newData.deleteState as UserDeleteState,
       schoolState: newData.schoolState as SchoolState,
     }))
   }
@@ -114,7 +121,7 @@ const SchoolDetailView: React.FC = () => {
   useEffect(() => {
     API.get('users/classCustomer/' + requestedId).then((res) => {
       setClassCustomers([])
-      res.data.map((classCustomer: classCustomer) => {
+      res.data.map((classCustomer: ClassCustomer) => {
         const newTimesAvailable =
           classCustomer.timesAvailableParsed.length === 1 &&
           classCustomer.timesAvailableParsed[0].dow === 1 &&
@@ -122,7 +129,7 @@ const SchoolDetailView: React.FC = () => {
           classCustomer.timesAvailableParsed[0].end === '00:00'
             ? []
             : classCustomer.timesAvailableParsed.map(
-                (time: timesAvailableParsed) => ({
+                (time: TimeSlotParsed) => ({
                   dow: time.dow,
                   start: dayjs(time.start, 'HH:mm'),
                   end: dayjs(time.end, 'HH:mm'),
@@ -130,7 +137,7 @@ const SchoolDetailView: React.FC = () => {
                 }),
               )
 
-        setClassCustomers((data: classCustomerForm[]) => [
+        setClassCustomers((data: ClassCustomerFormState[]) => [
           ...data,
           {
             id: classCustomer.id,
@@ -144,7 +151,7 @@ const SchoolDetailView: React.FC = () => {
     })
   }, [])
 
-  const submitForm = (override: Partial<schoolForm> = {}) => {
+  const submitForm = (override: Partial<SchoolFormState> = {}) => {
     const errorTexts = schoolFormValidation(school)
 
     if (errorTexts.valid) {
@@ -173,11 +180,11 @@ const SchoolDetailView: React.FC = () => {
       open: true,
       setProps: setConfirmationDialogProps,
       title:
-        school.deleteState === DeleteState.ACTIVE
+        school.deleteState === UserDeleteState.ACTIVE
           ? `${school.schoolName} wirklich archivieren?`
           : `${school.schoolName} wirklich löschen?`,
       text:
-        school.deleteState === DeleteState.ACTIVE
+        school.deleteState === UserDeleteState.ACTIVE
           ? `Möchtest du die Schule '${school.schoolName}' wirklich archivieren? Wenn die Schule noch Klassen besitzt, kann sie nicht archiviert werden.`
           : `Möchtest du die Schule '${school.schoolName}' wirklich löschen?`,
       action: () => {
@@ -199,14 +206,14 @@ const SchoolDetailView: React.FC = () => {
 
   const editClassCustomer = (
     newValue: {
-      timesAvailable?: timeAvailable[]
+      timesAvailable?: TimeSlot[]
       schoolType?: SchoolType
       grade?: number
       className?: string
     },
     index: number,
   ) => {
-    const updatedClassCutomer: classCustomerForm = {
+    const updatedClassCutomer: ClassCustomerFormState = {
       ...classCustomers[index],
       ...newValue,
     }
@@ -291,7 +298,7 @@ const SchoolDetailView: React.FC = () => {
             res.data.timesAvailableParsed[0].end === '00:00'
               ? []
               : res.data.timesAvailableParsed.map(
-                  (time: timesAvailableParsed) => ({
+                  (time: TimeSlotParsed) => ({
                     dow: time.dow,
                     start: dayjs(time.start, 'HH:mm'),
                     end: dayjs(time.end, 'HH:mm'),
@@ -640,7 +647,7 @@ const SchoolDetailView: React.FC = () => {
           {id && (
             <Stack direction={'row'} columnGap={2}>
               <h3>Klassen:</h3>
-              {school.deleteState !== DeleteState.DELETED && (
+              {school.deleteState !== UserDeleteState.DELETED && (
                 <IconButton
                   sx={{ marginLeft: 'auto' }}
                   onClick={() => {
@@ -772,7 +779,7 @@ const SchoolDetailView: React.FC = () => {
             ))}
           <Stack direction={'row'} columnGap={2}>
             <h3>Einsätze:</h3>
-            {id && school.deleteState !== DeleteState.DELETED && (
+            {id && school.deleteState !== UserDeleteState.DELETED && (
               <IconButton
                 sx={{ marginLeft: 'auto' }}
                 onClick={() => {
@@ -814,7 +821,7 @@ const SchoolDetailView: React.FC = () => {
             <Button onClick={() => submitForm()} variant="contained">
               Schule Speichern
             </Button>
-            {id && school.deleteState === DeleteState.DELETED && (
+            {id && school.deleteState === UserDeleteState.DELETED && (
               <Button
                 variant="outlined"
                 color="primary"
@@ -830,14 +837,14 @@ const SchoolDetailView: React.FC = () => {
                 sx={{ marginLeft: 'auto' }}
                 color="error"
               >
-                {school.deleteState === DeleteState.DELETED
+                {school.deleteState === UserDeleteState.DELETED
                   ? 'Schule löschen'
                   : 'Schule archivieren'}
               </Button>
             )}
             {id &&
               school.schoolState === SchoolState.CREATED &&
-              school.deleteState === DeleteState.ACTIVE && (
+              school.deleteState === UserDeleteState.ACTIVE && (
                 <Button
                   variant="contained"
                   color="success"
@@ -849,7 +856,7 @@ const SchoolDetailView: React.FC = () => {
                 </Button>
               )}
             {id &&
-              school.deleteState === DeleteState.ACTIVE &&
+              school.deleteState === UserDeleteState.ACTIVE &&
               school.schoolState === SchoolState.CONFIRMED && (
                 <Button variant="outlined" onClick={() => resetPassword()}>
                   Passwort-Reset
@@ -861,7 +868,7 @@ const SchoolDetailView: React.FC = () => {
               <h3>Rechnung generieren:</h3>
               <CustomerInvoiceDataSelect
                 generateInvoice={generateInvoice}
-                type={Role.SCHOOL}
+                type={UserRole.SCHOOL}
               />
             </>
           )}

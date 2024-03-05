@@ -14,10 +14,12 @@ import {
 } from '@mui/x-data-grid'
 import { useEffect, useState } from 'react'
 
-import { Degree, TeacherSchoolType, TeacherState } from '../types/enums'
-import subject from '../types/subject'
 import { useAuth } from '../../features/auth/components/AuthProvider'
 import { teacherSchoolTypeToString, teacherStateToString } from '../res/consts'
+import TeacherDegree from '../enums/TeacherDegree'
+import TeacherState from '../enums/TeacherState'
+import TeacherSchoolType from '../enums/TeacherSchoolType'
+import Subject from '../types/Subject'
 
 //definition of subject filter input
 export const SubjectsFilterInputValue: React.FC<GridFilterInputValueProps> = ({
@@ -26,7 +28,7 @@ export const SubjectsFilterInputValue: React.FC<GridFilterInputValueProps> = ({
 }) => {
   const { API } = useAuth()
 
-  const [subjects, setSubjects] = useState<subject[]>([])
+  const [subjects, setSubjects] = useState<Subject[]>([])
 
   useEffect(() => {
     API.get(`subjects`).then((res) => setSubjects(res.data))
@@ -75,16 +77,16 @@ export const DegreeFilterInputValue: React.FC<GridFilterInputValueProps> = ({
         name: 'degree',
         id: 'degree-select',
       }}
-      defaultValue={Degree.NOINFO}
+      defaultValue={TeacherDegree.NOINFO}
       required
       onChange={(event) => {
         applyValue({ ...item, value: event.target.value })
       }}
     >
-      <option value={Degree.NOINFO}>Keine Angabe</option>
-      <option value={Degree.HIGHSCHOOL}>Abitur</option>
-      <option value={Degree.BACHELOR}>Bachelor</option>
-      <option value={Degree.MASTER}>Master</option>
+      <option value={TeacherDegree.NOINFO}>Keine Angabe</option>
+      <option value={TeacherDegree.HIGHSCHOOL}>Abitur</option>
+      <option value={TeacherDegree.BACHELOR}>Bachelor</option>
+      <option value={TeacherDegree.MASTER}>Master</option>
     </NativeSelect>
   </FormControl>
 )
@@ -161,7 +163,7 @@ export const subjectOperator: GridFilterOperator = {
 
     return (params: GridCellParams): boolean => {
       return params.value
-        .map((sub: subject) => sub.name)
+        .map((sub: Subject) => sub.name)
         .includes(filterItem.value.name)
     }
   },
@@ -183,20 +185,20 @@ export const degreeOperator: GridFilterOperator = {
 
     return (params: GridCellParams): boolean => {
       switch (filterItem.value) {
-        case Degree.NOINFO:
+        case TeacherDegree.NOINFO:
           return true
-        case Degree.HIGHSCHOOL:
+        case TeacherDegree.HIGHSCHOOL:
           return (
-            params.value === Degree.HIGHSCHOOL ||
-            params.value === Degree.BACHELOR ||
-            params.value === Degree.MASTER
+            params.value === TeacherDegree.HIGHSCHOOL ||
+            params.value === TeacherDegree.BACHELOR ||
+            params.value === TeacherDegree.MASTER
           )
-        case Degree.BACHELOR:
+        case TeacherDegree.BACHELOR:
           return (
-            params.value === Degree.BACHELOR || params.value === Degree.MASTER
+            params.value === TeacherDegree.BACHELOR || params.value === TeacherDegree.MASTER
           )
-        case Degree.MASTER:
-          return params.value === Degree.MASTER
+        case TeacherDegree.MASTER:
+          return params.value === TeacherDegree.MASTER
         default:
           return false
       }

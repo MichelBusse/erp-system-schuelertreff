@@ -12,10 +12,10 @@ import { Box, useTheme } from '@mui/material'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Outlet } from 'react-router-dom'
 import MainMenu from '../MainMenu'
-import { TeacherState } from '../../../../core/types/enums'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import ErrorPage from '../../pages/Error'
 import BottomMenu from '../BottomMenu'
+import TeacherState from '../../../../core/enums/TeacherState'
 
 const menuItems = [
   {

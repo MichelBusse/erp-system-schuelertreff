@@ -12,9 +12,6 @@ import {
 import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
-import { ContractCreationForm } from '../../../../../core/types/form'
-import { leave, teacher } from '../../../../../core/types/user'
-import subject from '../../../../../core/types/subject'
 import { useAuth } from '../../../../auth/components/AuthProvider'
 import {
   leaveTypeToString,
@@ -22,16 +19,20 @@ import {
 } from '../../../../../core/res/consts'
 import { formatDate, getNextDow } from '../../../../../core/utils/date'
 import IconButtonAdornment from '../../../../general/components/IconButtonAdornment'
-import { TeacherState } from '../../../../../core/types/enums'
 import BetterTimePicker from '../../../../general/components/BetterTimePicker'
-import { suggestion } from '../../../../../core/types/contract'
+import ContractCreationFormState from '../../../../../core/types/Form/ContractCreationFormState'
+import TimeSuggestion from '../../../../../core/types/TimeSuggestion'
+import Leave from '../../../../../core/types/Leave'
+import Subject from '../../../../../core/types/Subject'
+import Teacher from '../../../../../core/types/Teacher'
+import TeacherState from '../../../../../core/enums/TeacherState'
 
 type Props = {
-  form: ContractCreationForm
-  setForm: React.Dispatch<React.SetStateAction<ContractCreationForm>>
-  suggestions: suggestion[]
-  leaves: Record<number, leave[]>
-  subject: subject | null
+  form: ContractCreationFormState
+  setForm: React.Dispatch<React.SetStateAction<ContractCreationFormState>>
+  suggestions: TimeSuggestion[]
+  leaves: Record<number, Leave[]>
+  subject: Subject | null
   minStartDate: Dayjs | null
   maxEndDate: Dayjs | null
   initialDow?: number
@@ -51,12 +52,12 @@ export default function CreationPage({
   initialStartTime,
   initialEndTime,
 }: Props) {
-  const [teachers, setTeachers] = useState<teacher[]>([])
+  const [teachers, setTeachers] = useState<Teacher[]>([])
 
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
 
-  const getTeacherById = (id: number): teacher | undefined => {
+  const getTeacherById = (id: number): Teacher | undefined => {
     return teachers.find((t) => t.id === id)
   }
 

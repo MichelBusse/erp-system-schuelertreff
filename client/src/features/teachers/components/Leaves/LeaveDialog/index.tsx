@@ -23,12 +23,14 @@ import { DatePicker } from '@mui/x-date-pickers'
 import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
-import { LeaveState, LeaveType } from '../../../../../core/types/enums'
-import { Role, leave } from '../../../../../core/types/user'
 import { leaveStateToString, leaveTypeToString, snackbarOptions, snackbarOptionsError } from '../../../../../core/res/consts'
 import { useAuth } from '../../../../auth/components/AuthProvider'
 import IconButtonAdornment from '../../../../general/components/IconButtonAdornment'
 import LeaveDialogSubstitute from '../LeaveDialogSubstitute'
+import LeaveType from '../../../../../core/enums/LeaveType'
+import LeaveState from '../../../../../core/enums/LeaveState'
+import Leave from '../../../../../core/types/Leave'
+import UserRole from '../../../../../core/enums/UserRole'
 
 
 export type LeaveForm = {
@@ -46,7 +48,7 @@ type Props = {
   close: () => void
   value: LeaveForm
   setValue: React.Dispatch<React.SetStateAction<LeaveForm>>
-  onSuccess: (id: number, value: leave | null) => void
+  onSuccess: (id: number, value: Leave | null) => void
 }
 
 const LeaveDialog: React.FC<Props> = ({
@@ -78,7 +80,7 @@ const LeaveDialog: React.FC<Props> = ({
     (typeof value.id !== 'undefined' && userId === 'me') ||
     initialState !== LeaveState.PENDING
 
-  const handleUpload = (id: number, data?: leave) => {
+  const handleUpload = (id: number, data?: Leave) => {
     if (uploadFile === null) return
 
     setLoading(true)
@@ -360,7 +362,7 @@ const LeaveDialog: React.FC<Props> = ({
               </Box>
             )}
 
-            {hasRole(Role.ADMIN) && !editDisabled && (
+            {hasRole(UserRole.ADMIN) && !editDisabled && (
               <>
                 <FormControl disabled={editDisabled}>
                   <RadioGroup

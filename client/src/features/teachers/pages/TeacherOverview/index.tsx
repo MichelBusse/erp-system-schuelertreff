@@ -13,11 +13,11 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from "../../../auth/components/AuthProvider";
-import subject from "../../../../core/types/subject";
-import { teacher } from "../../../../core/types/user";
-import { TeacherSchoolType } from "../../../../core/types/enums";
 import { degreeToString, teacherSchoolTypeToString } from "../../../../core/res/consts";
 import UserDocuments, { UserDocumentsType } from "../../../general/components/Documents/UserDocuments";
+import Subject from "../../../../core/types/Subject";
+import Teacher from "../../../../core/types/Teacher";
+import TeacherSchoolType from "../../../../core/enums/TeacherSchoolType";
 
 
 dayjs.extend(customParseFormat)
@@ -27,8 +27,8 @@ const TeacherOverview: React.FC = () => {
   const { id } = useParams()
   const navigate = useNavigate()
 
-  const [subjects, setSubjects] = useState<subject[]>([])
-  const [teacher, setTeacher] = useState<teacher | null>(null)
+  const [subjects, setSubjects] = useState<Subject[]>([])
+  const [teacher, setTeacher] = useState<Teacher | null>(null)
 
   if (!id) return <></>
 

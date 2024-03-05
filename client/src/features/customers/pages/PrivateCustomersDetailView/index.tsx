@@ -21,16 +21,20 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { defaultPrivateCustomerFormData, snackbarOptions, snackbarOptionsError } from '../../../../core/res/consts'
 import { defaultPrivateCustomerFormErrorTexts, privateCustomerFormValidation } from '../../../../core/utils/formValidation'
 import ConfirmationDialog, { ConfirmationDialogProps, defaultConfirmationDialogProps } from '../../../general/components/ConfirmationDialog'
-import { privateCustomerForm, privateCustomerFormErrorTexts } from '../../../../core/types/form'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { contractWithTeacher } from '../../../../core/types/contract'
-import { Role, timesAvailableParsed } from '../../../../core/types/user'
-import { CustomerType, DeleteState, SchoolType } from '../../../../core/types/enums'
 import CustomerInvoiceDataSelect, { CustomerInvoiceData } from '../../components/CustomerInvoiceDataSelect'
 import AddTimes from "../../../general/components/AddTimes";
 import UserDocuments, { UserDocumentsType } from "../../../general/components/Documents/UserDocuments";
 import ContractList from "../../../general/components/ContractList";
 import ContractDialog from "../../../timetable/components/ContractDialog/ContractDialog";
+import { Contract } from "../../../../core/types/Contract";
+import TimeSlotParsed from "../../../../core/types/TimeSlotParsed";
+import PrivateCustomerFormState from "../../../../core/types/Form/PrivateCustomerFormState";
+import PrivateCustomerFormErrorTexts from "../../../../core/types/Form/PrivateCustomerFormErrorTexts";
+import UserDeleteState from "../../../../core/enums/UserDeleteState";
+import SchoolType from "../../../../core/enums/SchoolType";
+import UserRole from "../../../../core/enums/UserRole";
+import CustomerType from "../../../../core/enums/CustomerType";
 
 
 dayjs.extend(customParseFormat)
@@ -45,17 +49,17 @@ const PrivateCustomerDetailView: React.FC = () => {
 
   const requestedId = id ? id : 'me'
 
-  const [data, setData] = useState<privateCustomerForm>(
+  const [data, setData] = useState<PrivateCustomerFormState>(
     defaultPrivateCustomerFormData,
   )
-  const [errors, setErrors] = useState<privateCustomerFormErrorTexts>(
+  const [errors, setErrors] = useState<PrivateCustomerFormErrorTexts>(
     defaultPrivateCustomerFormErrorTexts,
   )
 
   const [render, setRender] = useState<number>(0)
   const [contractDialogOpen, setContractDialogOpen] = useState<boolean>(false)
 
-  const [contracts, setContracts] = useState<contractWithTeacher[]>([])
+  const [contracts, setContracts] = useState<Contract[]>([])
   const [refreshContracts, setRefreshContracts] = useState<number>(0)
 
   useEffect(() => {
@@ -72,7 +76,7 @@ const PrivateCustomerDetailView: React.FC = () => {
         res.data.timesAvailableParsed[0].start === '00:00' &&
         res.data.timesAvailableParsed[0].end === '00:00'
           ? []
-          : res.data.timesAvailableParsed.map((time: timesAvailableParsed) => ({
+          : res.data.timesAvailableParsed.map((time: TimeSlotParsed) => ({
               dow: time.dow,
               start: dayjs(time.start, 'HH:mm'),
               end: dayjs(time.end, 'HH:mm'),
@@ -94,7 +98,7 @@ const PrivateCustomerDetailView: React.FC = () => {
         feeStandard: res.data.feeStandard,
         feeOnline: res.data.feeOnline,
         notes: res.data.notes ?? '',
-        deleteState: res.data.deleteState as DeleteState,
+        deleteState: res.data.deleteState as UserDeleteState,
       }))
     })
   }, [])
@@ -127,11 +131,11 @@ const PrivateCustomerDetailView: React.FC = () => {
       open: true,
       setProps: setConfirmationDialogProps,
       title:
-        data.deleteState === DeleteState.ACTIVE
+        data.deleteState === UserDeleteState.ACTIVE
           ? `${data.firstName + ' ' + data.lastName} wirklich archivieren?`
           : `${data.firstName + ' ' + data.lastName} wirklich löschen?`,
       text:
-        data.deleteState === DeleteState.ACTIVE
+        data.deleteState === UserDeleteState.ACTIVE
           ? `Möchtest du '${
               data.firstName + ' ' + data.lastName
             }' wirklich archivieren? Schüler können nur archiviert werden, wenn sie an keinen laufenden Verträgen beteiligt sind.`
@@ -431,7 +435,7 @@ const PrivateCustomerDetailView: React.FC = () => {
 
           <Stack direction={'row'} columnGap={2}>
             <h3>Einsätze:</h3>
-            {data.deleteState !== DeleteState.DELETED && (
+            {data.deleteState !== UserDeleteState.DELETED && (
               <IconButton
                 sx={{ marginLeft: 'auto' }}
                 onClick={() => {
@@ -467,7 +471,7 @@ const PrivateCustomerDetailView: React.FC = () => {
             <Button onClick={submitForm} variant="contained">
               Speichern
             </Button>
-            {id && data.deleteState === DeleteState.DELETED && (
+            {id && data.deleteState === UserDeleteState.DELETED && (
               <Button
                 variant="outlined"
                 color="primary"
@@ -483,7 +487,7 @@ const PrivateCustomerDetailView: React.FC = () => {
                 sx={{ marginLeft: 'auto' }}
                 color="error"
               >
-                {data.deleteState === DeleteState.DELETED
+                {data.deleteState === UserDeleteState.DELETED
                   ? 'Löschen'
                   : 'Archivieren'}
               </Button>
@@ -493,7 +497,7 @@ const PrivateCustomerDetailView: React.FC = () => {
           <h3>Rechnung generieren:</h3>
           <CustomerInvoiceDataSelect
             generateInvoice={generateInvoice}
-            type={Role.PRIVATECUSTOMER}
+            type={UserRole.PRIVATECUSTOMER}
           />
         </Stack>
       </Box>

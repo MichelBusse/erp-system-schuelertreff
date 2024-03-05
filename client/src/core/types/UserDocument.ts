@@ -1,9 +1,9 @@
-import user from './user'
+import User from './User'
 
-export type UserDocument = {
+type UserDocument = {
   id: number
 
-  owner?: user
+  owner?: User
 
   fileName: string
 
@@ -19,3 +19,5 @@ export type UserDocument = {
 
   content?: string
 }
+
+export default UserDocument;

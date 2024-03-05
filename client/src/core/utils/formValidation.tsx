@@ -1,19 +1,16 @@
 import dayjs from 'dayjs'
-
-import {
-  privateCustomerForm,
-  privateCustomerFormErrorTexts,
-  schoolForm,
-  schoolFormErrorTexts,
-  subjectForm,
-  subjectFormErrorTexts,
-  teacherForm,
-  teacherFormErrorTexts,
-} from '../types/form'
+import TeacherFormErrorTexts from '../types/Form/TeacherFormErrorTexts'
+import TeacherFormState from '../types/Form/TeacherFormState'
+import PrivateCustomerFormState from '../types/Form/PrivateCustomerFormState'
+import PrivateCustomerFormErrorTexts from '../types/Form/PrivateCustomerFormErrorTexts'
+import SchoolFormErrorTexts from '../types/Form/SchoolFormErrorTexts'
+import SchoolFormState from '../types/Form/SchoolFormState'
+import SubjectFormState from '../types/Form/SubjectFormState'
+import SubjectFormErrorTexts from '../types/Form/SubjectFormErrorTexts'
 
 export const testEmail = (email: string) => /.+@.+\.[A-Za-z]+$/.test(email)
 
-export const defaultTeacherFormErrorTexts: teacherFormErrorTexts = {
+export const defaultTeacherFormErrorTexts: TeacherFormErrorTexts = {
   firstName: '',
   lastName: '',
   city: '',
@@ -40,9 +37,9 @@ export const defaultTeacherFormErrorTexts: teacherFormErrorTexts = {
 }
 
 export function teacherFormValidation(
-  form: teacherForm,
+  form: TeacherFormState,
   admin?: boolean,
-): teacherFormErrorTexts {
+) {
   let errorTexts = { ...defaultTeacherFormErrorTexts }
 
   if (form.firstName.trim() === '') {
@@ -113,9 +110,9 @@ export function teacherFormValidation(
 }
 
 export function workContractFormValidation(
-  form: teacherForm,
+  form: TeacherFormState,
   admin = true,
-): teacherFormErrorTexts {
+) {
   const errorTexts = { ...defaultTeacherFormErrorTexts }
 
   if (form.firstName.trim() === '') {
@@ -195,7 +192,7 @@ export function workContractFormValidation(
   return errorTexts
 }
 
-export function efzFormValidation(form: teacherForm): teacherFormErrorTexts {
+export function efzFormValidation(form: TeacherFormState) {
   const errorTexts = { ...defaultTeacherFormErrorTexts }
 
   if (form.firstName.trim() === '') {
@@ -231,7 +228,7 @@ export function efzFormValidation(form: teacherForm): teacherFormErrorTexts {
   return errorTexts
 }
 
-export const defaultPrivateCustomerFormErrorTexts: privateCustomerFormErrorTexts =
+export const defaultPrivateCustomerFormErrorTexts: PrivateCustomerFormErrorTexts =
   {
     firstName: '',
     lastName: '',
@@ -250,8 +247,8 @@ export const defaultPrivateCustomerFormErrorTexts: privateCustomerFormErrorTexts
   }
 
 export function privateCustomerFormValidation(
-  form: privateCustomerForm,
-): privateCustomerFormErrorTexts {
+  form: PrivateCustomerFormState,
+) {
   const errorTexts = { ...defaultPrivateCustomerFormErrorTexts }
 
   if (form.firstName.trim() === '') {
@@ -287,7 +284,7 @@ export function privateCustomerFormValidation(
   return errorTexts
 }
 
-export const defaultSchoolFormErrorTexts: schoolFormErrorTexts = {
+export const defaultSchoolFormErrorTexts: SchoolFormErrorTexts = {
   firstName: '',
   lastName: '',
   city: '',
@@ -305,7 +302,7 @@ export const defaultSchoolFormErrorTexts: schoolFormErrorTexts = {
   valid: true,
 }
 
-export function schoolFormValidation(form: schoolForm): schoolFormErrorTexts {
+export function schoolFormValidation(form: SchoolFormState) {
   const errorTexts = { ...defaultSchoolFormErrorTexts }
 
   if (form.postalCode.trim() !== '' && form.postalCode.length !== 5) {
@@ -336,7 +333,7 @@ export function schoolFormValidation(form: schoolForm): schoolFormErrorTexts {
   return errorTexts
 }
 
-export const defaultSubjectFormErrorTexts = {
+export const defaultSubjectFormErrorTexts : SubjectFormErrorTexts = {
   color: '',
   name: '',
   shortForm: '',
@@ -344,8 +341,8 @@ export const defaultSubjectFormErrorTexts = {
 }
 
 export function subjectFormValidation(
-  form: subjectForm,
-): subjectFormErrorTexts {
+  form: SubjectFormState,
+) {
   const errorTexts = { ...defaultSubjectFormErrorTexts }
 
   if (form.name.trim() === '') {

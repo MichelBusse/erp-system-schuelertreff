@@ -16,13 +16,13 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { contractWithTeacher } from '../../../../core/types/contract'
-import { lessonForm } from '../../../../core/types/form'
-import { LessonState } from '../../../../core/types/lesson'
 import LoadingCenter from '../../../general/components/LoadingCenter'
 import ErrorPage, { NotFound } from '../../../general/pages/Error'
 import { snackbarOptions, snackbarOptionsError } from '../../../../core/res/consts'
 import ContractDialog from "../../components/ContractDialog/ContractDialog";
+import { Contract } from "../../../../core/types/Contract";
+import LessonFormState from "../../../../core/types/Form/LessonFormState";
+import LessonState from "../../../../core/enums/LessonState";
 
 
 const LessonDetailView: React.FC = () => {
@@ -35,8 +35,8 @@ const LessonDetailView: React.FC = () => {
   const [contractDialogOpen, setContractDialogOpen] = useState<boolean>(false)
   const [render, setRender] = useState(0)
 
-  const [contract, setContract] = useState<contractWithTeacher | undefined>()
-  const [data, setData] = useState<lessonForm>({
+  const [contract, setContract] = useState<Contract | undefined>()
+  const [data, setData] = useState<LessonFormState>({
     state: LessonState.IDLE,
     notes: '',
   })

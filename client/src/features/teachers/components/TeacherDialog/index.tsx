@@ -17,15 +17,15 @@ import axios from 'axios'
 import { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
-import { teacher } from '../../../../core/types/user'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import { snackbarOptionsError } from '../../../../core/res/consts'
 import IconButtonAdornment from '../../../general/components/IconButtonAdornment'
+import Teacher from '../../../../core/types/Teacher'
 
 type Props = {
   open: boolean
   closeDialog: () => void
-  setTeachers: React.Dispatch<React.SetStateAction<teacher[]>>
+  setTeachers: React.Dispatch<React.SetStateAction<Teacher[]>>
   teacherType?: 'employed' | 'applied'
 }
 

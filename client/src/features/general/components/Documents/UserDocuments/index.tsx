@@ -23,10 +23,10 @@ import {
   snackbarOptionsError,
 } from '../../../../../core/res/consts'
 import UploadDialog, { UploadDialogForm } from '../UploadDialog'
-import { Role } from '../../../../../core/types/user'
 import { formatDate } from '../../../../../core/utils/date'
 import DocumentEditDialog from '../DocumentEditDialog'
-import { UserDocument } from '../../../../../core/types/document'
+import UserDocument from '../../../../../core/types/UserDocument'
+import UserRole from '../../../../../core/enums/UserRole'
 
 export enum UserDocumentsType {
   PUBLIC = 'public',
@@ -171,7 +171,7 @@ const UserDocuments: React.FC<Props> = ({
     const [confirm, setConfirm] = useState(false)
 
     const editDisabled = !(
-      hasRole(Role.ADMIN) ||
+      hasRole(UserRole.ADMIN) ||
       ((userId === undefined || userId === decodeToken().sub) && doc.mayDelete)
     )
 
@@ -229,7 +229,7 @@ const UserDocuments: React.FC<Props> = ({
       >
         <ListItem>
           <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ width: '100%' }}>
-            {(hasRole(Role.ADMIN) || !userId) && (
+            {(hasRole(UserRole.ADMIN) || !userId) && (
               <Button variant="text" component="label" endIcon={<AddIcon />}>
                 <input
                   hidden
@@ -262,7 +262,7 @@ const UserDocuments: React.FC<Props> = ({
         loading={loading}
         onSubmit={uploadDoc}
         file={file}
-        minimalView={!hasRole(Role.ADMIN)}
+        minimalView={!hasRole(UserRole.ADMIN)}
       />
       <DocumentEditDialog
         open={editDialogOpen}

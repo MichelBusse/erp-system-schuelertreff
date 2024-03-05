@@ -3,15 +3,15 @@ import { useEffect, useState } from 'react'
 import { BsPlusLg } from 'react-icons/bs'
 
 import styles from './styles.module.scss'
-import subject from '../../../../core/types/subject'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import SubjectDialog from '../../components/SubjectDialog'
+import Subject from '../../../../core/types/Subject'
 
 const Subjects: React.FC = () => {
   const [error, setError] = useState('')
   const [open, setOpen] = useState(false)
-  const [subjects, setSubjects] = useState<subject[]>([])
-  const [initialSubject, setInitialSubject] = useState<subject | null>(null)
+  const [subjects, setSubjects] = useState<Subject[]>([])
+  const [initialSubject, setInitialSubject] = useState<Subject | null>(null)
   const { API } = useAuth()
 
   //Get subjects from DB
@@ -27,7 +27,7 @@ const Subjects: React.FC = () => {
     return <h1>{error}</h1>
   }
 
-  const openSubjectDialog = (subject?: subject) => {
+  const openSubjectDialog = (subject?: Subject) => {
     if (subject) {
       setInitialSubject(subject)
     } else {

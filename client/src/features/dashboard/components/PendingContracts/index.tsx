@@ -3,20 +3,21 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 
 import { CockpitComponent } from '../../pages/Cockpit'
-import { ContractState, contractWithTeacher } from '../../../../core/types/contract'
+import { Contract } from '../../../../core/types/Contract'
 import ContractList from '../../../general/components/ContractList'
 import { useAuth } from '../../../auth/components/AuthProvider'
+import ContractState from '../../../../core/enums/ContractState'
 
 const PendingContracts: CockpitComponent = ({ listSx }) => {
   const { API } = useAuth()
   const [pendingContracts, setPendingContracts] = useState<
-    contractWithTeacher[]
+    Contract[]
   >([])
   const [refresh, setRefresh] = useState<number>(0)
 
   useEffect(() => {
     API.get('contracts/pending').then((res) => {
-      const pendingContracts: contractWithTeacher[] = res.data
+      const pendingContracts: Contract[] = res.data
 
       pendingContracts.sort((a, b) => {
         // Past contracts at top

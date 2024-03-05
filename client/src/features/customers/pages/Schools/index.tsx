@@ -22,12 +22,12 @@ import { useSnackbar } from 'notistack'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
-import { SchoolType } from "../../../../core/types/enums";
 import { PrevIdProps } from "../../../../App";
 import { useAuth } from "../../../auth/components/AuthProvider";
-import { school } from "../../../../core/types/user";
 import { dataGridLocaleText, snackbarOptions, snackbarOptionsError } from "../../../../core/res/consts";
 import SchoolDialog from "../../components/SchoolDialog";
+import SchoolType from "../../../../core/enums/SchoolType";
+import School from "../../../../core/types/School";
 
 const SubjectsFilterInputValue: React.FC<GridFilterInputValueProps> = ({
   item,
@@ -108,7 +108,7 @@ const Schools: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
   const { enqueueSnackbar } = useSnackbar()
 
   const [open, setOpen] = useState(false)
-  const [customers, setCustomers] = useState<school[]>([])
+  const [customers, setCustomers] = useState<School[]>([])
   const [deletedSchoolsToggle, setDeletedSchoolsToggle] =
     useState<boolean>(false)
 

@@ -13,10 +13,10 @@ import { Theme } from '@mui/system'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import LeaveDialog, { LeaveForm } from '../../../teachers/components/Leaves/LeaveDialog'
-import { leave } from '../../../../core/types/user'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { LeaveState } from '../../../../core/types/enums'
 import { leaveStateToString, leaveTypeToString } from '../../../../core/res/consts'
+import LeaveState from '../../../../core/enums/LeaveState'
+import Leave from '../../../../core/types/Leave'
 
 type Props = {
   state: LeaveState
@@ -33,7 +33,7 @@ const formatDate = (date: string) => dayjs(date).format('DD.MM.YYYY')
 
 const CockpitLeaves: React.FC<Props> = ({ state, listSx }) => {
   const { API } = useAuth()
-  const [leaves, setLeaves] = useState<leave[]>([])
+  const [leaves, setLeaves] = useState<Leave[]>([])
   const [open, setOpen] = useState(false)
   const [refresh, setRefresh] = useState(0)
   const [render, setRender] = useState(0)

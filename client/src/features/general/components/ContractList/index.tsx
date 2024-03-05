@@ -14,16 +14,23 @@ import axios from 'axios'
 import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
-import { ContractState, contract, contractWithTeacher } from '../../../../core/types/contract'
+import { Contract } from '../../../../core/types/Contract'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import ConfirmationDialog, { ConfirmationDialogProps, defaultConfirmationDialogProps } from '../ConfirmationDialog'
-import { contractStateToString, contractTypeToString, snackbarOptions, snackbarOptionsError } from '../../../../core/res/consts'
+import ConfirmationDialog, {
+  defaultConfirmationDialogProps,
+} from '../ConfirmationDialog'
+import {
+  contractStateToString,
+  contractTypeToString,
+  snackbarOptions,
+  snackbarOptionsError,
+} from '../../../../core/res/consts'
 import ContractDialog from '../../../timetable/components/ContractDialog/ContractDialog'
-
+import ContractState from '../../../../core/enums/ContractState'
 
 type Props = {
-  contracts: contractWithTeacher[] | contract[]
-  setContracts: React.Dispatch<React.SetStateAction<contractWithTeacher[]>>
+  contracts: Contract[]
+  setContracts: React.Dispatch<React.SetStateAction<Contract[]>>
   onSuccess?: () => void
   allowTogglePast?: boolean
   sx?: SxProps<Theme>
@@ -41,12 +48,11 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const [render, setRender] = useState<number>(0)
-  const [initialContract, setInitialContract] = useState<
-    contractWithTeacher | undefined
-  >(undefined)
+  const [initialContract, setInitialContract] = useState<Contract | undefined>()
   const [open, setOpen] = useState<boolean>(false)
-  const [confirmationDialogProps, setConfirmationDialogProps] =
-    useState(defaultConfirmationDialogProps)
+  const [confirmationDialogProps, setConfirmationDialogProps] = useState(
+    defaultConfirmationDialogProps,
+  )
 
   const theme = useTheme()
   const [showPast, setShowPast] = useState(false)
@@ -60,8 +66,8 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
       action: () => {
         API.delete('contracts/' + contractId)
           .then(() => {
-            setContracts((prevContracts: contractWithTeacher[]) => {
-              const newContracts: contractWithTeacher[] = []
+            setContracts((prevContracts: Contract[]) => {
+              const newContracts: Contract[] = []
               for (const c of prevContracts) {
                 if (c.id !== contractId) newContracts.push(c)
               }
@@ -87,7 +93,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
     })
   }
 
-  const editContract = (contract: contractWithTeacher) => {
+  const editContract = (contract: Contract) => {
     setInitialContract(contract)
     setRender((r) => ++r)
     setOpen(true)

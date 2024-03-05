@@ -4,13 +4,13 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { classCustomer } from '../../../../core/types/user'
 import { DrawerParameters } from '../../pages/Timetable'
-import { contract } from '../../../../core/types/contract'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { lesson } from '../../../../core/types/lesson'
 import { snackbarOptionsError } from '../../../../core/res/consts'
 import MultiCalendar from '../MultiCalendar'
+import { Contract } from '../../../../core/types/Contract'
+import ClassCustomer from '../../../../core/types/ClassCustomer'
+import Lesson from '../../../../core/types/Lesson'
 
 
 type Props = {
@@ -23,8 +23,8 @@ const SchoolCalendar: React.FC<Props> = ({ date, setDrawer, refresh }) => {
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
 
-  const [contracts, setContracts] = useState<Record<number, contract[]>>({})
-  const [lessons, setLessons] = useState<lesson[]>([])
+  const [contracts, setContracts] = useState<Record<number, Contract[]>>({})
+  const [lessons, setLessons] = useState<Lesson[]>([])
   const [classes, setClasses] = useState<{ id: number; title: string }[]>([])
 
   const [loading, setLoading] = useState(true)
@@ -39,7 +39,7 @@ const SchoolCalendar: React.FC<Props> = ({ date, setDrawer, refresh }) => {
     API.get('users/classCustomer/' + requestedId).then((res) =>
       setClasses(
         res.data
-          .map((classCustomer: classCustomer) => ({
+          .map((classCustomer: ClassCustomer) => ({
             id: classCustomer.id,
             title: classCustomer.className,
           }))
@@ -62,13 +62,13 @@ const SchoolCalendar: React.FC<Props> = ({ date, setDrawer, refresh }) => {
       },
     })
       .then((res) => {
-        const contractsByClass: Record<number, contract[]> = {}
+        const contractsByClass: Record<number, Contract[]> = {}
         console.log(res.data.contracts)
         res.data.contracts
-          .sort((a: contract, b: contract) => {
+          .sort((a: Contract, b: Contract) => {
             return dayjs(a.startTime, 'HH:mm').diff(dayjs(b.startTime, 'HH:mm'))
           })
-          .map((c: contract) => {
+          .map((c: Contract) => {
             c.customers.map((customer) => {
               if (customer.role === 'classCustomer') {
                 if (customer.defaultClassCustomer === true) {

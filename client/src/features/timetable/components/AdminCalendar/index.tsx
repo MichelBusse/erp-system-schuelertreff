@@ -4,13 +4,13 @@ import { Box } from '@mui/system'
 import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
-import { contract } from '../../../../core/types/contract'
-import { lesson } from '../../../../core/types/lesson'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { teacher } from '../../../../core/types/user'
 import { snackbarOptionsError } from '../../../../core/res/consts'
 import MultiCalendar from '../MultiCalendar'
 import { DrawerParameters } from '../../pages/Timetable'
+import { Contract } from '../../../../core/types/Contract'
+import Lesson from '../../../../core/types/Lesson'
+import Teacher from '../../../../core/types/Teacher'
 
 type Props = {
   date: Dayjs
@@ -28,8 +28,8 @@ const AdminCalendar: React.FC<Props> = ({
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
 
-  const [contracts, setContracts] = useState<Record<number, contract[]>>({})
-  const [lessons, setLessons] = useState<lesson[]>([])
+  const [contracts, setContracts] = useState<Record<number, Contract[]>>({})
+  const [lessons, setLessons] = useState<Lesson[]>([])
   const [teachers, setTeachers] = useState<{ id: number; title: string }[]>([])
 
   const [loading, setLoading] = useState(true)
@@ -39,7 +39,7 @@ const AdminCalendar: React.FC<Props> = ({
     API.get('users/teacher/employed').then((res) =>
       setTeachers(
         res.data
-          .map((teacher: teacher) => ({
+          .map((teacher: Teacher) => ({
             id: teacher.id,
             title: `${teacher.firstName} ${teacher.lastName}`,
           }))
@@ -62,12 +62,12 @@ const AdminCalendar: React.FC<Props> = ({
       },
     })
       .then((res) => {
-        const contractsByTeacher: Record<number, contract[]> = {}
+        const contractsByTeacher: Record<number, Contract[]> = {}
         res.data.contracts
-          .sort((a: contract, b: contract) => {
+          .sort((a: Contract, b: Contract) => {
             return dayjs(a.startTime, 'HH:mm').diff(dayjs(b.startTime, 'HH:mm'))
           })
-          .map((c: contract) => {
+          .map((c: Contract) => {
             if (c.teacher) {
               contractsByTeacher[c.teacher.id] = (
                 contractsByTeacher[c.teacher.id] ?? []

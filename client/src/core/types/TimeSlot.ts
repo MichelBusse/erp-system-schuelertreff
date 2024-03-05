@@ -1,10 +1,10 @@
 import { Dayjs } from 'dayjs'
 
-type timeAvailable = {
+type TimeSlot = {
   id: string
   dow: number
   start: Dayjs | null
   end: Dayjs | null
 }
 
-export default timeAvailable
+export default TimeSlot

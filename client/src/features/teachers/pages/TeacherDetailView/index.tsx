@@ -30,18 +30,24 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import subject from '../../../../core/types/subject'
-import { teacherForm, teacherFormErrorTexts } from '../../../../core/types/form'
-import { leave, teacher, timesAvailableParsed } from '../../../../core/types/user'
 import { defaultTeacherFormData, snackbarOptions, snackbarOptionsError, teacherSchoolTypeToString, teacherStateToString } from '../../../../core/res/consts'
 import { defaultTeacherFormErrorTexts, efzFormValidation, teacherFormValidation, workContractFormValidation } from '../../../../core/utils/formValidation'
-import ConfirmationDialog, { ConfirmationDialogProps, defaultConfirmationDialogProps } from '../../../general/components/ConfirmationDialog'
-import { Degree, DeleteState, TeacherSchoolType, TeacherState } from '../../../../core/types/enums'
+import ConfirmationDialog, { defaultConfirmationDialogProps } from '../../../general/components/ConfirmationDialog'
 import TeacherInvoiceDataSelect, { TeacherInvoiceData } from '../../components/TeacherInvoiceDateSelect'
 import IconButtonAdornment from '../../../general/components/IconButtonAdornment'
 import AddTimes from '../../../general/components/AddTimes'
-import Leave from '../../components/Leaves/Leave'
 import UserDocuments, { UserDocumentsType } from '../../../general/components/Documents/UserDocuments'
+import TeacherFormState from '../../../../core/types/Form/TeacherFormState'
+import Subject from '../../../../core/types/Subject'
+import TeacherFormErrorTexts from '../../../../core/types/Form/TeacherFormErrorTexts'
+import TimeSlotParsed from '../../../../core/types/TimeSlotParsed'
+import Teacher from '../../../../core/types/Teacher'
+import UserDeleteState from '../../../../core/enums/UserDeleteState'
+import TeacherSchoolType from '../../../../core/enums/TeacherSchoolType'
+import TeacherDegree from '../../../../core/enums/TeacherDegree'
+import TeacherState from '../../../../core/enums/TeacherState'
+import Leave from '../../../../core/types/Leave'
+import LeaveOverview from '../../components/Leaves/LeaveOverview'
 
 dayjs.extend(customParseFormat)
 
@@ -51,10 +57,10 @@ const TeacherDetailView: React.FC = () => {
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
 
-  const [subjects, setSubjects] = useState<subject[]>([])
-  const [data, setData] = useState<teacherForm>(defaultTeacherFormData)
-  const [leaveData, setLeaveData] = useState<leave[]>([])
-  const [errors, setErrors] = useState<teacherFormErrorTexts>(defaultTeacherFormErrorTexts)
+  const [subjects, setSubjects] = useState<Subject[]>([])
+  const [data, setData] = useState<TeacherFormState>(defaultTeacherFormData)
+  const [leaveData, setLeaveData] = useState<Leave[]>([])
+  const [errors, setErrors] = useState<TeacherFormErrorTexts>(defaultTeacherFormErrorTexts)
   const [refreshDocuments, setRefreshDocuments] = useState(0)
 
   const [
@@ -79,7 +85,7 @@ const TeacherDetailView: React.FC = () => {
     API.get('users/teacher/' + requestedId).then((res) => updateData(res.data))
   }, [activeTeacherState])
 
-  const updateData = (newData: teacher) => {
+  const updateData = (newData: Teacher) => {
     //Convert default value to "Immer verfügbar" in list
     const newTimesAvailable =
       newData.timesAvailableParsed.length === 1 &&
@@ -87,7 +93,7 @@ const TeacherDetailView: React.FC = () => {
       newData.timesAvailableParsed[0].start === '00:00' &&
       newData.timesAvailableParsed[0].end === '00:00'
         ? []
-        : newData.timesAvailableParsed.map((time: timesAvailableParsed) => ({
+        : newData.timesAvailableParsed.map((time: TimeSlotParsed) => ({
             dow: time.dow,
             start: dayjs(time.start, 'HH:mm'),
             end: dayjs(time.end, 'HH:mm'),
@@ -148,13 +154,13 @@ const TeacherDetailView: React.FC = () => {
       })
   }
 
-  const submitForm = (override: Partial<teacherForm> = {}) => {
+  const submitForm = (override: Partial<TeacherFormState> = {}) => {
     const errorTexts = teacherFormValidation(data, id !== undefined)
 
     setErrors(errorTexts)
 
     if (errorTexts.valid) {
-      const formData: Partial<teacherForm> = {
+      const formData: Partial<TeacherFormState> = {
         ...data,
         ...override,
       }
@@ -205,15 +211,15 @@ const TeacherDetailView: React.FC = () => {
       open: true,
       setProps: setConfirmationDialogProps,
       title:
-        data.deleteState === DeleteState.ACTIVE
+        data.deleteState === UserDeleteState.ACTIVE
           ? 'Lehrkraft wirklich archivieren?'
           : 'Lehrkraft wirklich löschen?',
       text:
-        data.deleteState === DeleteState.ACTIVE
+        data.deleteState === UserDeleteState.ACTIVE
           ? 'Lehrkräfte können nur archiviert werden, wenn sie in keinen laufenden oder zukünftigen Einsätzen mehr eingeplant sind.'
           : 'Lehrkräfte können nur gelöscht werden, wenn sie in keinen vergangenen Einsätzen eingeplant waren.',
       actionText:
-        data.deleteState === DeleteState.ACTIVE ? 'Archivieren' : 'Löschen',
+        data.deleteState === UserDeleteState.ACTIVE ? 'Archivieren' : 'Löschen',
       action: () => {
         API.delete('users/teacher/' + requestedId)
           .then(() => {
@@ -222,7 +228,7 @@ const TeacherDetailView: React.FC = () => {
                 ' ' +
                 data.lastName +
                 ' wurde ' +
-                (data.deleteState === DeleteState.ACTIVE
+                (data.deleteState === UserDeleteState.ACTIVE
                   ? 'archiviert'
                   : 'gelöscht'),
               snackbarOptions,
@@ -695,10 +701,10 @@ const TeacherDetailView: React.FC = () => {
                     }))
                   }
                 >
-                  <MenuItem value={Degree.NOINFO}>Keine Angabe</MenuItem>
-                  <MenuItem value={Degree.HIGHSCHOOL}>Abitur</MenuItem>
-                  <MenuItem value={Degree.BACHELOR}>Bachelor</MenuItem>
-                  <MenuItem value={Degree.MASTER}>Master</MenuItem>
+                  <MenuItem value={TeacherDegree.NOINFO}>Keine Angabe</MenuItem>
+                  <MenuItem value={TeacherDegree.HIGHSCHOOL}>Abitur</MenuItem>
+                  <MenuItem value={TeacherDegree.BACHELOR}>Bachelor</MenuItem>
+                  <MenuItem value={TeacherDegree.MASTER}>Master</MenuItem>
                 </Select>
                 <FormHelperText>{errors.degree}</FormHelperText>
               </FormControl>
@@ -770,7 +776,7 @@ const TeacherDetailView: React.FC = () => {
           {data.state === TeacherState.EMPLOYED && (
             <>
               <Typography variant="h6">Urlaub/Krankmeldung:</Typography>
-              <Leave
+              <LeaveOverview
                 userId={requestedId}
                 value={leaveData}
                 setValue={setLeaveData}
@@ -848,7 +854,7 @@ const TeacherDetailView: React.FC = () => {
                 sx={{ marginLeft: 'auto' }}
                 color="error"
               >
-                {data.deleteState === DeleteState.ACTIVE
+                {data.deleteState === UserDeleteState.ACTIVE
                   ? data.state === TeacherState.CREATED ||
                     data.state === TeacherState.INTERVIEW ||
                     data.state === TeacherState.APPLIED
@@ -857,18 +863,18 @@ const TeacherDetailView: React.FC = () => {
                   : 'Löschen'}
               </Button>
             )}
-            {id && data.deleteState === DeleteState.DELETED && (
+            {id && data.deleteState === UserDeleteState.DELETED && (
               <Button
                 variant="outlined"
                 color="primary"
-                onClick={() => submitForm({ deleteState: DeleteState.ACTIVE })}
+                onClick={() => submitForm({ deleteState: UserDeleteState.ACTIVE })}
               >
                 Entarchivieren
               </Button>
             )}
             {id &&
               data.state === TeacherState.CREATED &&
-              data.deleteState === DeleteState.ACTIVE && (
+              data.deleteState === UserDeleteState.ACTIVE && (
                 <Button
                   variant="contained"
                   color="success"
@@ -881,7 +887,7 @@ const TeacherDetailView: React.FC = () => {
               )}
             {id &&
               data.state === TeacherState.INTERVIEW &&
-              data.deleteState === DeleteState.ACTIVE && (
+              data.deleteState === UserDeleteState.ACTIVE && (
                 <Button
                   variant="contained"
                   color="success"
@@ -894,7 +900,7 @@ const TeacherDetailView: React.FC = () => {
               )}
             {id &&
               data.state === TeacherState.APPLIED &&
-              data.deleteState === DeleteState.ACTIVE && (
+              data.deleteState === UserDeleteState.ACTIVE && (
                 <Button
                   variant="contained"
                   color="success"
@@ -907,7 +913,7 @@ const TeacherDetailView: React.FC = () => {
               )}
             {id &&
               data.state === TeacherState.CONTRACT &&
-              data.deleteState === DeleteState.ACTIVE && (
+              data.deleteState === UserDeleteState.ACTIVE && (
                 <Button
                   variant="contained"
                   color="success"
@@ -919,7 +925,7 @@ const TeacherDetailView: React.FC = () => {
             {id &&
               (data.state === TeacherState.CONTRACT ||
                 data.state === TeacherState.EMPLOYED) &&
-              data.deleteState === DeleteState.ACTIVE && (
+              data.deleteState === UserDeleteState.ACTIVE && (
                 <Button variant="outlined" onClick={() => resetPassword()}>
                   Passwort-Reset
                 </Button>
@@ -927,7 +933,7 @@ const TeacherDetailView: React.FC = () => {
           </Stack>
           {id &&
             data.state === TeacherState.EMPLOYED &&
-            data.deleteState === DeleteState.ACTIVE && (
+            data.deleteState === UserDeleteState.ACTIVE && (
               <>
                 <Typography variant="h6">Abrechnung:</Typography>
                 <TeacherInvoiceDataSelect generateInvoice={generateInvoice} />

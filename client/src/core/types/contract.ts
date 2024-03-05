@@ -1,15 +1,11 @@
-import { ContractType } from './enums'
-import { lesson } from './lesson'
-import subject from './subject'
-import { customer, leave, teacher } from './user'
+import ContractState from '../enums/ContractState'
+import ContractType from '../enums/ContractType'
+import Customer from './Customer'
+import Teacher from './Teacher'
+import Lesson from './Lesson'
+import subject from './Subject'
 
-export enum ContractState {
-  PENDING = 'pending',
-  ACCEPTED = 'accepted',
-  DECLINED = 'declined',
-}
-
-export type contract = {
+export type Contract = {
   id: number
   startTime: string
   endTime: string
@@ -17,39 +13,12 @@ export type contract = {
   endDate: string
   interval: 1
   subject: subject
-  customers: customer[]
-  teacher: teacher
-  state: ContractState
-  parentContract?: contract
-  childContracts: contract[]
-  lessons: lesson[]
-  contractType: ContractType
-  blocked?: boolean
-}
-
-export type contractWithTeacher = {
-  id: number
-  startTime: string
-  endTime: string
-  startDate: string
-  endDate: string
-  interval: 1
-  subject: subject
-  customers: customer[]
-  teacher: teacher
+  customers: Customer[]
+  teacher: Teacher
   state: ContractState
   contractType: ContractType
   blocked?: boolean
-}
-
-export type suggestion = {
-  teacherId: number
-  teacherName: string
-  suggestions: {
-    dow: number
-    start: string
-    end: string
-    overlap: number[]
-  }[]
-  leave: leave[]
+  parentContract?: Contract
+  childContracts: Contract[]
+  lessons: Lesson[]
 }

@@ -20,8 +20,8 @@ import ListItemText from '@mui/material/ListItemText'
 import dayjs, { Dayjs } from 'dayjs'
 import { nanoid } from 'nanoid'
 import { useState } from 'react'
-import timeAvailable from '../../../../core/types/timeAvailable'
 import BetterTimePicker from '../BetterTimePicker'
+import TimeSlot from '../../../../core/types/TimeSlot'
 
 type times = {
   dow: string
@@ -30,8 +30,8 @@ type times = {
 }
 
 type Props = {
-  value: timeAvailable[]
-  setValue: (newValue: timeAvailable[]) => void
+  value: TimeSlot[]
+  setValue: (newValue: TimeSlot[]) => void
 }
 
 const AddTimes: React.FC<Props> = ({ value, setValue }) => {

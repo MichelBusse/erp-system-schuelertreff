@@ -8,8 +8,6 @@ import { SnackbarProvider } from 'notistack'
 import { useState } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
-import { TeacherState } from './core/types/enums'
-import { Role } from './core/types/user'
 import { useAuth } from './features/auth/components/AuthProvider'
 import { Forbidden, NotFound } from './features/general/pages/Error'
 import Layout from './features/general/components/Layout'
@@ -27,10 +25,12 @@ import Applicants from './features/teachers/pages/Applicants'
 import Subjects from './features/subjects/pages/Subjects'
 import Login from './features/auth/pages/Login'
 import Reset from './features/auth/pages/Reset'
+import UserRole from './core/enums/UserRole'
+import TeacherState from './core/enums/TeacherState'
 
 export type NavigateState = { from: Location }
 
-const ProtectedRoute: React.FC<{ roles?: Role[] }> = ({
+const ProtectedRoute: React.FC<{ roles?: UserRole[] }> = ({
   children,
   roles = [],
 }) => {
@@ -41,7 +41,7 @@ const ProtectedRoute: React.FC<{ roles?: Role[] }> = ({
   if (
     location.pathname !== '/profile' &&
     isAuthed() &&
-    hasRole(Role.TEACHER) &&
+    hasRole(UserRole.TEACHER) &&
     decodeToken().state !== TeacherState.EMPLOYED
   ) {
     return <Navigate to="/profile" replace />
@@ -228,8 +228,8 @@ const App: React.FC = () => {
                 path="profile"
                 element={
                   <ProtectedRoute>
-                    {hasRole(Role.SCHOOL) ? <SchoolDetailView /> : null}
-                    {hasRole(Role.TEACHER) ? <TeacherDetailView /> : null}
+                    {hasRole(UserRole.SCHOOL) ? <SchoolDetailView /> : null}
+                    {hasRole(UserRole.TEACHER) ? <TeacherDetailView /> : null}
                   </ProtectedRoute>
                 }
               />

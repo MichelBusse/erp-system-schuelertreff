@@ -11,8 +11,8 @@ import { DatePicker } from '@mui/x-date-pickers'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { Role } from '../../../../core/types/user'
 import InvoiceDataSelect from '../../../general/components/InvoiceDataSelect'
+import UserRole from '../../../../core/enums/UserRole'
 
 export type CustomerInvoiceData = {
   invoiceNumber: number
@@ -27,7 +27,7 @@ type Props = {
     month: number,
     invoiceData: CustomerInvoiceData,
   ) => void
-  type: Role
+  type: UserRole
 }
 
 const CustomerInvoiceDataSelect: React.FC<Props> = ({
@@ -50,7 +50,7 @@ const CustomerInvoiceDataSelect: React.FC<Props> = ({
     invoiceDate: dayjs(),
   }
 
-  if (type === Role.SCHOOL)
+  if (type === UserRole.SCHOOL)
     defaultInvoiceData = {
       ...defaultInvoiceData,
       invoiceType: 'GTA',

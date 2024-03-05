@@ -10,16 +10,17 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { contract } from '../../../../core/types/contract'
-import { LessonState, lesson } from '../../../../core/types/lesson'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import { snackbarOptions, snackbarOptionsError } from '../../../../core/res/consts'
-import { ContractType } from '../../../../core/types/enums'
+import { Contract } from '../../../../core/types/Contract'
+import Lesson from '../../../../core/types/Lesson'
+import LessonState from '../../../../core/enums/LessonState'
+import ContractType from '../../../../core/enums/ContractType'
 
 
 type Props = {
-  contract: contract
-  existingLesson: lesson | null
+  contract: Contract
+  existingLesson: Lesson | null
   date: Dayjs
   calendarDate: Dayjs
   refresh: () => void

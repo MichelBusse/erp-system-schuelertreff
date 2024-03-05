@@ -15,16 +15,16 @@ import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { lesson } from '../../../../core/types/lesson'
 import CalendarControl from '../../components/CalendarControl'
 import SchoolCalendar from '../../components/SchoolCalendar'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { Role } from '../../../../core/types/user'
 import AdminCalendar from '../../components/AdminCalendar'
 import TeacherCalendar from '../../components/TeacherCalendar'
-import { contract } from '../../../../core/types/contract'
 import LessonOverview from '../../components/LessonOverview'
 import ContractDialog from '../../components/ContractDialog/ContractDialog'
+import { Contract } from '../../../../core/types/Contract'
+import Lesson from '../../../../core/types/Lesson'
+import UserRole from '../../../../core/enums/UserRole'
 
 
 dayjs.locale('de')
@@ -33,7 +33,7 @@ dayjs.extend(weekOfYear)
 export type DrawerParameters = {
   open: boolean
   params: GridCellParams | null
-  lessons: lesson[]
+  lessons: Lesson[]
 }
 
 const Timetable: React.FC = () => {
@@ -98,7 +98,7 @@ const Timetable: React.FC = () => {
       >
         <CalendarControl date={date} setDate={setDate} />
 
-        {hasRole(Role.SCHOOL) ? (
+        {hasRole(UserRole.SCHOOL) ? (
           <SchoolCalendar
             date={date}
             setDrawer={setDrawer}
@@ -106,7 +106,7 @@ const Timetable: React.FC = () => {
           />
         ) : null}
 
-        {hasRole(Role.ADMIN) ? (
+        {hasRole(UserRole.ADMIN) ? (
           <AdminCalendar
             date={date}
             setDrawer={setDrawer}
@@ -120,7 +120,7 @@ const Timetable: React.FC = () => {
           />
         ) : null}
 
-        {hasRole(Role.TEACHER) ? (
+        {hasRole(UserRole.TEACHER) ? (
           <TeacherCalendar
             date={date}
             setDrawer={setDrawer}
@@ -160,7 +160,7 @@ const Timetable: React.FC = () => {
                 </Typography>
               </Box>
 
-              {(drawer.params.value as contract[])?.map((c) => {
+              {(drawer.params.value as Contract[])?.map((c) => {
                 let existingLesson = null
                 for (const lesson of drawer.lessons) {
                   if (

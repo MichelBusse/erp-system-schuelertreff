@@ -20,12 +20,12 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import ConfirmationDialog, { ConfirmationDialogProps, defaultConfirmationDialogProps } from '../../../general/components/ConfirmationDialog'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { customer } from '../../../../core/types/user'
-import { contractForm } from '../../../../core/types/form'
 import { snackbarOptions } from '../../../../core/res/consts'
 import IconButtonAdornment from '../../../general/components/IconButtonAdornment'
 import { getNextDow } from '../../../../core/utils/date'
 import BetterTimePicker from '../../../general/components/BetterTimePicker'
+import Customer from '../../../../core/types/Customer'
+import ContractEditFormState from '../../../../core/types/Form/ContractEditFormState'
 
 
 dayjs.extend(customParseFormat)
@@ -42,7 +42,7 @@ const ContractEditDialog: React.FC<Props> = ({
   onSuccess = () => {},
 }) => {
   const { API } = useAuth()
-  const [customers, setCustomers] = useState<customer[]>([])
+  const [customers, setCustomers] = useState<Customer[]>([])
   const { enqueueSnackbar } = useSnackbar()
   const [confirmationDialogProps, setConfirmationDialogProps] =
     useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
@@ -51,7 +51,7 @@ const ContractEditDialog: React.FC<Props> = ({
     API.get('users/customer').then((res) => setCustomers(res.data))
   }, [])
 
-  const [data, setData] = useState<contractForm>({
+  const [data, setData] = useState<ContractEditFormState>({
     startDate: null,
     endDate: null,
     startTime: null,
@@ -63,7 +63,7 @@ const ContractEditDialog: React.FC<Props> = ({
     subject: null,
   })
 
-  const [prevContract, setPrevContract] = useState<contractForm>({
+  const [prevContract, setPrevContract] = useState<ContractEditFormState>({
     startDate: null,
     endDate: null,
     startTime: null,

@@ -18,22 +18,26 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../../../auth/components/AuthProvider'
-import { classCustomer, privateCustomer, school } from '../../../../../core/types/user'
-import subject from '../../../../../core/types/subject'
-import { ContractFilterForm } from '../../../../../core/types/form'
 import { snackbarOptionsError } from '../../../../../core/res/consts'
-import { contractWithTeacher } from '../../../../../core/types/contract'
 import IconButtonAdornment from '../../../../general/components/IconButtonAdornment'
-import { ContractType, CustomerType } from '../../../../../core/types/enums'
 import { getNextDow } from '../../../../../core/utils/date'
 import BetterTimePicker from '../../../../general/components/BetterTimePicker'
+import { Contract } from '../../../../../core/types/Contract'
+import ContractFilterFormState from '../../../../../core/types/Form/ContractFilterFormState'
+import School from '../../../../../core/types/School'
+import Subject from '../../../../../core/types/Subject'
+import ClassCustomer from '../../../../../core/types/ClassCustomer'
+import PrivateCustomer from '../../../../../core/types/PrivateCustomer'
+import CustomerType from '../../../../../core/enums/CustomerType'
+import UserRole from '../../../../../core/enums/UserRole'
+import ContractType from '../../../../../core/enums/ContractType'
 
 dayjs.extend(customParseFormat)
 
 type Props = {
-  form: ContractFilterForm
-  setForm: React.Dispatch<React.SetStateAction<ContractFilterForm>>
-  initialContract?: contractWithTeacher | null
+  form: ContractFilterFormState
+  setForm: React.Dispatch<React.SetStateAction<ContractFilterFormState>>
+  initialContract?: Contract | null
   alreadySubmitted?: boolean
 }
 
@@ -43,10 +47,10 @@ const Filter: React.FC<Props> = ({
   initialContract,
   alreadySubmitted,
 }) => {
-  const [privCustomers, setPrivCustomers] = useState<privateCustomer[]>([])
-  const [classCustomers, setClassCustomers] = useState<classCustomer[]>([])
-  const [schools, setSchools] = useState<school[]>([])
-  const [subjects, setSubjects] = useState<subject[]>([])
+  const [privCustomers, setPrivCustomers] = useState<PrivateCustomer[]>([])
+  const [classCustomers, setClassCustomers] = useState<ClassCustomer[]>([])
+  const [schools, setSchools] = useState<School[]>([])
+  const [subjects, setSubjects] = useState<Subject[]>([])
 
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
@@ -55,13 +59,13 @@ const Filter: React.FC<Props> = ({
     if (!initialContract) return
     if (alreadySubmitted) return
 
-    if (initialContract.customers[0].role === CustomerType.PRIVATE) {
+    if (initialContract.customers[0].role === UserRole.PRIVATECUSTOMER) {
       setForm((f) => ({ ...f, customerType: CustomerType.PRIVATE }))
     } else {
       setForm((f) => ({ ...f, customerType: CustomerType.SCHOOL }))
     }
     setForm((f) => {
-      const initialForm0Entry: ContractFilterForm = {
+      const initialForm0Entry: ContractFilterFormState = {
         ...f,
         minStartDate: dayjs(initialContract.startDate, 'YYYY-MM-DD'),
         startDate: dayjs(initialContract.startDate, 'YYYY-MM-DD'),
@@ -74,15 +78,15 @@ const Filter: React.FC<Props> = ({
         endTime: dayjs(initialContract.endTime, 'HH:mm'),
         dow: dayjs(initialContract.startDate, 'YYYY-MM-DD').day(),
       }
-      if (initialContract.customers[0].role === CustomerType.PRIVATE) {
+      if (initialContract.customers[0].role === UserRole.PRIVATECUSTOMER) {
         initialForm0Entry.privateCustomers =
-          initialContract.customers as privateCustomer[]
+          initialContract.customers as PrivateCustomer[]
       } else {
-        const school = (initialContract.customers[0] as classCustomer).school
+        const school = (initialContract.customers[0] as ClassCustomer).school
         initialForm0Entry.school = school
         initialForm0Entry.classCustomers = (
-          initialContract.customers as classCustomer[]
-        ).filter((c) => !c.defaultClassCustomer) as classCustomer[]
+          initialContract.customers as ClassCustomer[]
+        ).filter((c) => !c.defaultClassCustomer) as ClassCustomer[]
 
         loadClasses(school.id)
       }

@@ -15,18 +15,18 @@ import {
 import axios from 'axios'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
-import { privateCustomer } from '../../../../core/types/user'
-import { privateCustomerForm } from '../../../../core/types/form'
 import { defaultPrivateCustomerFormData, snackbarOptionsError } from '../../../../core/res/consts'
 import { defaultPrivateCustomerFormErrorTexts, privateCustomerFormValidation } from '../../../../core/utils/formValidation'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { SchoolType } from '../../../../core/types/enums'
 import AddTimes from '../../../general/components/AddTimes'
+import PrivateCustomerFormState from '../../../../core/types/Form/PrivateCustomerFormState'
+import PrivateCustomer from '../../../../core/types/PrivateCustomer'
+import SchoolType from '../../../../core/enums/SchoolType'
 
 type Props = {
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
-  setCustomers: React.Dispatch<React.SetStateAction<privateCustomer[]>>
+  setCustomers: React.Dispatch<React.SetStateAction<PrivateCustomer[]>>
 }
 
 const PrivateCustomerDialog: React.FC<Props> = ({
@@ -34,7 +34,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
   setOpen,
   setCustomers,
 }) => {
-  const [data, setData] = useState<privateCustomerForm>(
+  const [data, setData] = useState<PrivateCustomerFormState>(
     defaultPrivateCustomerFormData,
   )
   const [errors, setErrors] = useState(defaultPrivateCustomerFormErrorTexts)

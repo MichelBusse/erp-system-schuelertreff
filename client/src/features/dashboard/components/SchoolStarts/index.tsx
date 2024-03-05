@@ -16,11 +16,11 @@ import { NavLink } from 'react-router-dom'
 
 import { CockpitComponent } from '../../pages/Cockpit'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { school } from '../../../../core/types/user'
+import School from '../../../../core/types/School'
 
 const SchoolStarts: CockpitComponent = ({ listSx }) => {
   const { API } = useAuth()
-  const [schools, setSchools] = useState<Partial<school>[]>([])
+  const [schools, setSchools] = useState<Partial<School>[]>([])
   const [date, setDate] = useState<Dayjs>(dayjs())
 
   useEffect(() => {

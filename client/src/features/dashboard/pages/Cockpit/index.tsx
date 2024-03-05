@@ -4,9 +4,9 @@ import DailyContracts from '../../components/DailyContracts'
 import ContractsWithoutTeacher from '../../components/ContractsWithoutTeacher'
 import PendingContracts from '../../components/PendingContracts'
 import CockpitLeaves from '../../components/CockpitLeaves'
-import { LeaveState } from '../../../../core/types/enums'
 import ApplicationMeetings from '../../components/ApplicationMeetings'
 import SchoolStarts from '../../components/SchoolStarts'
+import LeaveState from '../../../../core/enums/LeaveState'
 
 type Props = {
   listSx?: SxProps<Theme>

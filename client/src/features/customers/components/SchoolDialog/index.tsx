@@ -13,23 +13,23 @@ import { DatePicker } from '@mui/x-date-pickers'
 import axios from 'axios'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
-import { schoolForm } from '../../../../core/types/form'
-import { school } from '../../../../core/types/user'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import { defaultSchoolFormData, snackbarOptionsError } from '../../../../core/res/consts'
 import { defaultSchoolFormErrorTexts, schoolFormValidation } from '../../../../core/utils/formValidation'
-import { SchoolType } from '../../../../core/types/enums'
 import IconButtonAdornment from '../../../general/components/IconButtonAdornment'
+import SchoolFormState from '../../../../core/types/Form/SchoolFormState'
+import School from '../../../../core/types/School'
+import SchoolType from '../../../../core/enums/SchoolType'
 
 
 type Props = {
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
-  setCustomers: React.Dispatch<React.SetStateAction<school[]>>
+  setCustomers: React.Dispatch<React.SetStateAction<School[]>>
 }
 
 const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
-  const [data, setData] = useState<schoolForm>(defaultSchoolFormData)
+  const [data, setData] = useState<SchoolFormState>(defaultSchoolFormData)
   const [errors, setErrors] = useState(defaultSchoolFormErrorTexts)
   const { enqueueSnackbar } = useSnackbar()
 

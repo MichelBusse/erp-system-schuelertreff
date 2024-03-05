@@ -17,18 +17,18 @@ import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
 import { PrevIdProps } from "../../../../App";
-import { teacher } from "../../../../core/types/user";
 import { useAuth } from "../../../auth/components/AuthProvider";
 import { degreeOperator, schoolTypesOperator, stateOperator, subjectOperator } from "../../../../core/utils/teacherFilterData";
-import subject from "../../../../core/types/subject";
 import { dataGridLocaleText, teacherStateToString } from "../../../../core/res/consts";
-import { TeacherState } from "../../../../core/types/enums";
 import TeacherDialog from "../../components/TeacherDialog";
+import Teacher from "../../../../core/types/Teacher";
+import Subject from "../../../../core/types/Subject";
+import TeacherState from "../../../../core/enums/TeacherState";
 
 const Applicants: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
   const [open, setOpen] = useState(false)
   const [renderDialog, setRenderDialog] = useState(0)
-  const [teachers, setTeachers] = useState<teacher[]>([])
+  const [teachers, setTeachers] = useState<Teacher[]>([])
   const navigate = useNavigate()
   const location = useLocation()
   const [deletedTeacherToggle, setDeletedTeacherToggle] =
@@ -116,7 +116,7 @@ const Applicants: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
       filterOperators: [subjectOperator],
       renderCell: (params) => (
         <Stack direction="row" spacing={2}>
-          {params.value?.map((subject: subject) => (
+          {params.value?.map((subject: Subject) => (
             <Chip
               key={subject.id}
               label={subject.name}

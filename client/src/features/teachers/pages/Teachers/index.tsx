@@ -1,4 +1,4 @@
-import styles from "../../../../core/styles/gridList.module.scss";
+import styles from '../../../../core/styles/gridList.module.scss'
 
 import { IosShare as IosShareIcon } from '@mui/icons-material'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
@@ -20,12 +20,21 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
 import { PrevIdProps } from '../../../../App'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { teacher } from '../../../../core/types/user'
-import { degreeOperator, schoolTypesOperator, subjectOperator } from '../../../../core/utils/teacherFilterData'
-import subject from '../../../../core/types/subject'
-import { dataGridLocaleText, snackbarOptions, snackbarOptionsError, teacherStateToString } from '../../../../core/res/consts'
-import { TeacherState } from '../../../../core/types/enums'
+import {
+  degreeOperator,
+  schoolTypesOperator,
+  subjectOperator,
+} from '../../../../core/utils/teacherFilterData'
+import {
+  dataGridLocaleText,
+  snackbarOptions,
+  snackbarOptionsError,
+  teacherStateToString,
+} from '../../../../core/res/consts'
 import TeacherDialog from '../../components/TeacherDialog'
+import Teacher from '../../../../core/types/Teacher'
+import Subject from '../../../../core/types/Subject'
+import TeacherState from '../../../../core/enums/TeacherState'
 
 const Teachers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
   const navigate = useNavigate()
@@ -35,7 +44,7 @@ const Teachers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
 
   const [open, setOpen] = useState(false)
   const [renderDialog, setRenderDialog] = useState(0)
-  const [teachers, setTeachers] = useState<teacher[]>([])
+  const [teachers, setTeachers] = useState<Teacher[]>([])
   const [deletedTeacherToggle, setDeletedTeacherToggle] =
     useState<boolean>(false)
 
@@ -119,7 +128,7 @@ const Teachers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
       filterOperators: [subjectOperator],
       renderCell: (params) => (
         <Stack direction="row" spacing={2}>
-          {params.value?.map((subject: subject) => (
+          {params.value?.map((subject: Subject) => (
             <Chip
               key={subject.id}
               label={subject.name}

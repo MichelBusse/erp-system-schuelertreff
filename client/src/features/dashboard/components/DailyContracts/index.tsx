@@ -6,12 +6,12 @@ import { useEffect, useState } from 'react'
 
 import { CockpitComponent } from '../../pages/Cockpit'
 import ContractList from '../../../general/components/ContractList'
-import { contractWithTeacher } from '../../../../core/types/contract'
 import { useAuth } from '../../../auth/components/AuthProvider'
+import { Contract } from '../../../../core/types/Contract'
 
 const DailyContracts: CockpitComponent = ({ listSx }) => {
   const { API } = useAuth()
-  const [contracts, setContracts] = useState<contractWithTeacher[]>([])
+  const [contracts, setContracts] = useState<Contract[]>([])
   const [date, setDate] = useState<Dayjs>(dayjs())
   const [refreshContracts, setRefreshContracts] = useState<number>(0)
 

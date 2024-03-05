@@ -2,15 +2,16 @@ import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material'
 import { Button, IconButton, List, ListItem, ListItemText } from '@mui/material'
 import dayjs from 'dayjs'
 import { useState } from 'react'
-import { leave } from '../../../../../core/types/user'
 import LeaveDialog, { LeaveForm } from '../LeaveDialog'
-import { LeaveState, LeaveType } from '../../../../../core/types/enums'
 import { leaveStateToString, leaveTypeToString } from '../../../../../core/res/consts'
 import { formatDate } from '../../../../../core/utils/date'
+import LeaveType from '../../../../../core/enums/LeaveType'
+import Leave from '../../../../../core/types/Leave'
+import LeaveState from '../../../../../core/enums/LeaveState'
 
 type Props = {
-  value: leave[]
-  setValue: React.Dispatch<React.SetStateAction<leave[]>>
+  value: Leave[]
+  setValue: React.Dispatch<React.SetStateAction<Leave[]>>
   userId: string
 }
 
@@ -22,7 +23,7 @@ const defaultFormData: LeaveForm = {
   hasAttachment: false,
 }
 
-const Leave: React.FC<Props> = ({ value, setValue, userId }) => {
+const LeaveOverview: React.FC<Props> = ({ value, setValue, userId }) => {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState(defaultFormData)
   const [render, setRender] = useState(0)
@@ -33,7 +34,7 @@ const Leave: React.FC<Props> = ({ value, setValue, userId }) => {
     setOpen(true)
   }
 
-  const onSuccess = (id: number, newValue: leave | null) => {
+  const onSuccess = (id: number, newValue: Leave | null) => {
     // update entries on success
     if (newValue === null) {
       // delete entry
@@ -120,4 +121,4 @@ const Leave: React.FC<Props> = ({ value, setValue, userId }) => {
   )
 }
 
-export default Leave
+export default LeaveOverview

@@ -11,16 +11,17 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { SketchPicker } from 'react-color'
 import { defaultSubjectFormErrorTexts, subjectFormValidation } from '../../../../core/utils/formValidation'
-import { subjectForm, subjectFormErrorTexts } from '../../../../core/types/form'
 import { defaultSubjectFormData, snackbarOptionsError } from '../../../../core/res/consts'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import subject from '../../../../core/types/subject'
+import SubjectFormErrorTexts from '../../../../core/types/Form/SubjectFormErrorTexts'
+import SubjectFormState from '../../../../core/types/Form/SubjectFormState'
+import Subject from '../../../../core/types/Subject'
 
 type Props = {
   open: boolean
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
-  setSubjects: React.Dispatch<React.SetStateAction<subject[]>>
-  initialSubject: subject | null
+  setSubjects: React.Dispatch<React.SetStateAction<Subject[]>>
+  initialSubject: Subject | null
 }
 
 const SubjectDialog: React.FC<Props> = ({
@@ -29,8 +30,8 @@ const SubjectDialog: React.FC<Props> = ({
   setSubjects,
   initialSubject,
 }) => {
-  const [data, setData] = useState<subjectForm>(defaultSubjectFormData)
-  const [errors, setErrors] = useState<subjectFormErrorTexts>(
+  const [data, setData] = useState<SubjectFormState>(defaultSubjectFormData)
+  const [errors, setErrors] = useState<SubjectFormErrorTexts>(
     defaultSubjectFormErrorTexts,
   )
   const { enqueueSnackbar } = useSnackbar()

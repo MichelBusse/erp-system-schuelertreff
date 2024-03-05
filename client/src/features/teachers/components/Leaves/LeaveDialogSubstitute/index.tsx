@@ -25,20 +25,22 @@ import {
 import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
-import { ContractState, contract, suggestion } from '../../../../../core/types/contract'
+import { Contract, } from '../../../../../core/types/Contract'
 import CreationPage from '../../../../timetable/components/ContractDialog/CreationPage'
-import { leave } from '../../../../../core/types/user'
-import { ContractCreationForm } from '../../../../../core/types/form'
 import { useAuth } from '../../../../auth/components/AuthProvider'
 import { contractStateToString, snackbarOptionsError } from '../../../../../core/res/consts'
 import ContractEditDialog from '../../../../timetable/components/ContractEditDialog'
+import ContractState from '../../../../../core/enums/ContractState'
+import TimeSuggestion from '../../../../../core/types/TimeSuggestion'
+import Leave from '../../../../../core/types/Leave'
+import ContractCreationFormState from '../../../../../core/types/Form/ContractCreationFormState'
 
 dayjs.locale('de')
 
 type Data = {
-  contract: contract
-  suggestions: suggestion[]
-  leaves: Record<number, leave[]>
+  contract: Contract
+  suggestions: TimeSuggestion[]
+  leaves: Record<number, Leave[]>
   minStartDate: Dayjs
   maxEndDate: Dayjs
 }
@@ -57,7 +59,7 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
   endDate,
   teacher,
 }) => {
-  const [contracts, setContracts] = useState<contract[]>([])
+  const [contracts, setContracts] = useState<Contract[]>([])
   const [openAccordion, setOpenAccordion] = useState(0)
   const [refresh, setRefresh] = useState(0)
 
@@ -65,7 +67,7 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
   const [loading, setLoading] = useState(false)
   const [render, setRender] = useState(0)
   const [data, setData] = useState<Data>()
-  const [form, setForm] = useState<ContractCreationForm>({
+  const [form, setForm] = useState<ContractCreationFormState>({
     startDate: null,
     endDate: null,
     startTime: null,
@@ -103,7 +105,7 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
   const handleAccordion = (id: number) =>
     setOpenAccordion((open) => (open === id ? 0 : id))
 
-  const openDialog = async (contract: contract) => {
+  const openDialog = async (contract: Contract) => {
     const lessonsSorted = contract.lessons
       .map((l) => dayjs(l.date))
       .slice()
@@ -128,9 +130,9 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
       },
     })
       .then((res) => {
-        const leavesByTeacher: Record<number, leave[]> = {}
+        const leavesByTeacher: Record<number, Leave[]> = {}
 
-        ;(res.data as leave[]).map((l) => {
+        ;(res.data as Leave[]).map((l) => {
           leavesByTeacher[l.user.id] = [
             ...(leavesByTeacher[l.user.id] ?? []),
             l,
@@ -147,7 +149,7 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
     if (typeof leaves === 'undefined') return
 
     // get suggestions
-    const suggestions: suggestion[] = await API.get('contracts/suggest', {
+    const suggestions: TimeSuggestion[] = await API.get('contracts/suggest', {
       params: {
         customers: contract.customers.map((c) => c.id).join(','),
         subjectId: contract.subject.id,

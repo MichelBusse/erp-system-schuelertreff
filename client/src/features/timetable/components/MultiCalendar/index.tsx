@@ -3,15 +3,15 @@ import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
 
 import styles from './styles.module.scss'
-import { contract } from '../../../../core/types/contract'
-import { lesson } from '../../../../core/types/lesson'
 import { DrawerParameters } from '../../pages/Timetable'
+import { Contract } from '../../../../core/types/Contract'
+import Lesson from '../../../../core/types/Lesson'
 
 type Props = {
   date: Dayjs
   setDrawer: (params: DrawerParameters) => void
-  contracts: Record<number, contract[]>
-  lessons: lesson[]
+  contracts: Record<number, Contract[]>
+  lessons: Lesson[]
   labels: { id: number; title: string }[]
 }
 
@@ -39,7 +39,7 @@ const MultiCalendar: React.FC<Props> = ({
         cursor: (params.value ?? []).length > 0 ? 'pointer' : 'normal',
       }}
     >
-      {(params.value as contract[])?.map((c) => {
+      {(params.value as Contract[])?.map((c) => {
         return (
           <Box
             key={c.id}

@@ -1,23 +1,19 @@
 import { GridLocaleText } from '@mui/x-data-grid'
 import { OptionsObject as SnackbarOptions } from 'notistack'
 
-import { ContractState } from '../types/contract'
-import {
-  ContractType,
-  Degree,
-  LeaveState,
-  LeaveType,
-  SchoolState,
-  SchoolType,
-  TeacherSchoolType,
-  TeacherState,
-} from '../types/enums'
-import {
-  classCustomerForm,
-  privateCustomerForm,
-  schoolForm,
-  teacherForm,
-} from '../types/form'
+import TeacherState from '../enums/TeacherState'
+import SchoolType from '../enums/SchoolType'
+import SchoolState from '../enums/SchoolState'
+import LeaveType from '../enums/LeaveType'
+import LeaveState from '../enums/LeaveState'
+import ContractState from '../enums/ContractState'
+import ContractType from '../enums/ContractType'
+import TeacherSchoolType from '../enums/TeacherSchoolType'
+import TeacherDegree from '../enums/TeacherDegree'
+import TeacherFormState from '../types/Form/TeacherFormState'
+import PrivateCustomerFormState from '../types/Form/PrivateCustomerFormState'
+import SchoolFormState from '../types/Form/SchoolFormState'
+import ClassCustomerFormState from '../types/Form/ClassCustomerFormState'
 
 export const dataGridLocaleText: Partial<GridLocaleText> = {
   filterPanelColumns: 'Spalte',
@@ -29,7 +25,7 @@ export const dataGridLocaleText: Partial<GridLocaleText> = {
   MuiTablePagination: { labelRowsPerPage: 'Einträge pro Seite:' },
 }
 
-export const defaultTeacherFormData: teacherForm = {
+export const defaultTeacherFormData: TeacherFormState = {
   firstName: '',
   lastName: '',
   city: '',
@@ -54,7 +50,7 @@ export const defaultTeacherFormData: teacherForm = {
   applicationLocation: '',
 }
 
-export const defaultPrivateCustomerFormData: privateCustomerForm = {
+export const defaultPrivateCustomerFormData: PrivateCustomerFormState = {
   firstName: '',
   lastName: '',
   city: '',
@@ -125,14 +121,15 @@ export const teacherSchoolTypeToString: { [key in TeacherSchoolType]: string } =
     sek2: 'Gymnasium Sek. 2',
   }
 
-export const degreeToString: { [key in Degree]: string } = {
+export const degreeToString: { [key in TeacherDegree]: string } = {
   noinfo: 'Keine Angabe',
   highschool: 'Abitur',
   bachelor: 'Bachelor',
   master: 'Master',
 }
 
-export const defaultSchoolFormData: schoolForm = {
+export const defaultSchoolFormData: SchoolFormState = {
+  timesAvailable: [],
   firstName: '',
   lastName: '',
   schoolName: '',
@@ -149,7 +146,7 @@ export const defaultSchoolFormData: schoolForm = {
   schoolState: SchoolState.CREATED,
 }
 
-export const defaultClassCustomerFormData: classCustomerForm = {
+export const defaultClassCustomerFormData: ClassCustomerFormState = {
   id: -1,
   className: '',
   timesAvailable: [],

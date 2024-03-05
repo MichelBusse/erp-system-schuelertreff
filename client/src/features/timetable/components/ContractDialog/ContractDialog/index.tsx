@@ -18,15 +18,19 @@ import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useSnackbar } from 'notistack'
 import React, { useState } from 'react'
-import { ContractState, contractWithTeacher, suggestion } from '../../../../../core/types/contract'
-import { ContractCreationForm, ContractFilterForm } from '../../../../../core/types/form'
 import { useAuth } from '../../../../auth/components/AuthProvider'
 import ConfirmationDialog, { ConfirmationDialogProps, defaultConfirmationDialogProps } from '../../../../general/components/ConfirmationDialog'
-import { ContractType, CustomerType } from '../../../../../core/types/enums'
-import { leave } from '../../../../../core/types/user'
 import { snackbarOptions, snackbarOptionsError } from '../../../../../core/res/consts'
 import CreationPage from '../CreationPage'
 import FilterPage from '../FilterPage'
+import ContractFilterFormState from '../../../../../core/types/Form/ContractFilterFormState'
+import { Contract } from '../../../../../core/types/Contract'
+import ContractType from '../../../../../core/enums/ContractType'
+import CustomerType from '../../../../../core/enums/CustomerType'
+import ContractCreationFormState from '../../../../../core/types/Form/ContractCreationFormState'
+import TimeSuggestion from '../../../../../core/types/TimeSuggestion'
+import Leave from '../../../../../core/types/Leave'
+import ContractState from '../../../../../core/enums/ContractState'
 
 dayjs.extend(customParseFormat)
 
@@ -34,8 +38,8 @@ type Props = {
   open: boolean
   setOpen: (open: boolean) => void
   onSuccess?: () => void
-  initialContract?: contractWithTeacher
-  initialForm0Props?: Partial<ContractFilterForm>
+  initialContract?: Contract
+  initialForm0Props?: Partial<ContractFilterFormState>
 }
 
 const ContractDialog: React.FC<Props> = ({
@@ -57,7 +61,7 @@ const ContractDialog: React.FC<Props> = ({
 
   // step 0
   const [loading0, setLoading0] = useState(false)
-  const [form0, setForm0] = useState<ContractFilterForm>({
+  const [form0, setForm0] = useState<ContractFilterFormState>({
     school: null,
     classCustomers: [],
     privateCustomers: [],
@@ -75,10 +79,10 @@ const ContractDialog: React.FC<Props> = ({
   })
 
   // step 1
-  const [suggestions, setSuggestions] = useState<suggestion[]>([])
-  const [leaves, setLeaves] = useState<Record<number, leave[]>>([])
+  const [suggestions, setSuggestions] = useState<TimeSuggestion[]>([])
+  const [leaves, setLeaves] = useState<Record<number, Leave[]>>([])
   const [loading1, setLoading1] = useState(false)
-  const [form1, setForm1] = useState<ContractCreationForm>({
+  const [form1, setForm1] = useState<ContractCreationFormState>({
     startDate: null,
     endDate: null,
     startTime: null,
@@ -111,9 +115,9 @@ const ContractDialog: React.FC<Props> = ({
       },
     })
       .then((res) => {
-        const leavesByTeacher: Record<number, leave[]> = {}
+        const leavesByTeacher: Record<number, Leave[]> = {}
 
-        ;(res.data as leave[]).map((l) => {
+        ;(res.data as Leave[]).map((l) => {
           leavesByTeacher[l.user.id] = [
             ...(leavesByTeacher[l.user.id] ?? []),
             l,
@@ -171,7 +175,7 @@ const ContractDialog: React.FC<Props> = ({
           const initialStartTime = dayjs(initialContract.startTime, 'HH:mm')
           const initialEndTime = dayjs(initialContract.endTime, 'HH:mm')
 
-          const resSuggestions = res.data as suggestion[]
+          const resSuggestions = res.data as TimeSuggestion[]
 
           resSuggestions.forEach((teacherSuggestion, teacherIndex) => {
             if (
