@@ -20,9 +20,9 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import ConfirmationDialog, { ConfirmationDialogProps, defaultConfirmationDialogProps } from '../../../general/components/ConfirmationDialog'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { snackbarOptions } from '../../../../core/res/consts'
+import { SNACKBAR_OPTIONS } from '../../../../core/res/Constants'
 import IconButtonAdornment from '../../../general/components/IconButtonAdornment'
-import { getNextDow } from '../../../../core/utils/date'
+import { getNextDow } from '../../../../core/utils/DateUtils'
 import BetterTimePicker from '../../../general/components/BetterTimePicker'
 import Customer from '../../../../core/types/Customer'
 import ContractEditFormState from '../../../../core/types/Form/ContractEditFormState'
@@ -112,7 +112,7 @@ const ContractEditDialog: React.FC<Props> = ({
           startTime: data.startTime?.format('HH:mm'),
           endTime: data.endTime?.format('HH:mm'),
         }).then(() => {
-          enqueueSnackbar('Vertrag geändert', snackbarOptions)
+          enqueueSnackbar('Vertrag geändert', SNACKBAR_OPTIONS)
           setDialogInfo(false, -1)
           onSuccess()
         })
@@ -128,7 +128,7 @@ const ContractEditDialog: React.FC<Props> = ({
       text: 'Es werden auch alle gehaltenen Stunden gelöscht und dieser Vorgang kann nicht mehr rückgängig gemacht werden.',
       action: () => {
         API.delete('contracts/' + dialogInfo.id).then(() => {
-          enqueueSnackbar('Einsatz gelöscht', snackbarOptions)
+          enqueueSnackbar('Einsatz gelöscht', SNACKBAR_OPTIONS)
           setDialogInfo(false, -1)
           onSuccess()
         })

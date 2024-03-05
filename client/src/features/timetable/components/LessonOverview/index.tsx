@@ -11,7 +11,7 @@ import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { snackbarOptions, snackbarOptionsError } from '../../../../core/res/consts'
+import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import { Contract } from '../../../../core/types/Contract'
 import Lesson from '../../../../core/types/Lesson'
 import LessonState from '../../../../core/enums/LessonState'
@@ -50,12 +50,12 @@ const LessonOverview: React.FC<Props> = ({
     })
       .then(() => {
         setHeld(held)
-        enqueueSnackbar('Stunde gespeichert', snackbarOptions)
+        enqueueSnackbar('Stunde gespeichert', SNACKBAR_OPTIONS)
         refresh()
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
   }
 

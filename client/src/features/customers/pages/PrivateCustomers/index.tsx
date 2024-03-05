@@ -18,9 +18,9 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
 import { PrevIdProps } from '../../../../App'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { dataGridLocaleText, snackbarOptions, snackbarOptionsError } from '../../../../core/res/consts'
 import PrivateCustomerDialog from '../../components/PrivateCustomerDialog'
 import PrivateCustomer from "../../../../core/types/PrivateCustomer";
+import { DATA_GRID_LOCALE_TEXT, SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from "../../../../core/res/Constants";
 
 const PrivateCustomers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
   const navigate = useNavigate()
@@ -148,11 +148,11 @@ const PrivateCustomers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
       .then(() =>
         enqueueSnackbar(
           'Email-Adressen wurden in die Zwischenablage kopiert',
-          snackbarOptions,
+          SNACKBAR_OPTIONS,
         ),
       )
       .catch(() =>
-        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError),
+        enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR),
       )
   }
 
@@ -168,7 +168,7 @@ const PrivateCustomers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
             setColumnVisibilityModel(newModel)
           }
           ref={ref}
-          localeText={dataGridLocaleText}
+          localeText={DATA_GRID_LOCALE_TEXT}
           headerHeight={0}
           disableSelectionOnClick={true}
           onRowClick={onRowClick}

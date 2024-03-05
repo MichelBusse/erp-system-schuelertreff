@@ -24,7 +24,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
 import { PrevIdProps } from "../../../../App";
 import { useAuth } from "../../../auth/components/AuthProvider";
-import { dataGridLocaleText, snackbarOptions, snackbarOptionsError } from "../../../../core/res/consts";
+import { DATA_GRID_LOCALE_TEXT, SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from "../../../../core/res/Constants";
 import SchoolDialog from "../../components/SchoolDialog";
 import SchoolType from "../../../../core/enums/SchoolType";
 import School from "../../../../core/types/School";
@@ -241,11 +241,11 @@ const Schools: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
       .then(() =>
         enqueueSnackbar(
           'Email-Adressen wurden in die Zwischenablage kopiert',
-          snackbarOptions,
+          SNACKBAR_OPTIONS,
         ),
       )
       .catch(() =>
-        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError),
+        enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR),
       )
   }
 
@@ -259,7 +259,7 @@ const Schools: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
           headerHeight={0}
           disableSelectionOnClick={true}
           onRowClick={onRowClick}
-          localeText={dataGridLocaleText}
+          localeText={DATA_GRID_LOCALE_TEXT}
           columnVisibilityModel={columnVisibilityModel}
           onColumnVisibilityModelChange={(newModel) =>
             setColumnVisibilityModel(newModel)

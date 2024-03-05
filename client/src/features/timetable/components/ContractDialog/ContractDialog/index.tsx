@@ -20,7 +20,7 @@ import { useSnackbar } from 'notistack'
 import React, { useState } from 'react'
 import { useAuth } from '../../../../auth/components/AuthProvider'
 import ConfirmationDialog, { ConfirmationDialogProps, defaultConfirmationDialogProps } from '../../../../general/components/ConfirmationDialog'
-import { snackbarOptions, snackbarOptionsError } from '../../../../../core/res/consts'
+import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from '../../../../../core/res/Constants'
 import CreationPage from '../CreationPage'
 import FilterPage from '../FilterPage'
 import ContractFilterFormState from '../../../../../core/types/Form/ContractFilterFormState'
@@ -128,7 +128,7 @@ const ContractDialog: React.FC<Props> = ({
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
 
     API.get('contracts/suggest', {
@@ -208,7 +208,7 @@ const ContractDialog: React.FC<Props> = ({
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
       .finally(() => setLoading0(false))
   }
@@ -249,7 +249,7 @@ const ContractDialog: React.FC<Props> = ({
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
       .finally(() => setLoading1(false))
   }
@@ -264,21 +264,21 @@ const ContractDialog: React.FC<Props> = ({
         action: () => {
           API.delete('contracts/' + initialContract?.id)
             .then(() => {
-              enqueueSnackbar('Einsatz gelöscht', snackbarOptions)
+              enqueueSnackbar('Einsatz gelöscht', SNACKBAR_OPTIONS)
               onSuccess()
             })
             .catch((error) => {
               if (axios.isAxiosError(error) && error.response?.status === 400) {
                 enqueueSnackbar(
                   (error.response.data as { message: string }).message,
-                  snackbarOptionsError,
+                  SNACKBAR_OPTIONS_ERROR,
                 )
                 onSuccess()
               } else {
                 console.error(error)
                 enqueueSnackbar(
                   'Ein Fehler ist aufgetreten.',
-                  snackbarOptionsError,
+                  SNACKBAR_OPTIONS_ERROR,
                 )
               }
             })

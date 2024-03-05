@@ -30,8 +30,7 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { defaultTeacherFormData, snackbarOptions, snackbarOptionsError, teacherSchoolTypeToString, teacherStateToString } from '../../../../core/res/consts'
-import { defaultTeacherFormErrorTexts, efzFormValidation, teacherFormValidation, workContractFormValidation } from '../../../../core/utils/formValidation'
+import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import ConfirmationDialog, { defaultConfirmationDialogProps } from '../../../general/components/ConfirmationDialog'
 import TeacherInvoiceDataSelect, { TeacherInvoiceData } from '../../components/TeacherInvoiceDateSelect'
 import IconButtonAdornment from '../../../general/components/IconButtonAdornment'
@@ -48,6 +47,9 @@ import TeacherDegree from '../../../../core/enums/TeacherDegree'
 import TeacherState from '../../../../core/enums/TeacherState'
 import Leave from '../../../../core/types/Leave'
 import LeaveOverview from '../../components/Leaves/LeaveOverview'
+import { DEFAULT_TEACHER_FORM_ERROR_TEXTS, DEFAULT_TEACHER_FORM_STATE } from '../../../../core/res/Defaults'
+import { efzFormValidation, teacherFormValidation, workContractFormValidation } from '../../../../core/utils/FormValidation'
+import { teacherSchoolTypeToString, teacherStateToString } from '../../../../core/utils/EnumToString'
 
 dayjs.extend(customParseFormat)
 
@@ -58,9 +60,9 @@ const TeacherDetailView: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar()
 
   const [subjects, setSubjects] = useState<Subject[]>([])
-  const [data, setData] = useState<TeacherFormState>(defaultTeacherFormData)
+  const [data, setData] = useState<TeacherFormState>(DEFAULT_TEACHER_FORM_STATE)
   const [leaveData, setLeaveData] = useState<Leave[]>([])
-  const [errors, setErrors] = useState<TeacherFormErrorTexts>(defaultTeacherFormErrorTexts)
+  const [errors, setErrors] = useState<TeacherFormErrorTexts>(DEFAULT_TEACHER_FORM_ERROR_TEXTS)
   const [refreshDocuments, setRefreshDocuments] = useState(0)
 
   const [
@@ -145,12 +147,12 @@ const TeacherDetailView: React.FC = () => {
       ),
     })
       .then((res) => {
-        enqueueSnackbar('Rückmeldung gesendet', snackbarOptions)
+        enqueueSnackbar('Rückmeldung gesendet', SNACKBAR_OPTIONS)
 
         updateData(res.data)
       })
       .catch(() => {
-        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR)
       })
   }
 
@@ -185,7 +187,7 @@ const TeacherDetailView: React.FC = () => {
         .then((res) => {
           enqueueSnackbar(
             data.firstName + ' ' + data.lastName + ' gespeichert',
-            snackbarOptions,
+            SNACKBAR_OPTIONS,
           )
 
           updateData(res.data)
@@ -194,15 +196,15 @@ const TeacherDetailView: React.FC = () => {
           if (axios.isAxiosError(error) && error.response?.status === 400) {
             enqueueSnackbar(
               (error.response.data as { message: string }).message,
-              snackbarOptionsError,
+              SNACKBAR_OPTIONS_ERROR,
             )
           } else {
             console.error(error)
-            enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+            enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
           }
         })
     } else {
-      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+      enqueueSnackbar('Überprüfe deine Eingaben', SNACKBAR_OPTIONS_ERROR)
     }
   }
 
@@ -231,7 +233,7 @@ const TeacherDetailView: React.FC = () => {
                 (data.deleteState === UserDeleteState.ACTIVE
                   ? 'archiviert'
                   : 'gelöscht'),
-              snackbarOptions,
+              SNACKBAR_OPTIONS,
             )
             navigate('/teachers')
           })
@@ -241,7 +243,7 @@ const TeacherDetailView: React.FC = () => {
                 ' ' +
                 data.lastName +
                 ' kann nicht entfernt werden, da noch Verträge existieren.',
-              snackbarOptionsError,
+              SNACKBAR_OPTIONS_ERROR,
             )
           })
       },
@@ -253,7 +255,7 @@ const TeacherDetailView: React.FC = () => {
     month: number,
     teacherInvoiceData: TeacherInvoiceData,
   ) => {
-    enqueueSnackbar('Abrechnung wird generiert...', snackbarOptions)
+    enqueueSnackbar('Abrechnung wird generiert...', SNACKBAR_OPTIONS)
     API.post('lessons/invoice/teacher', teacherInvoiceData, {
       params: {
         of: dayjs().year(year).month(month).format('YYYY-MM-DD'),
@@ -276,7 +278,7 @@ const TeacherDetailView: React.FC = () => {
         URL.revokeObjectURL(url)
       })
       .catch(() => {
-        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR)
       })
   }
 
@@ -286,7 +288,7 @@ const TeacherDetailView: React.FC = () => {
     setErrors(errorTexts)
 
     if (errorTexts.valid) {
-      enqueueSnackbar('Arbeitsvertrag wird generiert...', snackbarOptions)
+      enqueueSnackbar('Arbeitsvertrag wird generiert...', SNACKBAR_OPTIONS)
       API.get('users/teacher/generateWorkContract', {
         params: {
           teacherId: id,
@@ -294,13 +296,13 @@ const TeacherDetailView: React.FC = () => {
       })
         .then(() => {
           setRefreshDocuments((r) => r + 1)
-          enqueueSnackbar('Arbeitsvertrag generiert', snackbarOptions)
+          enqueueSnackbar('Arbeitsvertrag generiert', SNACKBAR_OPTIONS)
         })
         .catch(() => {
-          enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+          enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR)
         })
     } else {
-      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+      enqueueSnackbar('Überprüfe deine Eingaben', SNACKBAR_OPTIONS_ERROR)
     }
   }
 
@@ -310,7 +312,7 @@ const TeacherDetailView: React.FC = () => {
     setErrors(errorTexts)
 
     if (errorTexts.valid) {
-      enqueueSnackbar('Antrag EFZ wird generiert...', snackbarOptions)
+      enqueueSnackbar('Antrag EFZ wird generiert...', SNACKBAR_OPTIONS)
       API.get('users/teacher/generateEFZ', {
         params: {
           teacherId: id,
@@ -318,13 +320,13 @@ const TeacherDetailView: React.FC = () => {
       })
         .then(() => {
           setRefreshDocuments((r) => r + 1)
-          enqueueSnackbar('Antrag EFZ generiert', snackbarOptions)
+          enqueueSnackbar('Antrag EFZ generiert', SNACKBAR_OPTIONS)
         })
         .catch(() => {
-          enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+          enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR)
         })
     } else {
-      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+      enqueueSnackbar('Überprüfe deine Eingaben', SNACKBAR_OPTIONS_ERROR)
     }
   }
 
@@ -334,7 +336,7 @@ const TeacherDetailView: React.FC = () => {
         enqueueSnackbar('Der Passwort-Reset wurde an die E-Mail gesendet')
       })
       .catch(() => {
-        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR)
       })
   }
 

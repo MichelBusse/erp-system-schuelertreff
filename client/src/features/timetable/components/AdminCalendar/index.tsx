@@ -5,7 +5,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { snackbarOptionsError } from '../../../../core/res/consts'
+import { SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import MultiCalendar from '../MultiCalendar'
 import { DrawerParameters } from '../../pages/Timetable'
 import { Contract } from '../../../../core/types/Contract'
@@ -84,7 +84,7 @@ const AdminCalendar: React.FC<Props> = ({
       .catch((err) => {
         if (err?.code !== 'ERR_CANCELED') {
           console.error(err)
-          enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+          enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR)
         }
       })
 

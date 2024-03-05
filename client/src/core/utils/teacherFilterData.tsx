@@ -15,11 +15,11 @@ import {
 import { useEffect, useState } from 'react'
 
 import { useAuth } from '../../features/auth/components/AuthProvider'
-import { teacherSchoolTypeToString, teacherStateToString } from '../res/consts'
 import TeacherDegree from '../enums/TeacherDegree'
 import TeacherState from '../enums/TeacherState'
 import TeacherSchoolType from '../enums/TeacherSchoolType'
 import Subject from '../types/Subject'
+import { teacherSchoolTypeToString, teacherStateToString } from './EnumToString'
 
 //definition of subject filter input
 export const SubjectsFilterInputValue: React.FC<GridFilterInputValueProps> = ({

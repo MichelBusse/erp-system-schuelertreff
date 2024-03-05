@@ -14,12 +14,13 @@ import axios from 'axios'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { defaultSchoolFormData, snackbarOptionsError } from '../../../../core/res/consts'
-import { defaultSchoolFormErrorTexts, schoolFormValidation } from '../../../../core/utils/formValidation'
 import IconButtonAdornment from '../../../general/components/IconButtonAdornment'
 import SchoolFormState from '../../../../core/types/Form/SchoolFormState'
 import School from '../../../../core/types/School'
 import SchoolType from '../../../../core/enums/SchoolType'
+import { schoolFormValidation } from '../../../../core/utils/FormValidation'
+import { DEFAULT_SCHOOL_FORM_ERROR_TEXTS, DEFAULT_SCHOOL_FORM_STATE } from '../../../../core/res/Defaults'
+import { SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 
 
 type Props = {
@@ -29,8 +30,8 @@ type Props = {
 }
 
 const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
-  const [data, setData] = useState<SchoolFormState>(defaultSchoolFormData)
-  const [errors, setErrors] = useState(defaultSchoolFormErrorTexts)
+  const [data, setData] = useState<SchoolFormState>(DEFAULT_SCHOOL_FORM_STATE)
+  const [errors, setErrors] = useState(DEFAULT_SCHOOL_FORM_ERROR_TEXTS)
   const { enqueueSnackbar } = useSnackbar()
 
   const { API } = useAuth()
@@ -52,23 +53,23 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
           if (axios.isAxiosError(error) && error.response?.status === 400) {
             enqueueSnackbar(
               (error.response.data as { message: string }).message,
-              snackbarOptionsError,
+              SNACKBAR_OPTIONS_ERROR,
             )
           } else {
             console.error(error)
-            enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+            enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
           }
         })
     } else {
       setErrors(errorTexts)
-      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+      enqueueSnackbar('Überprüfe deine Eingaben', SNACKBAR_OPTIONS_ERROR)
     }
   }
 
   const closeForm = () => {
     setOpen(false)
-    setData(defaultSchoolFormData)
-    setErrors(defaultSchoolFormErrorTexts)
+    setData(DEFAULT_SCHOOL_FORM_STATE)
+    setErrors(DEFAULT_SCHOOL_FORM_ERROR_TEXTS)
   }
 
   return (

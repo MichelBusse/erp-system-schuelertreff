@@ -23,7 +23,7 @@ import { DatePicker } from '@mui/x-date-pickers'
 import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
-import { leaveStateToString, leaveTypeToString, snackbarOptions, snackbarOptionsError } from '../../../../../core/res/consts'
+import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from '../../../../../core/res/Constants'
 import { useAuth } from '../../../../auth/components/AuthProvider'
 import IconButtonAdornment from '../../../../general/components/IconButtonAdornment'
 import LeaveDialogSubstitute from '../LeaveDialogSubstitute'
@@ -31,6 +31,7 @@ import LeaveType from '../../../../../core/enums/LeaveType'
 import LeaveState from '../../../../../core/enums/LeaveState'
 import Leave from '../../../../../core/types/Leave'
 import UserRole from '../../../../../core/enums/UserRole'
+import { leaveStateToString, leaveTypeToString } from '../../../../../core/utils/EnumToString'
 
 
 export type LeaveForm = {
@@ -94,13 +95,13 @@ const LeaveDialog: React.FC<Props> = ({
       },
     })
       .then((res) => {
-        enqueueSnackbar('Erfolgreich gespeichert', snackbarOptions)
+        enqueueSnackbar('Erfolgreich gespeichert', SNACKBAR_OPTIONS)
         onSuccess(id, { ...(data ?? res.data), hasAttachment: true })
         close()
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
         setLoading(false)
       })
   }
@@ -124,14 +125,14 @@ const LeaveDialog: React.FC<Props> = ({
           if (uploadFile !== null) {
             handleUpload(res.data.id, res.data)
           } else {
-            enqueueSnackbar('Erfolgreich gespeichert', snackbarOptions)
+            enqueueSnackbar('Erfolgreich gespeichert', SNACKBAR_OPTIONS)
             onSuccess(res.data.id, res.data)
             close()
           }
         })
         .catch((err) => {
           console.error(err)
-          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+          enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
           setLoading(false)
         })
     }
@@ -143,13 +144,13 @@ const LeaveDialog: React.FC<Props> = ({
     } else {
       API.delete(`users/${userId}/leave/${value.id}`)
         .then(() => {
-          enqueueSnackbar('Erfolgreich gelöscht', snackbarOptions)
+          enqueueSnackbar('Erfolgreich gelöscht', SNACKBAR_OPTIONS)
           onSuccess(value.id ?? 0, null)
           close()
         })
         .catch((err) => {
           console.error(err)
-          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+          enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
         })
     }
   }
@@ -167,7 +168,7 @@ const LeaveDialog: React.FC<Props> = ({
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
   }
 

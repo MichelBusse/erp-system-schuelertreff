@@ -13,11 +13,11 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from "../../../auth/components/AuthProvider";
-import { degreeToString, teacherSchoolTypeToString } from "../../../../core/res/consts";
 import UserDocuments, { UserDocumentsType } from "../../../general/components/Documents/UserDocuments";
 import Subject from "../../../../core/types/Subject";
 import Teacher from "../../../../core/types/Teacher";
 import TeacherSchoolType from "../../../../core/enums/TeacherSchoolType";
+import { teacherDegreeToString, teacherSchoolTypeToString } from "../../../../core/utils/EnumToString";
 
 
 dayjs.extend(customParseFormat)
@@ -126,7 +126,7 @@ const TeacherOverview: React.FC = () => {
               <TextField
                 fullWidth={true}
                 label="Abschluss"
-                value={teacher?.degree ? degreeToString[teacher.degree] : ''}
+                value={teacher?.degree ? teacherDegreeToString[teacher.degree] : ''}
                 InputProps={{
                   readOnly: true,
                 }}

@@ -18,8 +18,6 @@ import { nanoid } from 'nanoid'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { defaultPrivateCustomerFormData, snackbarOptions, snackbarOptionsError } from '../../../../core/res/consts'
-import { defaultPrivateCustomerFormErrorTexts, privateCustomerFormValidation } from '../../../../core/utils/formValidation'
 import ConfirmationDialog, { ConfirmationDialogProps, defaultConfirmationDialogProps } from '../../../general/components/ConfirmationDialog'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import CustomerInvoiceDataSelect, { CustomerInvoiceData } from '../../components/CustomerInvoiceDataSelect'
@@ -35,6 +33,9 @@ import UserDeleteState from "../../../../core/enums/UserDeleteState";
 import SchoolType from "../../../../core/enums/SchoolType";
 import UserRole from "../../../../core/enums/UserRole";
 import CustomerType from "../../../../core/enums/CustomerType";
+import { DEFAULT_PRIVATE_CUSTOMER_FORM_ERROR_TEXTS, DEFAULT_PRIVATE_CUSTOMER_FORM_STATE } from "../../../../core/res/Defaults";
+import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from "../../../../core/res/Constants";
+import { privateCustomerFormValidation } from "../../../../core/utils/FormValidation";
 
 
 dayjs.extend(customParseFormat)
@@ -50,10 +51,10 @@ const PrivateCustomerDetailView: React.FC = () => {
   const requestedId = id ? id : 'me'
 
   const [data, setData] = useState<PrivateCustomerFormState>(
-    defaultPrivateCustomerFormData,
+    DEFAULT_PRIVATE_CUSTOMER_FORM_STATE,
   )
   const [errors, setErrors] = useState<PrivateCustomerFormErrorTexts>(
-    defaultPrivateCustomerFormErrorTexts,
+    DEFAULT_PRIVATE_CUSTOMER_FORM_ERROR_TEXTS,
   )
 
   const [render, setRender] = useState<number>(0)
@@ -117,12 +118,12 @@ const PrivateCustomerDetailView: React.FC = () => {
       }).then(() => {
         enqueueSnackbar(
           data.firstName + ' ' + data.lastName + ' gespeichert',
-          snackbarOptions,
+          SNACKBAR_OPTIONS,
         )
       })
     } else {
       setErrors(errorTexts)
-      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+      enqueueSnackbar('Überprüfe deine Eingaben', SNACKBAR_OPTIONS_ERROR)
     }
   }
 
@@ -147,7 +148,7 @@ const PrivateCustomerDetailView: React.FC = () => {
           .then(() => {
             enqueueSnackbar(
               data.firstName + ' ' + data.lastName + ' gelöscht',
-              snackbarOptions,
+              SNACKBAR_OPTIONS,
             )
             navigate('/privateCustomers')
           })
@@ -157,7 +158,7 @@ const PrivateCustomerDetailView: React.FC = () => {
                 ' ' +
                 data.lastName +
                 ' kann nicht gelöscht werden, da noch laufende Verträge existieren.',
-              snackbarOptionsError,
+              SNACKBAR_OPTIONS_ERROR,
             )
           })
       },
@@ -169,7 +170,7 @@ const PrivateCustomerDetailView: React.FC = () => {
     month: number,
     invoiceData: CustomerInvoiceData,
   ) => {
-    enqueueSnackbar('Rechnung wird generiert...', snackbarOptions)
+    enqueueSnackbar('Rechnung wird generiert...', SNACKBAR_OPTIONS)
     API.post(
       'lessons/invoice/customer',
       {
@@ -199,7 +200,7 @@ const PrivateCustomerDetailView: React.FC = () => {
         URL.revokeObjectURL(url)
       })
       .catch(() => {
-        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR)
       })
   }
 
@@ -208,12 +209,12 @@ const PrivateCustomerDetailView: React.FC = () => {
       .then(() => {
         enqueueSnackbar(
           `${data.firstName + ' ' + data.lastName} ist entarchiviert`,
-          snackbarOptions,
+          SNACKBAR_OPTIONS,
         )
         navigate('/privateCustomers')
       })
       .catch(() => {
-        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR)
       })
   }
 

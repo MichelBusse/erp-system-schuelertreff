@@ -14,9 +14,9 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import LeaveDialog, { LeaveForm } from '../../../teachers/components/Leaves/LeaveDialog'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { leaveStateToString, leaveTypeToString } from '../../../../core/res/consts'
 import LeaveState from '../../../../core/enums/LeaveState'
 import Leave from '../../../../core/types/Leave'
+import { leaveStateToString, leaveTypeToString } from '../../../../core/utils/EnumToString'
 
 type Props = {
   state: LeaveState

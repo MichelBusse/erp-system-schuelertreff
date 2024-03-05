@@ -10,12 +10,16 @@ import {
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { SketchPicker } from 'react-color'
-import { defaultSubjectFormErrorTexts, subjectFormValidation } from '../../../../core/utils/formValidation'
-import { defaultSubjectFormData, snackbarOptionsError } from '../../../../core/res/consts'
+import { subjectFormValidation } from '../../../../core/utils/FormValidation'
+import { SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import SubjectFormErrorTexts from '../../../../core/types/Form/SubjectFormErrorTexts'
 import SubjectFormState from '../../../../core/types/Form/SubjectFormState'
 import Subject from '../../../../core/types/Subject'
+import {
+  DEFAULT_SUBJECT_FORM_ERROR_TEXTS,
+  DEFAULT_SUBJECT_FORM_STATE,
+} from '../../../../core/res/Defaults'
 
 type Props = {
   open: boolean
@@ -30,9 +34,9 @@ const SubjectDialog: React.FC<Props> = ({
   setSubjects,
   initialSubject,
 }) => {
-  const [data, setData] = useState<SubjectFormState>(defaultSubjectFormData)
+  const [data, setData] = useState<SubjectFormState>(DEFAULT_SUBJECT_FORM_STATE)
   const [errors, setErrors] = useState<SubjectFormErrorTexts>(
-    defaultSubjectFormErrorTexts,
+    DEFAULT_SUBJECT_FORM_ERROR_TEXTS,
   )
   const { enqueueSnackbar } = useSnackbar()
 
@@ -54,27 +58,27 @@ const SubjectDialog: React.FC<Props> = ({
             })
             return newSubjects
           })
-          setData(defaultSubjectFormData)
-          setErrors(defaultSubjectFormErrorTexts)
+          setData(DEFAULT_SUBJECT_FORM_STATE)
+          setErrors(DEFAULT_SUBJECT_FORM_ERROR_TEXTS)
           setOpen(false)
         })
       } else {
         API.post('subjects', data).then((res) => {
           setSubjects((s) => [...s, res.data])
-          setData(defaultSubjectFormData)
+          setData(DEFAULT_SUBJECT_FORM_STATE)
           setOpen(false)
         })
       }
     } else {
       setErrors(errorTexts)
-      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+      enqueueSnackbar('Überprüfe deine Eingaben', SNACKBAR_OPTIONS_ERROR)
     }
   }
 
   const closeForm = () => {
     setOpen(false)
-    setData(defaultSubjectFormData)
-    setErrors(defaultSubjectFormErrorTexts)
+    setData(DEFAULT_SUBJECT_FORM_STATE)
+    setErrors(DEFAULT_SUBJECT_FORM_ERROR_TEXTS)
   }
 
   const deleteSubject = () => {
@@ -90,7 +94,7 @@ const SubjectDialog: React.FC<Props> = ({
             })
             return newSubjects
           })
-          setData(defaultSubjectFormData)
+          setData(DEFAULT_SUBJECT_FORM_STATE)
           setOpen(false)
         })
         .catch(() => {
@@ -98,7 +102,7 @@ const SubjectDialog: React.FC<Props> = ({
             'Das Fach "' +
               initialSubject.name +
               '" kann nicht gelöscht werden, da es in Verwendung ist.',
-            snackbarOptionsError,
+            SNACKBAR_OPTIONS_ERROR,
           )
         })
     }

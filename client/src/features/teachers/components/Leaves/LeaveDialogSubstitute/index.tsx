@@ -28,12 +28,13 @@ import { useEffect, useState } from 'react'
 import { Contract, } from '../../../../../core/types/Contract'
 import CreationPage from '../../../../timetable/components/ContractDialog/CreationPage'
 import { useAuth } from '../../../../auth/components/AuthProvider'
-import { contractStateToString, snackbarOptionsError } from '../../../../../core/res/consts'
+import { SNACKBAR_OPTIONS_ERROR } from '../../../../../core/res/Constants'
 import ContractEditDialog from '../../../../timetable/components/ContractEditDialog'
 import ContractState from '../../../../../core/enums/ContractState'
 import TimeSuggestion from '../../../../../core/types/TimeSuggestion'
 import Leave from '../../../../../core/types/Leave'
 import ContractCreationFormState from '../../../../../core/types/Form/ContractCreationFormState'
+import { contractStateToString } from '../../../../../core/utils/EnumToString'
 
 dayjs.locale('de')
 
@@ -143,7 +144,7 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
 
     if (typeof leaves === 'undefined') return
@@ -163,7 +164,7 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
       .then((res) => res.data)
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
 
     if (typeof suggestions === 'undefined') return
@@ -217,7 +218,7 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
       .finally(() => setLoading(false))
   }

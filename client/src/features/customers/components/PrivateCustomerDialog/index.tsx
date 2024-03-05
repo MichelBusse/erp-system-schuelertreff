@@ -15,13 +15,14 @@ import {
 import axios from 'axios'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
-import { defaultPrivateCustomerFormData, snackbarOptionsError } from '../../../../core/res/consts'
-import { defaultPrivateCustomerFormErrorTexts, privateCustomerFormValidation } from '../../../../core/utils/formValidation'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import AddTimes from '../../../general/components/AddTimes'
 import PrivateCustomerFormState from '../../../../core/types/Form/PrivateCustomerFormState'
 import PrivateCustomer from '../../../../core/types/PrivateCustomer'
 import SchoolType from '../../../../core/enums/SchoolType'
+import { privateCustomerFormValidation } from '../../../../core/utils/FormValidation'
+import { DEFAULT_PRIVATE_CUSTOMER_FORM_ERROR_TEXTS, DEFAULT_PRIVATE_CUSTOMER_FORM_STATE } from '../../../../core/res/Defaults'
+import { SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 
 type Props = {
   open: boolean
@@ -35,9 +36,9 @@ const PrivateCustomerDialog: React.FC<Props> = ({
   setCustomers,
 }) => {
   const [data, setData] = useState<PrivateCustomerFormState>(
-    defaultPrivateCustomerFormData,
+    DEFAULT_PRIVATE_CUSTOMER_FORM_STATE,
   )
-  const [errors, setErrors] = useState(defaultPrivateCustomerFormErrorTexts)
+  const [errors, setErrors] = useState(DEFAULT_PRIVATE_CUSTOMER_FORM_ERROR_TEXTS)
 
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
@@ -66,29 +67,29 @@ const PrivateCustomerDialog: React.FC<Props> = ({
         .then((res) => {
           setCustomers((s) => [...s, res.data])
           setOpen(false)
-          setData(defaultPrivateCustomerFormData)
+          setData(DEFAULT_PRIVATE_CUSTOMER_FORM_STATE)
         })
         .catch((error) => {
           if (axios.isAxiosError(error) && error.response?.status === 400) {
             enqueueSnackbar(
               (error.response.data as { message: string }).message,
-              snackbarOptionsError,
+              SNACKBAR_OPTIONS_ERROR,
             )
           } else {
             console.error(error)
-            enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+            enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
           }
         })
     } else {
       setErrors(errorTexts)
-      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+      enqueueSnackbar('Überprüfe deine Eingaben', SNACKBAR_OPTIONS_ERROR)
     }
   }
 
   const closeForm = () => {
     setOpen(false)
-    setData(defaultPrivateCustomerFormData)
-    setErrors(defaultPrivateCustomerFormErrorTexts)
+    setData(DEFAULT_PRIVATE_CUSTOMER_FORM_STATE)
+    setErrors(DEFAULT_PRIVATE_CUSTOMER_FORM_ERROR_TEXTS)
   }
 
   return (

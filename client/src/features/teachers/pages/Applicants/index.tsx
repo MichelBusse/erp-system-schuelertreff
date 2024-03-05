@@ -18,12 +18,13 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
 import { PrevIdProps } from "../../../../App";
 import { useAuth } from "../../../auth/components/AuthProvider";
-import { degreeOperator, schoolTypesOperator, stateOperator, subjectOperator } from "../../../../core/utils/teacherFilterData";
-import { dataGridLocaleText, teacherStateToString } from "../../../../core/res/consts";
+import { degreeOperator, schoolTypesOperator, stateOperator, subjectOperator } from "../../../../core/utils/TeacherFilterData";
+import { DATA_GRID_LOCALE_TEXT } from "../../../../core/res/Constants";
 import TeacherDialog from "../../components/TeacherDialog";
 import Teacher from "../../../../core/types/Teacher";
 import Subject from "../../../../core/types/Subject";
 import TeacherState from "../../../../core/enums/TeacherState";
+import { teacherStateToString } from "../../../../core/utils/EnumToString";
 
 const Applicants: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
   const [open, setOpen] = useState(false)
@@ -211,7 +212,7 @@ const Applicants: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
             setColumnVisibilityModel(newModel)
           }
           ref={ref}
-          localeText={dataGridLocaleText}
+          localeText={DATA_GRID_LOCALE_TEXT}
           headerHeight={0}
           disableSelectionOnClick={true}
           onRowClick={onRowClick}

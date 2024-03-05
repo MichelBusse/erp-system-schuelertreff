@@ -18,7 +18,7 @@ import { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { snackbarOptionsError } from '../../../../core/res/consts'
+import { SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import IconButtonAdornment from '../../../general/components/IconButtonAdornment'
 import Teacher from '../../../../core/types/Teacher'
 
@@ -74,11 +74,11 @@ const TeacherDialog: React.FC<Props> = ({
         if (axios.isAxiosError(error) && error.response?.status === 400) {
           enqueueSnackbar(
             (error.response.data as { message: string }).message,
-            snackbarOptionsError,
+            SNACKBAR_OPTIONS_ERROR,
           )
         } else {
           console.error(error)
-          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+          enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
         }
       })
   }

@@ -1,46 +1,19 @@
 import dayjs from 'dayjs'
-import TeacherFormErrorTexts from '../types/Form/TeacherFormErrorTexts'
 import TeacherFormState from '../types/Form/TeacherFormState'
 import PrivateCustomerFormState from '../types/Form/PrivateCustomerFormState'
-import PrivateCustomerFormErrorTexts from '../types/Form/PrivateCustomerFormErrorTexts'
-import SchoolFormErrorTexts from '../types/Form/SchoolFormErrorTexts'
 import SchoolFormState from '../types/Form/SchoolFormState'
 import SubjectFormState from '../types/Form/SubjectFormState'
-import SubjectFormErrorTexts from '../types/Form/SubjectFormErrorTexts'
+import {
+  DEFAULT_TEACHER_FORM_ERROR_TEXTS,
+  DEFAULT_PRIVATE_CUSTOMER_FORM_ERROR_TEXTS,
+  DEFAULT_SCHOOL_FORM_ERROR_TEXTS,
+  DEFAULT_SUBJECT_FORM_ERROR_TEXTS,
+} from '../res/Defaults'
 
 export const testEmail = (email: string) => /.+@.+\.[A-Za-z]+$/.test(email)
 
-export const defaultTeacherFormErrorTexts: TeacherFormErrorTexts = {
-  firstName: '',
-  lastName: '',
-  city: '',
-  postalCode: '',
-  street: '',
-  email: '',
-  phone: '',
-  timesAvailable: '',
-  subjects: '',
-  fee: '',
-  degree: '',
-  teacherSchoolTypes: '',
-  state: '',
-  iban: '',
-  bic: '',
-  bankAccountOwner: '',
-  bankInstitution: '',
-  dateOfBirth: '',
-  dateOfEmploymentStart: '',
-  valid: true,
-  dateOfApplication: '',
-  dateOfApplicationMeeting: '',
-  applicationLocation: '',
-}
-
-export function teacherFormValidation(
-  form: TeacherFormState,
-  admin?: boolean,
-) {
-  let errorTexts = { ...defaultTeacherFormErrorTexts }
+export function teacherFormValidation(form: TeacherFormState, admin?: boolean) {
+  let errorTexts = { ...DEFAULT_TEACHER_FORM_ERROR_TEXTS }
 
   if (form.firstName.trim() === '') {
     errorTexts.firstName = 'Fehlt'
@@ -113,7 +86,7 @@ export function workContractFormValidation(
   form: TeacherFormState,
   admin = true,
 ) {
-  const errorTexts = { ...defaultTeacherFormErrorTexts }
+  const errorTexts = { ...DEFAULT_TEACHER_FORM_ERROR_TEXTS }
 
   if (form.firstName.trim() === '') {
     errorTexts.firstName = 'Fehlt'
@@ -193,7 +166,7 @@ export function workContractFormValidation(
 }
 
 export function efzFormValidation(form: TeacherFormState) {
-  const errorTexts = { ...defaultTeacherFormErrorTexts }
+  const errorTexts = { ...DEFAULT_TEACHER_FORM_ERROR_TEXTS }
 
   if (form.firstName.trim() === '') {
     errorTexts.firstName = 'Fehlt'
@@ -228,28 +201,8 @@ export function efzFormValidation(form: TeacherFormState) {
   return errorTexts
 }
 
-export const defaultPrivateCustomerFormErrorTexts: PrivateCustomerFormErrorTexts =
-  {
-    firstName: '',
-    lastName: '',
-    city: '',
-    postalCode: '',
-    street: '',
-    email: '',
-    phone: '',
-    timesAvailable: '',
-    grade: '',
-    schoolType: '',
-    feeStandard: '',
-    feeOnline: '',
-    notes: '',
-    valid: true,
-  }
-
-export function privateCustomerFormValidation(
-  form: PrivateCustomerFormState,
-) {
-  const errorTexts = { ...defaultPrivateCustomerFormErrorTexts }
+export function privateCustomerFormValidation(form: PrivateCustomerFormState) {
+  const errorTexts = { ...DEFAULT_PRIVATE_CUSTOMER_FORM_ERROR_TEXTS }
 
   if (form.firstName.trim() === '') {
     errorTexts.firstName = 'Fehlt'
@@ -284,26 +237,8 @@ export function privateCustomerFormValidation(
   return errorTexts
 }
 
-export const defaultSchoolFormErrorTexts: SchoolFormErrorTexts = {
-  firstName: '',
-  lastName: '',
-  city: '',
-  postalCode: '',
-  street: '',
-  email: '',
-  phone: '',
-  timesAvailable: '',
-  schoolName: '',
-  schoolTypes: '',
-  feeStandard: '',
-  feeOnline: '',
-  notes: '',
-  dateOfStart: '',
-  valid: true,
-}
-
 export function schoolFormValidation(form: SchoolFormState) {
-  const errorTexts = { ...defaultSchoolFormErrorTexts }
+  const errorTexts = { ...DEFAULT_SCHOOL_FORM_ERROR_TEXTS }
 
   if (form.postalCode.trim() !== '' && form.postalCode.length !== 5) {
     errorTexts.postalCode = 'PLZ muss aus 5 Ziffern bestehen'
@@ -333,17 +268,8 @@ export function schoolFormValidation(form: SchoolFormState) {
   return errorTexts
 }
 
-export const defaultSubjectFormErrorTexts : SubjectFormErrorTexts = {
-  color: '',
-  name: '',
-  shortForm: '',
-  valid: true,
-}
-
-export function subjectFormValidation(
-  form: SubjectFormState,
-) {
-  const errorTexts = { ...defaultSubjectFormErrorTexts }
+export function subjectFormValidation(form: SubjectFormState) {
+  const errorTexts = { ...DEFAULT_SUBJECT_FORM_ERROR_TEXTS }
 
   if (form.name.trim() === '') {
     errorTexts.name = 'Fehlt'

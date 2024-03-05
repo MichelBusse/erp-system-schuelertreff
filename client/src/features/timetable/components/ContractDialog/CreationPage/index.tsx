@@ -14,10 +14,9 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../../../auth/components/AuthProvider'
 import {
-  leaveTypeToString,
-  snackbarOptionsError,
-} from '../../../../../core/res/consts'
-import { formatDate, getNextDow } from '../../../../../core/utils/date'
+  SNACKBAR_OPTIONS_ERROR,
+} from '../../../../../core/res/Constants'
+import { formatDate, getNextDow } from '../../../../../core/utils/DateUtils'
 import IconButtonAdornment from '../../../../general/components/IconButtonAdornment'
 import BetterTimePicker from '../../../../general/components/BetterTimePicker'
 import ContractCreationFormState from '../../../../../core/types/Form/ContractCreationFormState'
@@ -26,6 +25,7 @@ import Leave from '../../../../../core/types/Leave'
 import Subject from '../../../../../core/types/Subject'
 import Teacher from '../../../../../core/types/Teacher'
 import TeacherState from '../../../../../core/enums/TeacherState'
+import { leaveTypeToString } from '../../../../../core/utils/EnumToString'
 
 type Props = {
   form: ContractCreationFormState
@@ -66,7 +66,7 @@ export default function CreationPage({
       .then((res) => setTeachers(res.data))
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
   }, [])
 

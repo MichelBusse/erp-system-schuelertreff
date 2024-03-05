@@ -18,15 +18,12 @@ import * as B64ArrayBuffer from 'base64-arraybuffer'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../../../auth/components/AuthProvider'
-import {
-  snackbarOptions,
-  snackbarOptionsError,
-} from '../../../../../core/res/consts'
 import UploadDialog, { UploadDialogForm } from '../UploadDialog'
-import { formatDate } from '../../../../../core/utils/date'
+import { formatDate } from '../../../../../core/utils/DateUtils'
 import DocumentEditDialog from '../DocumentEditDialog'
 import UserDocument from '../../../../../core/types/UserDocument'
 import UserRole from '../../../../../core/enums/UserRole'
+import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from '../../../../../core/res/Constants'
 
 export enum UserDocumentsType {
   PUBLIC = 'public',
@@ -64,7 +61,7 @@ const UserDocuments: React.FC<Props> = ({
       .then((res) => setDocuments(res.data))
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS)
       })
   }, [refresh, outsideRefresh])
 
@@ -88,7 +85,7 @@ const UserDocuments: React.FC<Props> = ({
       mayDelete: !form.protected,
     })
       .then(() => {
-        enqueueSnackbar('Dokument gespeichert.', snackbarOptions)
+        enqueueSnackbar('Dokument gespeichert.', SNACKBAR_OPTIONS)
         setEditDialogDocument(undefined)
         setEditDialogOpen(false)
         setRefresh((r) => ++r)
@@ -97,11 +94,11 @@ const UserDocuments: React.FC<Props> = ({
         if (axios.isAxiosError(error) && error.response?.status === 400) {
           enqueueSnackbar(
             (error.response.data as { message: string }).message,
-            snackbarOptionsError,
+            SNACKBAR_OPTIONS_ERROR,
           )
         } else {
           console.error(error)
-          enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+          enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
         }
       })
   }
@@ -121,13 +118,13 @@ const UserDocuments: React.FC<Props> = ({
       content: B64ArrayBuffer.encode(buf),
     })
       .then(() => {
-        enqueueSnackbar('Erfolgreich gespeichert', snackbarOptions)
+        enqueueSnackbar('Erfolgreich gespeichert', SNACKBAR_OPTIONS)
         setOpen(false)
         setRefresh((r) => r + 1)
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
       .finally(() => setLoading(false))
   }
@@ -150,19 +147,19 @@ const UserDocuments: React.FC<Props> = ({
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
   }
 
   const deleteDoc = (id: number) => {
     API.delete(`documents/` + id)
       .then(() => {
-        enqueueSnackbar('Erfolgreich gelöscht', snackbarOptions)
+        enqueueSnackbar('Erfolgreich gelöscht', SNACKBAR_OPTIONS)
         setRefresh((r) => r + 1)
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
         setRefresh((r) => r + 1)
       })
   }

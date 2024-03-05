@@ -24,17 +24,17 @@ import {
   degreeOperator,
   schoolTypesOperator,
   subjectOperator,
-} from '../../../../core/utils/teacherFilterData'
+} from '../../../../core/utils/TeacherFilterData'
 import {
-  dataGridLocaleText,
-  snackbarOptions,
-  snackbarOptionsError,
-  teacherStateToString,
-} from '../../../../core/res/consts'
+  DATA_GRID_LOCALE_TEXT,
+  SNACKBAR_OPTIONS,
+  SNACKBAR_OPTIONS_ERROR,
+} from '../../../../core/res/Constants'
 import TeacherDialog from '../../components/TeacherDialog'
 import Teacher from '../../../../core/types/Teacher'
 import Subject from '../../../../core/types/Subject'
 import TeacherState from '../../../../core/enums/TeacherState'
+import { teacherStateToString } from '../../../../core/utils/EnumToString'
 
 const Teachers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
   const navigate = useNavigate()
@@ -222,11 +222,11 @@ const Teachers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
       .then(() =>
         enqueueSnackbar(
           'Email-Adressen wurden in die Zwischenablage kopiert',
-          snackbarOptions,
+          SNACKBAR_OPTIONS,
         ),
       )
       .catch(() =>
-        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError),
+        enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR),
       )
   }
 
@@ -245,7 +245,7 @@ const Teachers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
             params.row.id === prevId ? `lastVisited` : ''
           }
           ref={ref}
-          localeText={dataGridLocaleText}
+          localeText={DATA_GRID_LOCALE_TEXT}
           headerHeight={0}
           disableSelectionOnClick={true}
           onRowClick={onRowClick}

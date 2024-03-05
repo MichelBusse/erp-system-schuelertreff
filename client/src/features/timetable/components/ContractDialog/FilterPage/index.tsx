@@ -18,9 +18,9 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../../../auth/components/AuthProvider'
-import { snackbarOptionsError } from '../../../../../core/res/consts'
+import { SNACKBAR_OPTIONS_ERROR } from '../../../../../core/res/Constants'
 import IconButtonAdornment from '../../../../general/components/IconButtonAdornment'
-import { getNextDow } from '../../../../../core/utils/date'
+import { getNextDow } from '../../../../../core/utils/DateUtils'
 import BetterTimePicker from '../../../../general/components/BetterTimePicker'
 import { Contract } from '../../../../../core/types/Contract'
 import ContractFilterFormState from '../../../../../core/types/Form/ContractFilterFormState'
@@ -100,21 +100,21 @@ const Filter: React.FC<Props> = ({
       .then((res) => setPrivCustomers(res.data))
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
 
     API.get('users/school')
       .then((res) => setSchools(res.data))
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
 
     API.get('subjects')
       .then((res) => setSubjects(res.data))
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
 
     // if school is already set, load classCustomers
@@ -126,7 +126,7 @@ const Filter: React.FC<Props> = ({
       .then((res) => setClassCustomers(res.data))
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
   }
 

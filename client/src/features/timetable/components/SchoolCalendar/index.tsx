@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { DrawerParameters } from '../../pages/Timetable'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { snackbarOptionsError } from '../../../../core/res/consts'
+import { SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import MultiCalendar from '../MultiCalendar'
 import { Contract } from '../../../../core/types/Contract'
 import ClassCustomer from '../../../../core/types/ClassCustomer'
@@ -89,7 +89,7 @@ const SchoolCalendar: React.FC<Props> = ({ date, setDrawer, refresh }) => {
       .catch((err) => {
         if (err?.code !== 'ERR_CANCELED') {
           console.error(err)
-          enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+          enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR)
         }
       })
 

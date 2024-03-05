@@ -18,7 +18,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import LoadingCenter from '../../../general/components/LoadingCenter'
 import ErrorPage, { NotFound } from '../../../general/pages/Error'
-import { snackbarOptions, snackbarOptionsError } from '../../../../core/res/consts'
+import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import ContractDialog from "../../components/ContractDialog/ContractDialog";
 import { Contract } from "../../../../core/types/Contract";
 import LessonFormState from "../../../../core/types/Form/LessonFormState";
@@ -71,12 +71,12 @@ const LessonDetailView: React.FC = () => {
       ...data,
     })
       .then(() => {
-        enqueueSnackbar('Stunde gespeichert', snackbarOptions)
+        enqueueSnackbar('Stunde gespeichert', SNACKBAR_OPTIONS)
         navigate('/timetable/' + (initialDate ?? ''))
       })
       .catch((err) => {
         console.error(err)
-        enqueueSnackbar('Ein Fehler ist aufgetreten.', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten.', SNACKBAR_OPTIONS_ERROR)
       })
   }
 

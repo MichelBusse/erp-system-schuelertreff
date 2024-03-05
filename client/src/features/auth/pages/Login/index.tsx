@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 import logo from '../../../../core/assets/logoLarge.png'
 import { useAuth } from '../../components/AuthProvider'
-import { snackbarOptionsError } from '../../../../core/res/consts'
+import { SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 
 const Login: React.FC = () => {
   const [error, setError] = useState('')
@@ -40,7 +40,7 @@ const Login: React.FC = () => {
       .catch(() => {
         enqueueSnackbar(
           'Der Nutzer konnte nicht gefunden werden oder hat nicht die nötigen Berechtigungen',
-          snackbarOptionsError,
+          SNACKBAR_OPTIONS_ERROR,
         )
       })
   }

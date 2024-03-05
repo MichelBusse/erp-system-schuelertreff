@@ -30,9 +30,9 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from "../../../auth/components/AuthProvider";
-import { defaultClassCustomerFormData, defaultSchoolFormData, schoolStateToString, snackbarOptions, snackbarOptionsError } from "../../../../core/res/consts";
+import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from "../../../../core/res/Constants";
 import ConfirmationDialog, { ConfirmationDialogProps, defaultConfirmationDialogProps } from "../../../general/components/ConfirmationDialog";
-import { defaultSchoolFormErrorTexts, schoolFormValidation } from "../../../../core/utils/formValidation";
+import { schoolFormValidation } from "../../../../core/utils/FormValidation";
 import CustomerInvoiceDataSelect, { CustomerInvoiceData } from "../../components/CustomerInvoiceDataSelect";
 import IconButtonAdornment from "../../../general/components/IconButtonAdornment";
 import AddTimes from "../../../general/components/AddTimes";
@@ -51,6 +51,8 @@ import TimeSlot from "../../../../core/types/TimeSlot";
 import SchoolType from "../../../../core/enums/SchoolType";
 import UserRole from "../../../../core/enums/UserRole";
 import CustomerType from "../../../../core/enums/CustomerType";
+import { DEFAULT_CLASS_CUSTOMER_FORM_STATE, DEFAULT_SCHOOL_FORM_ERROR_TEXTS, DEFAULT_SCHOOL_FORM_STATE } from "../../../../core/res/Defaults";
+import { schoolStateToString } from "../../../../core/utils/EnumToString";
 
 
 
@@ -66,9 +68,9 @@ const SchoolDetailView: React.FC = () => {
   const requestedId = id ?? 'me'
 
   const [classCustomers, setClassCustomers] = useState<ClassCustomerFormState[]>([])
-  const [school, setSchool] = useState<SchoolFormState>(defaultSchoolFormData)
+  const [school, setSchool] = useState<SchoolFormState>(DEFAULT_SCHOOL_FORM_STATE)
   const [newClassCustomer, setNewClassCustomer] = useState<ClassCustomerFormState>(
-    defaultClassCustomerFormData,
+    DEFAULT_CLASS_CUSTOMER_FORM_STATE,
   )
   const [addClassDialogOpen, setAddClassDialogOpen] = useState<boolean>(false)
 
@@ -76,7 +78,7 @@ const SchoolDetailView: React.FC = () => {
     useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
 
   const [schoolErrors, setSchoolErrors] = useState<SchoolFormErrorTexts>(
-    defaultSchoolFormErrorTexts,
+    DEFAULT_SCHOOL_FORM_ERROR_TEXTS,
   )
 
   const [render, setRender] = useState<number>(0)
@@ -171,7 +173,7 @@ const SchoolDetailView: React.FC = () => {
         })
     } else {
       setSchoolErrors(errorTexts)
-      enqueueSnackbar('Überprüfe deine Eingaben', snackbarOptionsError)
+      enqueueSnackbar('Überprüfe deine Eingaben', SNACKBAR_OPTIONS_ERROR)
     }
   }
 
@@ -197,7 +199,7 @@ const SchoolDetailView: React.FC = () => {
             enqueueSnackbar(
               school.schoolName +
                 ' kann nicht gelöscht werden, da sie noch Klassen hat',
-              snackbarOptionsError,
+              SNACKBAR_OPTIONS_ERROR,
             )
           })
       },
@@ -261,7 +263,7 @@ const SchoolDetailView: React.FC = () => {
           .then(() => {
             enqueueSnackbar(
               classCustomer.className + ' gelöscht',
-              snackbarOptions,
+              SNACKBAR_OPTIONS,
             )
             setClassCustomers(classCustomers.filter((_, i) => i !== index))
           })
@@ -269,7 +271,7 @@ const SchoolDetailView: React.FC = () => {
             enqueueSnackbar(
               classCustomer.className +
                 ' kann nicht gelöscht werden, da noch laufende Verträge existieren.',
-              snackbarOptionsError,
+              SNACKBAR_OPTIONS_ERROR,
             )
           })
       },
@@ -317,7 +319,7 @@ const SchoolDetailView: React.FC = () => {
             },
           ])
 
-          setNewClassCustomer(defaultClassCustomerFormData)
+          setNewClassCustomer(DEFAULT_CLASS_CUSTOMER_FORM_STATE)
           enqueueSnackbar('Klasse erfolgreich hinzugefügt')
         })
         .catch(() => {
@@ -330,7 +332,7 @@ const SchoolDetailView: React.FC = () => {
 
   const cancelAddClass = () => {
     setAddClassDialogOpen(false)
-    setNewClassCustomer(defaultClassCustomerFormData)
+    setNewClassCustomer(DEFAULT_CLASS_CUSTOMER_FORM_STATE)
   }
 
   const generateInvoice = (
@@ -338,7 +340,7 @@ const SchoolDetailView: React.FC = () => {
     month: number,
     invoiceData: CustomerInvoiceData,
   ) => {
-    enqueueSnackbar('Rechnung wird generiert...', snackbarOptions)
+    enqueueSnackbar('Rechnung wird generiert...', SNACKBAR_OPTIONS)
     API.post('lessons/invoice/customer', invoiceData, {
       params: {
         of: dayjs().year(year).month(month).format('YYYY-MM-DD'),
@@ -361,7 +363,7 @@ const SchoolDetailView: React.FC = () => {
         URL.revokeObjectURL(url)
       })
       .catch(() => {
-        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR)
       })
   }
 
@@ -370,12 +372,12 @@ const SchoolDetailView: React.FC = () => {
       .then(() => {
         enqueueSnackbar(
           `${school.schoolName} ist entarchiviert`,
-          snackbarOptions,
+          SNACKBAR_OPTIONS,
         )
         navigate('/schools')
       })
       .catch(() => {
-        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR)
       })
   }
 
@@ -385,7 +387,7 @@ const SchoolDetailView: React.FC = () => {
         enqueueSnackbar('Der Passwort-Reset wurde an die E-Mail gesendet')
       })
       .catch(() => {
-        enqueueSnackbar('Ein Fehler ist aufgetreten', snackbarOptionsError)
+        enqueueSnackbar('Ein Fehler ist aufgetreten', SNACKBAR_OPTIONS_ERROR)
       })
   }
 

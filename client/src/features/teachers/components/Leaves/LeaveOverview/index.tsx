@@ -3,11 +3,11 @@ import { Button, IconButton, List, ListItem, ListItemText } from '@mui/material'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import LeaveDialog, { LeaveForm } from '../LeaveDialog'
-import { leaveStateToString, leaveTypeToString } from '../../../../../core/res/consts'
-import { formatDate } from '../../../../../core/utils/date'
+import { formatDate } from '../../../../../core/utils/DateUtils'
 import LeaveType from '../../../../../core/enums/LeaveType'
 import Leave from '../../../../../core/types/Leave'
 import LeaveState from '../../../../../core/enums/LeaveState'
+import { leaveStateToString, leaveTypeToString } from '../../../../../core/utils/EnumToString'
 
 type Props = {
   value: Leave[]

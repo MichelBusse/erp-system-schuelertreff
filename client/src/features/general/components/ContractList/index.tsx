@@ -20,13 +20,12 @@ import ConfirmationDialog, {
   defaultConfirmationDialogProps,
 } from '../ConfirmationDialog'
 import {
-  contractStateToString,
-  contractTypeToString,
-  snackbarOptions,
-  snackbarOptionsError,
-} from '../../../../core/res/consts'
+  SNACKBAR_OPTIONS,
+  SNACKBAR_OPTIONS_ERROR,
+} from '../../../../core/res/Constants'
 import ContractDialog from '../../../timetable/components/ContractDialog/ContractDialog'
 import ContractState from '../../../../core/enums/ContractState'
+import { contractStateToString, contractTypeToString } from '../../../../core/utils/EnumToString'
 
 type Props = {
   contracts: Contract[]
@@ -73,19 +72,19 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
               }
               return newContracts
             })
-            enqueueSnackbar('Einsatz gelöscht', snackbarOptions)
+            enqueueSnackbar('Einsatz gelöscht', SNACKBAR_OPTIONS)
           })
           .catch((error) => {
             if (axios.isAxiosError(error) && error.response?.status === 400) {
               enqueueSnackbar(
                 (error.response.data as { message: string }).message,
-                snackbarOptionsError,
+                SNACKBAR_OPTIONS_ERROR,
               )
             } else {
               console.error(error)
               enqueueSnackbar(
                 'Ein Fehler ist aufgetreten.',
-                snackbarOptionsError,
+                SNACKBAR_OPTIONS_ERROR,
               )
             }
           })
