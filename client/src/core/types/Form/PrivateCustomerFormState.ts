@@ -1,4 +1,4 @@
-import SchoolType from '../../enums/SchoolType'
+import SchoolType from '../../enums/SchoolType.enum'
 import UserFormState from './UserFormState'
 
 interface PrivateCustomerFormState extends UserFormState {

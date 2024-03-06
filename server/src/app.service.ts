@@ -3,8 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { InjectDataSource } from '@nestjs/typeorm'
 import { nanoid } from 'nanoid'
 import { DataSource } from 'typeorm'
-
-import { UsersService } from './users/users.service'
+import { UsersService } from './features/users/services/users.service'
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {

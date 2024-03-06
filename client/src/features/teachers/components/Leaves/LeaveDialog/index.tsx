@@ -27,10 +27,10 @@ import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from '../../../../../core/re
 import { useAuth } from '../../../../auth/components/AuthProvider'
 import IconButtonAdornment from '../../../../general/components/IconButtonAdornment'
 import LeaveDialogSubstitute from '../LeaveDialogSubstitute'
-import LeaveType from '../../../../../core/enums/LeaveType'
-import LeaveState from '../../../../../core/enums/LeaveState'
+import LeaveType from '../../../../../core/enums/LeaveType.enum'
+import LeaveState from '../../../../../core/enums/LeaveState.enum'
 import Leave from '../../../../../core/types/Leave'
-import UserRole from '../../../../../core/enums/UserRole'
+import UserRole from '../../../../../core/enums/UserRole.enum'
 import { leaveStateToString, leaveTypeToString } from '../../../../../core/utils/EnumToString'
 import LeaveFormState from '../../../../../core/types/Form/LeaveFormState'
 

@@ -1,5 +1,5 @@
 import { Dayjs } from "dayjs"
-import TeacherState from "../../enums/TeacherState"
+import TeacherState from "../../enums/TeacherState.enum"
 import Subject from "../Subject"
 import UserFormState from "./UserFormState"
 

@@ -1,5 +1,5 @@
 import { Dayjs } from 'dayjs'
-import SchoolState from '../../enums/SchoolState'
+import SchoolState from '../../enums/SchoolState.enum'
 import UserFormState from './UserFormState'
 
 interface SchoolFormState extends UserFormState {

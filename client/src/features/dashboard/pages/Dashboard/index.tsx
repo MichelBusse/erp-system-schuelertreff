@@ -5,7 +5,7 @@ import PendingContracts from '../../components/PendingContracts'
 import DashboardLeaves from '../../components/DashboardLeaves'
 import ApplicationMeetings from '../../components/ApplicationMeetings'
 import SchoolStarts from '../../components/SchoolStarts'
-import LeaveState from '../../../../core/enums/LeaveState'
+import LeaveState from '../../../../core/enums/LeaveState.enum'
 
 export default function Dashboard () {
   const theme = useTheme()

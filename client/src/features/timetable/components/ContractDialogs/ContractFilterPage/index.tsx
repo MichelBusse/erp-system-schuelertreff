@@ -28,9 +28,9 @@ import School from '../../../../../core/types/School'
 import Subject from '../../../../../core/types/Subject'
 import ClassCustomer from '../../../../../core/types/ClassCustomer'
 import PrivateCustomer from '../../../../../core/types/PrivateCustomer'
-import CustomerType from '../../../../../core/enums/CustomerType'
-import UserRole from '../../../../../core/enums/UserRole'
-import ContractType from '../../../../../core/enums/ContractType'
+import CustomerType from '../../../../../core/enums/CustomerType.enum'
+import UserRole from '../../../../../core/enums/UserRole.enum'
+import ContractType from '../../../../../core/enums/ContractType.enum'
 
 dayjs.extend(customParseFormat)
 

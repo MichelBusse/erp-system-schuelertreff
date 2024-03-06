@@ -1,5 +1,5 @@
-import SchoolState from "../enums/SchoolState"
-import UserRole from "../enums/UserRole"
+import SchoolState from "../enums/SchoolState.enum"
+import UserRole from "../enums/UserRole.enum"
 import User from "./User"
 
 interface School extends User {

@@ -1,5 +1,5 @@
-import LeaveState from "../enums/LeaveState"
-import LeaveType from "../enums/LeaveType"
+import LeaveState from "../enums/LeaveState.enum"
+import LeaveType from "../enums/LeaveType.enum"
 
 type Leave = {
   id: number

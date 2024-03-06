@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useInterval from 'react-useinterval'
 
-import UserRole from '../../../../core/enums/UserRole'
+import UserRole from '../../../../core/enums/UserRole.enum'
 import NavigationState from '../../../../core/types/NavigationState'
 import AuthContextValue from '../../../../core/types/AuthContextValue'
 import Jwt from '../../../../core/types/Jwt'

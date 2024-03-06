@@ -22,12 +22,12 @@ import DocumentUploadDialog from '../UserDocumentUploadDialog'
 import { formatDate } from '../../../../../core/utils/DateUtils'
 import DocumentEditDialog from '../UserDocumentEditDialog'
 import UserDocument from '../../../../../core/types/UserDocument'
-import UserRole from '../../../../../core/enums/UserRole'
+import UserRole from '../../../../../core/enums/UserRole.enum'
 import {
   SNACKBAR_OPTIONS,
   SNACKBAR_OPTIONS_ERROR,
 } from '../../../../../core/res/Constants'
-import UserDocumentType from '../../../../../core/enums/UserDocumentType'
+import UserDocumentType from '../../../../../core/enums/UserDocumentType.enum'
 import UserDocumentFormState from '../../../../../core/types/Form/UserDocumentFormState'
 
 type Props = {

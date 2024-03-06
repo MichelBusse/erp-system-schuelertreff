@@ -1,4 +1,4 @@
-import SchoolType from '../../enums/SchoolType'
+import SchoolType from '../../enums/SchoolType.enum'
 import TimeSlot from '../TimeSlot'
 
 interface ClassCustomerFormState {

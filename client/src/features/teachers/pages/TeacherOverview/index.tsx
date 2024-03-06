@@ -15,10 +15,10 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from "../../../auth/components/AuthProvider";
 import Subject from "../../../../core/types/Subject";
 import Teacher from "../../../../core/types/Teacher";
-import TeacherSchoolType from "../../../../core/enums/TeacherSchoolType";
+import TeacherSchoolType from "../../../../core/enums/TeacherSchoolType.enum";
 import { teacherDegreeToString, teacherSchoolTypeToString } from "../../../../core/utils/EnumToString";
 import UserDocumentList from "../../../general/components/UserDocuments/UserDocumentList";
-import UserDocumentType from "../../../../core/enums/UserDocumentType";
+import UserDocumentType from "../../../../core/enums/UserDocumentType.enum";
 
 
 dayjs.extend(customParseFormat)

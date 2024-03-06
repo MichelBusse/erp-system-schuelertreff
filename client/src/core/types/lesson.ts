@@ -1,4 +1,4 @@
-import LessonState from "../enums/LessonState"
+import LessonState from "../enums/LessonState.enum"
 import { Contract } from "./Contract"
 
 type Lesson = {

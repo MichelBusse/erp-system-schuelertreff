@@ -24,8 +24,8 @@ import TimeSuggestion from '../../../../../core/types/TimeSuggestion'
 import Leave from '../../../../../core/types/Leave'
 import Subject from '../../../../../core/types/Subject'
 import Teacher from '../../../../../core/types/Teacher'
-import TeacherState from '../../../../../core/enums/TeacherState'
 import { leaveTypeToString } from '../../../../../core/utils/EnumToString'
+import TeacherState from '../../../../../core/enums/TeacherState.enum'
 
 type Props = {
   form: ContractCreationFormState

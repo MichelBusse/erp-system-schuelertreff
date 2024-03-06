@@ -21,9 +21,9 @@ import ErrorPage from '../../../general/pages/Error'
 import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import { Contract } from "../../../../core/types/Contract";
 import LessonFormState from "../../../../core/types/Form/LessonFormState";
-import LessonState from "../../../../core/enums/LessonState";
 import NotFoundError from "../../../general/pages/NotFoundError";
 import ContractCreateDialog from "../../components/ContractDialogs/ContractCreateDialog";
+import LessonState from "../../../../core/enums/LessonState.enum";
 
 
 const LessonDetailView: React.FC = () => {

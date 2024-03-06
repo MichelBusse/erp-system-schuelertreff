@@ -1,5 +1,5 @@
-import UserDeleteState from "../enums/UserDeleteState"
-import UserRole from "../enums/UserRole"
+import UserDeleteState from "../enums/UserDeleteState.enum"
+import UserRole from "../enums/UserRole.enum"
 import Leave from "./Leave"
 import TimeSlot from "./TimeSlot"
 import TimeSlotParsed from "./TimeSlotParsed"

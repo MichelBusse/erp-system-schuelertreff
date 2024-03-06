@@ -12,7 +12,7 @@ import {
   TextField,
 } from '@mui/material'
 import { useState } from 'react'
-import UserDocumentType from '../../../../../core/enums/UserDocumentType'
+import UserDocumentType from '../../../../../core/enums/UserDocumentType.enum'
 import UserDocumentFormState from '../../../../../core/types/Form/UserDocumentFormState'
 
 type Props = {

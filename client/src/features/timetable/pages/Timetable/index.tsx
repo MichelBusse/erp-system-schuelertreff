@@ -21,7 +21,7 @@ import AdminCalendar from '../../components/AdminCalendar'
 import TeacherCalendar from '../../components/TeacherCalendar'
 import LessonOverview from '../../components/LessonOverview'
 import { Contract } from '../../../../core/types/Contract'
-import UserRole from '../../../../core/enums/UserRole'
+import UserRole from '../../../../core/enums/UserRole.enum'
 import ContractCreateDialog from '../../components/ContractDialogs/ContractCreateDialog'
 import TimetableDrawerData from '../../../../core/types/TimetableDrawerData'
 

@@ -1,4 +1,4 @@
-import UserDeleteState from "../../enums/UserDeleteState"
+import UserDeleteState from "../../enums/UserDeleteState.enum"
 import TimeSlot from "../TimeSlot"
 
 interface UserFormState {

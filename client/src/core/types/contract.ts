@@ -1,5 +1,5 @@
-import ContractState from '../enums/ContractState'
-import ContractType from '../enums/ContractType'
+import ContractState from '../enums/ContractState.enum'
+import ContractType from '../enums/ContractType.enum'
 import Customer from './Customer'
 import Teacher from './Teacher'
 import Lesson from './Lesson'

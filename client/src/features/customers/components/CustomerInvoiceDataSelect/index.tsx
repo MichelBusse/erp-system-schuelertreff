@@ -12,8 +12,8 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import InvoiceDataSelect from '../../../general/components/InvoiceDataSelect'
-import UserRole from '../../../../core/enums/UserRole'
 import CustomerInvoiceData from '../../../../core/types/CustomerInvoiceData'
+import UserRole from '../../../../core/enums/UserRole.enum'
 
 type Props = {
   generateInvoice: (

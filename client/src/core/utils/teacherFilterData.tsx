@@ -15,9 +15,9 @@ import {
 import { useEffect, useState } from 'react'
 
 import { useAuth } from '../../features/auth/components/AuthProvider'
-import TeacherDegree from '../enums/TeacherDegree'
-import TeacherState from '../enums/TeacherState'
-import TeacherSchoolType from '../enums/TeacherSchoolType'
+import TeacherDegree from '../enums/TeacherDegree.enum'
+import TeacherState from '../enums/TeacherState.enum'
+import TeacherSchoolType from '../enums/TeacherSchoolType.enum'
 import Subject from '../types/Subject'
 import { teacherSchoolTypeToString, teacherStateToString } from './EnumToString'
 

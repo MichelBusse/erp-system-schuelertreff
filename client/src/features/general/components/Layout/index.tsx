@@ -5,7 +5,7 @@ import MainMenu from '../MainMenu'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import ErrorPage from '../../pages/Error'
 import BottomMenu from '../BottomMenu'
-import TeacherState from '../../../../core/enums/TeacherState'
+import TeacherState from '../../../../core/enums/TeacherState.enum'
 import MenuItems from '../../../../core/res/MenuItems'
 
 const Layout: React.FC = () => {

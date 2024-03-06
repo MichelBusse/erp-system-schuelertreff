@@ -14,8 +14,8 @@ import { useAuth } from '../../../auth/components/AuthProvider'
 import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import { Contract } from '../../../../core/types/Contract'
 import Lesson from '../../../../core/types/Lesson'
-import LessonState from '../../../../core/enums/LessonState'
-import ContractType from '../../../../core/enums/ContractType'
+import ContractType from '../../../../core/enums/ContractType.enum'
+import LessonState from '../../../../core/enums/LessonState.enum'
 
 
 type Props = {

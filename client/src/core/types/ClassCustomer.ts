@@ -1,5 +1,5 @@
-import SchoolType from "../enums/SchoolType"
-import UserRole from "../enums/UserRole"
+import SchoolType from "../enums/SchoolType.enum"
+import UserRole from "../enums/UserRole.enum"
 import School from "./School"
 import TimeSlot from "./TimeSlot"
 import TimeSlotParsed from "./TimeSlotParsed"

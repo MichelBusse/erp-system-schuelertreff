@@ -32,7 +32,7 @@ import {
 import TeacherDialog from '../../components/TeacherDialog'
 import Teacher from '../../../../core/types/Teacher'
 import Subject from '../../../../core/types/Subject'
-import TeacherState from '../../../../core/enums/TeacherState'
+import TeacherState from '../../../../core/enums/TeacherState.enum'
 import { teacherStateToString } from '../../../../core/utils/EnumToString'
 import PreviousIdPageProps from '../../../../core/types/PreviousIdPageProps'
 

@@ -5,14 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
-import { AuthModule } from './auth/auth.module'
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard'
-import { RolesGuard } from './auth/guards/roles.guard'
-import { ContractsModule } from './contracts/contracts.module'
-import { DocumentsModule } from './documents/documents.module'
-import { LessonsModule } from './lessons/lessons.module'
-import { SubjectsModule } from './subjects/subjects.module'
-import { UsersModule } from './users/users.module'
+import { JwtAuthGuard } from './features/auth/guards/jwt-auth.guard'
+import { RolesGuard } from './features/auth/guards/roles.guard'
+import { UsersModule } from './features/users/modules/users.module'
+import { SubjectsModule } from './features/subjects/modules/subjects.module'
+import { LessonsModule } from './features/lessons/modules/lessons.module'
+import { ContractsModule } from './features/contracts/modules/contracts.module'
+import { AuthModule } from './features/auth/modules/auth.module'
+import { UserDocumentsModule } from './features/user-documents/modules/user-documents.module'
 
 const ENV = process.env.NODE_ENV
 
@@ -41,7 +41,7 @@ const ENV = process.env.NODE_ENV
     ContractsModule,
     UsersModule,
     AuthModule,
-    DocumentsModule,
+    UserDocumentsModule,
   ],
   controllers: [AppController],
   providers: [

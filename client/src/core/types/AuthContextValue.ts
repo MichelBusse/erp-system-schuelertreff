@@ -1,6 +1,6 @@
 import { AxiosInstance } from "axios"
 import Jwt from "./Jwt"
-import UserRole from "../enums/UserRole"
+import UserRole from "../enums/UserRole.enum"
 
 type AuthContextValue = {
   token: string

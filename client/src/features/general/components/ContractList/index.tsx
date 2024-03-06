@@ -21,7 +21,7 @@ import {
   SNACKBAR_OPTIONS,
   SNACKBAR_OPTIONS_ERROR,
 } from '../../../../core/res/Constants'
-import ContractState from '../../../../core/enums/ContractState'
+import ContractState from '../../../../core/enums/ContractState.enum'
 import { contractStateToString, contractTypeToString } from '../../../../core/utils/EnumToString'
 import { DEFAULT_CONFIRMATION_DIALOG_DATA } from '../../../../core/res/Defaults'
 import ContractCreateDialog from '../../../timetable/components/ContractDialogs/ContractCreateDialog'

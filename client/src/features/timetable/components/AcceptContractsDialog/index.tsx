@@ -13,8 +13,8 @@ import { useSnackbar } from 'notistack'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import { SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import { Contract } from '../../../../core/types/Contract'
-import ContractState from '../../../../core/enums/ContractState'
-import ContractType from '../../../../core/enums/ContractType'
+import ContractState from '../../../../core/enums/ContractState.enum'
+import ContractType from '../../../../core/enums/ContractType.enum'
 
 type Props = {
   contracts: Contract[]

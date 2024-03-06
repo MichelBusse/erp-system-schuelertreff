@@ -1,5 +1,5 @@
 import { Autocomplete, Box, TextField } from '@mui/material'
-import SchoolType from '../../../../core/enums/SchoolType'
+import SchoolType from '../../../../core/enums/SchoolType.enum'
 import { GridFilterInputValueProps } from '@mui/x-data-grid'
 
 export default function SchoolTypeFilterInput({

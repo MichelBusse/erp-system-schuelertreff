@@ -1,5 +1,5 @@
-import SchoolType from "../enums/SchoolType"
-import UserRole from "../enums/UserRole"
+import SchoolType from "../enums/SchoolType.enum"
+import UserRole from "../enums/UserRole.enum"
 import User from "./User"
 
 interface PrivateCustomer extends User {

@@ -2,8 +2,8 @@ import { Dayjs } from "dayjs"
 import ClassCustomer from "../ClassCustomer"
 import PrivateCustomer from "../PrivateCustomer"
 import Subject from "../Subject"
-import CustomerType from "../../enums/CustomerType"
-import ContractType from "../../enums/ContractType"
+import CustomerType from "../../enums/CustomerType.enum"
+import ContractType from "../../enums/ContractType.enum"
 
 type ContractFilterFormState = {
   school: {

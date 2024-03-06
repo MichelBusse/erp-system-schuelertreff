@@ -1,7 +1,7 @@
-import TeacherDegree from "../enums/TeacherDegree"
-import TeacherSchoolType from "../enums/TeacherSchoolType"
-import TeacherState from "../enums/TeacherState"
-import UserRole from "../enums/UserRole"
+import TeacherDegree from "../enums/TeacherDegree.enum"
+import TeacherSchoolType from "../enums/TeacherSchoolType.enum"
+import TeacherState from "../enums/TeacherState.enum"
+import UserRole from "../enums/UserRole.enum"
 import Subject from "./Subject"
 import User from "./User"
 

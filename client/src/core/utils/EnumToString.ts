@@ -1,11 +1,11 @@
-import ContractState from "../enums/ContractState"
-import ContractType from "../enums/ContractType"
-import LeaveState from "../enums/LeaveState"
-import LeaveType from "../enums/LeaveType"
-import SchoolState from "../enums/SchoolState"
-import TeacherDegree from "../enums/TeacherDegree"
-import TeacherSchoolType from "../enums/TeacherSchoolType"
-import TeacherState from "../enums/TeacherState"
+import ContractState from "../enums/ContractState.enum"
+import ContractType from "../enums/ContractType.enum"
+import LeaveState from "../enums/LeaveState.enum"
+import LeaveType from "../enums/LeaveType.enum"
+import SchoolState from "../enums/SchoolState.enum"
+import TeacherDegree from "../enums/TeacherDegree.enum"
+import TeacherSchoolType from "../enums/TeacherSchoolType.enum"
+import TeacherState from "../enums/TeacherState.enum"
 
 export const teacherStateToString: { [key in TeacherState]: string } = {
   created: 'Registriert',

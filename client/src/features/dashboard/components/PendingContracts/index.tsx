@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { Contract } from '../../../../core/types/Contract'
 import ContractList from '../../../general/components/ContractList'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import ContractState from '../../../../core/enums/ContractState'
+import ContractState from '../../../../core/enums/ContractState.enum'
 import DashboardProps from '../../../../core/types/DashboardProps'
 
 export default function PendingContracts({ listSx } : DashboardProps) {

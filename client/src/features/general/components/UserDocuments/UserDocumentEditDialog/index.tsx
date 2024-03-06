@@ -14,7 +14,7 @@ import {
 import { useState } from 'react'
 import { useAuth } from '../../../../auth/components/AuthProvider'
 import UserDocument from '../../../../../core/types/UserDocument'
-import UserRole from '../../../../../core/enums/UserRole'
+import UserRole from '../../../../../core/enums/UserRole.enum'
 import UserDocumentFormState from '../../../../../core/types/Form/UserDocumentFormState'
 
 type Props = {

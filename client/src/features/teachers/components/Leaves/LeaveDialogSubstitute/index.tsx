@@ -29,13 +29,13 @@ import { Contract, } from '../../../../../core/types/Contract'
 import { useAuth } from '../../../../auth/components/AuthProvider'
 import { SNACKBAR_OPTIONS_ERROR } from '../../../../../core/res/Constants'
 import ContractEditDialog from '../../../../timetable/components/ContractDialogs/ContractEditDialog'
-import ContractState from '../../../../../core/enums/ContractState'
 import TimeSuggestion from '../../../../../core/types/TimeSuggestion'
 import Leave from '../../../../../core/types/Leave'
 import ContractCreationFormState from '../../../../../core/types/Form/ContractCreationFormState'
 import { contractStateToString } from '../../../../../core/utils/EnumToString'
 import LeaveDialogData from '../../../../../core/types/LeaveDialogData'
 import ContractCreationPage from '../../../../timetable/components/ContractDialogs/ContractCreationPage'
+import ContractState from '../../../../../core/enums/ContractState.enum'
 
 dayjs.locale('de')
 

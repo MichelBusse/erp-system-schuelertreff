@@ -28,14 +28,14 @@ import CreationPage from '../ContractCreationPage'
 import FilterPage from '../ContractFilterPage'
 import ContractFilterFormState from '../../../../../core/types/Form/ContractFilterFormState'
 import { Contract } from '../../../../../core/types/Contract'
-import ContractType from '../../../../../core/enums/ContractType'
-import CustomerType from '../../../../../core/enums/CustomerType'
 import ContractCreationFormState from '../../../../../core/types/Form/ContractCreationFormState'
 import TimeSuggestion from '../../../../../core/types/TimeSuggestion'
 import Leave from '../../../../../core/types/Leave'
-import ContractState from '../../../../../core/enums/ContractState'
+import ContractState from '../../../../../core/enums/ContractState.enum'
 import ConfirmationDialogData from '../../../../../core/types/ConfirmationDialogData'
 import { DEFAULT_CONFIRMATION_DIALOG_DATA } from '../../../../../core/res/Defaults'
+import ContractType from '../../../../../core/enums/ContractType.enum'
+import CustomerType from '../../../../../core/enums/CustomerType.enum'
 
 dayjs.extend(customParseFormat)
 
