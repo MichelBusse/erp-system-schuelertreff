@@ -28,7 +28,7 @@ type Props = {
   setValue: (newValue: TimeSlot[]) => void
 }
 
-const AddTimes: React.FC<Props> = ({ value, setValue }) => {
+export default function TimeSlotList({ value, setValue }: Props) {
   const [timeSlot, setTimeSlot] = useState<TimeSlot>({
     id: nanoid(),
     dow: 0,
@@ -37,10 +37,7 @@ const AddTimes: React.FC<Props> = ({ value, setValue }) => {
   })
   const addTime = () => {
     if (timeSlot.dow != 0 && timeSlot.start && timeSlot.end) {
-      setValue([
-        ...value,
-        timeSlot,
-      ])
+      setValue([...value, timeSlot])
 
       setTimeSlot({
         id: nanoid(),
@@ -161,5 +158,3 @@ const AddTimes: React.FC<Props> = ({ value, setValue }) => {
     </>
   )
 }
-
-export default AddTimes

@@ -16,13 +16,13 @@ import axios from 'axios'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import AddTimes from '../../../general/components/AddTimes'
 import PrivateCustomerFormState from '../../../../core/types/Form/PrivateCustomerFormState'
 import PrivateCustomer from '../../../../core/types/PrivateCustomer'
 import SchoolType from '../../../../core/enums/SchoolType'
 import { privateCustomerFormValidation } from '../../../../core/utils/FormValidation'
 import { DEFAULT_PRIVATE_CUSTOMER_FORM_ERROR_TEXTS, DEFAULT_PRIVATE_CUSTOMER_FORM_STATE } from '../../../../core/res/Defaults'
 import { SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
+import TimeSlotList from '../../../general/components/TimeSlotList'
 
 type Props = {
   open: boolean
@@ -243,7 +243,7 @@ const PrivateCustomerDialog: React.FC<Props> = ({
           </Stack>
           <FormControl>
             <FormLabel>Verfügbarkeit</FormLabel>
-            <AddTimes
+            <TimeSlotList
               value={data.timesAvailable}
               setValue={(newValue) =>
                 setData((data) => ({ ...data, timesAvailable: newValue }))

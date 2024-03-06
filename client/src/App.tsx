@@ -29,8 +29,6 @@ import TeacherState from './core/enums/TeacherState'
 import ForbiddenError from './features/general/pages/ForbiddenError'
 import NotFoundError from './features/general/pages/NotFoundError'
 
-export type NavigateState = { from: Location }
-
 const ProtectedRoute: React.FC<{ roles?: UserRole[] }> = ({
   children,
   roles = [],

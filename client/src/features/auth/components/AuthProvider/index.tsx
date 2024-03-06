@@ -4,10 +4,10 @@ import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useInterval from 'react-useinterval'
 
-import { NavigateState } from '../../../../App'
 import UserRole from '../../../../core/enums/UserRole'
-import AuthContextValue from '../../types/AuthContextValue'
-import Jwt from '../../types/Jwt'
+import NavigationState from '../../../../core/types/NavigationState'
+import AuthContextValue from '../../../../core/types/AuthContextValue'
+import Jwt from '../../../../core/types/Jwt'
 
 const KEY = 'token'
 const MINUTE = 60000
@@ -64,7 +64,7 @@ const AuthProvider: React.FC = ({ children }) => {
     if (response.data.access_token) {
       setToken(response.data.access_token)
 
-      const origin = (location.state as NavigateState)?.from?.pathname || '/'
+      const origin = (location.state as NavigationState)?.from?.pathname || '/'
       navigate(origin)
     }
   }

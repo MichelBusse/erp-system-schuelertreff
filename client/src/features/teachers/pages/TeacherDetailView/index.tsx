@@ -33,7 +33,6 @@ import { useAuth } from '../../../auth/components/AuthProvider'
 import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import ConfirmationDialog from '../../../general/components/ConfirmationDialog'
 import IconButtonAdornment from '../../../general/components/IconButtonAdornment'
-import AddTimes from '../../../general/components/AddTimes'
 import UserDocumentList from '../../../general/components/UserDocuments/UserDocumentList'
 import TeacherFormState from '../../../../core/types/Form/TeacherFormState'
 import Subject from '../../../../core/types/Subject'
@@ -52,6 +51,7 @@ import { teacherSchoolTypeToString, teacherStateToString } from '../../../../cor
 import UserDocumentType from '../../../../core/enums/UserDocumentType'
 import TeacherInvoiceDataSelect from '../../components/TeacherInvoiceDateSelect'
 import TeacherInvoiceData from '../../../../core/types/TeacherInvoiceData'
+import TimeSlotList from '../../../general/components/TimeSlotList'
 
 dayjs.extend(customParseFormat)
 
@@ -770,7 +770,7 @@ const TeacherDetailView: React.FC = () => {
 
           <Typography variant="h6">Verfügbarkeit:</Typography>
           <Box>
-            <AddTimes
+            <TimeSlotList
               value={data.timesAvailable ?? []}
               setValue={(newValue) =>
                 setData((data) => ({ ...data, timesAvailable: newValue }))

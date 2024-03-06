@@ -10,7 +10,7 @@ import React from 'react'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import MenuLink from '../MenuLink'
 
-export type BottomMenuProps = {
+export type Props = {
   items: Array<{
     icon: typeof SvgIcon
     text: string
@@ -19,7 +19,7 @@ export type BottomMenuProps = {
   }>
 }
 
-const BottomMenu: React.FC<BottomMenuProps> = ({ items }) => {
+const BottomMenu: React.FC<Props> = ({ items }) => {
   const { isAuthed, handleLogout, decodeToken } = useAuth()
 
   const theme = useTheme()

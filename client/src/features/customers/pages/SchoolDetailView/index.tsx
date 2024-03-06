@@ -35,7 +35,6 @@ import ConfirmationDialog from "../../../general/components/ConfirmationDialog";
 import { schoolFormValidation } from "../../../../core/utils/FormValidation";
 import CustomerInvoiceDataSelect from "../../components/CustomerInvoiceDataSelect";
 import IconButtonAdornment from "../../../general/components/IconButtonAdornment";
-import AddTimes from "../../../general/components/AddTimes";
 import ContractList from "../../../general/components/ContractList";
 import { Contract } from "../../../../core/types/Contract";
 import SchoolFormErrorTexts from "../../../../core/types/Form/SchoolFormErrorTexts";
@@ -56,6 +55,7 @@ import ConfirmationDialogData from "../../../../core/types/ConfirmationDialogDat
 import UserDocumentType from "../../../../core/enums/UserDocumentType";
 import UserDocumentList from "../../../general/components/UserDocuments/UserDocumentList";
 import ContractCreateDialog from "../../../timetable/components/ContractDialogs/ContractCreateDialog";
+import TimeSlotList from "../../../general/components/TimeSlotList";
 
 
 
@@ -763,7 +763,7 @@ const SchoolDetailView: React.FC = () => {
                           }}
                         />
                       </Stack>
-                      <AddTimes
+                      <TimeSlotList
                         value={classCustomer.timesAvailable ?? []}
                         setValue={(newValue) =>
                           editClassCustomer({ timesAvailable: newValue }, index)
@@ -935,7 +935,7 @@ const SchoolDetailView: React.FC = () => {
                 }}
               />
             </Stack>
-            <AddTimes
+            <TimeSlotList
               value={newClassCustomer.timesAvailable}
               setValue={(newValue) =>
                 setNewClassCustomer((classCustomer) => ({

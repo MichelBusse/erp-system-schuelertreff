@@ -21,7 +21,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 import ConfirmationDialog from '../../../general/components/ConfirmationDialog'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import CustomerInvoiceDataSelect from '../../components/CustomerInvoiceDataSelect'
-import AddTimes from "../../../general/components/AddTimes";
 import ContractList from "../../../general/components/ContractList";
 import { Contract } from "../../../../core/types/Contract";
 import TimeSlotParsed from "../../../../core/types/TimeSlotParsed";
@@ -39,6 +38,7 @@ import ConfirmationDialogData from "../../../../core/types/ConfirmationDialogDat
 import UserDocumentType from "../../../../core/enums/UserDocumentType";
 import UserDocumentList from "../../../general/components/UserDocuments/UserDocumentList";
 import ContractCreateDialog from "../../../timetable/components/ContractDialogs/ContractCreateDialog";
+import TimeSlotList from "../../../general/components/TimeSlotList";
 
 
 dayjs.extend(customParseFormat)
@@ -419,7 +419,7 @@ const PrivateCustomerDetailView: React.FC = () => {
           </Stack>
           <h3>Verfügbarkeit:</h3>
           <Box>
-            <AddTimes
+            <TimeSlotList
               value={data.timesAvailable}
               setValue={(newValue) =>
                 setData((data) => ({ ...data, timesAvailable: newValue }))
