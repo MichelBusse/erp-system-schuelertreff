@@ -36,7 +36,6 @@ const SchoolDialog: React.FC<Props> = ({ open, setOpen, setCustomers }) => {
 
   const { API } = useAuth()
 
-  //TODO: validate filled fields
   const submitForm = () => {
     const errorTexts = schoolFormValidation(data)
 

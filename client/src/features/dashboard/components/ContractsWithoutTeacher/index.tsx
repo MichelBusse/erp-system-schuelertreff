@@ -1,12 +1,12 @@
 import { Box, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 
-import { CockpitComponent } from '../../pages/Cockpit'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import ContractList from '../../../general/components/ContractList'
 import { Contract } from '../../../../core/types/Contract'
+import DashboardProps from '../../../../core/types/DashboardProps'
 
-const ContractsWithoutTeacher: CockpitComponent = ({ listSx }) => {
+export default function ContractsWithoutTeacher({ listSx }: DashboardProps) {
   const { API } = useAuth()
   const [contracts, setContracts] = useState<Contract[]>([])
   const [refreshContracts, setRefreshContracts] = useState<number>(0)
@@ -40,5 +40,3 @@ const ContractsWithoutTeacher: CockpitComponent = ({ listSx }) => {
     </>
   )
 }
-
-export default ContractsWithoutTeacher

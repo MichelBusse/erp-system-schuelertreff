@@ -4,18 +4,18 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { DrawerParameters } from '../../pages/Timetable'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import { SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import MultiCalendar from '../MultiCalendar'
 import { Contract } from '../../../../core/types/Contract'
 import ClassCustomer from '../../../../core/types/ClassCustomer'
 import Lesson from '../../../../core/types/Lesson'
+import TimetableDrawerData from '../../../../core/types/TimetableDrawerData'
 
 
 type Props = {
   date: Dayjs
-  setDrawer: (params: DrawerParameters) => void
+  setDrawer: (params: TimetableDrawerData) => void
   refresh?: number
 }
 

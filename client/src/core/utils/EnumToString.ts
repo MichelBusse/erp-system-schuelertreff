@@ -31,6 +31,12 @@ export const leaveStateToString: { [key in LeaveState]: string } = {
   declined: 'abgelehnt',
 }
 
+export const leaveStateToHeadlineString: { [key in LeaveState]: string } = {
+  pending: 'Ausstehende Urlaube/Krankmeldungen',
+  accepted: 'Bestätigte Urlaube/Krankmeldungen',
+  declined: 'Abgelehnte Urlaube/Krankmeldungen',
+}
+
 export const contractStateToString: { [key in ContractState]: string } = {
   pending: 'ausstehend',
   accepted: 'bestätigt',

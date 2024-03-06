@@ -22,29 +22,22 @@ import {
   ListItemText,
   Typography,
 } from '@mui/material'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { Contract, } from '../../../../../core/types/Contract'
-import CreationPage from '../../../../timetable/components/ContractDialog/CreationPage'
 import { useAuth } from '../../../../auth/components/AuthProvider'
 import { SNACKBAR_OPTIONS_ERROR } from '../../../../../core/res/Constants'
-import ContractEditDialog from '../../../../timetable/components/ContractEditDialog'
+import ContractEditDialog from '../../../../timetable/components/ContractDialogs/ContractEditDialog'
 import ContractState from '../../../../../core/enums/ContractState'
 import TimeSuggestion from '../../../../../core/types/TimeSuggestion'
 import Leave from '../../../../../core/types/Leave'
 import ContractCreationFormState from '../../../../../core/types/Form/ContractCreationFormState'
 import { contractStateToString } from '../../../../../core/utils/EnumToString'
+import LeaveDialogData from '../../../../../core/types/LeaveDialogData'
+import ContractCreationPage from '../../../../timetable/components/ContractDialogs/ContractCreationPage'
 
 dayjs.locale('de')
-
-type Data = {
-  contract: Contract
-  suggestions: TimeSuggestion[]
-  leaves: Record<number, Leave[]>
-  minStartDate: Dayjs
-  maxEndDate: Dayjs
-}
 
 type Props = {
   onSuccess?: () => void
@@ -67,7 +60,7 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
   const [dialogOpen, setDialogOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [render, setRender] = useState(0)
-  const [data, setData] = useState<Data>()
+  const [data, setData] = useState<LeaveDialogData>()
   const [form, setForm] = useState<ContractCreationFormState>({
     startDate: null,
     endDate: null,
@@ -322,7 +315,7 @@ const LeaveDialogSubstitute: React.FC<Props> = ({
         >
           <Box sx={{ overflow: 'auto', padding: 0.5, height: '345px' }}>
             {!!data && (
-              <CreationPage
+              <ContractCreationPage
                 key={render}
                 form={form}
                 setForm={setForm}

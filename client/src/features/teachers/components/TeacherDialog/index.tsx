@@ -14,13 +14,13 @@ import {
 } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
 import axios from 'axios'
-import { Dayjs } from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import { SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import IconButtonAdornment from '../../../general/components/IconButtonAdornment'
 import Teacher from '../../../../core/types/Teacher'
+import TeacherDialogFormState from '../../../../core/types/Form/TeacherDialogFormState'
 
 type Props = {
   open: boolean
@@ -29,22 +29,13 @@ type Props = {
   teacherType?: 'employed' | 'applied'
 }
 
-type form = {
-  firstName: string
-  lastName: string
-  email: string
-  applicationLocation: string
-  dateOfApplication: Dayjs | null
-  skip: boolean
-}
-
 const TeacherDialog: React.FC<Props> = ({
   open,
   closeDialog,
   setTeachers,
   teacherType,
 }) => {
-  const [form, setForm] = useState<form>({
+  const [form, setForm] = useState<TeacherDialogFormState>({
     firstName: '',
     lastName: '',
     email: '',

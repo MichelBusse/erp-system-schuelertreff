@@ -2,13 +2,13 @@ import { Box, Stack, Typography } from '@mui/material'
 import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 
-import { CockpitComponent } from '../../pages/Cockpit'
 import { Contract } from '../../../../core/types/Contract'
 import ContractList from '../../../general/components/ContractList'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import ContractState from '../../../../core/enums/ContractState'
+import DashboardProps from '../../../../core/types/DashboardProps'
 
-const PendingContracts: CockpitComponent = ({ listSx }) => {
+export default function PendingContracts({ listSx } : DashboardProps) {
   const { API } = useAuth()
   const [pendingContracts, setPendingContracts] = useState<
     Contract[]
@@ -69,5 +69,3 @@ const PendingContracts: CockpitComponent = ({ listSx }) => {
     </>
   )
 }
-
-export default PendingContracts

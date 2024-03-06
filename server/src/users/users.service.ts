@@ -985,8 +985,6 @@ export class UsersService {
       mayAuthenticate: false,
     })
 
-    //TODO Maybe send creation Mail
-
     return this.schoolsRepository.save(school)
   }
 

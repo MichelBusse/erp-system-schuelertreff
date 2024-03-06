@@ -8,13 +8,13 @@ import AcceptContractsDialog from '../AcceptContractsDialog'
 import Calendar from '../Calendar'
 import { SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { DrawerParameters } from '../../pages/Timetable'
 import { Contract } from '../../../../core/types/Contract'
 import Lesson from '../../../../core/types/Lesson'
+import TimetableDrawerData from '../../../../core/types/TimetableDrawerData'
 
 type Props = {
   date: Dayjs
-  setDrawer: (params: DrawerParameters) => void
+  setDrawer: (params: TimetableDrawerData) => void
   refresh?: number
   setRefresh?: React.Dispatch<React.SetStateAction<number>>
 }

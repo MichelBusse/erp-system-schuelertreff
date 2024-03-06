@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 
-const ErrorPage: React.FC<{ code: string; message: string }> = ({
+const Error: React.FC<{ code: string; message: string }> = ({
   code,
   message,
 }) => {
@@ -36,12 +36,5 @@ const ErrorPage: React.FC<{ code: string; message: string }> = ({
   )
 }
 
-export default ErrorPage
+export default Error
 
-export const Forbidden: React.FC = () => (
-  <ErrorPage code="403" message="Fehlende Berechtigung" />
-)
-
-export const NotFound: React.FC = () => (
-  <ErrorPage code="404" message="Seite nicht gefunden" />
-)

@@ -10,7 +10,6 @@ import {
   Typography,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import { GridCellParams } from '@mui/x-data-grid'
 import dayjs from 'dayjs'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { useEffect, useState } from 'react'
@@ -21,20 +20,14 @@ import { useAuth } from '../../../auth/components/AuthProvider'
 import AdminCalendar from '../../components/AdminCalendar'
 import TeacherCalendar from '../../components/TeacherCalendar'
 import LessonOverview from '../../components/LessonOverview'
-import ContractDialog from '../../components/ContractDialog/ContractDialog'
 import { Contract } from '../../../../core/types/Contract'
-import Lesson from '../../../../core/types/Lesson'
 import UserRole from '../../../../core/enums/UserRole'
+import ContractCreateDialog from '../../components/ContractDialogs/ContractCreateDialog'
+import TimetableDrawerData from '../../../../core/types/TimetableDrawerData'
 
 
 dayjs.locale('de')
 dayjs.extend(weekOfYear)
-
-export type DrawerParameters = {
-  open: boolean
-  params: GridCellParams | null
-  lessons: Lesson[]
-}
 
 const Timetable: React.FC = () => {
   const { hasRole, decodeToken } = useAuth()
@@ -44,7 +37,7 @@ const Timetable: React.FC = () => {
 
   const userRole = decodeToken().role
 
-  const [drawer, setDrawer] = useState<DrawerParameters>({
+  const [drawer, setDrawer] = useState<TimetableDrawerData>({
     open: false,
     params: null,
     lessons: [],
@@ -202,7 +195,7 @@ const Timetable: React.FC = () => {
 
       {!!render && (
         <>
-          <ContractDialog
+          <ContractCreateDialog
             key={render}
             open={open}
             setOpen={setOpen}

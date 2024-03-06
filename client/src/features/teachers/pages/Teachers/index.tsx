@@ -18,7 +18,6 @@ import { useSnackbar } from 'notistack'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
-import { PrevIdProps } from '../../../../App'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import {
   degreeOperator,
@@ -35,8 +34,9 @@ import Teacher from '../../../../core/types/Teacher'
 import Subject from '../../../../core/types/Subject'
 import TeacherState from '../../../../core/enums/TeacherState'
 import { teacherStateToString } from '../../../../core/utils/EnumToString'
+import PreviousIdPageProps from '../../../../core/types/PreviousIdPageProps'
 
-const Teachers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
+const Teachers: React.FC<PreviousIdPageProps> = ({ prevId, setPrevId }) => {
   const navigate = useNavigate()
   const location = useLocation()
   const { API } = useAuth()

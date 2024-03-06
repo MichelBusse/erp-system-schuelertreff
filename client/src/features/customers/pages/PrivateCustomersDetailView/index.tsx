@@ -18,13 +18,11 @@ import { nanoid } from 'nanoid'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import ConfirmationDialog, { ConfirmationDialogProps, defaultConfirmationDialogProps } from '../../../general/components/ConfirmationDialog'
+import ConfirmationDialog from '../../../general/components/ConfirmationDialog'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import CustomerInvoiceDataSelect, { CustomerInvoiceData } from '../../components/CustomerInvoiceDataSelect'
+import CustomerInvoiceDataSelect from '../../components/CustomerInvoiceDataSelect'
 import AddTimes from "../../../general/components/AddTimes";
-import UserDocuments, { UserDocumentsType } from "../../../general/components/Documents/UserDocuments";
 import ContractList from "../../../general/components/ContractList";
-import ContractDialog from "../../../timetable/components/ContractDialog/ContractDialog";
 import { Contract } from "../../../../core/types/Contract";
 import TimeSlotParsed from "../../../../core/types/TimeSlotParsed";
 import PrivateCustomerFormState from "../../../../core/types/Form/PrivateCustomerFormState";
@@ -33,9 +31,14 @@ import UserDeleteState from "../../../../core/enums/UserDeleteState";
 import SchoolType from "../../../../core/enums/SchoolType";
 import UserRole from "../../../../core/enums/UserRole";
 import CustomerType from "../../../../core/enums/CustomerType";
-import { DEFAULT_PRIVATE_CUSTOMER_FORM_ERROR_TEXTS, DEFAULT_PRIVATE_CUSTOMER_FORM_STATE } from "../../../../core/res/Defaults";
+import { DEFAULT_CONFIRMATION_DIALOG_DATA, DEFAULT_PRIVATE_CUSTOMER_FORM_ERROR_TEXTS, DEFAULT_PRIVATE_CUSTOMER_FORM_STATE } from "../../../../core/res/Defaults";
 import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from "../../../../core/res/Constants";
 import { privateCustomerFormValidation } from "../../../../core/utils/FormValidation";
+import CustomerInvoiceData from "../../../../core/types/CustomerInvoiceData";
+import ConfirmationDialogData from "../../../../core/types/ConfirmationDialogData";
+import UserDocumentType from "../../../../core/enums/UserDocumentType";
+import UserDocumentList from "../../../general/components/UserDocuments/UserDocumentList";
+import ContractCreateDialog from "../../../timetable/components/ContractDialogs/ContractCreateDialog";
 
 
 dayjs.extend(customParseFormat)
@@ -45,8 +48,8 @@ const PrivateCustomerDetailView: React.FC = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
-  const [confirmationDialogProps, setConfirmationDialogProps] =
-    useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
+  const [confirmationDialogData, setConfirmationDialogData] =
+    useState<ConfirmationDialogData>(DEFAULT_CONFIRMATION_DIALOG_DATA)
 
   const requestedId = id ? id : 'me'
 
@@ -128,9 +131,9 @@ const PrivateCustomerDetailView: React.FC = () => {
   }
 
   const deleteUser = () => {
-    setConfirmationDialogProps({
+    setConfirmationDialogData({
       open: true,
-      setProps: setConfirmationDialogProps,
+      setProps: setConfirmationDialogData,
       title:
         data.deleteState === UserDeleteState.ACTIVE
           ? `${data.firstName + ' ' + data.lastName} wirklich archivieren?`
@@ -455,8 +458,8 @@ const PrivateCustomerDetailView: React.FC = () => {
             onSuccess={() => setRefreshContracts((r) => r + 1)}
           />
           <h3>Dokumente:</h3>
-          <UserDocuments
-            userDocumentsType={UserDocumentsType.PRIVATE}
+          <UserDocumentList
+            userDocumentsType={UserDocumentType.PRIVATE}
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
           />
           <Stack
@@ -502,8 +505,8 @@ const PrivateCustomerDetailView: React.FC = () => {
           />
         </Stack>
       </Box>
-      <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
-      <ContractDialog
+      <ConfirmationDialog confirmationDialogData={confirmationDialogData} />
+      <ContractCreateDialog
         key={render}
         open={contractDialogOpen}
         setOpen={setContractDialogOpen}

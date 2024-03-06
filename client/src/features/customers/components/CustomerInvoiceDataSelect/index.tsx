@@ -8,18 +8,12 @@ import {
   TextField,
 } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import InvoiceDataSelect from '../../../general/components/InvoiceDataSelect'
 import UserRole from '../../../../core/enums/UserRole'
-
-export type CustomerInvoiceData = {
-  invoiceNumber: number
-  invoiceType: string
-  invoicePreparationTime: number
-  invoiceDate: Dayjs
-}
+import CustomerInvoiceData from '../../../../core/types/CustomerInvoiceData'
 
 type Props = {
   generateInvoice: (

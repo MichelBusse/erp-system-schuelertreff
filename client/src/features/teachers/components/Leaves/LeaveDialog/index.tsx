@@ -20,7 +20,7 @@ import {
   Typography,
 } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from '../../../../../core/res/Constants'
@@ -32,23 +32,15 @@ import LeaveState from '../../../../../core/enums/LeaveState'
 import Leave from '../../../../../core/types/Leave'
 import UserRole from '../../../../../core/enums/UserRole'
 import { leaveStateToString, leaveTypeToString } from '../../../../../core/utils/EnumToString'
+import LeaveFormState from '../../../../../core/types/Form/LeaveFormState'
 
-
-export type LeaveForm = {
-  id?: number
-  type: LeaveType
-  state: LeaveState
-  startDate: Dayjs | null
-  endDate: Dayjs | null
-  hasAttachment: boolean
-}
 
 type Props = {
   userId: string
   open: boolean
   close: () => void
-  value: LeaveForm
-  setValue: React.Dispatch<React.SetStateAction<LeaveForm>>
+  value: LeaveFormState
+  setValue: React.Dispatch<React.SetStateAction<LeaveFormState>>
   onSuccess: (id: number, value: Leave | null) => void
 }
 

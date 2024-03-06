@@ -2,14 +2,14 @@ import { Box } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import dayjs, { Dayjs } from 'dayjs'
 
-import { DrawerParameters } from '../../pages/Timetable'
 import styles from './styles.module.scss'
 import { Contract } from '../../../../core/types/Contract'
 import Lesson from '../../../../core/types/Lesson'
+import TimetableDrawerData from '../../../../core/types/TimetableDrawerData'
 
 type Props = {
   date: Dayjs
-  setDrawer: (params: DrawerParameters) => void
+  setDrawer: (params: TimetableDrawerData) => void
   contracts: Contract[]
   lessons: Lesson[]
 }

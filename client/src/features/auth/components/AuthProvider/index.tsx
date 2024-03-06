@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios'
+import axios from 'axios'
 import jwtDecode from 'jwt-decode'
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -6,28 +6,11 @@ import useInterval from 'react-useinterval'
 
 import { NavigateState } from '../../../../App'
 import UserRole from '../../../../core/enums/UserRole'
+import AuthContextValue from '../../types/AuthContextValue'
+import Jwt from '../../types/Jwt'
 
 const KEY = 'token'
 const MINUTE = 60000
-
-export type JwtType = {
-  exp: number
-  iat: number
-  sub: number
-  username: string
-  role: string
-  state?: string
-}
-
-export type AuthContextValue = {
-  token: string
-  handleLogin: (email: string, password: string) => Promise<void>
-  handleLogout: () => void
-  isAuthed: () => boolean
-  decodeToken: () => JwtType
-  hasRole: (role: UserRole) => boolean
-  API: AxiosInstance
-}
 
 const AuthContext = React.createContext({} as AuthContextValue)
 
@@ -90,7 +73,7 @@ const AuthProvider: React.FC = ({ children }) => {
 
   const isAuthed = () => token !== ''
 
-  const decodeToken = () => jwtDecode<JwtType>(token)
+  const decodeToken = () => jwtDecode<Jwt>(token)
 
   const refreshToken = () => {
     API.get('/auth/refresh')

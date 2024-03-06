@@ -31,14 +31,12 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from "../../../auth/components/AuthProvider";
 import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from "../../../../core/res/Constants";
-import ConfirmationDialog, { ConfirmationDialogProps, defaultConfirmationDialogProps } from "../../../general/components/ConfirmationDialog";
+import ConfirmationDialog from "../../../general/components/ConfirmationDialog";
 import { schoolFormValidation } from "../../../../core/utils/FormValidation";
-import CustomerInvoiceDataSelect, { CustomerInvoiceData } from "../../components/CustomerInvoiceDataSelect";
+import CustomerInvoiceDataSelect from "../../components/CustomerInvoiceDataSelect";
 import IconButtonAdornment from "../../../general/components/IconButtonAdornment";
 import AddTimes from "../../../general/components/AddTimes";
 import ContractList from "../../../general/components/ContractList";
-import UserDocuments, { UserDocumentsType } from "../../../general/components/Documents/UserDocuments";
-import ContractDialog from "../../../timetable/components/ContractDialog/ContractDialog";
 import { Contract } from "../../../../core/types/Contract";
 import SchoolFormErrorTexts from "../../../../core/types/Form/SchoolFormErrorTexts";
 import ClassCustomerFormState from "../../../../core/types/Form/ClassCustomerFormState";
@@ -51,8 +49,13 @@ import TimeSlot from "../../../../core/types/TimeSlot";
 import SchoolType from "../../../../core/enums/SchoolType";
 import UserRole from "../../../../core/enums/UserRole";
 import CustomerType from "../../../../core/enums/CustomerType";
-import { DEFAULT_CLASS_CUSTOMER_FORM_STATE, DEFAULT_SCHOOL_FORM_ERROR_TEXTS, DEFAULT_SCHOOL_FORM_STATE } from "../../../../core/res/Defaults";
+import { DEFAULT_CLASS_CUSTOMER_FORM_STATE, DEFAULT_CONFIRMATION_DIALOG_DATA, DEFAULT_SCHOOL_FORM_ERROR_TEXTS, DEFAULT_SCHOOL_FORM_STATE } from "../../../../core/res/Defaults";
 import { schoolStateToString } from "../../../../core/utils/EnumToString";
+import CustomerInvoiceData from "../../../../core/types/CustomerInvoiceData";
+import ConfirmationDialogData from "../../../../core/types/ConfirmationDialogData";
+import UserDocumentType from "../../../../core/enums/UserDocumentType";
+import UserDocumentList from "../../../general/components/UserDocuments/UserDocumentList";
+import ContractCreateDialog from "../../../timetable/components/ContractDialogs/ContractCreateDialog";
 
 
 
@@ -74,8 +77,8 @@ const SchoolDetailView: React.FC = () => {
   )
   const [addClassDialogOpen, setAddClassDialogOpen] = useState<boolean>(false)
 
-  const [confirmationDialogProps, setConfirmationDialogProps] =
-    useState<ConfirmationDialogProps>(defaultConfirmationDialogProps)
+  const [confirmationDialogData, setConfirmationDialogData] =
+    useState<ConfirmationDialogData>(DEFAULT_CONFIRMATION_DIALOG_DATA)
 
   const [schoolErrors, setSchoolErrors] = useState<SchoolFormErrorTexts>(
     DEFAULT_SCHOOL_FORM_ERROR_TEXTS,
@@ -178,9 +181,9 @@ const SchoolDetailView: React.FC = () => {
   }
 
   const deleteUser = () => {
-    setConfirmationDialogProps({
+    setConfirmationDialogData({
       open: true,
-      setProps: setConfirmationDialogProps,
+      setProps: setConfirmationDialogData,
       title:
         school.deleteState === UserDeleteState.ACTIVE
           ? `${school.schoolName} wirklich archivieren?`
@@ -253,9 +256,9 @@ const SchoolDetailView: React.FC = () => {
   const deleteClass = (index: number) => {
     const classCustomer = classCustomers[index]
 
-    setConfirmationDialogProps({
+    setConfirmationDialogData({
       open: true,
-      setProps: setConfirmationDialogProps,
+      setProps: setConfirmationDialogData,
       title: `${classCustomer.className} wirklich löschen?`,
       text: `Möchtest du die Klasse ${classCustomer.className} wirklich löschen?`,
       action: () => {
@@ -801,8 +804,8 @@ const SchoolDetailView: React.FC = () => {
             userRole={role}
           />
           <h3>Dokumente:</h3>
-          <UserDocuments
-            userDocumentsType={UserDocumentsType.PRIVATE}
+          <UserDocumentList
+            userDocumentsType={UserDocumentType.PRIVATE}
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
           />
           {id && (
@@ -952,8 +955,8 @@ const SchoolDetailView: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
-      <ContractDialog
+      <ConfirmationDialog confirmationDialogData={confirmationDialogData} />
+      <ContractCreateDialog
         key={render}
         open={contractDialogOpen}
         setOpen={setContractDialogOpen}

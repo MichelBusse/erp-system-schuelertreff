@@ -13,11 +13,12 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from "../../../auth/components/AuthProvider";
-import UserDocuments, { UserDocumentsType } from "../../../general/components/Documents/UserDocuments";
 import Subject from "../../../../core/types/Subject";
 import Teacher from "../../../../core/types/Teacher";
 import TeacherSchoolType from "../../../../core/enums/TeacherSchoolType";
 import { teacherDegreeToString, teacherSchoolTypeToString } from "../../../../core/utils/EnumToString";
+import UserDocumentList from "../../../general/components/UserDocuments/UserDocumentList";
+import UserDocumentType from "../../../../core/enums/UserDocumentType";
 
 
 dayjs.extend(customParseFormat)
@@ -134,8 +135,8 @@ const TeacherOverview: React.FC = () => {
             </Stack>
           </Stack>
           <h3>Öffentliche Dokumente:</h3>
-          <UserDocuments
-            userDocumentsType={UserDocumentsType.PUBLIC}
+          <UserDocumentList
+            userDocumentsType={UserDocumentType.PUBLIC}
             userId={Number(id)}
           />
           <Stack

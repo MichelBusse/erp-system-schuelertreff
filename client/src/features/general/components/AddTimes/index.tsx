@@ -17,17 +17,11 @@ import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemAvatar from '@mui/material/ListItemAvatar'
 import ListItemText from '@mui/material/ListItemText'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import { nanoid } from 'nanoid'
 import { useState } from 'react'
 import BetterTimePicker from '../BetterTimePicker'
 import TimeSlot from '../../../../core/types/TimeSlot'
-
-type times = {
-  dow: string
-  start: Dayjs | null
-  end: Dayjs | null
-}
 
 type Props = {
   value: TimeSlot[]
@@ -35,25 +29,22 @@ type Props = {
 }
 
 const AddTimes: React.FC<Props> = ({ value, setValue }) => {
-  const [times, setTimes] = useState<times>({
-    dow: '',
+  const [timeSlot, setTimeSlot] = useState<TimeSlot>({
+    id: nanoid(),
+    dow: 0,
     start: null,
     end: null,
   })
   const addTime = () => {
-    if (times.dow && times.start && times.end) {
+    if (timeSlot.dow != 0 && timeSlot.start && timeSlot.end) {
       setValue([
         ...value,
-        {
-          id: nanoid(),
-          dow: parseInt(times.dow),
-          start: times.start,
-          end: times.end,
-        },
+        timeSlot,
       ])
 
-      setTimes({
-        dow: '',
+      setTimeSlot({
+        id: nanoid(),
+        dow: 0,
         start: null,
         end: null,
       })
@@ -101,12 +92,11 @@ const AddTimes: React.FC<Props> = ({ value, setValue }) => {
             <Select
               id="dow"
               label="Wochentag"
-              value={times.dow}
+              value={timeSlot.dow}
               onChange={(event) =>
-                //TODO fix types
-                setTimes((data) => ({
+                setTimeSlot((data) => ({
                   ...data,
-                  dow: event.target.value,
+                  dow: event.target.value as number,
                 }))
               }
             >
@@ -122,13 +112,13 @@ const AddTimes: React.FC<Props> = ({ value, setValue }) => {
             label="Startzeit"
             minutesStep={5}
             required={true}
-            maxTime={times.end?.subtract(30, 'm')}
-            value={times.start}
+            maxTime={timeSlot.end?.subtract(30, 'm')}
+            value={timeSlot.start}
             onChange={(value) => {
-              setTimes((data) => ({ ...data, start: value }))
+              setTimeSlot((data) => ({ ...data, start: value }))
             }}
             clearValue={() => {
-              setTimes((data) => ({ ...data, start: null }))
+              setTimeSlot((data) => ({ ...data, start: null }))
             }}
           />
           <BetterTimePicker
@@ -136,13 +126,13 @@ const AddTimes: React.FC<Props> = ({ value, setValue }) => {
             label="Endzeit"
             minutesStep={5}
             required={true}
-            minTime={times.start?.add(30, 'm')}
-            value={times.end}
+            minTime={timeSlot.start?.add(30, 'm')}
+            value={timeSlot.end}
             onChange={(value) => {
-              setTimes((data) => ({ ...data, end: value }))
+              setTimeSlot((data) => ({ ...data, end: value }))
             }}
             clearValue={() => {
-              setTimes((data) => ({ ...data, end: null }))
+              setTimeSlot((data) => ({ ...data, end: null }))
             }}
           />
         </Stack>

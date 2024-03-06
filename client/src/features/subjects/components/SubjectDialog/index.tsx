@@ -42,7 +42,6 @@ const SubjectDialog: React.FC<Props> = ({
 
   const { API } = useAuth()
 
-  //TODO: validate filled fields
   const submitForm = () => {
     const errorTexts = subjectFormValidation(data)
 

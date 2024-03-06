@@ -57,7 +57,6 @@ export abstract class User {
   @Column({ nullable: true })
   postalCode: string
 
-  //TODO: E-Mail validation
   @Column({ unique: true, nullable: true })
   email: string
 

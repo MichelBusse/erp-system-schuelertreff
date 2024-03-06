@@ -10,12 +10,7 @@ import {
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import InvoiceDataSelect from '../../../general/components/InvoiceDataSelect'
-
-export type TeacherInvoiceData = {
-  costPerLiter: number
-  consumption: number
-  kilometers: number
-}
+import TeacherInvoiceData from '../../../../core/types/TeacherInvoiceData'
 
 type Props = {
   generateInvoice: (

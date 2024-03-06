@@ -16,13 +16,13 @@ import { useSnackbar } from 'notistack'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
-import { PrevIdProps } from '../../../../App'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import PrivateCustomerDialog from '../../components/PrivateCustomerDialog'
 import PrivateCustomer from "../../../../core/types/PrivateCustomer";
 import { DATA_GRID_LOCALE_TEXT, SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from "../../../../core/res/Constants";
+import PreviousIdPageProps from "../../../../core/types/PreviousIdPageProps";
 
-const PrivateCustomers: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
+const PrivateCustomers: React.FC<PreviousIdPageProps> = ({ prevId, setPrevId }) => {
   const navigate = useNavigate()
   const location = useLocation()
   const { API } = useAuth()

@@ -16,7 +16,6 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
-import { PrevIdProps } from "../../../../App";
 import { useAuth } from "../../../auth/components/AuthProvider";
 import { degreeOperator, schoolTypesOperator, stateOperator, subjectOperator } from "../../../../core/utils/TeacherFilterData";
 import { DATA_GRID_LOCALE_TEXT } from "../../../../core/res/Constants";
@@ -25,8 +24,9 @@ import Teacher from "../../../../core/types/Teacher";
 import Subject from "../../../../core/types/Subject";
 import TeacherState from "../../../../core/enums/TeacherState";
 import { teacherStateToString } from "../../../../core/utils/EnumToString";
+import PreviousIdPageProps from "../../../../core/types/PreviousIdPageProps";
 
-const Applicants: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
+const Applicants: React.FC<PreviousIdPageProps> = ({ prevId, setPrevId }) => {
   const [open, setOpen] = useState(false)
   const [renderDialog, setRenderDialog] = useState(0)
   const [teachers, setTeachers] = useState<Teacher[]>([])

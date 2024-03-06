@@ -4,12 +4,12 @@ import { Box, IconButton, Stack, Typography } from '@mui/material'
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 
-import { CockpitComponent } from '../../pages/Cockpit'
 import ContractList from '../../../general/components/ContractList'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import { Contract } from '../../../../core/types/Contract'
+import DashboardProps from '../../../../core/types/DashboardProps'
 
-const DailyContracts: CockpitComponent = ({ listSx }) => {
+export default function DailyContracts({ listSx } : DashboardProps) {
   const { API } = useAuth()
   const [contracts, setContracts] = useState<Contract[]>([])
   const [date, setDate] = useState<Dayjs>(dayjs())
@@ -64,5 +64,3 @@ const DailyContracts: CockpitComponent = ({ listSx }) => {
     </>
   )
 }
-
-export default DailyContracts

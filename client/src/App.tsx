@@ -9,9 +9,8 @@ import { useState } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
 import { useAuth } from './features/auth/components/AuthProvider'
-import { Forbidden, NotFound } from './features/general/pages/Error'
 import Layout from './features/general/components/Layout'
-import Cockpit from './features/dashboard/pages/Cockpit'
+import Dashboard from './features/dashboard/pages/Dashboard'
 import Timetable from './features/timetable/pages/Timetable'
 import TeacherOverview from './features/teachers/pages/TeacherOverview'
 import LessonDetailView from './features/timetable/pages/LessonDetailView'
@@ -24,9 +23,11 @@ import TeacherDetailView from './features/teachers/pages/TeacherDetailView'
 import Applicants from './features/teachers/pages/Applicants'
 import Subjects from './features/subjects/pages/Subjects'
 import Login from './features/auth/pages/Login'
-import Reset from './features/auth/pages/Reset'
+import ResetPassword from './features/auth/pages/ResetPassword'
 import UserRole from './core/enums/UserRole'
 import TeacherState from './core/enums/TeacherState'
+import ForbiddenError from './features/general/pages/ForbiddenError'
+import NotFoundError from './features/general/pages/NotFoundError'
 
 export type NavigateState = { from: Location }
 
@@ -50,7 +51,7 @@ const ProtectedRoute: React.FC<{ roles?: UserRole[] }> = ({
   if (!isAuthed()) {
     return <Navigate to="/login" replace state={{ from: location }} />
   } else if (roles.length > 0 && !roles.some((r) => r === decodeToken().role)) {
-    return <Forbidden />
+    return <ForbiddenError />
   }
 
   return <>{children}</>
@@ -65,11 +66,6 @@ const theme = createTheme({
     // },
   },
 })
-
-export type PrevIdProps = {
-  prevId?: number
-  setPrevId?: React.Dispatch<React.SetStateAction<number | undefined>>
-}
 
 const App: React.FC = () => {
   const { isAuthed, hasRole } = useAuth()
@@ -95,7 +91,7 @@ const App: React.FC = () => {
                 path="cockpit"
                 element={
                   <ProtectedRoute>
-                    <Cockpit />
+                    <Dashboard />
                   </ProtectedRoute>
                 }
               ></Route>
@@ -248,10 +244,10 @@ const App: React.FC = () => {
 
             <Route path="reset">
               <Route path="" element={<Navigate to="/" replace={true} />} />
-              <Route path=":token" element={<Reset />} />
+              <Route path=":token" element={<ResetPassword />} />
             </Route>
 
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<NotFoundError />} />
           </Routes>
         </SnackbarProvider>
       </ThemeProvider>

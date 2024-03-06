@@ -1,7 +1,11 @@
+import LeaveState from '../enums/LeaveState'
+import LeaveType from '../enums/LeaveType'
 import SchoolState from '../enums/SchoolState'
 import SchoolType from '../enums/SchoolType'
 import TeacherState from '../enums/TeacherState'
+import ConfirmationDialogData from '../types/ConfirmationDialogData'
 import ClassCustomerFormState from '../types/Form/ClassCustomerFormState'
+import LeaveFormState from '../types/Form/LeaveFormState'
 import PrivateCustomerFormErrorTexts from '../types/Form/PrivateCustomerFormErrorTexts'
 import PrivateCustomerFormState from '../types/Form/PrivateCustomerFormState'
 import SchoolFormErrorTexts from '../types/Form/SchoolFormErrorTexts'
@@ -151,4 +155,20 @@ export const DEFAULT_SUBJECT_FORM_ERROR_TEXTS : SubjectFormErrorTexts = {
   name: '',
   shortForm: '',
   valid: true,
+}
+
+export const DEFAULT_CONFIRMATION_DIALOG_DATA: ConfirmationDialogData = {
+  open: false,
+  setProps: () => {},
+  title: '',
+  text: '',
+  action: () => {},
+}
+
+export const DEFAULT_LEAVE_FORM_STATE: LeaveFormState = {
+  type: LeaveType.REGULAR,
+  state: LeaveState.PENDING,
+  startDate: null,
+  endDate: null,
+  hasAttachment: false,
 }

@@ -2,18 +2,13 @@ import styles from "../../../../core/styles/gridList.module.scss";
 
 import { FolderDelete, IosShare as IosShareIcon } from '@mui/icons-material'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import { Autocomplete, IconButton, TextField } from '@mui/material'
-import { Box } from '@mui/system'
+import { IconButton } from '@mui/material'
 import {
   DataGrid,
   getGridStringOperators,
-  GridCellParams,
   GridColumns,
   GridColumnVisibilityModel,
   GridEventListener,
-  GridFilterInputValueProps,
-  GridFilterItem,
-  GridFilterOperator,
   GridRowSpacingParams,
   GridToolbarContainer,
   GridToolbarFilterButton,
@@ -22,86 +17,14 @@ import { useSnackbar } from 'notistack'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
-import { PrevIdProps } from "../../../../App";
 import { useAuth } from "../../../auth/components/AuthProvider";
 import { DATA_GRID_LOCALE_TEXT, SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from "../../../../core/res/Constants";
 import SchoolDialog from "../../components/SchoolDialog";
-import SchoolType from "../../../../core/enums/SchoolType";
 import School from "../../../../core/types/School";
+import { SchoolTypeFilterOperator } from "../../../../core/res/Filters";
+import PreviousIdPageProps from "../../../../core/types/PreviousIdPageProps";
 
-const SubjectsFilterInputValue: React.FC<GridFilterInputValueProps> = ({
-  item,
-  applyValue,
-}) => {
-  return (
-    <Box
-      sx={{
-        display: 'inline-flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        height: 48,
-      }}
-    >
-      <Autocomplete
-        id="schoolTypes"
-        options={[
-          SchoolType.GRUNDSCHULE,
-          SchoolType.OBERSCHULE,
-          SchoolType.GYMNASIUM,
-          SchoolType.ANDERE,
-        ]}
-        getOptionLabel={(option) => {
-          switch (option) {
-            case SchoolType.GRUNDSCHULE:
-              return 'Grundschule'
-            case SchoolType.OBERSCHULE:
-              return 'Oberschule'
-            case SchoolType.GYMNASIUM:
-              return 'Gymnasium'
-            case SchoolType.ANDERE:
-              return 'Andere'
-            default:
-              return ''
-          }
-        }}
-        value={item.value}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            variant="standard"
-            label="Schulart"
-            sx={{ minWidth: '150px' }}
-          />
-        )}
-        onChange={(event, newValue) => {
-          applyValue({ ...item, value: newValue })
-        }}
-      />
-    </Box>
-  )
-}
-
-const schoolTypesOperator: GridFilterOperator = {
-  label: 'enthalten',
-  value: 'includes',
-  getApplyFilterFn: (filterItem: GridFilterItem) => {
-    if (
-      !filterItem.columnField ||
-      !filterItem.value ||
-      !filterItem.operatorValue
-    ) {
-      return null
-    }
-
-    return (params: GridCellParams): boolean => {
-      return params.value.includes(filterItem.value)
-    }
-  },
-  InputComponent: SubjectsFilterInputValue,
-  InputComponentProps: { type: 'string' },
-}
-
-const Schools: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
+const Schools: React.FC<PreviousIdPageProps> = ({ prevId, setPrevId }) => {
   const navigate = useNavigate()
   const location = useLocation()
   const { API } = useAuth()
@@ -202,7 +125,7 @@ const Schools: React.FC<PrevIdProps> = ({ prevId, setPrevId }) => {
       field: 'schoolTypes',
       headerClassName: 'DataGridHead',
       headerName: 'Schulart',
-      filterOperators: [schoolTypesOperator],
+      filterOperators: [SchoolTypeFilterOperator],
       renderCell: () => <></>,
     },
   ]

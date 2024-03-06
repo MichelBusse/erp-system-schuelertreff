@@ -14,10 +14,10 @@ import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import { CockpitComponent } from '../../pages/Cockpit'
 import Teacher from '../../../../core/types/Teacher'
+import DashboardProps from '../../../../core/types/DashboardProps'
 
-const ApplicationMeetings: CockpitComponent = ({ listSx }) => {
+export default function ApplicationMeetings({ listSx } : DashboardProps) {
   const { API } = useAuth()
   const [teachers, setTeachers] = useState<Partial<Teacher>[]>([])
   const [date, setDate] = useState<Dayjs>(dayjs())
@@ -95,5 +95,3 @@ const ApplicationMeetings: CockpitComponent = ({ listSx }) => {
     </>
   )
 }
-
-export default ApplicationMeetings

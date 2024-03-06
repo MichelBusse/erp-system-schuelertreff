@@ -7,22 +7,8 @@ import {
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import React from 'react'
-import { NavLink as NavLinkBase, NavLinkProps } from 'react-router-dom'
 import { useAuth } from '../../../auth/components/AuthProvider'
-
-
-const NavLink = React.forwardRef<HTMLAnchorElement, NavLinkProps>(
-  (props, ref) => (
-    <NavLinkBase
-      ref={ref}
-      {...props}
-      className={({ isActive }) =>
-        `${props.className} ${isActive && 'Mui-selected'}`
-      }
-    />
-  ),
-)
-NavLink.displayName = 'NavLink' // for debugging
+import MenuLink from '../MenuLink'
 
 export type BottomMenuProps = {
   items: Array<{
@@ -60,7 +46,7 @@ const BottomMenu: React.FC<BottomMenuProps> = ({ items }) => {
           .map((item, i) => (
             <BottomNavigationAction
               key={i}
-              component={NavLink}
+              component={MenuLink}
               icon={<item.icon />}
               to={item.href}
               sx={{ minWidth: '0px' }}

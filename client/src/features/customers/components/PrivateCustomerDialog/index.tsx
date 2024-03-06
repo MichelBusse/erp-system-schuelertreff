@@ -43,7 +43,6 @@ const PrivateCustomerDialog: React.FC<Props> = ({
   const { API } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
 
-  //TODO: validate filled fields
   const submitForm = () => {
     const errorTexts = privateCustomerFormValidation(data)
 

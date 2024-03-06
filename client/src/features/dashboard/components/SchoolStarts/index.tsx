@@ -13,12 +13,11 @@ import {
 import dayjs, { Dayjs } from 'dayjs'
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-
-import { CockpitComponent } from '../../pages/Cockpit'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import School from '../../../../core/types/School'
+import DashboardProps from '../../../../core/types/DashboardProps'
 
-const SchoolStarts: CockpitComponent = ({ listSx }) => {
+export default function SchoolStarts({ listSx } : DashboardProps) {
   const { API } = useAuth()
   const [schools, setSchools] = useState<Partial<School>[]>([])
   const [date, setDate] = useState<Dayjs>(dayjs())
@@ -91,5 +90,3 @@ const SchoolStarts: CockpitComponent = ({ listSx }) => {
     </>
   )
 }
-
-export default SchoolStarts

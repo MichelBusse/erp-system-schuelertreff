@@ -31,11 +31,10 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import { SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
-import ConfirmationDialog, { defaultConfirmationDialogProps } from '../../../general/components/ConfirmationDialog'
-import TeacherInvoiceDataSelect, { TeacherInvoiceData } from '../../components/TeacherInvoiceDateSelect'
+import ConfirmationDialog from '../../../general/components/ConfirmationDialog'
 import IconButtonAdornment from '../../../general/components/IconButtonAdornment'
 import AddTimes from '../../../general/components/AddTimes'
-import UserDocuments, { UserDocumentsType } from '../../../general/components/Documents/UserDocuments'
+import UserDocumentList from '../../../general/components/UserDocuments/UserDocumentList'
 import TeacherFormState from '../../../../core/types/Form/TeacherFormState'
 import Subject from '../../../../core/types/Subject'
 import TeacherFormErrorTexts from '../../../../core/types/Form/TeacherFormErrorTexts'
@@ -47,9 +46,12 @@ import TeacherDegree from '../../../../core/enums/TeacherDegree'
 import TeacherState from '../../../../core/enums/TeacherState'
 import Leave from '../../../../core/types/Leave'
 import LeaveOverview from '../../components/Leaves/LeaveOverview'
-import { DEFAULT_TEACHER_FORM_ERROR_TEXTS, DEFAULT_TEACHER_FORM_STATE } from '../../../../core/res/Defaults'
+import { DEFAULT_CONFIRMATION_DIALOG_DATA, DEFAULT_TEACHER_FORM_ERROR_TEXTS, DEFAULT_TEACHER_FORM_STATE } from '../../../../core/res/Defaults'
 import { efzFormValidation, teacherFormValidation, workContractFormValidation } from '../../../../core/utils/FormValidation'
 import { teacherSchoolTypeToString, teacherStateToString } from '../../../../core/utils/EnumToString'
+import UserDocumentType from '../../../../core/enums/UserDocumentType'
+import TeacherInvoiceDataSelect from '../../components/TeacherInvoiceDateSelect'
+import TeacherInvoiceData from '../../../../core/types/TeacherInvoiceData'
 
 dayjs.extend(customParseFormat)
 
@@ -78,8 +80,8 @@ const TeacherDetailView: React.FC = () => {
   const requestedId = id ?? 'me'
   const activeTeacherState = decodeToken().state
 
-  const [confirmationDialogProps, setConfirmationDialogProps] =
-    useState(defaultConfirmationDialogProps)
+  const [confirmationDialogData, setConfirmationDialogData] =
+    useState(DEFAULT_CONFIRMATION_DIALOG_DATA)
 
   // refresh data if teacher state is updated (i.e. application accepted)
   useEffect(() => {
@@ -209,9 +211,9 @@ const TeacherDetailView: React.FC = () => {
   }
 
   const deleteUser = () => {
-    setConfirmationDialogProps({
+    setConfirmationDialogData({
       open: true,
-      setProps: setConfirmationDialogProps,
+      setProps: setConfirmationDialogData,
       title:
         data.deleteState === UserDeleteState.ACTIVE
           ? 'Lehrkraft wirklich archivieren?'
@@ -786,10 +788,10 @@ const TeacherDetailView: React.FC = () => {
             </>
           )}
           <h3>Dokumente:</h3>
-          <UserDocuments
+          <UserDocumentList
             refresh={refreshDocuments}
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
-            userDocumentsType={UserDocumentsType.PRIVATE}
+            userDocumentsType={UserDocumentType.PRIVATE}
             actions={
               id &&
               (data.state === TeacherState.CONTRACT ||
@@ -814,8 +816,8 @@ const TeacherDetailView: React.FC = () => {
             }
           />
           <h3>Öffentliche Dokumente:</h3>
-          <UserDocuments
-            userDocumentsType={UserDocumentsType.PUBLIC}
+          <UserDocumentList
+            userDocumentsType={UserDocumentType.PUBLIC}
             refresh={refreshDocuments}
             userId={requestedId !== 'me' ? parseInt(requestedId) : undefined}
           />
@@ -844,8 +846,6 @@ const TeacherDetailView: React.FC = () => {
             <Button
               variant="contained"
               onClick={() => submitForm()}
-              // TODO: rework form validation to provide more direct feedback to user
-              // disabled={!formValidation('teacher', data).validation}
             >
               Speichern
             </Button>
@@ -944,7 +944,7 @@ const TeacherDetailView: React.FC = () => {
         </Stack>
       </Box>
 
-      <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
+      <ConfirmationDialog confirmationDialogData={confirmationDialogData} />
 
       <Dialog open={applicationMeetingRequestDialogOpen}>
         <DialogContent>

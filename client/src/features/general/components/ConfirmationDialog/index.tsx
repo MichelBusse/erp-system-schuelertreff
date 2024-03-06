@@ -6,54 +6,38 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@mui/material'
-
-export type ConfirmationDialogProps = {
-  open: boolean
-  setProps: React.Dispatch<React.SetStateAction<ConfirmationDialogProps>>
-  title: string
-  text: string
-  action: () => void
-  actionText?: string
-}
-
-export const defaultConfirmationDialogProps: ConfirmationDialogProps = {
-  open: false,
-  setProps: () => {},
-  title: '',
-  text: '',
-  action: () => {},
-}
+import ConfirmationDialogData from '../../../../core/types/ConfirmationDialogData'
 
 const ConfirmationDialog: React.FC<{
-  confirmationDialogProps: ConfirmationDialogProps
-}> = ({ confirmationDialogProps }) => (
+  confirmationDialogData: ConfirmationDialogData
+}> = ({ confirmationDialogData }) => (
   <Dialog
-    open={confirmationDialogProps.open}
+    open={confirmationDialogData.open}
     keepMounted
     aria-describedby="alert-dialog-slide-description"
     sx={{ zIndex: 2000 }}
   >
-    <DialogTitle>{confirmationDialogProps.title}</DialogTitle>
+    <DialogTitle>{confirmationDialogData.title}</DialogTitle>
     <DialogContent>
       <DialogContentText id="alert-dialog-slide-description">
-        {confirmationDialogProps.text}
+        {confirmationDialogData.text}
       </DialogContentText>
     </DialogContent>
     <DialogActions>
       <Button
         onClick={() =>
-          confirmationDialogProps.setProps(defaultConfirmationDialogProps)
+          confirmationDialogData.setProps(confirmationDialogData)
         }
       >
         Abbrechen
       </Button>
       <Button
         onClick={() => {
-          confirmationDialogProps.action()
-          confirmationDialogProps.setProps(defaultConfirmationDialogProps)
+          confirmationDialogData.action()
+          confirmationDialogData.setProps(confirmationDialogData)
         }}
       >
-        {confirmationDialogProps.actionText ?? 'Bestätigen'}
+        {confirmationDialogData.actionText ?? 'Bestätigen'}
       </Button>
     </DialogActions>
   </Dialog>

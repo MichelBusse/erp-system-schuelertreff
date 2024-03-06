@@ -2,12 +2,12 @@ import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material'
 import { Button, IconButton, List, ListItem, ListItemText } from '@mui/material'
 import dayjs from 'dayjs'
 import { useState } from 'react'
-import LeaveDialog, { LeaveForm } from '../LeaveDialog'
+import LeaveDialog from '../LeaveDialog'
 import { formatDate } from '../../../../../core/utils/DateUtils'
-import LeaveType from '../../../../../core/enums/LeaveType'
 import Leave from '../../../../../core/types/Leave'
-import LeaveState from '../../../../../core/enums/LeaveState'
 import { leaveStateToString, leaveTypeToString } from '../../../../../core/utils/EnumToString'
+import LeaveFormState from '../../../../../core/types/Form/LeaveFormState'
+import { DEFAULT_LEAVE_FORM_STATE } from '../../../../../core/res/Defaults'
 
 type Props = {
   value: Leave[]
@@ -15,20 +15,12 @@ type Props = {
   userId: string
 }
 
-const defaultFormData: LeaveForm = {
-  type: LeaveType.REGULAR,
-  state: LeaveState.PENDING,
-  startDate: null,
-  endDate: null,
-  hasAttachment: false,
-}
-
 const LeaveOverview: React.FC<Props> = ({ value, setValue, userId }) => {
   const [open, setOpen] = useState(false)
-  const [form, setForm] = useState(defaultFormData)
+  const [form, setForm] = useState(DEFAULT_LEAVE_FORM_STATE)
   const [render, setRender] = useState(0)
 
-  const openDialog = (form: LeaveForm) => {
+  const openDialog = (form: LeaveFormState) => {
     setRender((r) => r + 1)
     setForm(form)
     setOpen(true)
@@ -79,7 +71,7 @@ const LeaveOverview: React.FC<Props> = ({ value, setValue, userId }) => {
           <Button
             variant="text"
             endIcon={<AddIcon />}
-            onClick={() => openDialog(defaultFormData)}
+            onClick={() => openDialog(DEFAULT_LEAVE_FORM_STATE)}
           >
             Hinzufügen
           </Button>

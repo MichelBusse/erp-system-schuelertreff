@@ -16,16 +16,15 @@ import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { Contract } from '../../../../core/types/Contract'
 import { useAuth } from '../../../auth/components/AuthProvider'
-import ConfirmationDialog, {
-  defaultConfirmationDialogProps,
-} from '../ConfirmationDialog'
+import ConfirmationDialog from '../ConfirmationDialog'
 import {
   SNACKBAR_OPTIONS,
   SNACKBAR_OPTIONS_ERROR,
 } from '../../../../core/res/Constants'
-import ContractDialog from '../../../timetable/components/ContractDialog/ContractDialog'
 import ContractState from '../../../../core/enums/ContractState'
 import { contractStateToString, contractTypeToString } from '../../../../core/utils/EnumToString'
+import { DEFAULT_CONFIRMATION_DIALOG_DATA } from '../../../../core/res/Defaults'
+import ContractCreateDialog from '../../../timetable/components/ContractDialogs/ContractCreateDialog'
 
 type Props = {
   contracts: Contract[]
@@ -49,17 +48,17 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
   const [render, setRender] = useState<number>(0)
   const [initialContract, setInitialContract] = useState<Contract | undefined>()
   const [open, setOpen] = useState<boolean>(false)
-  const [confirmationDialogProps, setConfirmationDialogProps] = useState(
-    defaultConfirmationDialogProps,
+  const [confirmationDialogData, setConfirmationDialogData] = useState(
+    DEFAULT_CONFIRMATION_DIALOG_DATA,
   )
 
   const theme = useTheme()
   const [showPast, setShowPast] = useState(false)
 
   const deleteContract = (contractId: number) => {
-    setConfirmationDialogProps({
+    setConfirmationDialogData({
       open: true,
-      setProps: setConfirmationDialogProps,
+      setProps: setConfirmationDialogData,
       title: 'Einsatz wirklich löschen?',
       text: 'Es werden auch alle gehaltenen Stunden gelöscht und dieser Vorgang kann nicht mehr rückgängig gemacht werden.',
       action: () => {
@@ -228,7 +227,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
             </ListItem>
           ))}
       </List>
-      <ContractDialog
+      <ContractCreateDialog
         key={render}
         open={open}
         setOpen={setOpen}
@@ -237,7 +236,7 @@ const ContractList: React.FC<React.PropsWithChildren<Props>> = ({
         }}
         initialContract={initialContract}
       />
-      <ConfirmationDialog confirmationDialogProps={confirmationDialogProps} />
+      <ConfirmationDialog confirmationDialogData={confirmationDialogData} />
     </>
   )
 }

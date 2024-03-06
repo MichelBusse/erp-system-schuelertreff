@@ -7,14 +7,14 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import { SNACKBAR_OPTIONS_ERROR } from '../../../../core/res/Constants'
 import MultiCalendar from '../MultiCalendar'
-import { DrawerParameters } from '../../pages/Timetable'
 import { Contract } from '../../../../core/types/Contract'
 import Lesson from '../../../../core/types/Lesson'
 import Teacher from '../../../../core/types/Teacher'
+import TimetableDrawerData from '../../../../core/types/TimetableDrawerData'
 
 type Props = {
   date: Dayjs
-  setDrawer: (params: DrawerParameters) => void
+  setDrawer: (params: TimetableDrawerData) => void
   openDialog: () => void
   refresh?: number
 }
