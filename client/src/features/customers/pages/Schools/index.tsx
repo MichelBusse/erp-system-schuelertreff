@@ -21,8 +21,8 @@ import { useAuth } from "../../../auth/components/AuthProvider";
 import { DATA_GRID_LOCALE_TEXT, SNACKBAR_OPTIONS, SNACKBAR_OPTIONS_ERROR } from "../../../../core/res/Constants";
 import SchoolDialog from "../../components/SchoolDialog";
 import School from "../../../../core/types/School";
-import { SchoolTypeFilterOperator } from "../../../../core/res/Filters";
 import PreviousIdPageProps from "../../../../core/types/PreviousIdPageProps";
+import { SchoolTypeFilterOperator } from "../../../../core/res/FilterOperators";
 
 const Schools: React.FC<PreviousIdPageProps> = ({ prevId, setPrevId }) => {
   const navigate = useNavigate()

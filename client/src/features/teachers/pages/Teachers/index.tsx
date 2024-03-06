@@ -20,11 +20,6 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
 import { useAuth } from '../../../auth/components/AuthProvider'
 import {
-  degreeOperator,
-  schoolTypesOperator,
-  subjectOperator,
-} from '../../../../core/utils/TeacherFilterData'
-import {
   DATA_GRID_LOCALE_TEXT,
   SNACKBAR_OPTIONS,
   SNACKBAR_OPTIONS_ERROR,
@@ -35,6 +30,7 @@ import Subject from '../../../../core/types/Subject'
 import TeacherState from '../../../../core/enums/TeacherState.enum'
 import { teacherStateToString } from '../../../../core/utils/EnumToString'
 import PreviousIdPageProps from '../../../../core/types/PreviousIdPageProps'
+import { SubjectsFilterOperator, TeacherDegreeFilterOperator, TeacherSchoolTypeFilterOperator } from '../../../../core/res/FilterOperators'
 
 const Teachers: React.FC<PreviousIdPageProps> = ({ prevId, setPrevId }) => {
   const navigate = useNavigate()
@@ -125,7 +121,7 @@ const Teachers: React.FC<PreviousIdPageProps> = ({ prevId, setPrevId }) => {
       // width: 650,
       //hide: true,
       flex: 1,
-      filterOperators: [subjectOperator],
+      filterOperators: [SubjectsFilterOperator],
       renderCell: (params) => (
         <Stack direction="row" spacing={2}>
           {params.value?.map((subject: Subject) => (
@@ -151,7 +147,7 @@ const Teachers: React.FC<PreviousIdPageProps> = ({ prevId, setPrevId }) => {
       field: 'degree',
       headerClassName: 'DataGridHead',
       headerName: 'Abschluss',
-      filterOperators: [degreeOperator],
+      filterOperators: [TeacherDegreeFilterOperator],
       renderCell: () => <></>,
     },
     {
@@ -180,7 +176,7 @@ const Teachers: React.FC<PreviousIdPageProps> = ({ prevId, setPrevId }) => {
       // width: 650,
       // hide: true,
       flex: 1,
-      filterOperators: [schoolTypesOperator],
+      filterOperators: [TeacherSchoolTypeFilterOperator],
       renderCell: () => <></>,
     },
   ]

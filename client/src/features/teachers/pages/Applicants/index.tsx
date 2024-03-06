@@ -17,7 +17,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import useMeasure from 'react-use-measure'
 import { useAuth } from "../../../auth/components/AuthProvider";
-import { degreeOperator, schoolTypesOperator, stateOperator, subjectOperator } from "../../../../core/utils/TeacherFilterData";
 import { DATA_GRID_LOCALE_TEXT } from "../../../../core/res/Constants";
 import TeacherDialog from "../../components/TeacherDialog";
 import Teacher from "../../../../core/types/Teacher";
@@ -25,6 +24,7 @@ import Subject from "../../../../core/types/Subject";
 import TeacherState from "../../../../core/enums/TeacherState.enum";
 import { teacherStateToString } from "../../../../core/utils/EnumToString";
 import PreviousIdPageProps from "../../../../core/types/PreviousIdPageProps";
+import { SubjectsFilterOperator, TeacherDegreeFilterOperator, TeacherSchoolTypeFilterOperator, TeacherStateFilterOperator } from "../../../../core/res/FilterOperators";
 
 const Applicants: React.FC<PreviousIdPageProps> = ({ prevId, setPrevId }) => {
   const [open, setOpen] = useState(false)
@@ -114,7 +114,7 @@ const Applicants: React.FC<PreviousIdPageProps> = ({ prevId, setPrevId }) => {
       // width: 650,
       //hide: true,
       flex: 1,
-      filterOperators: [subjectOperator],
+      filterOperators: [SubjectsFilterOperator],
       renderCell: (params) => (
         <Stack direction="row" spacing={2}>
           {params.value?.map((subject: Subject) => (
@@ -140,7 +140,7 @@ const Applicants: React.FC<PreviousIdPageProps> = ({ prevId, setPrevId }) => {
       field: 'degree',
       headerClassName: 'DataGridHead',
       headerName: 'Abschluss',
-      filterOperators: [degreeOperator],
+      filterOperators: [TeacherDegreeFilterOperator],
       renderCell: () => <></>,
     },
     {
@@ -149,7 +149,7 @@ const Applicants: React.FC<PreviousIdPageProps> = ({ prevId, setPrevId }) => {
       headerName: 'Status',
       minWidth: 150,
       flex: 0,
-      filterOperators: [stateOperator],
+      filterOperators: [TeacherStateFilterOperator],
       renderCell: (params) => (
         <div
           style={{
@@ -169,7 +169,7 @@ const Applicants: React.FC<PreviousIdPageProps> = ({ prevId, setPrevId }) => {
       // width: 650,
       // hide: true,
       flex: 1,
-      filterOperators: [schoolTypesOperator],
+      filterOperators: [TeacherSchoolTypeFilterOperator],
       renderCell: () => <></>,
     },
   ]

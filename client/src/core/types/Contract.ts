@@ -2,8 +2,8 @@ import ContractState from '../enums/ContractState.enum'
 import ContractType from '../enums/ContractType.enum'
 import Customer from './Customer'
 import Teacher from './Teacher'
-import Lesson from './Lesson'
 import subject from './Subject'
+import Lesson from './Lesson'
 
 export type Contract = {
   id: number
