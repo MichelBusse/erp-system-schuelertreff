@@ -4,6 +4,9 @@ import { IsValidDate } from 'src/IsValidDate.decorator'
 
 import { LeaveState, LeaveType } from '../entities/leave.entity'
 
+/**
+ * Schema for creating a updating a leave
+ */ 
 export class LeaveDto {
   @IsString()
   @IsValidDate()

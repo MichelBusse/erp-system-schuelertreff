@@ -4,6 +4,9 @@ import { IsInt, IsOptional, Max, Min } from 'class-validator'
 import { IsTime24h } from 'src/IsTime24h.decorator'
 import { IsValidDate } from 'src/IsValidDate.decorator'
 
+/**
+ * Schema for requesting time slot suggestions
+ */ 
 export class SuggestContractsDto {
   @IsInt()
   subjectId: number

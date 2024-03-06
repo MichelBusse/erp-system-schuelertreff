@@ -4,7 +4,10 @@ import { IsValidDate } from 'src/IsValidDate.decorator'
 
 import { LessonState } from '../lesson.entity'
 
-export class CreateLessonDto {
+/**
+ * Schema for creating or updating a lesson
+ */ 
+export class LessonDto {
   @IsValidDate()
   date: string
 

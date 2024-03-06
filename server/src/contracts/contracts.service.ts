@@ -10,7 +10,6 @@ import { Brackets, DataSource, Repository } from 'typeorm'
 
 import { LessonsService } from 'src/lessons/lessons.service'
 import { SubjectsService } from 'src/subjects/subjects.service'
-import { timeAvailable } from 'src/users/dto/timeAvailable'
 import { Customer, User } from 'src/users/entities'
 import { SchoolType, TeacherSchoolType } from 'src/users/entities/user.entity'
 import { parseMultirange, UsersService } from 'src/users/users.service'
@@ -19,6 +18,7 @@ import { Contract, ContractState } from './contract.entity'
 import { AcceptOrDeclineContractDto } from './dto/accept-or-decline-contract-dto'
 import { CreateContractDto } from './dto/create-contract.dto'
 import { SuggestContractsDto } from './dto/suggest-contracts.dto'
+import { TimeSlot } from 'src/users/models/TimeSlot'
 
 @Injectable()
 export class ContractsService {
@@ -616,7 +616,7 @@ export class ContractsService {
     return suggestions.filter((s) => s.suggestions.length > 0)
   }
 
-  durationMinutes(range: timeAvailable): number {
+  durationMinutes(range: TimeSlot): number {
     return dayjs('2001-01-01 ' + range.end).diff(
       '2001-01-01 ' + range.start,
       'minute',
@@ -630,7 +630,7 @@ export class ContractsService {
   async checkOverlap(
     teacherId: number,
     customers: number[],
-    range: timeAvailable,
+    range: TimeSlot,
     ignoreContracts: number[],
     startDate?: string,
     endDate?: string | null,

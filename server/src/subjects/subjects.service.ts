@@ -5,7 +5,7 @@ import { DataSource, Repository } from 'typeorm'
 import { Contract } from 'src/contracts/contract.entity'
 import { Teacher } from 'src/users/entities'
 
-import { CreateSubjectDto } from './dto/create-subject.dto'
+import { SubjectDto } from './dto/subject.dto'
 import { Subject } from './subject.entity'
 
 @Injectable()
@@ -17,7 +17,7 @@ export class SubjectsService {
     private connection: DataSource,
   ) {}
 
-  create(createUserDto: CreateSubjectDto): Promise<Subject> {
+  create(createUserDto: SubjectDto): Promise<Subject> {
     const subject = new Subject()
     subject.name = createUserDto.name
     subject.color = createUserDto.color
@@ -26,7 +26,7 @@ export class SubjectsService {
     return this.subjectsRepository.save(subject)
   }
 
-  async update(id: number, createUserDto: CreateSubjectDto): Promise<Subject> {
+  async update(id: number, createUserDto: SubjectDto): Promise<Subject> {
     const subject = await this.subjectsRepository.findOneByOrFail({ id })
 
     subject.name = createUserDto.name

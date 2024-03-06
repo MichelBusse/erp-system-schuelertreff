@@ -8,8 +8,11 @@ import {
 } from 'class-validator'
 
 import { SchoolType } from '../entities/user.entity'
-import { timeAvailable } from './timeAvailable'
+import { TimeSlot } from '../models/TimeSlot'
 
+/**
+ * Schema for creating a class customer
+ */ 
 export class CreateClassCustomerDto {
   @IsNotEmpty()
   className: string
@@ -18,9 +21,9 @@ export class CreateClassCustomerDto {
   school: number
 
   @IsArray()
-  @Type(() => timeAvailable)
+  @Type(() => TimeSlot)
   @ValidateNested({ each: true })
-  timesAvailable: timeAvailable[]
+  timesAvailable: TimeSlot[]
 
   @IsEnum(SchoolType)
   schoolType: SchoolType

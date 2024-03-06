@@ -1,16 +1,17 @@
 import { IsBoolean, IsNotEmpty, IsOptional } from 'class-validator'
 
 import { IsValidDate } from 'src/IsValidDate.decorator'
+import { CreateUserDto } from './create-user.dto'
 
-export class CreateTeacherDto {
+/**
+ * Schema for creating a teacher
+ */ 
+export class CreateTeacherDto extends CreateUserDto {
   @IsNotEmpty()
   lastName: string
 
   @IsNotEmpty()
   firstName: string
-
-  @IsNotEmpty()
-  email: string
 
   @IsOptional()
   applicationLocation: string

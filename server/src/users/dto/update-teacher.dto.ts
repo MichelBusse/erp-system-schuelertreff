@@ -8,6 +8,9 @@ import { TeacherState } from '../entities/teacher.entity'
 import { TeacherSchoolType } from '../entities/user.entity'
 import { UpdateUserDto } from './update-user.dto'
 
+/**
+ * Schema for updating a teacher
+ */ 
 export class UpdateTeacherDto extends UpdateUserDto {
   @IsOptional()
   fee: number

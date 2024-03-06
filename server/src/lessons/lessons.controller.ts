@@ -18,9 +18,9 @@ import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 import { Contract } from 'src/contracts/contract.entity'
 
-import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Lesson } from './lesson.entity'
 import { LessonsService } from './lessons.service'
+import { LessonDto } from './dto/lesson.dto'
 
 @Controller('lessons')
 export class LessonsController {
@@ -129,7 +129,7 @@ export class LessonsController {
   @Post()
   async updateOrCreate(
     @Request() req,
-    @Body() dto: CreateLessonDto,
+    @Body() dto: LessonDto,
   ): Promise<Lesson> {
     if (!(await this.lessonsService.validateDate(dto.date, dto.contractId)))
       throw new BadRequestException('Datum ist nicht gültig für diesen Einsatz')

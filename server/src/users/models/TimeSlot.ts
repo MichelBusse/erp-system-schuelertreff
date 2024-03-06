@@ -2,7 +2,10 @@ import { IsInt, Max, Min } from 'class-validator'
 
 import { IsTime24h } from 'src/IsTime24h.decorator'
 
-export class timeAvailable {
+/**
+ * Model for a TimeSlot
+ */ 
+export class TimeSlot {
   @IsInt()
   @Min(1)
   @Max(5)

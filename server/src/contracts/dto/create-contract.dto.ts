@@ -5,6 +5,9 @@ import { IsValidDate } from 'src/IsValidDate.decorator'
 
 import { ContractState } from '../contract.entity'
 
+/**
+ * Schema for creating a contract
+ */ 
 export class CreateContractDto {
   customers: number[]
 

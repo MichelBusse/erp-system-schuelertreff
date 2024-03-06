@@ -3,7 +3,7 @@ import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'
 import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 
-import { CreateSubjectDto } from './dto/create-subject.dto'
+import { SubjectDto } from './dto/subject.dto'
 import { Subject } from './subject.entity'
 import { SubjectsService } from './subjects.service'
 
@@ -15,14 +15,14 @@ export class SubjectsController {
   @Post(':id')
   update(
     @Param('id') id: number,
-    @Body() updateSubjectDto: CreateSubjectDto,
+    @Body() updateSubjectDto: SubjectDto,
   ): Promise<Subject> {
     return this.subjectsService.update(id, updateSubjectDto)
   }
 
   @Roles(Role.ADMIN)
   @Post()
-  create(@Body() createSubjectDto: CreateSubjectDto): Promise<Subject> {
+  create(@Body() createSubjectDto: SubjectDto): Promise<Subject> {
     return this.subjectsService.create(createSubjectDto)
   }
 

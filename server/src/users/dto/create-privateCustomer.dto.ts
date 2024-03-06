@@ -9,8 +9,11 @@ import {
 
 import { SchoolType } from '../entities/user.entity'
 import { CreateUserDto } from './create-user.dto'
-import { timeAvailable } from './timeAvailable'
+import { TimeSlot } from '../models/TimeSlot'
 
+/**
+ * Schema for creating a private customer
+ */ 
 export class CreatePrivateCustomerDto extends CreateUserDto {
   @IsNotEmpty()
   lastName: string
@@ -19,9 +22,9 @@ export class CreatePrivateCustomerDto extends CreateUserDto {
   firstName: string
 
   @IsArray()
-  @Type(() => timeAvailable)
+  @Type(() => TimeSlot)
   @ValidateNested({ each: true })
-  timesAvailable: timeAvailable[]
+  timesAvailable: TimeSlot[]
 
   @IsEnum(SchoolType)
   schoolType: SchoolType

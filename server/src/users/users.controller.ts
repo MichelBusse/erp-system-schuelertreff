@@ -22,7 +22,6 @@ import { Roles } from 'src/auth/decorators/roles.decorator'
 import { Role } from 'src/auth/role.enum'
 import { Document } from 'src/documents/document.entity'
 
-import { ApplicationMeetingRequestDto } from './dto/application-meeting-request.dto'
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
@@ -44,6 +43,7 @@ import {
 } from './entities'
 import { Leave, LeaveState } from './entities/leave.entity'
 import { UsersService } from './users.service'
+import { RequestApplicationMeetingDto } from './dto/request-application-meeting.dto'
 
 @Controller('users')
 export class UsersController {
@@ -333,7 +333,7 @@ export class UsersController {
   @Roles(Role.ADMIN)
   async sendApplicationMeetingRequest(
     @Param('id') id: number,
-    @Body() dto: ApplicationMeetingRequestDto,
+    @Body() dto: RequestApplicationMeetingDto,
   ): Promise<Teacher> {
     return this.usersService.sendApplicationMeetingRequest(id, dto)
   }

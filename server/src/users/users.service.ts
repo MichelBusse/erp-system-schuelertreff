@@ -27,14 +27,12 @@ import {
   employmentMail,
 } from 'src/mailTexts'
 
-import { ApplicationMeetingRequestDto } from './dto/application-meeting-request.dto'
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { CreateClassCustomerDto } from './dto/create-classCustomer.dto'
 import { CreatePrivateCustomerDto } from './dto/create-privateCustomer.dto'
 import { CreateSchoolDto } from './dto/create-school.dto'
 import { CreateTeacherDto } from './dto/create-teacher.dto'
 import { LeaveDto } from './dto/leave.dto'
-import { timeAvailable } from './dto/timeAvailable'
 import { UpdateClassCustomerDto } from './dto/update-classCustomer.dto'
 import { UpdatePrivateCustomerDto } from './dto/update-privateCustomer.dto'
 import { UpdateSchoolDto } from './dto/update-school.dto'
@@ -53,6 +51,8 @@ import { Leave, LeaveState } from './entities/leave.entity'
 import { SchoolState } from './entities/school.entity'
 import { TeacherState } from './entities/teacher.entity'
 import { DeleteState, maxTimeRange } from './entities/user.entity'
+import { RequestApplicationMeetingDto } from './dto/request-application-meeting.dto'
+import { TimeSlot } from './models/TimeSlot'
 
 require('dayjs/locale/de')
 
@@ -67,7 +67,7 @@ const allowedStateTransitions: Record<TeacherState, TeacherState[]> = {
 /**
  * Format Array of {@link timeAvailable} as Postgres `tstzmultirange`
  */
-export function formatTimesAvailable(times: timeAvailable[]) {
+export function formatTimesAvailable(times: TimeSlot[]) {
   if (times.length === 0) return `{${maxTimeRange}}`
 
   return `{${times
@@ -81,7 +81,7 @@ export function formatTimesAvailable(times: timeAvailable[]) {
 /**
  * Parse Postgres `tstzmultirange` literal to Array of {@link timeAvailable}
  */
-export function parseMultirange(multirange: string): timeAvailable[] {
+export function parseMultirange(multirange: string): TimeSlot[] {
   const regex = /\["?([^",]*)"?, ?"?([^",]*)"?\)/g
 
   return [...multirange.matchAll(regex)].map((range) => {
@@ -98,7 +98,7 @@ export function parseMultirange(multirange: string): timeAvailable[] {
 
 function transformUser<U extends User>(
   user: U,
-): U & { timesAvailableParsed: timeAvailable[] } {
+): U & { timesAvailableParsed: TimeSlot[] } {
   return {
     ...user,
     timesAvailableParsed: parseMultirange(user.timesAvailable),
@@ -675,7 +675,7 @@ export class UsersService {
 
   async sendApplicationMeetingRequest(
     id: number,
-    dto: ApplicationMeetingRequestDto,
+    dto: RequestApplicationMeetingDto,
   ): Promise<Teacher> {
     const user = await this.findOneTeacher(id)
 

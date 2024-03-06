@@ -5,9 +5,11 @@ import {
   IsOptional,
   ValidateNested,
 } from 'class-validator'
+import { TimeSlot } from '../models/TimeSlot'
 
-import { timeAvailable } from './timeAvailable'
-
+/**
+ * Schema for updating a user
+ */ 
 export class UpdateUserDto {
   @IsOptional()
   @IsNotEmpty()
@@ -35,7 +37,7 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsArray()
-  @Type(() => timeAvailable)
+  @Type(() => TimeSlot)
   @ValidateNested({ each: true })
-  timesAvailable: timeAvailable[]
+  timesAvailable: TimeSlot[]
 }

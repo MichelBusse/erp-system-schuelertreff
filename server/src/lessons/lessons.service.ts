@@ -23,9 +23,9 @@ import { ClassCustomer, PrivateCustomer } from 'src/users/entities'
 import { Leave, LeaveState } from 'src/users/entities/leave.entity'
 import { UsersService } from 'src/users/users.service'
 
-import { CreateLessonDto } from './dto/create-lesson.dto'
 import { Invoice } from './invoice.entity'
 import { Lesson, LessonState } from './lesson.entity'
+import { LessonDto } from './dto/lesson.dto'
 
 require('dayjs/locale/de')
 
@@ -74,7 +74,7 @@ export class LessonsService {
   ) {}
 
   async updateOrCreate(
-    dto: CreateLessonDto,
+    dto: LessonDto,
     teacherId?: number,
   ): Promise<Lesson> {
     let lesson = await this.lessonsRepository.findOne({
